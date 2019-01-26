@@ -1,6 +1,7 @@
 config/private.*
 bin/
 pkg/
+tmp/
 
 # Binaries for programs and plugins
 *.exe

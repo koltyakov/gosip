@@ -8,17 +8,16 @@ import (
 	"github.com/denisbrodbeck/machineid" // port cpass's implementation
 )
 
-func getMachineID(original bool) string {
-	guid, err := machineid.ID()
+func getMachineID(original bool) (machineID string, err error) {
+	machineID, err = machineid.ID()
 	if err != nil {
-		panic(err)
+		return
 	}
-	guid = strings.ToLower(guid)
+	machineID = strings.ToLower(machineID)
 	if !original {
 		hasher := sha256.New()
-		hasher.Write([]byte(guid))
-		// guid = fmt.Sprintf("%x", hasher.Sum(nil))
-		guid = hex.EncodeToString(hasher.Sum(nil))
+		hasher.Write([]byte(machineID))
+		machineID = hex.EncodeToString(hasher.Sum(nil))
 	}
-	return guid
+	return
 }

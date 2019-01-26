@@ -7,20 +7,17 @@ import (
 )
 
 func main() {
-	c := cpass.NewCpass("")
-	myString := "\\\"My string\\\""
+	c := cpass.Cpass("")
+	myString := "secret"
 	fmt.Printf("Original: %s\n", myString)
-
-	encoded, _ := c.Encrypt([]byte(myString))
-	fmt.Printf("Encoded: %x\n", encoded)
-
-	decoded, _ := c.Decrypt(encoded)
-	fmt.Printf("Decoded: %s\n", decoded)
 
 	encodedStr, _ := c.Encode(myString)
 	fmt.Printf("encodedStr: %s\n", encodedStr)
 
 	decodedStr, _ := c.Decode(encodedStr)
 	fmt.Printf("decodedStr: %s\n", decodedStr)
+
+	cpassFromNodeJS, _ := c.Decode("eefd0b898b9c9aa80b6ced46204ba228JpCTeYtSJSBjdxZrRk24kg==")
+	fmt.Printf("cpassFromNodeJS: %s\n", cpassFromNodeJS)
 
 }
