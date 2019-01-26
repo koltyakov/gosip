@@ -1,6 +1,8 @@
 package cpass
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestUsingMachineID(t *testing.T) {
 	const secret = "secret"
@@ -20,5 +22,25 @@ func TestUsingMachineID(t *testing.T) {
 	}
 	if secret != decoded {
 		t.Error("Got decription error")
+	}
+}
+
+func TestCustomEncryptionKey(t *testing.T) {
+	const secret = "secret"
+	c1 := Cpass("")
+	c2 := Cpass("CUSTOM_KEY")
+
+	encoded1, err := c1.Encode(secret)
+	if err != nil {
+		t.Error(err)
+	}
+
+	encoded2, err := c2.Encode(secret)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if encoded1 == encoded2 {
+		t.Error("Got encryption error")
 	}
 }

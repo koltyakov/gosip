@@ -1,6 +1,8 @@
 package cpass
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetMachineID(t *testing.T) {
 	machineID, err := getMachineID(true)
