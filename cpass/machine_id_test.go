@@ -1,0 +1,10 @@
+package cpass
+
+import "testing"
+
+func TestGetMachineID(t *testing.T) {
+	machineID := getMachineID(true)
+	if machineID == "" {
+		t.Error("Got empty machine id")
+	}
+}

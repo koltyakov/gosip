@@ -1,0 +1,7 @@
+{
+  "files.trimTrailingWhitespace": true,
+  "editor.tabSize": 2,
+  "editor.autoIndent": true,
+  "editor.renderWhitespace": "all",
+  "window.zoomLevel": 0
+}
