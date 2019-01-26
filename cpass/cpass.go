@@ -1,10 +1,5 @@
 package cpass
 
-import (
-	"encoding/hex"
-	"fmt"
-)
-
 // Crypter - cpass module structure
 type Crypter struct {
 	encryptionKey []byte
@@ -20,7 +15,6 @@ func Cpass(masterKey string) *Crypter {
 			masterKey = key
 		}
 	}
-	fmt.Println(hex.EncodeToString(hashCipherKey(masterKey)))
 	return &Crypter{hashCipherKey(masterKey)}
 }
 
