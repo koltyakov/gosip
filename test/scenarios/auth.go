@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path"
+	"runtime"
 	"time"
 
 	"github.com/koltyakov/gosip/auth/onlineaddinonly"
@@ -16,7 +18,9 @@ func GetAuthTest() {
 	startAtProc := time.Now()
 	startAt := time.Now()
 
-	config, err := cnfg.InitAuthConfigAddinOnly("./config/private.addinonly.json", "")
+	_, filename, _, _ := runtime.Caller(1)
+	configPath := path.Join(path.Dir(filename), "../../config/private.addinonly.json")
+	config, err := cnfg.InitAuthConfigAddinOnly(configPath, "")
 	if err != nil {
 		fmt.Printf("unable to get config: %v", err)
 		return
@@ -33,6 +37,17 @@ func GetAuthTest() {
 	// fmt.Printf("auth token: %s\n", authToken)
 	fmt.Printf("authenticated in, sec: %f\n", time.Since(startAt).Seconds())
 	startAt = time.Now()
+
+	///
+	authToken, err = onlineaddinonly.GetAuth(config)
+	if err != nil {
+		fmt.Printf("unable to get auth: %v", err)
+		return
+	}
+	// fmt.Printf("auth token: %s\n", authToken)
+	fmt.Printf("second auth in, sec: %f\n", time.Since(startAt).Seconds())
+	startAt = time.Now()
+	///
 
 	apiEndpoint := config.SiteURL + "/_api/web?$select=Title"
 	req, err := http.NewRequest("GET", apiEndpoint, nil)

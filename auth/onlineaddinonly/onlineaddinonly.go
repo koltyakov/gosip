@@ -8,12 +8,23 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/koltyakov/gosip/cnfg"
+	cache "github.com/patrickmn/go-cache"
+)
+
+var (
+	storage = cache.New(5*time.Minute, 10*time.Minute)
 )
 
 // GetAuth : get auth
 func GetAuth(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
+	cacheKey := creds.SiteURL + "@clientid-" + creds.ClientID
+	if accessToken, found := storage.Get(cacheKey); found {
+		return accessToken.(string), nil
+	}
+
 	parsedURL, err := url.Parse(creds.SiteURL)
 	if err != nil {
 		return "", err
@@ -30,7 +41,7 @@ func GetAuth(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
 		return "", err
 	}
 
-	servicePrincipal := "00000003-0000-0ff1-ce00-000000000000" // TODO: mode to constance
+	servicePrincipal := "00000003-0000-0ff1-ce00-000000000000" // TODO: move to constants
 	resource := fmt.Sprintf("%s/%s@%s", servicePrincipal, parsedURL.Hostname(), creds.Realm)
 	fullClientID := fmt.Sprintf("%s@%s", creds.ClientID, creds.Realm)
 
@@ -82,12 +93,12 @@ func GetAuth(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
 	}
 
 	type getAuthResponse struct {
-		ExpiresOn   int32  `json:"expires_on,string"`
-		Resource    string `json:"resource"`
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"`
-		ExpiresIn   int32  `json:"expires_in,string"`
-		NotBefore   int32  `json:"not_before,string"`
+		// ExpiresOn   int32  `json:"expires_on,string"`
+		// Resource    string `json:"resource"`
+		AccessToken string        `json:"access_token"`
+		TokenType   string        `json:"token_type"`
+		ExpiresIn   time.Duration `json:"expires_in,string"`
+		// NotBefore   int32  `json:"not_before,string"`
 	}
 
 	results := &getAuthResponse{}
@@ -97,9 +108,7 @@ func GetAuth(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
 		return "", err
 	}
 
-	// TODO: cache
-
-	// fmt.Printf("Token: %s\n", results.AccessToken)
+	storage.Set(cacheKey, results.AccessToken, (results.ExpiresIn-60)*time.Second)
 
 	return results.AccessToken, nil
 
@@ -107,6 +116,12 @@ func GetAuth(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
 
 func getAuthURL(realm string) (string, error) {
 	endpoint := getAcsRealmURL(realm)
+
+	cacheKey := endpoint
+	if authURL, found := storage.Get(cacheKey); found {
+		return authURL.(string), nil
+	}
+
 	resp, err := http.Get(endpoint)
 	if err != nil {
 		return "", err
@@ -134,6 +149,7 @@ func getAuthURL(realm string) (string, error) {
 
 	for _, endpoint := range results.Endpoints {
 		if endpoint.Protocol == "OAuth2" {
+			storage.Set(cacheKey, endpoint.Location, 60*time.Minute)
 			return endpoint.Location, nil
 		}
 	}
@@ -144,6 +160,11 @@ func getAuthURL(realm string) (string, error) {
 func getRealm(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
 	if creds.Realm != "" {
 		return creds.Realm, nil
+	}
+
+	cacheKey := creds.SiteURL + "@realm"
+	if realm, found := storage.Get(cacheKey); found {
+		return realm.(string), nil
 	}
 
 	endpoint := creds.SiteURL + "/_vti_bin/client.svc"
@@ -166,6 +187,7 @@ func getRealm(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
 	for _, part := range strings.Split(authHeader, `",`) {
 		p := strings.Split(part, `="`)
 		if p[0] == "Bearer realm" {
+			storage.Set(cacheKey, p[0], 60*time.Minute)
 			return p[1], nil
 		}
 	}
