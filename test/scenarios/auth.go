@@ -13,6 +13,7 @@ import (
 
 // GetAuthTest : get auth test scenario
 func GetAuthTest() {
+	startAtProc := time.Now()
 	startAt := time.Now()
 
 	config, err := cnfg.InitAuthConfigAddinOnly("./config/private.addinonly.json", "")
@@ -21,14 +22,17 @@ func GetAuthTest() {
 		return
 	}
 	fmt.Printf("config: %v\n", config)
+	fmt.Printf("config read in, sec: %f\n", time.Since(startAt).Seconds())
+	startAt = time.Now()
 
 	authToken, err := onlineaddinonly.GetAuth(config)
 	if err != nil {
 		fmt.Printf("unable to get auth: %v", err)
 		return
 	}
-
-	fmt.Printf("auth token: %s\n", authToken)
+	// fmt.Printf("auth token: %s\n", authToken)
+	fmt.Printf("authenticated in, sec: %f\n", time.Since(startAt).Seconds())
+	startAt = time.Now()
 
 	apiEndpoint := config.SiteURL + "/_api/web?$select=Title"
 	req, err := http.NewRequest("GET", apiEndpoint, nil)
@@ -67,8 +71,9 @@ func GetAuthTest() {
 		return
 	}
 
-	fmt.Printf("\nWeb title: %v\n", results.Title)
-
-	fmt.Printf("Took seconds: %f\n", time.Since(startAt).Seconds())
+	fmt.Println("=== Response from API ===")
+	fmt.Printf("Web title: %v\n", results.Title)
+	fmt.Printf("api requested in, sec: %f\n", time.Since(startAt).Seconds())
+	fmt.Printf("summary time, sec: %f\n", time.Since(startAtProc).Seconds())
 
 }

@@ -19,6 +19,12 @@ func GetAuth(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
 		return "", err
 	}
 
+	realm, err := getRealm(creds)
+	if err != nil {
+		return "", err
+	}
+	creds.Realm = realm
+
 	authURL, err := getAuthURL(creds.Realm)
 	if err != nil {
 		return "", err
@@ -60,8 +66,6 @@ func GetAuth(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
 	// if err != nil {
 	// 	return "", err
 	// }
-
-	fmt.Println(authURL)
 
 	// proxyURL, _ := url.Parse("http://127.0.0.1:8888")
 	// http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyURL), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
@@ -135,6 +139,38 @@ func getAuthURL(realm string) (string, error) {
 	}
 
 	return "", errors.New("No OAuth2 protocol location found")
+}
+
+func getRealm(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
+	if creds.Realm != "" {
+		return creds.Realm, nil
+	}
+
+	endpoint := creds.SiteURL + "/_vti_bin/client.svc"
+	req, err := http.NewRequest("POST", endpoint, nil)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Authorization", "Bearer ")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	authHeader := resp.Header.Get("www-authenticate")
+
+	for _, part := range strings.Split(authHeader, `",`) {
+		p := strings.Split(part, `="`)
+		if p[0] == "Bearer realm" {
+			return p[1], nil
+		}
+	}
+
+	return "", errors.New("Wasn't able to get Realm")
 }
 
 func getAcsRealmURL(realm string) string {
