@@ -16,19 +16,19 @@ type AuthCnfg struct {
 }
 
 // InitAuthConfig constructs auth config
-func InitAuthConfig(privateFile, masterKey string) (config *AuthCnfg, err error) {
+func InitAuthConfig(privateFile, masterKey string) (*AuthCnfg, error) {
 	jsonFile, err := os.Open(privateFile)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer jsonFile.Close()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
-	config = &AuthCnfg{}
+	config := &AuthCnfg{}
 	json.Unmarshal(byteValue, &config)
 
 	c := cpass.Cpass(masterKey)
 	config.Password, _ = c.Decode(config.Password)
 
-	return
+	return config, nil
 }
