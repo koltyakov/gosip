@@ -22,9 +22,9 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	}
 
 	cacheKey := parsedURL.Host + "@tmg@" + creds.Username + "@" + creds.Password
-	// if accessToken, found := storage.Get(cacheKey); found {
-	// 	return accessToken.(string), nil
-	// }
+	if accessToken, found := storage.Get(cacheKey); found {
+		return accessToken.(string), nil
+	}
 
 	endpoint := fmt.Sprintf("%s://%s/CookieAuth.dll?Logon", parsedURL.Scheme, parsedURL.Host)
 
