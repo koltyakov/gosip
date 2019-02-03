@@ -18,7 +18,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Hostname() + "@basic@" + creds.Username + "@" + creds.Password
+	cacheKey := parsedURL.Host + "@basic@" + creds.Username + "@" + creds.Password
 	if accessToken, found := storage.Get(cacheKey); found {
 		return accessToken.(string), nil
 	}

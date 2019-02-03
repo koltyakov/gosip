@@ -24,7 +24,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Hostname() + "@addinonly@" + creds.ClientID + "@" + creds.ClientSecret
+	cacheKey := parsedURL.Host + "@addinonly@" + creds.ClientID + "@" + creds.ClientSecret
 	if accessToken, found := storage.Get(cacheKey); found {
 		return accessToken.(string), nil
 	}
@@ -41,7 +41,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	}
 
 	servicePrincipal := "00000003-0000-0ff1-ce00-000000000000" // TODO: move to constants
-	resource := fmt.Sprintf("%s/%s@%s", servicePrincipal, parsedURL.Hostname(), creds.Realm)
+	resource := fmt.Sprintf("%s/%s@%s", servicePrincipal, parsedURL.Host, creds.Realm)
 	fullClientID := fmt.Sprintf("%s@%s", creds.ClientID, creds.Realm)
 
 	// type getAuthForm struct {
@@ -166,7 +166,7 @@ func getRealm(creds *AuthCnfg) (string, error) {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Hostname() + "@realm"
+	cacheKey := parsedURL.Host + "@realm"
 	if realm, found := storage.Get(cacheKey); found {
 		return realm.(string), nil
 	}

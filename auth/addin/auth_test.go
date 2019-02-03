@@ -8,7 +8,7 @@ import (
 
 func TestGettingAuthToken(t *testing.T) {
 	auth := &AuthCnfg{}
-	err := auth.ReadConfig("../../config/private.addinonly.json")
+	err := auth.ReadConfig("../../config/private.addin.json")
 
 	if err != nil {
 		t.Error(err)
