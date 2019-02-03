@@ -25,7 +25,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Hostname() + "@adfs@" + creds.Username + "@" + creds.Password
+	cacheKey := parsedURL.Host + "@adfs@" + creds.Username + "@" + creds.Password
 	if authCookie, found := storage.Get(cacheKey); found {
 		return authCookie.(string), nil
 	}
@@ -35,13 +35,16 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		return "", err
 	}
 
-	tokenResp, err := postTokenData(token, notBefore, notAfter, creds)
+	authCookie, err := postTokenData(token, notBefore, notAfter, creds)
 	if err != nil {
 		fmt.Printf("Post token error: %v\n", err)
 		return "", err
 	}
 
-	return tokenResp, nil
+	notAfterTime, _ := time.Parse(time.RFC3339, notAfter)
+	storage.Set(cacheKey, authCookie, (time.Until(notAfterTime)-60)*time.Second)
+
+	return authCookie, nil
 
 }
 
@@ -138,5 +141,4 @@ func postTokenData(token []byte, notBefore, notAfter string, creds *AuthCnfg) (s
 	cookie := resp.Header.Get("Set-Cookie") // TODO: parse ADFS cookie only (?)
 
 	return cookie, nil
-
 }
