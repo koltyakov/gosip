@@ -9,8 +9,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/koltyakov/gosip/auth/onlineaddinonly"
-	"github.com/koltyakov/gosip/cnfg"
+	"github.com/koltyakov/gosip/auth/spoaddinonly"
 )
 
 // GetAuthTest : get auth test scenario
@@ -20,16 +19,18 @@ func GetAuthTest() {
 
 	_, filename, _, _ := runtime.Caller(1)
 	configPath := path.Join(path.Dir(filename), "../../config/private.addinonly.json")
-	config, err := cnfg.InitAuthConfigAddinOnly(configPath, "")
+
+	auth := &spoaddinonly.AuthCnfg{}
+	err := auth.ReadConfig(configPath)
 	if err != nil {
 		fmt.Printf("unable to get config: %v", err)
 		return
 	}
-	fmt.Printf("config: %v\n", config)
+	fmt.Printf("config: %v\n", auth)
 	fmt.Printf("config read in, sec: %f\n", time.Since(startAt).Seconds())
 	startAt = time.Now()
 
-	authToken, err := onlineaddinonly.GetAuth(config)
+	authToken, err := auth.GetAuth()
 	if err != nil {
 		fmt.Printf("unable to get auth: %v", err)
 		return
@@ -39,17 +40,17 @@ func GetAuthTest() {
 	startAt = time.Now()
 
 	///
-	authToken, err = onlineaddinonly.GetAuth(config)
+	authToken, err = auth.GetAuth()
 	if err != nil {
 		fmt.Printf("unable to get auth: %v", err)
 		return
 	}
 	// fmt.Printf("auth token: %s\n", authToken)
-	fmt.Printf("second auth in, sec: %f\n", time.Since(startAt).Seconds())
+	fmt.Printf("second auth (cached) in, sec: %f\n", time.Since(startAt).Seconds())
 	startAt = time.Now()
 	///
 
-	apiEndpoint := config.SiteURL + "/_api/web?$select=Title"
+	apiEndpoint := auth.SiteURL + "/_api/web?$select=Title"
 	req, err := http.NewRequest("GET", apiEndpoint, nil)
 	if err != nil {
 		fmt.Printf("unable to create a request: %v", err)

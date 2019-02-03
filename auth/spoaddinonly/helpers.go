@@ -1,4 +1,4 @@
-package onlineaddinonly
+package spoaddinonly
 
 import (
 	"encoding/json"
@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/koltyakov/gosip/cnfg"
 	cache "github.com/patrickmn/go-cache"
 )
 
@@ -19,15 +18,15 @@ var (
 )
 
 // GetAuth : get auth
-func GetAuth(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
-	cacheKey := creds.SiteURL + "@clientid-" + creds.ClientID
-	if accessToken, found := storage.Get(cacheKey); found {
-		return accessToken.(string), nil
-	}
-
+func GetAuth(creds *AuthCnfg) (string, error) {
 	parsedURL, err := url.Parse(creds.SiteURL)
 	if err != nil {
 		return "", err
+	}
+
+	cacheKey := parsedURL.Hostname() + "@addinonly@" + creds.ClientID + "@" + creds.ClientSecret
+	if accessToken, found := storage.Get(cacheKey); found {
+		return accessToken.(string), nil
 	}
 
 	realm, err := getRealm(creds)
@@ -115,7 +114,7 @@ func GetAuth(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
 }
 
 func getAuthURL(realm string) (string, error) {
-	endpoint := getAcsRealmURL(realm)
+	endpoint := fmt.Sprintf("https://%s/metadata/json/1?realm=%s", "accounts.accesscontrol.windows.net", realm) // TODO: Add endpoint mapping
 
 	cacheKey := endpoint
 	if authURL, found := storage.Get(cacheKey); found {
@@ -157,12 +156,17 @@ func getAuthURL(realm string) (string, error) {
 	return "", errors.New("No OAuth2 protocol location found")
 }
 
-func getRealm(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
+func getRealm(creds *AuthCnfg) (string, error) {
 	if creds.Realm != "" {
 		return creds.Realm, nil
 	}
 
-	cacheKey := creds.SiteURL + "@realm"
+	parsedURL, err := url.Parse(creds.SiteURL)
+	if err != nil {
+		return "", err
+	}
+
+	cacheKey := parsedURL.Hostname() + "@realm"
 	if realm, found := storage.Get(cacheKey); found {
 		return realm.(string), nil
 	}
@@ -193,8 +197,4 @@ func getRealm(creds *cnfg.AuthCnfgAddinOnly) (string, error) {
 	}
 
 	return "", errors.New("Wasn't able to get Realm")
-}
-
-func getAcsRealmURL(realm string) string {
-	return fmt.Sprintf("https://%s/metadata/json/1?realm=%s", "accounts.accesscontrol.windows.net", realm) // TODO: Add endpoint mapping
 }

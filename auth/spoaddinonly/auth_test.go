@@ -1,26 +1,26 @@
-package onlineaddinonly
+package spoaddinonly
 
 import (
 	"fmt"
 	"testing"
 	"time"
-
-	"github.com/koltyakov/gosip/cnfg"
 )
 
 func TestGettingAuthToken(t *testing.T) {
-	config, err := cnfg.InitAuthConfigAddinOnly("../../config/private.addinonly.json", "")
+	auth := &AuthCnfg{}
+	err := auth.ReadConfig("../../config/private.addinonly.json")
+
 	if err != nil {
 		t.Error(err)
 	}
-	if config.SiteURL == "" {
+	if auth.SiteURL == "" {
 		t.Error("Got empty config property")
 	}
-	if config.ClientID == "" || config.ClientSecret == "" {
+	if auth.ClientID == "" || auth.ClientSecret == "" {
 		t.Error("Doesn't contain clientId and/or secretId properties")
 	}
 
-	token, err := GetAuth(config)
+	token, err := auth.GetAuth()
 	if err != nil {
 		t.Error(err)
 	}
@@ -30,7 +30,7 @@ func TestGettingAuthToken(t *testing.T) {
 
 	// Second auth should involve caching and be instant
 	startAt := time.Now()
-	token, err = GetAuth(config)
+	token, err = auth.GetAuth()
 	if err != nil {
 		t.Error(err)
 	}
