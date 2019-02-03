@@ -2,6 +2,7 @@ config/private.*
 bin/
 pkg/
 tmp/
+debug/
 
 # Binaries for programs and plugins
 *.exe

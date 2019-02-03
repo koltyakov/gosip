@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/koltyakov/gosip/cpass"
 )
@@ -11,9 +12,9 @@ import (
 // AuthCnfg : auth config structure
 type AuthCnfg struct {
 	SiteURL  string `json:"siteUrl"`
+	Domain   string `json:"domain"`
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Domain   string `json:"domain"`
 
 	masterKey string
 }
@@ -33,6 +34,10 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 	pass, err := crypt.Decode(c.Password)
 	if err == nil {
 		c.Password = pass
+	}
+
+	if c.Domain != "" && !strings.Contains(c.Username, "\\") && !strings.Contains(c.Username, "@") {
+		c.Username = c.Domain + "\\" + c.Username
 	}
 
 	return nil
