@@ -12,6 +12,7 @@ func main() {
 	// s.ConfigReaderSpoAddinOnlyTest()
 
 	// s.GetAddinAuthTest()
-	s.GetAdfsAuthTest()
+	// s.GetAdfsAuthTest()
+	s.GetBasicAuthTest()
 
 }
