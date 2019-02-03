@@ -1,5 +1,8 @@
 # gosip - SharePoint authentication client for Golang
 
+> This is early draft version. Lot's of improvements and breaking changes are expected in the near future until GA version is proclaimed.<br>
+> Don't through bananas at me, it's my first steps in experiments in Golang field. =)
+
 ## Main features
 
 `gosip` allows you to perform SharePoint unattended (without user interaction) http authentication with Go (Golang) using different authentication strategies.
