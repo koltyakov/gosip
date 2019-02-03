@@ -13,6 +13,7 @@ func main() {
 
 	// s.GetAddinAuthTest()
 	// s.GetAdfsAuthTest()
-	s.GetBasicAuthTest()
+	// s.GetBasicAuthTest()
+	s.GetFbaAuthTest()
 
 }
