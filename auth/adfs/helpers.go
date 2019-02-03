@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/koltyakov/gosip/templates"
 	cache "github.com/patrickmn/go-cache"
 )
 
@@ -54,7 +55,7 @@ func getSamlAssertion(creds *AuthCnfg) ([]byte, string, string, error) {
 	}
 
 	usernameMixedURL := fmt.Sprintf("%s://%s/adfs/services/trust/13/usernamemixed", parsedAdfsURL.Scheme, parsedAdfsURL.Host)
-	samlBody, err := buildAdfsSamlWsfedTemplate(usernameMixedURL, creds.Username, creds.Password, creds.RelyingParty)
+	samlBody, err := templates.AdfsSamlWsfedTemplate(usernameMixedURL, creds.Username, creds.Password, creds.RelyingParty)
 	if err != nil {
 		return []byte(""), "", "", err
 	}
@@ -105,7 +106,7 @@ func getSamlAssertion(creds *AuthCnfg) ([]byte, string, string, error) {
 }
 
 func postTokenData(token []byte, notBefore, notAfter string, creds *AuthCnfg) (string, error) {
-	wresult, err := buildAdfsSamlTokenTemplate(token, notBefore, notAfter, creds.RelyingParty)
+	wresult, err := templates.AdfsSamlTokenTemplate(token, notBefore, notAfter, creds.RelyingParty)
 	if err != nil {
 		return "", err
 	}

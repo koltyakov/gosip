@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/koltyakov/gosip/templates"
 	cache "github.com/patrickmn/go-cache"
 )
 
@@ -30,7 +31,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	}
 
 	endpoint := fmt.Sprintf("%s://%s/_vti_bin/authentication.asmx", parsedURL.Scheme, parsedURL.Host)
-	soapBody, err := buildFbaWsTemplate(creds.Username, creds.Password)
+	soapBody, err := templates.FbaWsTemplate(creds.Username, creds.Password)
 	if err != nil {
 		return "", err
 	}
