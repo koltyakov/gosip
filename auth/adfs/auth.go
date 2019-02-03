@@ -1,17 +1,21 @@
-package spoaddinonly
+package adfs
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+
+	"github.com/koltyakov/gosip/cpass"
 )
 
 // AuthCnfg : auth config structure
 type AuthCnfg struct {
 	SiteURL      string `json:"siteUrl"`
-	ClientID     string `json:"clientId"`
-	ClientSecret string `json:"clientSecret"`
-	Realm        string `json:"realm"`
+	Username     string `json:"username"`
+	Password     string `json:"password"`
+	RelyingParty string `json:"relyingParty"`
+	AdfsURL      string `json:"adfsUrl"`
+	AdfsCookie   string `json:"adfsCookie"`
 
 	masterKey string
 }
@@ -26,6 +30,12 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	json.Unmarshal(byteValue, &c)
+
+	crypt := cpass.Cpass(c.masterKey)
+	pass, err := crypt.Decode(c.Password)
+	if err == nil {
+		c.Password = pass
+	}
 
 	return nil
 }

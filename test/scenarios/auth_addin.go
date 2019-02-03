@@ -9,18 +9,18 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/koltyakov/gosip/auth/spoaddinonly"
+	"github.com/koltyakov/gosip/auth/addin"
 )
 
-// GetAuthTest : get auth test scenario
-func GetAuthTest() {
+// GetAddinAuthTest : get auth test scenario
+func GetAddinAuthTest() {
 	startAtProc := time.Now()
 	startAt := time.Now()
 
 	_, filename, _, _ := runtime.Caller(1)
-	configPath := path.Join(path.Dir(filename), "../../config/private.addinonly.json")
+	configPath := path.Join(path.Dir(filename), "../../config/private.addin.json")
 
-	auth := &spoaddinonly.AuthCnfg{}
+	auth := &addin.AuthCnfg{}
 	err := auth.ReadConfig(configPath)
 	if err != nil {
 		fmt.Printf("unable to get config: %v", err)
@@ -58,7 +58,6 @@ func GetAuthTest() {
 	}
 
 	req.Header.Set("Accept", "application/json;odata=minimalmetadata")
-	// req.Header.Set("Content-Type", "application/json;odata=minimalmetadata")
 	req.Header.Set("Authorization", "Bearer "+authToken)
 
 	client := &http.Client{}

@@ -3,7 +3,7 @@ package scenarios
 import (
 	"fmt"
 
-	"github.com/koltyakov/gosip/auth/spoaddinonly"
+	"github.com/koltyakov/gosip/auth/addin"
 	"github.com/koltyakov/gosip/cnfg"
 )
 
@@ -15,8 +15,8 @@ func ConfigReaderTest() {
 
 // ConfigReaderSpoAddinOnlyTest : test scenario
 func ConfigReaderSpoAddinOnlyTest() {
-	config := &spoaddinonly.AuthCnfg{}
-	err := config.ReadConfig("./config/private.addinonly.json")
+	config := &addin.AuthCnfg{}
+	err := config.ReadConfig("./config/private.addin.json")
 	if err != nil {
 		fmt.Printf("Error reading config: %v", err)
 		return

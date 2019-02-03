@@ -1,4 +1,4 @@
-package spoaddinonly
+package addin
 
 import (
 	"encoding/json"
