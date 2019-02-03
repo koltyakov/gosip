@@ -1,6 +1,4 @@
 package gosip
 
-// GetID returns the platform specific machine id of the current host OS.
-func GetID() string {
-	return ""
-}
+// TODO: Expose generic version of SPAuth strategy
+// currently, "github.com/koltyakov/gosip/auth/[strategy_name]" should be imported
