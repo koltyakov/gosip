@@ -1,36 +1,3 @@
-# gosip - SharePoint authentication client for Golang
-
-## Main features
-
-`gosip` allows you to perform SharePoint unattended (without user interaction) http authentication with Go (Golang) using different authentication strategies.
-
-Supported SharePoint versions:
-
-- SharePoint Online (SPO)
-- On-Prem: 2019, 2016, and 2013
-
-Authentication strategies:
-
-- SharePoint 2013, 2016, 2019:
-  - ADFS user credentials
-  - Form-based authentication (FBA)
-  - Forefront TMG authentication
-- SharePoint Online:
-  - Addin only permissions
-  - SAML based with user credentials
-  - ADFS user credentials
-
-## Installation
-
-```bash
-go get github.com/koltyakov/gosip
-```
-
-## Usage samples
-
-### Addin Only Permissions
-
-```golang
 package main
 
 import (
@@ -92,22 +59,5 @@ func main() {
 	}
 
 	fmt.Println("=== Response from API ===")
-	fmt.Printf("Web title: %s\n", results.Title)
+	fmt.Printf("Web title: %v\n", results.Title)
 }
-```
-
-## Tests
-
-### Run autometed tests
-
-```bash
-go test ./...
-```
-
-### Run manual test
-
-Modify `cmd/gosip/main.go` to include required scenarios and run:
-
-```bash
-go run cmd/gosip/main.go
-```
