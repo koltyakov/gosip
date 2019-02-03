@@ -75,6 +75,7 @@ func getSecurityToken(creds *AuthCnfg) (string, string, error) {
 		State               int    `json:"State"`
 		UserState           int    `json:"UserState"`
 		Login               string `json:"Login"`
+		AuthURL             string `json"AuthURL"`
 	}
 
 	userRealm := &userReadlmResponse{}
@@ -93,7 +94,7 @@ func getSecurityToken(creds *AuthCnfg) (string, string, error) {
 	}
 
 	if userRealm.NameSpaceType == "Federated" {
-		// return getSecurityTokenWithAdfs(userRealm.AuthURL)
+		return getSecurityTokenWithAdfs(userRealm.AuthURL, creds)
 	}
 
 	return "", "", fmt.Errorf("Unable to resolve namespace authentiation type. Type received: %s", userRealm.NameSpaceType)
@@ -174,6 +175,117 @@ func getSecurityTokenWithOnline(creds *AuthCnfg) (string, string, error) {
 	return authCookie, result.Response.Lifetime.Expires, nil
 }
 
-// func getSecurityTokenWithAdfs() {
-// 	// Reuse ADFS helpers
-// }
+// TODO: test the method, it possibly contains issues and extra complexity
+func getSecurityTokenWithAdfs(adfsURL string, creds *AuthCnfg) (string, string, error) {
+	parsedAdfsURL, err := url.Parse(adfsURL)
+	if err != nil {
+		return "", "", err
+	}
+
+	usernameMixedURL := fmt.Sprintf("%s://%s/adfs/services/trust/13/usernamemixed", parsedAdfsURL.Scheme, parsedAdfsURL.Host)
+	samlBody, err := templates.AdfsSamlWsfedTemplate(usernameMixedURL, creds.Username, creds.Password, "urn:federation:MicrosoftOnline")
+	if err != nil {
+		return "", "", err
+	}
+
+	req, err := http.NewRequest("POST", usernameMixedURL, bytes.NewBuffer([]byte(samlBody)))
+	if err != nil {
+		return "", "", err
+	}
+
+	req.Header.Set("Content-Type", "application/soap+xml;charset=utf-8")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", "", err
+	}
+	defer resp.Body.Close()
+
+	res, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", "", err
+	}
+
+	// fmt.Printf("ADFS: %s\n", string(res))
+
+	type samlAssertion struct {
+		Fault    string `xml:"Body>Fault>Reason>Text"`
+		Response struct {
+			Token struct {
+				Inner      []byte `xml:",innerxml"`
+				Conditions struct {
+					NotBefore    string `xml:"NotBefore,attr"`
+					NotOnOrAfter string `xml:"NotOnOrAfter,attr"`
+				} `xml:"Assertion>Conditions"`
+			} `xml:"RequestedSecurityToken"`
+		} `xml:"Body>RequestSecurityTokenResponseCollection>RequestSecurityTokenResponse"`
+	}
+	result := &samlAssertion{}
+	if err := xml.Unmarshal(res, &result); err != nil {
+		return "", "", err
+	}
+
+	if result.Fault != "" {
+		return "", "", errors.New(result.Fault)
+	}
+
+	parsedURL, err := url.Parse(adfsURL)
+	if err != nil {
+		return "", "", err
+	}
+
+	rootSite := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
+	tokenRequest, err := templates.OnlineSamlWsfedAdfsTemplate(rootSite, string(result.Response.Token.Inner))
+
+	stsEndpoint := "https://login.microsoftonline.com/extSTS.srf" // TODO: mapping
+
+	req, err = http.NewRequest("POST", stsEndpoint, bytes.NewBuffer([]byte(tokenRequest)))
+	if err != nil {
+		return "", "", err
+	}
+
+	req.Header.Set("Content-Type", "application/soap+xml;charset=utf-8")
+
+	resp, err = client.Do(req)
+	if err != nil {
+		return "", "", err
+	}
+	defer resp.Body.Close()
+
+	xmlResponse, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", "", err
+	}
+
+	type tokenAssertion struct {
+		Fault    string `xml:"Body>Fault>Reason>Text"`
+		Response struct {
+			BinaryToken string `xml:"RequestedSecurityToken>BinarySecurityToken"`
+			Lifetime    struct {
+				Created string `xml:"Created"`
+				Expires string `xml:"Expires"`
+			} `xml:"Lifetime"`
+		} `xml:"Body>RequestSecurityTokenResponse"`
+	}
+	tokenResult := &tokenAssertion{}
+	if err := xml.Unmarshal(xmlResponse, &tokenResult); err != nil {
+		return "", "", err
+	}
+
+	formsEndpoint := fmt.Sprintf("%s://%s/_forms/default.aspx?wa=wsignin1.0", parsedURL.Scheme, parsedURL.Host)
+	resp, err = client.Post(formsEndpoint, "application/x-www-form-urlencoded", strings.NewReader(tokenResult.Response.BinaryToken))
+	if err != nil {
+		return "", "", err
+	}
+	defer resp.Body.Close()
+
+	var authCookie string
+	for _, coo := range resp.Cookies() {
+		if coo.Name == "rtFa" || coo.Name == "FedAuth" {
+			authCookie += coo.String() + "; "
+		}
+	}
+
+	return authCookie, tokenResult.Response.Lifetime.Expires, nil
+}
