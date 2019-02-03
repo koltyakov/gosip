@@ -44,7 +44,7 @@ func GetBasicAuthTest() {
 		return
 	}
 
-	req.Header.Set("Accept", "application/json;odata=verbose")
+	req.Header.Set("Accept", "application/json;odata=verbose") // Just because it's 2013 in my case
 	req.SetBasicAuth(auth.Username, auth.Password)
 
 	resp, err := client.Do(req)
