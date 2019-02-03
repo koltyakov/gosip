@@ -104,6 +104,17 @@ func main() {
 
 ### Run automated tests
 
+Create auth credentials store files in `./config` folder for corresponding strategies:
+
+- private.addin.json
+- private.adfs.json
+- private.basic.json
+- private.fba.json
+- private.saml.json
+- private.tmg.json
+
+Auth configs should have the same structure as [node-sp-auth's](https://github.com/s-kainet/node-sp-auth) configs.
+
 ```bash
 go test ./...
 ```
@@ -115,3 +126,7 @@ Modify `cmd/gosip/main.go` to include required scenarios and run:
 ```bash
 go run cmd/gosip/main.go
 ```
+
+## Reference
+
+A lot of stuff for authemtication flows have been "copied" from [node-sp-auth](https://github.com/s-kainet/node-sp-auth) library, which we intensively use in Node.js ecosystem for years.
