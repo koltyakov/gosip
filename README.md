@@ -98,7 +98,7 @@ func main() {
 
 ## Tests
 
-### Run autometed tests
+### Run automated tests
 
 ```bash
 go test ./...
