@@ -23,6 +23,6 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		return accessToken.(string), nil
 	}
 
+	// ntlmssp.Negotiator()
 	return "OK", nil
-
 }

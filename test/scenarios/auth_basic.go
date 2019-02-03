@@ -1,17 +1,21 @@
 package scenarios
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"path"
 	"runtime"
 	"time"
 
+	ntlmssp "github.com/Azure/go-ntlmssp"
 	"github.com/koltyakov/gosip/auth/basic"
 )
 
 // GetBasicAuthTest : get auth test scenario
 func GetBasicAuthTest() {
-	// startAtProc := time.Now()
+	startAtProc := time.Now()
 	startAt := time.Now()
 
 	_, filename, _, _ := runtime.Caller(1)
@@ -27,65 +31,55 @@ func GetBasicAuthTest() {
 	fmt.Printf("config read in, sec: %f\n", time.Since(startAt).Seconds())
 	startAt = time.Now()
 
-	authToken, err := auth.GetAuth()
+	client := &http.Client{
+		Transport: ntlmssp.Negotiator{
+			RoundTripper: &http.Transport{},
+		},
+	}
+
+	apiEndpoint := auth.SiteURL + "/_api/web?$select=Title"
+	req, err := http.NewRequest("GET", apiEndpoint, nil)
 	if err != nil {
-		fmt.Printf("unable to get auth: %v", err)
+		fmt.Printf("unable to create a request: %v", err)
 		return
 	}
-	fmt.Printf("auth token: %s\n", authToken)
-	fmt.Printf("authenticated in, sec: %f\n", time.Since(startAt).Seconds())
-	startAt = time.Now()
 
-	// ///
-	// authToken, err = auth.GetAuth()
-	// if err != nil {
-	// 	fmt.Printf("unable to get auth: %v", err)
-	// 	return
-	// }
-	// // fmt.Printf("auth token: %s\n", authToken)
-	// fmt.Printf("second auth (cached) in, sec: %f\n", time.Since(startAt).Seconds())
-	// startAt = time.Now()
-	// ///
+	req.Header.Set("Accept", "application/json;odata=verbose")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
-	// apiEndpoint := auth.SiteURL + "/_api/web?$select=Title"
-	// req, err := http.NewRequest("GET", apiEndpoint, nil)
-	// if err != nil {
-	// 	fmt.Printf("unable to create a request: %v", err)
-	// 	return
-	// }
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("unable to request api: %v", err)
+		return
+	}
+	defer resp.Body.Close()
 
-	// req.Header.Set("Accept", "application/json;odata=minimalmetadata")
-	// req.Header.Set("Authorization", "Bearer "+authToken)
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("unable to read a response: %v", err)
+		return
+	}
 
-	// client := &http.Client{}
-	// resp, err := client.Do(req)
-	// if err != nil {
-	// 	fmt.Printf("unable to request api: %v", err)
-	// 	return
-	// }
-	// defer resp.Body.Close()
+	// fmt.Println(resp.StatusCode)
+	// fmt.Println(string(data))
 
-	// data, err := ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	fmt.Printf("unable to read a response: %v", err)
-	// 	return
-	// }
+	type apiResponse struct {
+		Result struct {
+			Title string `json:"Title"`
+		} `json:"d"`
+	}
 
-	// type apiResponse struct {
-	// 	Title string `json:"Title"`
-	// }
+	results := &apiResponse{}
 
-	// results := &apiResponse{}
+	err = json.Unmarshal(data, &results)
+	if err != nil {
+		fmt.Printf("unable to parse a response: %v", err)
+		return
+	}
 
-	// err = json.Unmarshal(data, &results)
-	// if err != nil {
-	// 	fmt.Printf("unable to parse a response: %v", err)
-	// 	return
-	// }
-
-	// fmt.Println("=== Response from API ===")
-	// fmt.Printf("Web title: %v\n", results.Title)
-	// fmt.Printf("api requested in, sec: %f\n", time.Since(startAt).Seconds())
-	// fmt.Printf("summary time, sec: %f\n", time.Since(startAtProc).Seconds())
+	fmt.Println("=== Response from API ===")
+	fmt.Printf("Web title: %v\n", results.Result.Title)
+	fmt.Printf("api requested in, sec: %f\n", time.Since(startAt).Seconds())
+	fmt.Printf("summary time, sec: %f\n", time.Since(startAtProc).Seconds())
 
 }
