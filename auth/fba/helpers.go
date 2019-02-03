@@ -1,6 +1,12 @@
 package fba
 
 import (
+	"bytes"
+	"encoding/xml"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -19,10 +25,61 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	}
 
 	cacheKey := parsedURL.Host + "@fba@" + creds.Username + "@" + creds.Password
-	if accessToken, found := storage.Get(cacheKey); found {
-		return accessToken.(string), nil
+	if authCookie, found := storage.Get(cacheKey); found {
+		return authCookie.(string), nil
 	}
 
-	return "OK", nil
+	endpoint := fmt.Sprintf("%s://%s/_vti_bin/authentication.asmx", parsedURL.Scheme, parsedURL.Host)
+	soapBody, err := buildFbaWsTemplate(creds.Username, creds.Password)
+	if err != nil {
+		return "", err
+	}
 
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer([]byte(soapBody)))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Content-Type", "text/xml;charset=utf-8")
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	res, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	// fmt.Printf("FBA: %s\n", string(res))
+
+	type fbaResponse struct {
+		ErrorCode      string `xml:"Body>LoginResponse>LoginResult>ErrorCode"`
+		CookieName     string `xml:"Body>LoginResponse>LoginResult>CookieName"`
+		TimeoutSeconds int64  `xml:"Body>LoginResponse>LoginResult>TimeoutSeconds"`
+	}
+	result := &fbaResponse{}
+	if err := xml.Unmarshal(res, &result); err != nil {
+		return "", err
+	}
+
+	if result.ErrorCode != "NoError" {
+		return "", errors.New(result.ErrorCode)
+	}
+
+	if result.ErrorCode == "PasswordNotMatch" {
+		return "", errors.New("Password doesn't not match")
+	}
+
+	// fmt.Printf("FBA: %s\n", string(result.CookieName))
+
+	authCookie := resp.Header.Get("Set-Cookie") // TODO: parse FBA cookie only (?)
+
+	storage.Set(cacheKey, authCookie, time.Duration(result.TimeoutSeconds-60)*time.Second)
+
+	return authCookie, nil
 }

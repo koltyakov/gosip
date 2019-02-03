@@ -45,7 +45,6 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	storage.Set(cacheKey, authCookie, (time.Until(notAfterTime)-60)*time.Second)
 
 	return authCookie, nil
-
 }
 
 func getSamlAssertion(creds *AuthCnfg) ([]byte, string, string, error) {
