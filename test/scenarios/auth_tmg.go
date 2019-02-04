@@ -26,7 +26,8 @@ func GetTmgAuthTest() {
 		fmt.Printf("unable to get config: %v", err)
 		return
 	}
-	fmt.Printf("config: %v\n", auth)
+	// fmt.Printf("config: %v\n", auth)
+	fmt.Printf("siteUrl: %s\n", auth.SiteURL)
 	fmt.Printf("config read in, sec: %f\n", time.Since(startAt).Seconds())
 	startAt = time.Now()
 
