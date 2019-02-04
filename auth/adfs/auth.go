@@ -3,6 +3,7 @@ package adfs
 import (
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 
@@ -58,4 +59,24 @@ func (c *AuthCnfg) SetMasterkey(masterKey string) {
 // GetAuth : authenticates, receives access token
 func (c *AuthCnfg) GetAuth() (string, error) {
 	return GetAuth(c)
+}
+
+// GetSiteURL : gets siteURL
+func (c *AuthCnfg) GetSiteURL() string {
+	return c.SiteURL
+}
+
+// GetStrategy : gets auth strategy name
+func (c *AuthCnfg) GetStrategy() string {
+	return "adfs"
+}
+
+// SetAuth : authenticate request
+func (c *AuthCnfg) SetAuth(req *http.Request) error {
+	authCookie, err := c.GetAuth()
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Cookie", authCookie)
+	return nil
 }

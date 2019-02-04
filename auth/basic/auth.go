@@ -3,6 +3,7 @@ package basic
 import (
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 
@@ -51,4 +52,20 @@ func (c *AuthCnfg) SetMasterkey(masterKey string) {
 // GetAuth : authenticates, receives access token
 func (c *AuthCnfg) GetAuth() (string, error) {
 	return GetAuth(c)
+}
+
+// GetSiteURL : gets siteURL
+func (c *AuthCnfg) GetSiteURL() string {
+	return c.SiteURL
+}
+
+// GetStrategy : gets auth strategy name
+func (c *AuthCnfg) GetStrategy() string {
+	return "basic"
+}
+
+// SetAuth : authenticate request
+func (c *AuthCnfg) SetAuth(req *http.Request) error {
+	req.SetBasicAuth(c.Username, c.Password)
+	return nil
 }
