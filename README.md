@@ -34,6 +34,57 @@ Authentication strategies:
 go get github.com/koltyakov/gosip
 ```
 
+## Usage insights
+
+1\. Understand SharePoint environment type and authentication strategy.
+
+Let's assume it's, SharePoint Online and Addin Only permissions. When `github.com/koltyakov/gosip/auth/addin` subpackage should be used.
+
+2\. Initiate authentication object.
+
+```golang
+auth := &addin.AuthCnfg{
+	SiteURL:      os.Getenv("SPAUTH_SITEURL"),
+	ClientID:     os.Getenv("SPAUTH_CLIENTID"),
+	ClientSecret: os.Getenv("SPAUTH_CLIENTSECRET"),
+}
+```
+
+AuthCnfg's from different strategies contains different options.
+
+The authentication options can be provided explicitly or can be read from a configuration file.
+
+```golang
+configPath := "./config/private.adfs.json"
+auth := &adfs.AuthCnfg{}
+
+err := auth.ReadConfig(configPath)
+if err != nil {
+	fmt.Printf("Unable to get config: %v\n", err)
+	return
+}
+```
+
+3\. Use SP awared HTTP client from `github.com/koltyakov/gosip` package.
+
+```golang
+client := &gosip.SPClient{
+	AuthCnfg: auth,
+}
+
+var req *http.Request
+// Initiate API request
+// ...
+
+resp, err := client.Execute(req)
+if err != nil {
+	fmt.Printf("Unable to request api: %v", err)
+	return
+}
+```
+
+SPClient has `Execute` method which is a wrapper function injecting SharePoint authentication and ending up calling http.Client's `Do` method.
+
 ## Usage samples
 
 ### Addin Only Permissions
