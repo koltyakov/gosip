@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/koltyakov/gosip"
 )
 
 // AuthCnfg : auth config structure
@@ -52,7 +54,7 @@ func (c *AuthCnfg) GetStrategy() string {
 }
 
 // SetAuth : authenticate request
-func (c *AuthCnfg) SetAuth(req *http.Request) error {
+func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
 	authToken, err := c.GetAuth()
 	if err != nil {
 		return err

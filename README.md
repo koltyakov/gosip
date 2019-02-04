@@ -156,7 +156,7 @@ func main() {
 }
 ```
 
-### Basic auth and NTML handshake
+### Basic auth (NTML)
 
 ```golang
 package main
@@ -166,7 +166,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	ntlmssp "github.com/Azure/go-ntlmssp"
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/auth/basic"
 )
@@ -183,11 +182,6 @@ func main() {
 
 	client := &gosip.SPClient{
 		AuthCnfg: auth,
-	}
-
-	// NTML + Negotiation
-	client.Transport = ntlmssp.Negotiator{
-		RoundTripper: &http.Transport{},
 	}
 
 	apiEndpoint := auth.GetSiteURL() + "/_api/web?$select=Title"

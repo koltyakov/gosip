@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/cpass"
 )
 
@@ -72,7 +73,7 @@ func (c *AuthCnfg) GetStrategy() string {
 }
 
 // SetAuth : authenticate request
-func (c *AuthCnfg) SetAuth(req *http.Request) error {
+func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
 	authCookie, err := c.GetAuth()
 	if err != nil {
 		return err

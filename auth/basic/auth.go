@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	ntlmssp "github.com/Azure/go-ntlmssp"
+	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/cpass"
 )
 
@@ -65,7 +67,11 @@ func (c *AuthCnfg) GetStrategy() string {
 }
 
 // SetAuth : authenticate request
-func (c *AuthCnfg) SetAuth(req *http.Request) error {
+func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
+	// NTML + Negotiation
+	httpClient.Transport = ntlmssp.Negotiator{
+		RoundTripper: &http.Transport{},
+	}
 	req.SetBasicAuth(c.Username, c.Password)
 	return nil
 }
