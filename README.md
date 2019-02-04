@@ -1,5 +1,9 @@
 # gosip - SharePoint authentication client for Golang
 
+<p align="center">
+  <img src="./assets/gosip.png" />
+</p>
+
 > This is early draft version. Lot's of improvements and breaking changes are expected in the near future until GA version is proclaimed.
 
 Don't through bananas at me, it's my first steps and experiments in Golang field. =)
