@@ -38,7 +38,7 @@ go get github.com/koltyakov/gosip
 
 1\. Understand SharePoint environment type and authentication strategy.
 
-Let's assume it's, SharePoint Online and Addin Only permissions. When `github.com/koltyakov/gosip/auth/addin` subpackage should be used.
+Let's assume it's, SharePoint Online and Addin Only permissions. Then `github.com/koltyakov/gosip/auth/addin` subpackage should be used.
 
 2\. Initiate authentication object.
 
