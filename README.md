@@ -291,4 +291,4 @@ go run cmd/gosip/main.go
 
 ## Reference
 
-A lot of stuff for authemtication flows have been "copied" from [node-sp-auth](https://github.com/s-kainet/node-sp-auth) library, which we intensively use in Node.js ecosystem for years.
+A lot of stuff for auth flows have been "copied" from [node-sp-auth](https://github.com/s-kainet/node-sp-auth) library (used as blueprint), which we intensively use in Node.js ecosystem for years.
