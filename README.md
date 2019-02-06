@@ -6,7 +6,7 @@
 
 > This is early draft version. Lot's of improvements and breaking changes are expected in the near future until GA version is proclaimed.
 
-Don't through bananas at me, it's my first steps and experiments in Golang field. =)
+Don't throw bananas at me, it's my first steps and experiments in Golang field. =)
 
 ## Main features
 
