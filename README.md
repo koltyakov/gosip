@@ -1,4 +1,4 @@
-# gosip - SharePoint HTTP client for Golang
+# gosip - SharePoint HTTP client for Go
 
 <p align="center">
   <img src="./assets/gosip.png" />
