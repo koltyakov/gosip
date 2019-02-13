@@ -1,4 +1,4 @@
-# gosip - SharePoint API HTTP client for Golang
+# gosip - SharePoint HTTP client for Go
 
 <p align="center">
   <img src="./assets/gosip.png" />
@@ -6,7 +6,7 @@
 
 > This is early draft version. Lot's of improvements and breaking changes are expected in the near future until GA version is proclaimed.
 
-Don't through bananas at me, it's my first steps and experiments in Golang field. =)
+Don't throw bananas at me, it's my first steps and experiments in Golang field. =)
 
 ## Main features
 
@@ -38,7 +38,7 @@ go get github.com/koltyakov/gosip
 
 1\. Understand SharePoint environment type and authentication strategy.
 
-Let's assume it's, SharePoint Online and Addin Only permissions. When `github.com/koltyakov/gosip/auth/addin` subpackage should be used.
+Let's assume it's, SharePoint Online and Addin Only permissions. Then `github.com/koltyakov/gosip/auth/addin` subpackage should be used.
 
 2\. Initiate authentication object.
 
@@ -291,4 +291,4 @@ go run cmd/gosip/main.go
 
 ## Reference
 
-A lot of stuff for authemtication flows have been "copied" from [node-sp-auth](https://github.com/s-kainet/node-sp-auth) library, which we intensively use in Node.js ecosystem for years.
+A lot of stuff for auth flows have been "copied" from [node-sp-auth](https://github.com/s-kainet/node-sp-auth) library (used as blueprint), which we intensively use in Node.js ecosystem for years.
