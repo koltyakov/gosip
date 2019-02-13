@@ -31,6 +31,16 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		return authCookie.(string), nil
 	}
 
+	// In case of WAP
+	if creds.AdfsCookie == "EdgeAccessCookie" {
+		authCookie, err := wapAuthFlow(creds)
+		if err != nil {
+			return "", err
+		}
+		storage.Set(cacheKey, authCookie, time.Duration(30)*time.Minute)
+		return authCookie, nil
+	}
+
 	token, notBefore, notAfter, err := getSamlAssertion(creds)
 	if err != nil {
 		return "", err
@@ -41,6 +51,8 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		fmt.Printf("Post token error: %v\n", err)
 		return "", err
 	}
+
+	// fmt.Printf("Auth Cookie: %s\n", authCookie)
 
 	notAfterTime, _ := time.Parse(time.RFC3339, notAfter)
 	storage.Set(cacheKey, authCookie, (time.Until(notAfterTime)-60)*time.Second)
@@ -91,6 +103,11 @@ func getSamlAssertion(creds *AuthCnfg) ([]byte, string, string, error) {
 					NotOnOrAfter string `xml:"NotOnOrAfter,attr"`
 				} `xml:"Assertion>Conditions"`
 			} `xml:"RequestedSecurityToken"`
+			// This is for WPA (urn:AppProxy:com)
+			Lifetime struct {
+				Created string `xml:"Created"`
+				Expires string `xml:"Expires"`
+			} `xml:"Lifetime"`
 		} `xml:"Body>RequestSecurityTokenResponseCollection>RequestSecurityTokenResponse"`
 	}
 	result := &samlAssertion{}
@@ -102,7 +119,17 @@ func getSamlAssertion(creds *AuthCnfg) ([]byte, string, string, error) {
 		return []byte(""), "", "", errors.New(result.Fault)
 	}
 
-	return result.Response.Token.Inner, result.Response.Token.Conditions.NotBefore, result.Response.Token.Conditions.NotOnOrAfter, nil
+	created := result.Response.Token.Conditions.NotBefore
+	if created == "" {
+		created = result.Response.Lifetime.Created
+	}
+
+	expires := result.Response.Token.Conditions.NotOnOrAfter
+	if expires == "" {
+		expires = result.Response.Lifetime.Expires
+	}
+
+	return result.Response.Token.Inner, created, expires, nil
 }
 
 func postTokenData(token []byte, notBefore, notAfter string, creds *AuthCnfg) (string, error) {
@@ -141,4 +168,75 @@ func postTokenData(token []byte, notBefore, notAfter string, creds *AuthCnfg) (s
 	cookie := resp.Header.Get("Set-Cookie") // TODO: parse ADFS cookie only (?)
 
 	return cookie, nil
+}
+
+// WAP auth flow - TODO: refactor
+func wapAuthFlow(creds *AuthCnfg) (string, error) {
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	resp, err := client.Get(creds.SiteURL)
+	if err != nil {
+		return "", err
+	}
+
+	redirect, err := resp.Location()
+	if err != nil {
+		return "", err
+	}
+
+	redirectURL := fmt.Sprintf("%s", redirect)
+
+	params := url.Values{}
+	params.Set("UserName", creds.Username)
+	params.Set("Password", creds.Password)
+	params.Set("AuthMethod", "FormsAuthentication")
+
+	resp, err = client.Post(redirectURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	if err != nil {
+		return "", err
+	}
+	// defer resp.Body.Close()
+
+	tempCookie := resp.Header.Get("Set-Cookie")
+
+	req, err := http.NewRequest("GET", redirectURL, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+	req.Header.Set("Cookie", tempCookie)
+
+	resp, err = client.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	redirect, err = resp.Location()
+	if err != nil {
+		return "", err
+	}
+	redirectURL = fmt.Sprintf("%s", redirect)
+
+	req, err = http.NewRequest("GET", redirectURL, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+
+	resp, err = client.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	// TODO: get expirity somehow
+	authCookie := resp.Header.Get("Set-Cookie")
+	authCookie = strings.Split(authCookie, ";")[0]
+
+	// fmt.Printf(authCookie)
+
+	return authCookie, nil
 }

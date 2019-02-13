@@ -11,7 +11,8 @@ func main() {
 	// s.ConfigReaderTest()
 	// s.ConfigReaderSpoAddinOnlyTest()
 
-	// s.GetFbaAuthTest()
-	s.SPClientTest()
+	s.GetAdfsAuthTest()
+	// s.GetTmgAuthTest()
+	// s.SPClientTest()
 
 }
