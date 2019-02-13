@@ -26,12 +26,26 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		return accessToken.(string), nil
 	}
 
+	redirect, err := detectCookieAuthURL(creds.SiteURL)
+	if err != nil {
+		return "", err
+	}
+	// fmt.Printf("Redirect URL: %s\n", redirect)
+
 	endpoint := fmt.Sprintf("%s://%s/CookieAuth.dll?Logon", parsedURL.Scheme, parsedURL.Host)
 
+	fmt.Printf("Endpoint: %s\n", endpoint)
+
 	params := url.Values{}
-	params.Set("curl", "Z2F") // curl=Z2F&reason=0&formdir=2
-	params.Set("reason", "0")
-	params.Set("formdir", "2") // TODO: get these params automatically
+
+	querystr := strings.Replace(redirect.RawQuery, "GetLogon?", "", 1)
+	for _, part := range strings.Split(querystr, "&") {
+		p := strings.Split(part, "=")
+		if len(p) == 2 {
+			params.Set(p[0], p[1])
+		}
+	}
+
 	params.Set("username", creds.Username)
 	params.Set("password", creds.Password)
 
@@ -56,4 +70,33 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	storage.Set(cacheKey, authCookie, 60*60*time.Second)
 
 	return authCookie, nil
+}
+
+func detectCookieAuthURL(siteURL string) (*url.URL, error) {
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+
+	req, err := http.NewRequest("GET", siteURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+	// req.Header.Set("Upgrade-Insecure-Requests", "1")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	redirect, err := resp.Location()
+	if err != nil {
+		return nil, err
+	}
+
+	return redirect, nil
 }
