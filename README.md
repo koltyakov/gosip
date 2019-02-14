@@ -20,9 +20,9 @@ Supported SharePoint versions:
 Authentication strategies:
 
 - SharePoint 2013, 2016, 2019:
-  - ADFS user credentials
+  - ADFS user credentials (ADFS, WAP -> Basic, WAP -> ADFS)
+	- Behind reverse proxy (TMG, WAP -> Basic, WAP -> ADFS)
   - Form-based authentication (FBA)
-  - Forefront TMG authentication
 - SharePoint Online:
   - Addin only permissions
   - SAML based with user credentials
@@ -93,9 +93,9 @@ SPClient has `Execute` method which is a wrapper function injecting SharePoint a
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 
@@ -117,38 +117,24 @@ func main() {
 	apiEndpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
 	req, err := http.NewRequest("GET", apiEndpoint, nil)
 	if err != nil {
-		fmt.Printf("Unable to create a request: %v", err)
-		return
+		log.Fatalf("unable to create a request: %v\n", err)
 	}
 
 	req.Header.Set("Accept", "application/json;odata=minimalmetadata")
 
 	resp, err := client.Execute(req)
 	if err != nil {
-		fmt.Printf("Unable to request api: %v", err)
-		return
+		log.Fatalf("unable to request api: %v\n", err)
 	}
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Printf("Unable to read a response: %v", err)
-		return
+		log.Fatalf("unable to read a response: %v\n", err)
 	}
 
-	type apiResponse struct {
-		Title string `json:"Title"`
-	}
-
-	results := &apiResponse{}
-
-	err = json.Unmarshal(data, &results)
-	if err != nil {
-		fmt.Printf("Unable to parse a response: %v", err)
-		return
-	}
-
-	fmt.Printf("Web title: %v\n", results.Title)
+	// No JSON unmarshalling for simplicity
+	fmt.Printf("response: %s\n", data)
 }
 ```
 
@@ -160,6 +146,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/koltyakov/gosip"
@@ -172,8 +159,7 @@ func main() {
 
 	err := auth.ReadConfig(configPath)
 	if err != nil {
-		fmt.Printf("Unable to get config: %v\n", err)
-		return
+		log.Fatalf("unable to get config: %v\n", err)
 	}
 
 	client := &gosip.SPClient{
@@ -183,27 +169,23 @@ func main() {
 	apiEndpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
 	req, err := http.NewRequest("GET", apiEndpoint, nil)
 	if err != nil {
-		fmt.Printf("Unable to create a request: %v", err)
-		return
+		log.Fatalf("unable to create a request: %v\n", err)
 	}
 
 	req.Header.Set("Accept", "application/json;odata=verbose")
 
-	fmt.Printf("Requesting api endpoint: %s\n", apiEndpoint)
 	resp, err := client.Execute(req)
 	if err != nil {
-		fmt.Printf("Unable to request api: %v\n", err)
-		return
+		log.Fatalf("unable to request api: %v\n", err)
 	}
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Printf("Unable to read a response: %v\n", err)
-		return
+		log.Fatalf("unable to read a response: %v\n", err)
 	}
 
-	fmt.Printf("Raw data: %s", string(data))
+	fmt.Printf("response: %s\n", data)
 }
 ```
 
@@ -215,6 +197,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/koltyakov/gosip"
@@ -227,8 +210,7 @@ func main() {
 
 	err := auth.ReadConfig(configPath)
 	if err != nil {
-		fmt.Printf("Unable to get config: %v\n", err)
-		return
+		log.Fatalf("unable to get config: %v\n", err)
 	}
 
 	client := &gosip.SPClient{
@@ -238,27 +220,23 @@ func main() {
 	apiEndpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
 	req, err := http.NewRequest("GET", apiEndpoint, nil)
 	if err != nil {
-		fmt.Printf("Unable to create a request: %v", err)
-		return
+		log.Fatalf("unable to create a request: %v", err)
 	}
 
 	req.Header.Set("Accept", "application/json;odata=verbose")
 
-	fmt.Printf("Requesting api endpoint: %s\n", apiEndpoint)
 	resp, err := client.Execute(req)
 	if err != nil {
-		fmt.Printf("Unable to request api: %v\n", err)
-		return
+		log.Fatalf("unable to request api: %v\n", err)
 	}
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Printf("Unable to read a response: %v\n", err)
-		return
+		log.Fatalf("unable to read a response: %v\n", err)
 	}
 
-	fmt.Printf("Raw data: %s", string(data))
+	fmt.Printf("response: %s\n", data)
 }
 ```
 
