@@ -36,13 +36,15 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 
 	// In case of WAP
 	if creds.AdfsCookie == "EdgeAccessCookie" {
-		authCookie, err = wapAuthFlow(creds)
+		authCookie, expires, err = wapAuthFlow(creds)
 		if err != nil {
 			return "", err
 		}
-		expirity = time.Duration(30) * time.Minute
+		if expires == "" {
+			expirity = time.Duration(30) * time.Minute
+		}
 	} else {
-		authCookie, expires, err = adfsAuthFlow(creds)
+		authCookie, expires, err = adfsAuthFlow(creds, "")
 		if err != nil {
 			return "", err
 		}
@@ -55,7 +57,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	return authCookie, nil
 }
 
-func adfsAuthFlow(creds *AuthCnfg) (string, string, error) {
+func adfsAuthFlow(creds *AuthCnfg, edgeCookie string) (string, string, error) {
 	parsedAdfsURL, err := url.Parse(creds.AdfsURL)
 	if err != nil {
 		return "", "", err
@@ -73,6 +75,9 @@ func adfsAuthFlow(creds *AuthCnfg) (string, string, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/soap+xml;charset=utf-8")
+	if edgeCookie != "" {
+		req.Header.Set("Cookie", edgeCookie)
+	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -150,20 +155,32 @@ func adfsAuthFlow(creds *AuthCnfg) (string, string, error) {
 		},
 	}
 
-	resp, err = client.Post(rootSiteURL+"/_trust/", "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	req, err = http.NewRequest("POST", rootSiteURL+"/_trust/", strings.NewReader(params.Encode()))
+	if err != nil {
+		return "", "", err
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if edgeCookie != "" {
+		req.Header.Set("Cookie", edgeCookie)
+	}
+
+	resp, err = client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
 	defer resp.Body.Close()
 
-	cookie := resp.Header.Get("Set-Cookie") // TODO: parse ADFS cookie only (?)
+	authCookie := resp.Header.Get("Set-Cookie") // FedAuth
+	authCookie = strings.Split(authCookie, ";")[0]
 
-	return cookie, expires, nil
+	return authCookie, expires, nil
 }
 
 // WAP auth flow - TODO: refactor
-func wapAuthFlow(creds *AuthCnfg) (string, error) {
+func wapAuthFlow(creds *AuthCnfg) (string, string, error) {
 	client := &http.Client{
+		// Disabling redirect so response 302 location can be resolved
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
@@ -171,12 +188,13 @@ func wapAuthFlow(creds *AuthCnfg) (string, error) {
 
 	resp, err := client.Get(creds.SiteURL)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
+	// Response location with WAP login endpoint is used to send form auth request
 	redirect, err := resp.Location()
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	redirectURL := fmt.Sprintf("%s", redirect)
@@ -188,46 +206,81 @@ func wapAuthFlow(creds *AuthCnfg) (string, error) {
 
 	resp, err = client.Post(redirectURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	// defer resp.Body.Close()
 
-	tempCookie := resp.Header.Get("Set-Cookie")
-
+	// Request to redirect URL using MSISAuth
 	req, err := http.NewRequest("GET", redirectURL, nil)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
+	msisAuthCookie := resp.Header.Get("Set-Cookie")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
-	req.Header.Set("Cookie", tempCookie)
+	req.Header.Set("Cookie", msisAuthCookie)
 
 	resp, err = client.Do(req)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
+	// Yet another redirect using JWT at this point (spUrl?authToken=JWT&client-request-id=)
 	redirect, err = resp.Location()
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	redirectURL = fmt.Sprintf("%s", redirect)
 
 	req, err = http.NewRequest("GET", redirectURL, nil)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+	// req.Header.Set("Cookie", msisAuthCookie) // brakes it all
 
 	resp, err = client.Do(req)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// TODO: get expirity somehow
-	authCookie := resp.Header.Get("Set-Cookie")
+	authCookie := resp.Header.Get("Set-Cookie") // EdgeAccessCookie
 	authCookie = strings.Split(authCookie, ";")[0]
+
+	var fedAuthExpire string
+
+	// ADFS behind WAP scenario, similar to the ordinary ADFS but requires EdgeAccessCookie
+	if redirect, err := resp.Location(); err == nil {
+		if strings.Contains(fmt.Sprintf("%s", redirect), "/_layouts/15/Authenticate.aspx") {
+			redirectURL = fmt.Sprintf("%s", redirect)
+			client := &http.Client{}
+
+			req, err = http.NewRequest("GET", redirectURL, nil)
+			if err != nil {
+				return "", "", err
+			}
+			req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+			req.Header.Set("Cookie", authCookie)
+
+			resp, err = client.Do(req)
+			if err != nil {
+				return "", "", err
+			}
+
+			c := *creds
+			c.RelyingParty = resp.Request.URL.Query().Get("wtrealm")
+			c.AdfsCookie = "FedAuth"
+
+			fedAuthCookie, expire, err := adfsAuthFlow(&c, authCookie)
+			if err != nil {
+				return "", "", err
+			}
+
+			fedAuthExpire = expire
+			authCookie += "; " + fedAuthCookie
+		}
+	}
 
 	// fmt.Printf(authCookie)
 
-	return authCookie, nil
+	return authCookie, fedAuthExpire, nil
 }

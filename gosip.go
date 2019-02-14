@@ -1,7 +1,7 @@
 package gosip
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 )
 
@@ -31,7 +31,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 			StatusCode: 400,
 			Request:    req,
 		}
-		return res, errors.New("Client initialization error")
+		return res, fmt.Errorf("client initialization error, no siteUrl is provided")
 	}
 	err := c.AuthCnfg.SetAuth(req, c)
 	if err != nil {
