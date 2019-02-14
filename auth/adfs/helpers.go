@@ -31,50 +31,45 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		return authCookie.(string), nil
 	}
 
+	var authCookie, expires string
+	var expirity time.Duration
+
 	// In case of WAP
 	if creds.AdfsCookie == "EdgeAccessCookie" {
-		authCookie, err := wapAuthFlow(creds)
+		authCookie, err = wapAuthFlow(creds)
 		if err != nil {
 			return "", err
 		}
-		storage.Set(cacheKey, authCookie, time.Duration(30)*time.Minute)
-		return authCookie, nil
+		expirity = time.Duration(30) * time.Minute
+	} else {
+		authCookie, expires, err = adfsAuthFlow(creds)
+		if err != nil {
+			return "", err
+		}
+		expiresTime, _ := time.Parse(time.RFC3339, expires)
+		expirity = (time.Until(expiresTime) - 60) * time.Second
 	}
 
-	token, notBefore, notAfter, err := getSamlAssertion(creds)
-	if err != nil {
-		return "", err
-	}
-
-	authCookie, err := postTokenData(token, notBefore, notAfter, creds)
-	if err != nil {
-		fmt.Printf("Post token error: %v\n", err)
-		return "", err
-	}
-
-	// fmt.Printf("Auth Cookie: %s\n", authCookie)
-
-	notAfterTime, _ := time.Parse(time.RFC3339, notAfter)
-	storage.Set(cacheKey, authCookie, (time.Until(notAfterTime)-60)*time.Second)
+	storage.Set(cacheKey, authCookie, expirity)
 
 	return authCookie, nil
 }
 
-func getSamlAssertion(creds *AuthCnfg) ([]byte, string, string, error) {
+func adfsAuthFlow(creds *AuthCnfg) (string, string, error) {
 	parsedAdfsURL, err := url.Parse(creds.AdfsURL)
 	if err != nil {
-		return []byte(""), "", "", err
+		return "", "", err
 	}
 
 	usernameMixedURL := fmt.Sprintf("%s://%s/adfs/services/trust/13/usernamemixed", parsedAdfsURL.Scheme, parsedAdfsURL.Host)
 	samlBody, err := templates.AdfsSamlWsfedTemplate(usernameMixedURL, creds.Username, creds.Password, creds.RelyingParty)
 	if err != nil {
-		return []byte(""), "", "", err
+		return "", "", err
 	}
 
 	req, err := http.NewRequest("POST", usernameMixedURL, bytes.NewBuffer([]byte(samlBody)))
 	if err != nil {
-		return []byte(""), "", "", err
+		return "", "", err
 	}
 
 	req.Header.Set("Content-Type", "application/soap+xml;charset=utf-8")
@@ -82,13 +77,13 @@ func getSamlAssertion(creds *AuthCnfg) ([]byte, string, string, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return []byte(""), "", "", err
+		return "", "", err
 	}
 	defer resp.Body.Close()
 
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return []byte(""), "", "", err
+		return "", "", err
 	}
 
 	// fmt.Printf("ADFS: %s\n", string(res))
@@ -112,11 +107,11 @@ func getSamlAssertion(creds *AuthCnfg) ([]byte, string, string, error) {
 	}
 	result := &samlAssertion{}
 	if err := xml.Unmarshal(res, &result); err != nil {
-		return []byte(""), "", "", err
+		return "", "", err
 	}
 
 	if result.Fault != "" {
-		return []byte(""), "", "", errors.New(result.Fault)
+		return "", "", errors.New(result.Fault)
 	}
 
 	created := result.Response.Token.Conditions.NotBefore
@@ -129,18 +124,14 @@ func getSamlAssertion(creds *AuthCnfg) ([]byte, string, string, error) {
 		expires = result.Response.Lifetime.Expires
 	}
 
-	return result.Response.Token.Inner, created, expires, nil
-}
-
-func postTokenData(token []byte, notBefore, notAfter string, creds *AuthCnfg) (string, error) {
-	wresult, err := templates.AdfsSamlTokenTemplate(token, notBefore, notAfter, creds.RelyingParty)
+	wresult, err := templates.AdfsSamlTokenTemplate(result.Response.Token.Inner, created, expires, creds.RelyingParty)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	parsedURL, err := url.Parse(creds.SiteURL)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	rootSiteURL := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
@@ -153,21 +144,21 @@ func postTokenData(token []byte, notBefore, notAfter string, creds *AuthCnfg) (s
 	// proxyURL, _ := url.Parse("http://127.0.0.1:8888")
 	// http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyURL), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 
-	client := &http.Client{
+	client = &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
 	}
 
-	resp, err := client.Post(rootSiteURL+"/_trust/", "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	resp, err = client.Post(rootSiteURL+"/_trust/", "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	defer resp.Body.Close()
 
 	cookie := resp.Header.Get("Set-Cookie") // TODO: parse ADFS cookie only (?)
 
-	return cookie, nil
+	return cookie, expires, nil
 }
 
 // WAP auth flow - TODO: refactor
