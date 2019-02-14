@@ -1,7 +1,7 @@
 # gosip - SharePoint HTTP client for Go
 
 <p align="center">
-  <img src="./assets/gosip.png" />
+  <img src="./assets/gosip2.png" />
 </p>
 
 > This is early draft version. Lot's of improvements and breaking changes are expected in the near future until GA version is proclaimed.
