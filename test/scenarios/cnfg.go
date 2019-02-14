@@ -9,7 +9,7 @@ import (
 // ConfigReaderSpoAddinOnlyTest : test scenario
 func ConfigReaderSpoAddinOnlyTest() {
 	config := &addin.AuthCnfg{}
-	err := config.ReadConfig("./config/private.addin.json")
+	err := config.ReadConfig(resolveCnfgPath("./config/private.addin.json"))
 	if err != nil {
 		fmt.Printf("Error reading config: %v", err)
 		return

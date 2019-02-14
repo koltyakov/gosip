@@ -5,14 +5,5 @@ import (
 )
 
 func main() {
-
-	// s.CpassDummyTest()
-	// s.CpassAutoModeTest()
-	// s.ConfigReaderTest()
-	// s.ConfigReaderSpoAddinOnlyTest()
-
 	s.GetAdfsAuthTest()
-	// s.GetTmgAuthTest()
-	// s.SPClientTest()
-
 }
