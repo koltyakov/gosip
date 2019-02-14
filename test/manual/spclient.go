@@ -1,4 +1,4 @@
-package scenarios
+package manual
 
 import (
 	"encoding/json"

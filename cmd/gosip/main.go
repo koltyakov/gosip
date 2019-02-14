@@ -1,9 +1,11 @@
 package main
 
 import (
-	s "github.com/koltyakov/gosip/test/scenarios"
+	m "github.com/koltyakov/gosip/test/manual"
 )
 
 func main() {
-	s.GetAdfsAuthTest()
+	m.GetAdfsAuthTest()
+	m.GetWapAuthTest()
+	m.GetWapAdfsAuthTest()
 }
