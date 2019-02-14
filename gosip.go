@@ -2,15 +2,15 @@
 Package gosip is pure Go library for dealing with SharePoint unattended authentication and API consumption.
 
 It supports a variety of different authentication strategies such as:
-- ADFS user credentials
-- Auth to SharePoint behind a reverse proxy (TMG, WAP)
-- Form-based authentication (FBA)
-- Addin only permissions
-- SAML based with user credentials
+* ADFS user credentials
+* Auth to SharePoint behind a reverse proxy (TMG, WAP)
+* Form-based authentication (FBA)
+* Addin only permissions
+* SAML based with user credentials
 
 Amongst supported platform versions are:
-- SharePoint Online (SPO)
-- On-Prem: 2019, 2016, and 2013
+* SharePoint Online (SPO)
+* On-Prem: 2019, 2016, and 2013
 */
 package gosip
 
