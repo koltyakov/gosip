@@ -1,9 +1,9 @@
 package addin
 
 import (
-	"fmt"
 	"testing"
-	"time"
+
+	h "github.com/koltyakov/gosip/test/helpers"
 )
 
 func TestGettingAuthToken(t *testing.T) {
