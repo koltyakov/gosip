@@ -21,7 +21,7 @@ Authentication strategies:
 
 - SharePoint 2013, 2016, 2019:
   - ADFS user credentials (ADFS, WAP -> Basic, WAP -> ADFS)
-	- Behind reverse proxy (TMG, WAP -> Basic, WAP -> ADFS)
+  - Behind reverse proxy (TMG, WAP -> Basic, WAP -> ADFS)
   - Form-based authentication (FBA)
 - SharePoint Online:
   - Addin only permissions
