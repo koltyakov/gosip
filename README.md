@@ -4,7 +4,7 @@
   <img src="./assets/gosip2.png" />
 </p>
 
-> This is early draft version. Lot's of improvements and breaking changes are expected in the near future until GA version is proclaimed.
+> This is early version. Improvements and breaking changes are expected before GA version release.
 
 ## Main features
 
