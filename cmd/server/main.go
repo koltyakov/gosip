@@ -16,9 +16,9 @@ func main() {
 		log.Fatalf("unable to get config: %v", err)
 	}
 
-	http.HandleFunc("/favicon.ico", handlers.GetFavicon(auth))
 	http.HandleFunc("/web", handlers.GetWeb(auth))
 	http.HandleFunc("/file", handlers.GetFile(auth))
+	http.HandleFunc("/", handlers.Proxy(auth))
 
 	log.Fatal(http.ListenAndServe(":8081", nil))
 
