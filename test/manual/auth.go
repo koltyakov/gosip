@@ -57,6 +57,11 @@ func GetTmgAuthTest() {
 	r(&tmg.AuthCnfg{}, "./config/private.tmg.json")
 }
 
+// GetOnlineADFSTest : SPO ADFS auth test scenario
+func GetOnlineADFSTest() {
+	r(&saml.AuthCnfg{}, "./config/private.spo-adfs.json")
+}
+
 func r(auth gosip.AuthCnfg, cnfgPath string) {
 	startAt := time.Now()
 

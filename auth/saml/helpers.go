@@ -75,7 +75,7 @@ func getSecurityToken(creds *AuthCnfg) (string, string, error) {
 		State               int    `json:"State"`
 		UserState           int    `json:"UserState"`
 		Login               string `json:"Login"`
-		AuthURL             string `json"AuthURL"`
+		AuthURL             string `json:"AuthURL"`
 	}
 
 	userRealm := &userReadlmResponse{}
@@ -182,6 +182,9 @@ func getSecurityTokenWithAdfs(adfsURL string, creds *AuthCnfg) (string, string, 
 		return "", "", err
 	}
 
+	// proxyURL, _ := url.Parse("http://127.0.0.1:8888")
+	// http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyURL), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+
 	usernameMixedURL := fmt.Sprintf("%s://%s/adfs/services/trust/13/usernamemixed", parsedAdfsURL.Scheme, parsedAdfsURL.Host)
 	samlBody, err := templates.AdfsSamlWsfedTemplate(usernameMixedURL, creds.Username, creds.Password, "urn:federation:MicrosoftOnline")
 	if err != nil {
@@ -210,33 +213,39 @@ func getSecurityTokenWithAdfs(adfsURL string, creds *AuthCnfg) (string, string, 
 	// fmt.Printf("ADFS: %s\n", string(res))
 
 	type samlAssertion struct {
-		Fault    string `xml:"Body>Fault>Reason>Text"`
 		Response struct {
+			Fault string `xml:"Fault>Reason>Text"`
 			Token struct {
 				Inner      []byte `xml:",innerxml"`
 				Conditions struct {
 					NotBefore    string `xml:"NotBefore,attr"`
 					NotOnOrAfter string `xml:"NotOnOrAfter,attr"`
 				} `xml:"Assertion>Conditions"`
-			} `xml:"RequestedSecurityToken"`
-		} `xml:"Body>RequestSecurityTokenResponseCollection>RequestSecurityTokenResponse"`
+			} `xml:"RequestSecurityTokenResponseCollection>RequestSecurityTokenResponse>RequestedSecurityToken"`
+		} `xml:"Body"`
 	}
+
 	result := &samlAssertion{}
 	if err := xml.Unmarshal(res, &result); err != nil {
 		return "", "", err
 	}
 
-	if result.Fault != "" {
-		return "", "", errors.New(result.Fault)
+	// fmt.Printf("Token: %s", result.Response.Token.Inner)
+
+	if result.Response.Fault != "" {
+		return "", "", errors.New(result.Response.Fault)
 	}
 
-	parsedURL, err := url.Parse(adfsURL)
+	// parsedURL, err := url.Parse(adfsURL)
+	parsedURL, err := url.Parse(creds.SiteURL)
 	if err != nil {
 		return "", "", err
 	}
 
 	rootSite := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
 	tokenRequest, err := templates.OnlineSamlWsfedAdfsTemplate(rootSite, string(result.Response.Token.Inner))
+
+	// fmt.Printf("tokenRequest: %s\n", tokenRequest)
 
 	stsEndpoint := "https://login.microsoftonline.com/extSTS.srf" // TODO: mapping
 
@@ -258,6 +267,8 @@ func getSecurityTokenWithAdfs(adfsURL string, creds *AuthCnfg) (string, string, 
 		return "", "", err
 	}
 
+	// fmt.Printf("token: %s\n", xmlResponse)
+
 	type tokenAssertion struct {
 		Fault    string `xml:"Body>Fault>Reason>Text"`
 		Response struct {
@@ -268,9 +279,20 @@ func getSecurityTokenWithAdfs(adfsURL string, creds *AuthCnfg) (string, string, 
 			} `xml:"Lifetime"`
 		} `xml:"Body>RequestSecurityTokenResponse"`
 	}
+
 	tokenResult := &tokenAssertion{}
 	if err := xml.Unmarshal(xmlResponse, &tokenResult); err != nil {
 		return "", "", err
+	}
+
+	if tokenResult.Response.BinaryToken == "" {
+		return "", "", errors.New("can't extract binary token")
+	}
+
+	client = &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
 	}
 
 	formsEndpoint := fmt.Sprintf("%s://%s/_forms/default.aspx?wa=wsignin1.0", parsedURL.Scheme, parsedURL.Host)

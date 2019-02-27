@@ -5,7 +5,8 @@ import (
 )
 
 func main() {
-	m.GetAdfsAuthTest()
-	m.GetWapAuthTest()
-	m.GetWapAdfsAuthTest()
+	// m.GetAdfsAuthTest()
+	// m.GetWapAuthTest()
+	// m.GetWapAdfsAuthTest()
+	m.GetOnlineADFSTest()
 }
