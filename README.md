@@ -112,8 +112,8 @@ func main() {
 		AuthCnfg: auth,
 	}
 
-	apiEndpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
-	req, err := http.NewRequest("GET", apiEndpoint, nil)
+	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		log.Fatalf("unable to create a request: %v\n", err)
 	}
@@ -164,8 +164,8 @@ func main() {
 		AuthCnfg: auth,
 	}
 
-	apiEndpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
-	req, err := http.NewRequest("GET", apiEndpoint, nil)
+	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		log.Fatalf("unable to create a request: %v\n", err)
 	}
@@ -215,8 +215,8 @@ func main() {
 		AuthCnfg: auth,
 	}
 
-	apiEndpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
-	req, err := http.NewRequest("GET", apiEndpoint, nil)
+	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		log.Fatalf("unable to create a request: %v", err)
 	}

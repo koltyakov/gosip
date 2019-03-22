@@ -18,51 +18,51 @@ import (
 )
 
 // GetAddinAuthTest : Addin auth test scenario
-func GetAddinAuthTest() {
-	r(&addin.AuthCnfg{}, "./config/private.addin.json")
+func GetAddinAuthTest() *gosip.SPClient {
+	return r(&addin.AuthCnfg{}, "./config/private.addin.json")
 }
 
 // GetAdfsAuthTest : ADFS auth test scenario
-func GetAdfsAuthTest() {
-	r(&adfs.AuthCnfg{}, "./config/private.adfs.json")
+func GetAdfsAuthTest() *gosip.SPClient {
+	return r(&adfs.AuthCnfg{}, "./config/private.adfs.json")
 }
 
 // GetWapAuthTest : WAP -> Basic auth test scenario
-func GetWapAuthTest() {
-	r(&adfs.AuthCnfg{}, "./config/private.wap.json")
+func GetWapAuthTest() *gosip.SPClient {
+	return r(&adfs.AuthCnfg{}, "./config/private.wap.json")
 }
 
 // GetWapAdfsAuthTest : WAP -> ADFS auth test scenario
-func GetWapAdfsAuthTest() {
-	r(&adfs.AuthCnfg{}, "./config/private.wap-adfs.json")
+func GetWapAdfsAuthTest() *gosip.SPClient {
+	return r(&adfs.AuthCnfg{}, "./config/private.wap-adfs.json")
 }
 
 // GetNtlmAuthTest : NTML auth test scenario
-func GetNtlmAuthTest() {
-	r(&ntlm.AuthCnfg{}, "./config/private.ntlm.json")
+func GetNtlmAuthTest() *gosip.SPClient {
+	return r(&ntlm.AuthCnfg{}, "./config/private.ntlm.json")
 }
 
 // GetFbaAuthTest : FBA auth test scenario
-func GetFbaAuthTest() {
-	r(&fba.AuthCnfg{}, "./config/private.fba.json")
+func GetFbaAuthTest() *gosip.SPClient {
+	return r(&fba.AuthCnfg{}, "./config/private.fba.json")
 }
 
 // GetSamlAuthTest : SAML auth test scenario
-func GetSamlAuthTest() {
-	r(&saml.AuthCnfg{}, "./config/private.saml.json")
+func GetSamlAuthTest() *gosip.SPClient {
+	return r(&saml.AuthCnfg{}, "./config/private.saml.json")
 }
 
 // GetTmgAuthTest : TMG auth test scenario
-func GetTmgAuthTest() {
-	r(&tmg.AuthCnfg{}, "./config/private.tmg.json")
+func GetTmgAuthTest() *gosip.SPClient {
+	return r(&tmg.AuthCnfg{}, "./config/private.tmg.json")
 }
 
 // GetOnlineADFSTest : SPO ADFS auth test scenario
-func GetOnlineADFSTest() {
-	r(&saml.AuthCnfg{}, "./config/private.spo-adfs.json")
+func GetOnlineADFSTest() *gosip.SPClient {
+	return r(&saml.AuthCnfg{}, "./config/private.spo-adfs.json")
 }
 
-func r(auth gosip.AuthCnfg, cnfgPath string) {
+func r(auth gosip.AuthCnfg, cnfgPath string) *gosip.SPClient {
 	startAt := time.Now()
 
 	configPath := u.ResolveCnfgPath(cnfgPath)
@@ -75,8 +75,8 @@ func r(auth gosip.AuthCnfg, cnfgPath string) {
 
 	client := &gosip.SPClient{AuthCnfg: auth}
 
-	apiEndpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
-	req, err := http.NewRequest("GET", apiEndpoint, nil)
+	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		log.Fatalf("unable to create a request: %v", err)
 	}
@@ -96,4 +96,6 @@ func r(auth gosip.AuthCnfg, cnfgPath string) {
 
 	fmt.Printf("response: %s\n", data)
 	fmt.Printf("time taken, sec: %f\n", time.Since(startAt).Seconds())
+
+	return client
 }

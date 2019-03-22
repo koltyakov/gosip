@@ -23,8 +23,8 @@ func main() {
 		AuthCnfg: auth,
 	}
 
-	apiEndpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
-	req, err := http.NewRequest("GET", apiEndpoint, nil)
+	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		fmt.Printf("Unable to create a request: %v", err)
 		return
@@ -32,7 +32,7 @@ func main() {
 
 	req.Header.Set("Accept", "application/json;odata=verbose")
 
-	fmt.Printf("Requesting api endpoint: %s\n", apiEndpoint)
+	fmt.Printf("Requesting api endpoint: %s\n", endpoint)
 	resp, err := client.Execute(req)
 	if err != nil {
 		fmt.Printf("Unable to request api: %v\n", err)

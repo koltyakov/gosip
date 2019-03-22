@@ -68,8 +68,8 @@ func authInitTest(cnfgPath, strategy string) {
 func apiCallTest(client *gosip.SPClient, siteURL string) {
 	fmt.Println("")
 	startAt := time.Now()
-	apiEndpoint := siteURL + "/_api/web?$select=Title"
-	req, err := http.NewRequest("GET", apiEndpoint, nil)
+	endpoint := siteURL + "/_api/web?$select=Title"
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		fmt.Printf("Unable to create a request: %v", err)
 		return
@@ -77,7 +77,7 @@ func apiCallTest(client *gosip.SPClient, siteURL string) {
 
 	req.Header.Set("Accept", "application/json;odata=verbose")
 
-	fmt.Printf("Requesting api endpoint: %s\n", apiEndpoint)
+	fmt.Printf("Requesting api endpoint: %s\n", endpoint)
 	resp, err := client.Execute(req)
 	if err != nil {
 		fmt.Printf("Unable to request api: %v\n", err)

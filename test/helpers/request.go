@@ -21,8 +21,8 @@ func CheckRequest(auth gosip.AuthCnfg, cnfgPath string) error {
 		AuthCnfg: auth,
 	}
 
-	apiEndpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
-	req, err := http.NewRequest("GET", apiEndpoint, nil)
+	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return fmt.Errorf("unable to create a request: %v", err)
 	}

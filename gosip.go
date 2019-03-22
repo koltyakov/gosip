@@ -71,7 +71,6 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		!strings.Contains(strings.ToLower(req.URL.Path), "/_api/contextinfo") &&
 		req.Header.Get("X-RequestDigest") == ""
 	if digestIsRequired {
-		fmt.Println("empty digest")
 		digest, err := GetDigest(c)
 		if err != nil {
 			res := &http.Response{
