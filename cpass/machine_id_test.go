@@ -10,6 +10,6 @@ func TestGetMachineID(t *testing.T) {
 		t.Error(err)
 	}
 	if machineID == "" {
-		t.Error("Got empty machine id")
+		t.Error("got empty machine id")
 	}
 }

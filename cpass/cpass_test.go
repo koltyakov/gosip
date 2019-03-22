@@ -13,7 +13,7 @@ func TestUsingMachineID(t *testing.T) {
 		t.Error(err)
 	}
 	if secret == encoded {
-		t.Error("Got encryption error")
+		t.Error("got encryption error")
 	}
 
 	decoded, err := c.Decode(encoded)
@@ -21,7 +21,7 @@ func TestUsingMachineID(t *testing.T) {
 		t.Error(err)
 	}
 	if secret != decoded {
-		t.Error("Got decription error")
+		t.Error("got decription error")
 	}
 }
 
@@ -41,6 +41,6 @@ func TestCustomEncryptionKey(t *testing.T) {
 	}
 
 	if encoded1 == encoded2 {
-		t.Error("Got encryption error")
+		t.Error("got encryption error")
 	}
 }
