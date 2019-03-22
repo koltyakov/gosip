@@ -6,12 +6,12 @@ import (
 	"net/http"
 
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/auth/basic"
+	strategy "github.com/koltyakov/gosip/auth/adfs"
 )
 
 func main() {
-	configPath := "./config/private.basic.json"
-	auth := &basic.AuthCnfg{}
+	configPath := "./config/private.adfs.json"
+	auth := &strategy.AuthCnfg{}
 
 	err := auth.ReadConfig(configPath)
 	if err != nil {

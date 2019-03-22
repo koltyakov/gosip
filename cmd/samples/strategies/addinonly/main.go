@@ -8,11 +8,11 @@ import (
 	"os"
 
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/auth/addin"
+	strategy "github.com/koltyakov/gosip/auth/addin"
 )
 
 func main() {
-	auth := &addin.AuthCnfg{
+	auth := &strategy.AuthCnfg{
 		SiteURL:      os.Getenv("SPAUTH_SITEURL"),
 		ClientID:     os.Getenv("SPAUTH_CLIENTID"),
 		ClientSecret: os.Getenv("SPAUTH_CLIENTSECRET"),

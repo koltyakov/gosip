@@ -8,5 +8,6 @@ func main() {
 	// m.GetAdfsAuthTest()
 	// m.GetWapAuthTest()
 	// m.GetWapAdfsAuthTest()
-	m.GetOnlineADFSTest()
+	// m.GetOnlineADFSTest()
+	m.GetNtlmAuthTest()
 }
