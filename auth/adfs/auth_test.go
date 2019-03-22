@@ -11,7 +11,7 @@ var (
 )
 
 func TestGettingAuthToken(t *testing.T) {
-	err := h.CheckRequest(
+	err := h.CheckAuth(
 		&AuthCnfg{},
 		cnfgPath,
 		[]string{"SiteURL", "Username", "Password"},

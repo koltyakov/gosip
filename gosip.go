@@ -25,6 +25,7 @@ type AuthCnfg interface {
 	ReadConfig(configPath string) error
 	GetAuth() (string, error)
 	GetSiteURL() string
+	GetStrategy() string
 	SetAuth(req *http.Request, client *SPClient) error
 }
 

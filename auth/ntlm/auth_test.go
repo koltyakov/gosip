@@ -11,11 +11,18 @@ var (
 )
 
 func TestGettingAuthToken(t *testing.T) {
-	err := h.CheckRequest(
+	err := h.CheckAuth(
 		&AuthCnfg{},
 		cnfgPath,
 		[]string{"SiteURL", "Username", "Password"},
 	)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestBasicRequest(t *testing.T) {
+	err := h.CheckRequest(&AuthCnfg{}, cnfgPath)
 	if err != nil {
 		t.Error(err)
 	}
