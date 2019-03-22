@@ -17,6 +17,7 @@ package gosip
 import (
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // AuthCnfg is an abstract auth config interface,
@@ -40,6 +41,8 @@ type SPClient struct {
 // is a wrapper for standard http.Client' `Do` method,
 // injects authorization tokens, etc.
 func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
+
+	// Read stored creds and config
 	if c.ConfigPath != "" && c.AuthCnfg.GetSiteURL() == "" {
 		c.AuthCnfg.ReadConfig(c.ConfigPath)
 	}
@@ -51,14 +54,35 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		}
 		return res, fmt.Errorf("client initialization error, no siteUrl is provided")
 	}
+
+	// Wrap SharePoint authentication
 	err := c.AuthCnfg.SetAuth(req, c)
 	if err != nil {
 		res := &http.Response{
-			Status:     "401 Access Denied",
+			Status:     "401 Unauthorized",
 			StatusCode: 401,
 			Request:    req,
 		}
 		return res, err
 	}
+
+	// Inject X-RequestDigest header when needed
+	digestIsRequired := req.Method == "POST" &&
+		!strings.Contains(strings.ToLower(req.URL.Path), "/_api/contextinfo") &&
+		req.Header.Get("X-RequestDigest") == ""
+	if digestIsRequired {
+		fmt.Println("empty digest")
+		digest, err := GetDigest(c)
+		if err != nil {
+			res := &http.Response{
+				Status:     "400 Bad Request",
+				StatusCode: 400,
+				Request:    req,
+			}
+			return res, err
+		}
+		req.Header.Add("X-RequestDigest", digest)
+	}
+
 	return c.Do(req)
 }
