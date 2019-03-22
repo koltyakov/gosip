@@ -1,4 +1,4 @@
-package basic
+package ntlm
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ import (
 func TestGettingAuthToken(t *testing.T) {
 	err := h.CheckRequest(
 		&AuthCnfg{},
-		"./config/private.basic.json",
+		"./config/private.ntlm.json",
 		[]string{"SiteURL", "Username", "Password"},
 	)
 	if err != nil {

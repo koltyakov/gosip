@@ -4,14 +4,14 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/koltyakov/gosip/auth/basic"
+	"github.com/koltyakov/gosip/auth/ntlm"
 	"github.com/koltyakov/gosip/cmd/server/handlers"
 )
 
 func main() {
 
-	auth := &basic.AuthCnfg{}
-	err := auth.ReadConfig("./config/private.basic.json")
+	auth := &ntlm.AuthCnfg{}
+	err := auth.ReadConfig("./config/private.ntlm.json")
 	if err != nil {
 		log.Fatalf("unable to get config: %v", err)
 	}

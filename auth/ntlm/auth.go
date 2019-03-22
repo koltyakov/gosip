@@ -1,4 +1,4 @@
-package basic
+package ntlm
 
 import (
 	"encoding/json"
@@ -63,7 +63,7 @@ func (c *AuthCnfg) GetSiteURL() string {
 
 // GetStrategy : gets auth strategy name
 func (c *AuthCnfg) GetStrategy() string {
-	return "basic"
+	return "ntlm"
 }
 
 // SetAuth : authenticate request

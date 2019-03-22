@@ -10,7 +10,7 @@ import (
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/auth/addin"
 	"github.com/koltyakov/gosip/auth/adfs"
-	"github.com/koltyakov/gosip/auth/basic"
+	"github.com/koltyakov/gosip/auth/ntlm"
 	"github.com/koltyakov/gosip/auth/fba"
 	"github.com/koltyakov/gosip/auth/saml"
 	"github.com/koltyakov/gosip/auth/tmg"
@@ -37,9 +37,9 @@ func GetWapAdfsAuthTest() {
 	r(&adfs.AuthCnfg{}, "./config/private.wap-adfs.json")
 }
 
-// GetBasicAuthTest : NTML auth test scenario
-func GetBasicAuthTest() {
-	r(&basic.AuthCnfg{}, "./config/private.basic.json")
+// GetNtlmAuthTest : NTML auth test scenario
+func GetNtlmAuthTest() {
+	r(&ntlm.AuthCnfg{}, "./config/private.ntlm.json")
 }
 
 // GetFbaAuthTest : FBA auth test scenario

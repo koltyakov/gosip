@@ -12,7 +12,7 @@ import (
 	ntlmssp "github.com/Azure/go-ntlmssp"
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/auth/adfs"
-	"github.com/koltyakov/gosip/auth/basic"
+	"github.com/koltyakov/gosip/auth/ntlm"
 	"github.com/koltyakov/gosip/auth/fba"
 )
 
@@ -21,7 +21,7 @@ func SPClientTest() {
 	configs := [][]string{
 		[]string{"../../config/private.adfs.json", "adfs"},
 		[]string{"../../config/private.fba.json", "fba"},
-		[]string{"../../config/private.basic.json", "basic"},
+		[]string{"../../config/private.ntlm.json", "ntlm"},
 	}
 	for _, c := range configs {
 		authInitTest(c[0], c[1])
@@ -37,8 +37,8 @@ func authInitTest(cnfgPath, strategy string) {
 	switch strategy {
 	case "fba":
 		auth = &fba.AuthCnfg{}
-	case "basic":
-		auth = &basic.AuthCnfg{}
+	case "ntlm":
+		auth = &ntlm.AuthCnfg{}
 	case "adfs":
 		auth = &adfs.AuthCnfg{}
 	default:
@@ -56,7 +56,7 @@ func authInitTest(cnfgPath, strategy string) {
 		AuthCnfg: auth,
 	}
 
-	if strategy == "basic" {
+	if strategy == "ntlm" {
 		client.Transport = ntlmssp.Negotiator{
 			RoundTripper: &http.Transport{},
 		}

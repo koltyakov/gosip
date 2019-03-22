@@ -17,9 +17,9 @@ Supported SharePoint versions:
 
 Authentication strategies:
 
-- SharePoint 2013, 2016, 2019:
-  - ADFS user credentials (ADFS, WAP -> Basic, WAP -> ADFS)
-  - Behind reverse proxy (TMG, WAP -> Basic, WAP -> ADFS)
+- SharePoint On-Premises 2019/2016/2013:
+  - ADFS user credentials (ADFS, WAP -> Basic/NTLM, WAP -> ADFS)
+  - Behind reverse proxy (TMG, WAP -> Basic/NTLM, WAP -> ADFS)
   - Form-based authentication (FBA)
 - SharePoint Online:
   - Addin only permissions
@@ -36,12 +36,12 @@ go get github.com/koltyakov/gosip
 
 1\. Understand SharePoint environment type and authentication strategy.
 
-Let's assume it's, SharePoint Online and Addin Only permissions. Then `github.com/koltyakov/gosip/auth/addin` subpackage should be used.
+Let's assume it's, SharePoint Online and Addin Only permissions. Then `strategy "github.com/koltyakov/gosip/auth/addin"` subpackage should be used.
 
 2\. Initiate authentication object.
 
 ```golang
-auth := &addin.AuthCnfg{
+auth := &strategy.AuthCnfg{
 	SiteURL:      os.Getenv("SPAUTH_SITEURL"),
 	ClientID:     os.Getenv("SPAUTH_CLIENTID"),
 	ClientSecret: os.Getenv("SPAUTH_CLIENTSECRET"),
@@ -54,7 +54,7 @@ The authentication options can be provided explicitly or can be read from a conf
 
 ```golang
 configPath := "./config/private.adfs.json"
-auth := &adfs.AuthCnfg{}
+auth := &strategy.AuthCnfg{}
 
 err := auth.ReadConfig(configPath)
 if err != nil {
@@ -98,11 +98,11 @@ import (
 	"os"
 
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/auth/addin"
+	strategy "github.com/koltyakov/gosip/auth/addin"
 )
 
 func main() {
-	auth := &addin.AuthCnfg{
+	auth := &strategy.AuthCnfg{
 		SiteURL:      os.Getenv("SPAUTH_SITEURL"),
 		ClientID:     os.Getenv("SPAUTH_CLIENTID"),
 		ClientSecret: os.Getenv("SPAUTH_CLIENTSECRET"),
@@ -148,12 +148,12 @@ import (
 	"net/http"
 
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/auth/adfs"
+	strategy "github.com/koltyakov/gosip/auth/adfs"
 )
 
 func main() {
 	configPath := "./config/private.adfs.json"
-	auth := &adfs.AuthCnfg{}
+	auth := &strategy.AuthCnfg{}
 
 	err := auth.ReadConfig(configPath)
 	if err != nil {
@@ -187,7 +187,7 @@ func main() {
 }
 ```
 
-### Basic auth (NTML)
+### Basic/NTLM auth
 
 ```golang
 package main
@@ -199,12 +199,12 @@ import (
 	"net/http"
 
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/auth/basic"
+	strategy "github.com/koltyakov/gosip/auth/ntlm"
 )
 
 func main() {
-	configPath := "./config/private.basic.json"
-	auth := &basic.AuthCnfg{}
+	configPath := "./config/private.ntlm.json"
+	auth := &strategy.AuthCnfg{}
 
 	err := auth.ReadConfig(configPath)
 	if err != nil {
@@ -246,7 +246,7 @@ Create auth credentials store files in `./config` folder for corresponding strat
 
 - private.addin.json
 - private.adfs.json
-- private.basic.json
+- private.ntlm.json
 - private.fba.json
 - private.saml.json
 - private.tmg.json
