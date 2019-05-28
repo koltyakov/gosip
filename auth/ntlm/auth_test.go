@@ -7,10 +7,13 @@ import (
 )
 
 var (
-	cnfgPath = "./config/private.ntlm.json"
+	cnfgPath = "./config/private.onprem-ntlm.json"
 )
 
 func TestGettingAuthToken(t *testing.T) {
+	if !h.ConfigExists(cnfgPath) {
+		t.Skip("No config found, skipping...")
+	}
 	err := h.CheckAuth(
 		&AuthCnfg{},
 		cnfgPath,
@@ -22,6 +25,9 @@ func TestGettingAuthToken(t *testing.T) {
 }
 
 func TestBasicRequest(t *testing.T) {
+	if !h.ConfigExists(cnfgPath) {
+		t.Skip("No auth config provided")
+	}
 	err := h.CheckRequest(&AuthCnfg{}, cnfgPath)
 	if err != nil {
 		t.Error(err)
@@ -29,6 +35,9 @@ func TestBasicRequest(t *testing.T) {
 }
 
 func TestGettingDigest(t *testing.T) {
+	if !h.ConfigExists(cnfgPath) {
+		t.Skip("No auth config provided")
+	}
 	err := h.CheckDigest(&AuthCnfg{}, cnfgPath)
 	if err != nil {
 		t.Error(err)

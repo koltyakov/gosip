@@ -7,10 +7,13 @@ import (
 )
 
 var (
-	cnfgPath = "./config/private.tmg.json"
+	cnfgPath = "./config/private.onprem-tmg.json"
 )
 
 func TestGettingAuthToken(t *testing.T) {
+	if !h.ConfigExists(cnfgPath) {
+		t.Skip("No auth config provided")
+	}
 	err := h.CheckAuth(
 		&AuthCnfg{},
 		cnfgPath,
@@ -22,6 +25,9 @@ func TestGettingAuthToken(t *testing.T) {
 }
 
 func TestGettingDigest(t *testing.T) {
+	if !h.ConfigExists(cnfgPath) {
+		t.Skip("No auth config provided")
+	}
 	err := h.CheckDigest(&AuthCnfg{}, cnfgPath)
 	if err != nil {
 		t.Error(err)
