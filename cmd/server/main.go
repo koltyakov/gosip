@@ -11,7 +11,7 @@ import (
 func main() {
 
 	auth := &ntlm.AuthCnfg{}
-	err := auth.ReadConfig("./config/private.ntlm.json")
+	err := auth.ReadConfig("./config/private.onprem-ntlm.json")
 	if err != nil {
 		log.Fatalf("unable to get config: %v", err)
 	}

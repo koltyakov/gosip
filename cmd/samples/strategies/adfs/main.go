@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	configPath := "./config/private.adfs.json"
+	configPath := "./config/private.onprem-adfs.json"
 	auth := &strategy.AuthCnfg{}
 
 	err := auth.ReadConfig(configPath)

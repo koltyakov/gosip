@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	configPath := "./config/private.ntlm.json"
+	configPath := "./config/private.onprem-ntlm.json"
 	auth := &strategy.AuthCnfg{}
 
 	err := auth.ReadConfig(configPath)
