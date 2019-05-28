@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/koltyakov/gosip"
+	"github.com/koltyakov/gosip/cpass"
 )
 
 // AuthCnfg : auth config structure
@@ -30,7 +31,30 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	json.Unmarshal(byteValue, &c)
 
+	crypt := cpass.Cpass(c.masterKey)
+	secret, err := crypt.Decode(c.ClientSecret)
+	if err == nil {
+		c.ClientSecret = secret
+	}
+
 	return nil
+}
+
+// WriteConfig : writes private config with auth options
+func (c *AuthCnfg) WriteConfig(privateFile string) error {
+	crypt := cpass.Cpass(c.masterKey)
+	secret, err := crypt.Encode(c.ClientSecret)
+	if err != nil {
+		secret = c.ClientSecret
+	}
+	conf := &AuthCnfg{
+		SiteURL:      c.SiteURL,
+		ClientID:     c.ClientID,
+		ClientSecret: secret,
+		Realm:        c.Realm,
+	}
+	file, _ := json.MarshalIndent(conf, "", "  ")
+	return ioutil.WriteFile(privateFile, file, 0644)
 }
 
 // SetMasterkey : defines custom masterkey

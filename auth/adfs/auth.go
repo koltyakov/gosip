@@ -52,6 +52,26 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 	return nil
 }
 
+// WriteConfig : writes private config with auth options
+func (c *AuthCnfg) WriteConfig(privateFile string) error {
+	crypt := cpass.Cpass(c.masterKey)
+	pass, err := crypt.Encode(c.Password)
+	if err != nil {
+		pass = c.Password
+	}
+	conf := &AuthCnfg{
+		SiteURL:      c.SiteURL,
+		Username:     c.Username,
+		Domain:       c.Domain,
+		Password:     pass,
+		RelyingParty: c.RelyingParty,
+		AdfsURL:      c.AdfsURL,
+		AdfsCookie:   c.AdfsCookie,
+	}
+	file, _ := json.MarshalIndent(conf, "", "  ")
+	return ioutil.WriteFile(privateFile, file, 0644)
+}
+
 // SetMasterkey : defines custom masterkey
 func (c *AuthCnfg) SetMasterkey(masterKey string) {
 	c.masterKey = masterKey

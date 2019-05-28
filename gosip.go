@@ -24,6 +24,7 @@ import (
 // allows different authentications strategies' dependency injection
 type AuthCnfg interface {
 	ReadConfig(configPath string) error
+	WriteConfig(configPath string) error
 	GetAuth() (string, error)
 	GetSiteURL() string
 	GetStrategy() string
