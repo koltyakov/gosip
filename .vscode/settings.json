@@ -4,5 +4,6 @@
   "editor.autoIndent": true,
   "editor.renderWhitespace": "all",
   "window.zoomLevel": 0,
-  "go.formatTool": "goimports"
+  "go.formatTool": "goimports",
+  "go.testFlags": ["-count=1"]
 }
