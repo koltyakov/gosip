@@ -283,10 +283,8 @@ Configure environment variables:
 - SPAUTH_USERNAME
 - SPAUTH_PASSWORD
 
-Run using `--ci` flag.
-
 ```bash
-go test ./... -race --ci -timeout 30s
+go test ./... -race -timeout 30s
 ```
 
 ## Reference

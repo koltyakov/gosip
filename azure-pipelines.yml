@@ -10,6 +10,7 @@ variables:
   GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
   GO111MODULE: 'on'
+  SPAUTH_CI: 'true'
 
 steps:
 - script: |
@@ -30,7 +31,7 @@ steps:
   displayName: 'Get dependencies'
 
 - script: |
-    go test ./... -race --ci -timeout 30s
+    go test ./... -race
   workingDirectory: '$(modulePath)'
   displayName: 'Run tests'
   env:

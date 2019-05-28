@@ -1,7 +1,6 @@
 package saml
 
 import (
-	"flag"
 	"os"
 	"testing"
 
@@ -18,8 +17,7 @@ var (
 )
 
 func init() {
-	flag.BoolVar(&ci, "ci", false, "Continues integration mode")
-	flag.Parse()
+	ci = os.Getenv("SPAUTH_CI") == "true"
 
 	if ci { // In CI mode
 		cnfgPath := "./config/private.spo-user.ci.json"
