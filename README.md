@@ -1,5 +1,8 @@
 # gosip - SharePoint HTTP client for Go (Golang)
 
+![Build Status](https://koltyakov.visualstudio.com/SPNode/_apis/build/status/gosip?branchName=master)
+[![License](https://img.shields.io/github/license/koltyakov/gosip.svg)](https://github.com/koltyakov/gosip/blob/master/LICENSE)
+
 <p align="center">
   <img src="./assets/gosip2.png" />
 </p>
