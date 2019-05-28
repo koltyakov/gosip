@@ -1,0 +1,8 @@
+{
+  "siteUrl": "https://www.contoso.com/sites/test",
+  "username": "john.doe@contoso.com",
+  "password": "this-is-not-a-real-password",
+  "relyingParty": "urn:AppProxy:com",
+  "adfsUrl": "https://login.contoso.com",
+  "adfsCookie": "EdgeAccessCookie"
+}
