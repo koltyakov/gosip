@@ -12,16 +12,16 @@ import (
 	ntlmssp "github.com/Azure/go-ntlmssp"
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/auth/adfs"
-	"github.com/koltyakov/gosip/auth/ntlm"
 	"github.com/koltyakov/gosip/auth/fba"
+	"github.com/koltyakov/gosip/auth/ntlm"
 )
 
 // SPClientTest : api call test
 func SPClientTest() {
 	configs := [][]string{
-		[]string{"../../config/private.adfs.json", "adfs"},
-		[]string{"../../config/private.fba.json", "fba"},
-		[]string{"../../config/private.ntlm.json", "ntlm"},
+		{"../../config/private.adfs.json", "adfs"},
+		{"../../config/private.fba.json", "fba"},
+		{"../../config/private.ntlm.json", "ntlm"},
 	}
 	for _, c := range configs {
 		authInitTest(c[0], c[1])
