@@ -26,7 +26,6 @@ func TestHashingDiffValues(t *testing.T) {
 	}
 }
 
-
 func TestHashingSameValues(t *testing.T) {
 	b1 := hashCipherKey("same value")
 	b2 := hashCipherKey("same value")
