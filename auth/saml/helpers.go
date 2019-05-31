@@ -244,6 +244,9 @@ func getSecurityTokenWithAdfs(adfsURL string, creds *AuthCnfg) (string, string, 
 
 	rootSite := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
 	tokenRequest, err := templates.OnlineSamlWsfedAdfsTemplate(rootSite, string(result.Response.Token.Inner))
+	if err != nil {
+		return "", "", err
+	}
 
 	// fmt.Printf("tokenRequest: %s\n", tokenRequest)
 
