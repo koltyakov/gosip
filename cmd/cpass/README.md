@@ -1,4 +1,4 @@
-# Encript secrets
+# Encrypt secrets
 
 ```bash
 go run ./cmd/cpass/main.go -secret MyP@s$word

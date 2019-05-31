@@ -21,7 +21,7 @@ func TestUsingMachineID(t *testing.T) {
 		t.Error(err)
 	}
 	if secret != decoded {
-		t.Error("got decription error")
+		t.Error("got decryption error")
 	}
 }
 
@@ -30,17 +30,50 @@ func TestCustomEncryptionKey(t *testing.T) {
 	c1 := Cpass("")
 	c2 := Cpass("CUSTOM_KEY")
 
-	encoded1, err := c1.Encode(secret)
+	encoded, err := c1.Encode(secret)
 	if err != nil {
 		t.Error(err)
 	}
 
-	encoded2, err := c2.Encode(secret)
+	decoded, err := c2.Decode(encoded)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if encoded1 == encoded2 {
+	if secret == decoded {
 		t.Error("got encryption error")
+	}
+}
+
+func TestEmptyShouldUseMachineID(t *testing.T) {
+	const secret = "secret"
+
+	machineID, err := getMachineID(false)
+	if err != nil {
+		t.Error(err)
+	}
+
+	c1 := Cpass(machineID)
+	c2 := Cpass("")
+
+	encoded, err := c1.Encode(secret)
+	if err != nil {
+		t.Error(err)
+	}
+
+	decoded, err := c2.Decode(encoded)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if secret != decoded {
+		t.Error("got encryption error")
+	}
+}
+
+func TestMasterKeyIsNotEmpty(t *testing.T) {
+	c := Cpass("")
+	if string(c.encryptionKey) == string(hashCipherKey("")) {
+		t.Error("got master key helper error")
 	}
 }

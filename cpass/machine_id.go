@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"strings"
 
-	"github.com/denisbrodbeck/machineid" // port cpass's implementation
+	"github.com/denisbrodbeck/machineid" // ToDo: port cpass's implementation
 )
 
 func getMachineID(original bool) (string, error) {

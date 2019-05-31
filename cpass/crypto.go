@@ -7,11 +7,14 @@ import (
 	"encoding/base64"
 	"errors"
 	"io"
+	"strings"
 )
+
+var anchor = "cpass|"
 
 // Encrypt encodes a string value to a locally decodable hash.
 func encrypt(decoded string, key []byte) (string, error) {
-	plainText := []byte(decoded)
+	plainText := []byte(anchor + decoded)
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return decoded, err
@@ -38,7 +41,7 @@ func decrypt(encoded string, key []byte) (string, error) {
 		return encoded, err
 	}
 	if len(cipherText) < aes.BlockSize {
-		err = errors.New("Ciphertext block size is too short")
+		err = errors.New("ciphertext block size is too short")
 		return encoded, err
 	}
 	iv := cipherText[:aes.BlockSize]
@@ -46,5 +49,12 @@ func decrypt(encoded string, key []byte) (string, error) {
 	stream := cipher.NewCFBDecrypter(block, iv)
 	stream.XORKeyStream(cipherText, cipherText)
 	decoded := string(cipherText)
+
+	// By design decrypt with incorrect key must end up with the value
+	if strings.Index(decoded, anchor) != 0 {
+		return encoded, nil
+	}
+
+	decoded = strings.Replace(decoded, anchor, "", 1) // remove anchor from string
 	return decoded, nil
 }
