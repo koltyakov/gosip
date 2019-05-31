@@ -71,6 +71,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	digestIsRequired := req.Method == "POST" &&
 		!strings.Contains(strings.ToLower(req.URL.Path), "/_api/contextinfo") &&
 		req.Header.Get("X-RequestDigest") == ""
+
 	if digestIsRequired {
 		digest, err := GetDigest(c)
 		if err != nil {
@@ -84,5 +85,11 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		req.Header.Add("X-RequestDigest", digest)
 	}
 
-	return c.Do(req)
+	resp, err := c.Do(req)
+
+	if err == nil && resp.StatusCode != 200 {
+		err = fmt.Errorf("%s", resp.Status)
+	}
+
+	return resp, err
 }

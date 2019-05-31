@@ -215,6 +215,12 @@ func wapAuthFlow(creds *AuthCnfg) (string, string, error) {
 		return "", "", err
 	}
 	msisAuthCookie := resp.Header.Get("Set-Cookie")
+
+	if msisAuthCookie == "" {
+		err = errors.New("msisAuthCookie is empty, that might be the result of incorrect username and password")
+		return "", "", err
+	}
+
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
 	req.Header.Set("Cookie", msisAuthCookie)
 

@@ -34,7 +34,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 
 	endpoint := fmt.Sprintf("%s://%s/CookieAuth.dll?Logon", parsedURL.Scheme, parsedURL.Host)
 
-	fmt.Printf("Endpoint: %s\n", endpoint)
+	// fmt.Printf("Endpoint: %s\n", endpoint)
 
 	params := url.Values{}
 

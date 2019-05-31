@@ -19,42 +19,44 @@ import (
 
 // GetAddinAuthTest : Addin auth test scenario
 func GetAddinAuthTest() *gosip.SPClient {
-	return r(&addin.AuthCnfg{}, "./config/private.addin.json")
+	return r(&addin.AuthCnfg{}, "./config/private.spo-addin.json")
 }
 
 // GetAdfsAuthTest : ADFS auth test scenario
 func GetAdfsAuthTest() *gosip.SPClient {
-	return r(&adfs.AuthCnfg{}, "./config/private.adfs.json")
+	return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap.json")
+	// return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap-adfs.json")
+	// return r(&adfs.AuthCnfg{}, "./config/private.onprem-adfs.json")
 }
 
 // GetWapAuthTest : WAP -> Basic auth test scenario
 func GetWapAuthTest() *gosip.SPClient {
-	return r(&adfs.AuthCnfg{}, "./config/private.wap.json")
+	return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap.json")
 }
 
 // GetWapAdfsAuthTest : WAP -> ADFS auth test scenario
 func GetWapAdfsAuthTest() *gosip.SPClient {
-	return r(&adfs.AuthCnfg{}, "./config/private.wap-adfs.json")
+	return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap-adfs.json")
 }
 
 // GetNtlmAuthTest : NTML auth test scenario
 func GetNtlmAuthTest() *gosip.SPClient {
-	return r(&ntlm.AuthCnfg{}, "./config/private.ntlm.json")
+	return r(&ntlm.AuthCnfg{}, "./config/private.onprem-ntlm.json")
 }
 
 // GetFbaAuthTest : FBA auth test scenario
 func GetFbaAuthTest() *gosip.SPClient {
-	return r(&fba.AuthCnfg{}, "./config/private.fba.json")
+	return r(&fba.AuthCnfg{}, "./config/private.onprem-fba.json")
 }
 
 // GetSamlAuthTest : SAML auth test scenario
 func GetSamlAuthTest() *gosip.SPClient {
-	return r(&saml.AuthCnfg{}, "./config/private.saml.json")
+	return r(&saml.AuthCnfg{}, "./config/private.spo-user.json")
 }
 
 // GetTmgAuthTest : TMG auth test scenario
 func GetTmgAuthTest() *gosip.SPClient {
-	return r(&tmg.AuthCnfg{}, "./config/private.tmg.json")
+	return r(&tmg.AuthCnfg{}, "./config/private.onprem-tmg.json")
 }
 
 // GetOnlineADFSTest : SPO ADFS auth test scenario

@@ -86,7 +86,7 @@ func getSecurityToken(creds *AuthCnfg) (string, string, error) {
 	// fmt.Printf("Results: %v\n", userRealm.NameSpaceType)
 
 	if userRealm.NameSpaceType == "" {
-		return "", "", errors.New("Unable to define namespace type for Online authentiation")
+		return "", "", errors.New("unable to define namespace type for Online authentiation")
 	}
 
 	if userRealm.NameSpaceType == "Managed" {

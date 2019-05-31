@@ -93,11 +93,12 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 
 	type getAuthResponse struct {
 		// ExpiresOn   int32  `json:"expires_on,string"`
+		// NotBefore   int32  `json:"not_before,string"`
 		// Resource    string `json:"resource"`
 		AccessToken string        `json:"access_token"`
 		TokenType   string        `json:"token_type"`
 		ExpiresIn   time.Duration `json:"expires_in,string"`
-		// NotBefore   int32  `json:"not_before,string"`
+		Error       string        `json:"error_description"`
 	}
 
 	results := &getAuthResponse{}
@@ -105,6 +106,10 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	err = json.Unmarshal(data, &results)
 	if err != nil {
 		return "", err
+	}
+
+	if results.Error != "" {
+		return "", fmt.Errorf("%s", results.Error)
 	}
 
 	storage.Set(cacheKey, results.AccessToken, (results.ExpiresIn-60)*time.Second)
@@ -153,7 +158,7 @@ func getAuthURL(realm string) (string, error) {
 		}
 	}
 
-	return "", errors.New("No OAuth2 protocol location found")
+	return "", errors.New("no OAuth2 protocol location found")
 }
 
 func getRealm(creds *AuthCnfg) (string, error) {
@@ -196,5 +201,5 @@ func getRealm(creds *AuthCnfg) (string, error) {
 		}
 	}
 
-	return "", errors.New("Wasn't able to get Realm")
+	return "", errors.New("wasn't able to get Realm")
 }

@@ -73,7 +73,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	}
 
 	if result.ErrorCode == "PasswordNotMatch" {
-		return "", errors.New("Password doesn't not match")
+		return "", errors.New("password doesn't not match")
 	}
 
 	// fmt.Printf("FBA: %s\n", string(result.CookieName))

@@ -7,14 +7,23 @@ import (
 )
 
 func main() {
-	// m.GetAdfsAuthTest()
-	// m.GetWapAuthTest()
-	// m.GetWapAdfsAuthTest()
-	// m.GetOnlineADFSTest()
-	client := m.GetNtlmAuthTest()
-	resp, err := m.CheckBasicPost(client)
-	if err != nil {
-		fmt.Printf("error in CheckBasicPost: %v\n", err)
+	// client := m.GetAdfsAuthTest()
+	// client := m.GetWapAuthTest()
+	// client := m.GetWapAdfsAuthTest()
+	// client := m.GetOnlineADFSTest()
+	// client := m.GetNtlmAuthTest()
+	// client := m.GetAddinAuthTest()
+	// client := m.GetFbaAuthTest()
+	// client := m.GetSamlAuthTest()
+	client := m.GetTmgAuthTest()
+
+	if client == nil {
+		fmt.Println("No client")
 	}
-	fmt.Printf("response from CheckBasicPost: %s\n", resp)
+
+	// resp, err := m.CheckBasicPost(client)
+	// if err != nil {
+	// 	fmt.Printf("error in CheckBasicPost: %v\n", err)
+	// }
+	// fmt.Printf("response from CheckBasicPost: %s\n", resp)
 }
