@@ -10,8 +10,6 @@
   <img src="./assets/gosip2.png" />
 </p>
 
-> This is early version. Improvements and breaking changes are expected before GA version release.
-
 ## Main features
 
 `gosip` allows you to perform SharePoint unattended (without user interaction) http authentication with Go (Golang) using different authentication strategies.
@@ -24,12 +22,13 @@ Supported SharePoint versions:
 Authentication strategies:
 
 - SharePoint On-Premises 2019/2016/2013:
+  - User credentianls (NTLM)
   - ADFS user credentials (ADFS, WAP -> Basic/NTLM, WAP -> ADFS)
   - Behind reverse proxy (TMG, WAP -> Basic/NTLM, WAP -> ADFS)
   - Form-based authentication (FBA)
 - SharePoint Online:
-  - Addin only permissions
   - SAML based with user credentials
+  - Add-In only permissions
   - ADFS user credentials (automatically detects in SAML strategy)
 
 ## Installation
@@ -42,7 +41,16 @@ go get github.com/koltyakov/gosip
 
 1\. Understand SharePoint environment type and authentication strategy.
 
-Let's assume it's, SharePoint Online and Addin Only permissions. Then `strategy "github.com/koltyakov/gosip/auth/addin"` subpackage should be used.
+Let's assume it's, SharePoint Online and Add-In Only permissions. Then `strategy "github.com/koltyakov/gosip/auth/addin"` subpackage should be used.
+
+```golang
+package main
+
+import (
+	"github.com/koltyakov/gosip"
+	strategy "github.com/koltyakov/gosip/auth/addin"
+)
+```
 
 2\. Initiate authentication object.
 
