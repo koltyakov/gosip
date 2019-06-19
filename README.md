@@ -1,4 +1,4 @@
-# gosip - SharePoint HTTP client for Go (Golang)
+# gosip - SharePoint Auth & HTTP client for Go (Golang)
 
 ![Build Status](https://koltyakov.visualstudio.com/SPNode/_apis/build/status/gosip?branchName=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/koltyakov/gosip)](https://goreportcard.com/report/github.com/koltyakov/gosip)
@@ -14,17 +14,19 @@
 
 `gosip` allows you to perform SharePoint unattended (without user interaction) http authentication with Go (Golang) using different authentication strategies.
 
-Supported SharePoint versions:
+Simplifies SharePoint API consumption such as REST API, CSOM (client.svc/ProcessQuery), etc.
+
+### Supported SharePoint versions:
 
 - SharePoint Online (SPO)
-- On-Prem: 2019, 2016, and 2013
+- On-Premises (2019/2016/2013)
 
-Authentication strategies:
+### Authentication strategies:
 
 - SharePoint On-Premises 2019/2016/2013:
   - User credentianls (NTLM)
   - ADFS user credentials (ADFS, WAP -> Basic/NTLM, WAP -> ADFS)
-  - Behind reverse proxy (TMG, WAP -> Basic/NTLM, WAP -> ADFS)
+  - Behind a reverse proxy (Forefront TMG, WAP -> Basic/NTLM, WAP -> ADFS)
   - Form-based authentication (FBA)
 - SharePoint Online:
   - SAML based with user credentials
