@@ -48,3 +48,4 @@ steps:
     version: 'v0.7.32'
     cwd: '$(modulePath)'
     failOnError: 'SKIP'
+  condition: and(succeeded(), contains(variables['Build.SourceVersionMessage'], '[fossa check]'))
