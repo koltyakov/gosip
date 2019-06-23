@@ -4,8 +4,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/koltyakov/gosip)](https://goreportcard.com/report/github.com/koltyakov/gosip)
 [![GoDoc](https://godoc.org/github.com/koltyakov/gosip?status.svg)](https://godoc.org/github.com/koltyakov/gosip)
 [![License](https://img.shields.io/github/license/koltyakov/gosip.svg)](https://github.com/koltyakov/gosip/blob/master/LICENSE)
-[![Sourcegraph](https://sourcegraph.com/github.com/koltyakov/gosip/-/badge.svg)](https://sourcegraph.com/github.com/koltyakov/gosip?badge)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkoltyakov%2Fgosip.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkoltyakov%2Fgosip?ref=badge_shield)
+[![Sourcegraph](https://sourcegraph.com/github.com/koltyakov/gosip/-/badge.svg)](https://sourcegraph.com/github.com/koltyakov/gosip?badge)
 
 <p align="center">
   <img src="./assets/gosip2.png" />
