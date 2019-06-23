@@ -40,10 +40,3 @@ steps:
     SPAUTH_PASSWORD: $(ci.spo.password)
     SPAUTH_CLIENTID: $(ci.spo.clientid)
     SPAUTH_CLIENTSECRET: $(ci.spo.clientsecret)
-
-- task: FOSSA@0
-  inputs:
-    FOSSAService: 'FOSSA'
-    source: 'INSTALL'
-    version: 'v0.7.32'
-    failOnError: 'SKIP'
