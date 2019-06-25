@@ -16,6 +16,7 @@ func main() {
 		log.Fatalf("unable to get config: %v", err)
 	}
 
+	http.HandleFunc("/digest", handlers.GetDigest(auth))
 	http.HandleFunc("/web", handlers.GetWeb(auth))
 	http.HandleFunc("/file", handlers.GetFile(auth))
 	http.HandleFunc("/", handlers.Proxy(auth))
