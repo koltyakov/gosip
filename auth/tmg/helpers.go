@@ -67,7 +67,8 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	authCookie := resp.Header.Get("Set-Cookie") // TODO: parse TMG cookie only (?)
 
 	// TODO: ttl detection
-	storage.Set(cacheKey, authCookie, 60*60*time.Second)
+	expirity := time.Hour
+	storage.Set(cacheKey, authCookie, expirity)
 
 	return authCookie, nil
 }

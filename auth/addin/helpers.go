@@ -112,7 +112,8 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		return "", fmt.Errorf("%s", results.Error)
 	}
 
-	storage.Set(cacheKey, results.AccessToken, (results.ExpiresIn-60)*time.Second)
+	expirity := (results.ExpiresIn - 60) * time.Second
+	storage.Set(cacheKey, results.AccessToken, expirity)
 
 	return results.AccessToken, nil
 

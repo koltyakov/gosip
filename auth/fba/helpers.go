@@ -59,9 +59,9 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	// fmt.Printf("FBA: %s\n", string(res))
 
 	type fbaResponse struct {
-		ErrorCode      string `xml:"Body>LoginResponse>LoginResult>ErrorCode"`
-		CookieName     string `xml:"Body>LoginResponse>LoginResult>CookieName"`
-		TimeoutSeconds int64  `xml:"Body>LoginResponse>LoginResult>TimeoutSeconds"`
+		ErrorCode      string        `xml:"Body>LoginResponse>LoginResult>ErrorCode"`
+		CookieName     string        `xml:"Body>LoginResponse>LoginResult>CookieName"`
+		TimeoutSeconds time.Duration `xml:"Body>LoginResponse>LoginResult>TimeoutSeconds"`
 	}
 	result := &fbaResponse{}
 	if err := xml.Unmarshal(res, &result); err != nil {
@@ -79,8 +79,9 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	// fmt.Printf("FBA: %s\n", string(result.CookieName))
 
 	authCookie := resp.Header.Get("Set-Cookie") // TODO: parse FBA cookie only (?)
+	expirity := (result.TimeoutSeconds - 60) * time.Second
 
-	storage.Set(cacheKey, authCookie, time.Duration(result.TimeoutSeconds-60)*time.Second)
+	storage.Set(cacheKey, authCookie, expirity)
 
 	return authCookie, nil
 }

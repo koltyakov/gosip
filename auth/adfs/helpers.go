@@ -41,7 +41,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 			return "", err
 		}
 		if expires == "" {
-			expirity = time.Duration(30) * time.Minute
+			expirity = 30 * time.Minute // ToDO: move to settings or dynamically get
 		}
 	} else {
 		authCookie, expires, err = adfsAuthFlow(creds, "")
@@ -49,7 +49,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 			return "", err
 		}
 		expiresTime, _ := time.Parse(time.RFC3339, expires)
-		expirity = (time.Until(expiresTime) - 60) * time.Second
+		expirity = time.Until(expiresTime) - 60*time.Second
 	}
 
 	storage.Set(cacheKey, authCookie, expirity)

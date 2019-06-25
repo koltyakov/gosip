@@ -63,10 +63,12 @@ func GetDigest(client *SPClient) (string, error) {
 		return "", errors.New("received empty FormDigestValue")
 	}
 
+	expirity := (results.D.GetContextWebInformation.FormDigestTimeoutSeconds - 60) * time.Second
+
 	storage.Set(
 		cacheKey,
 		results.D.GetContextWebInformation.FormDigestValue,
-		results.D.GetContextWebInformation.FormDigestTimeoutSeconds*time.Second,
+		expirity,
 	)
 
 	return results.D.GetContextWebInformation.FormDigestValue, nil
