@@ -3,6 +3,7 @@ package gosip
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -28,7 +29,7 @@ type contextInfoResponse struct {
 func GetDigest(client *SPClient) (string, error) {
 	siteURL := client.AuthCnfg.GetSiteURL()
 
-	cacheKey := siteURL + "@digest@" + "" // TODO: add unique identity for the client
+	cacheKey := siteURL + "@digest@" + fmt.Sprintf("%#v", client.AuthCnfg)
 	if digestValue, found := storage.Get(cacheKey); found {
 		return digestValue.(string), nil
 	}
