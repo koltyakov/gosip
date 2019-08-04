@@ -87,7 +87,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 
 	resp, err := c.Do(req)
 
-	if err == nil && resp.StatusCode != 200 {
+	if err == nil && !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
 		err = fmt.Errorf("%s", resp.Status)
 	}
 
