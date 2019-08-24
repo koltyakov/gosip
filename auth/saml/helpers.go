@@ -39,7 +39,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	}
 
 	notAfterTime, _ := time.Parse(time.RFC3339, notAfter)
-	expirity := time.Until(notAfterTime) - 60 * time.Second
+	expirity := time.Until(notAfterTime) - 60*time.Second
 	storage.Set(cacheKey, authCookie, expirity)
 
 	return authCookie, nil
