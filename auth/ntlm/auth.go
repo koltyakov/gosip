@@ -86,8 +86,14 @@ func (c *AuthCnfg) GetStrategy() string {
 // SetAuth : authenticate request
 func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
 	// NTML + Negotiation
-	httpClient.Transport = ntlmssp.Negotiator{
-		RoundTripper: &http.Transport{},
+	if httpClient.Transport != nil {
+		httpClient.Transport = ntlmssp.Negotiator{
+			RoundTripper: httpClient.Transport, // custom transport
+		}
+	} else {
+		httpClient.Transport = ntlmssp.Negotiator{
+			RoundTripper: &http.Transport{},
+		}
 	}
 	req.SetBasicAuth(c.Username, c.Password)
 	return nil
