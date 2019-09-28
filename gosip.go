@@ -85,6 +85,8 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		req.Header.Add("X-RequestDigest", digest)
 	}
 
+	req.Header.Add("X-ClientService-ClientTag", "Gosip:@1.0.0")
+
 	resp, err := c.Do(req)
 
 	if err == nil && !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
