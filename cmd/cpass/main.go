@@ -18,7 +18,7 @@ func main() {
 	flag.StringVar(&mode, "mode", "encode", "Mode: encode/decode")
 	flag.Parse()
 
-	crypt := cpass.Cpass("")
+	crypt := cpass.Cpass(masterKey)
 
 	if mode == "encode" {
 		secret, _ := crypt.Encode(rawSecret)
