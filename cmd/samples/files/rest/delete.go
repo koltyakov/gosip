@@ -13,7 +13,7 @@ import (
 func DeleteFile(client *gosip.SPClient, fileRelativeURL string) (string, error) {
 
 	endpoint := fmt.Sprintf(
-		"%s/_api/Web/GetFileByServerRelativeUrl(@FileServerRelativeUrl)/$value?@FileServerRelativeUrl='%s'",
+		"%s/_api/Web/GetFileByServerRelativeUrl(@FileServerRelativeUrl)?@FileServerRelativeUrl='%s'",
 		client.AuthCnfg.GetSiteURL(),
 		url.QueryEscape(fileRelativeURL),
 	)
