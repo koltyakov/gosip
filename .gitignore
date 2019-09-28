@@ -3,6 +3,7 @@ bin/
 pkg/
 tmp/
 debug/
+download/
 
 # Binaries for programs and plugins
 *.exe
