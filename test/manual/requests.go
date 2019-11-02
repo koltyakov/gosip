@@ -1,36 +1,19 @@
 package manual
 
 import (
-	"bytes"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 
 	"github.com/koltyakov/gosip"
+	"github.com/koltyakov/gosip/sprest"
 )
 
 // CheckBasicPost : try creating an item
 func CheckBasicPost(client *gosip.SPClient) (string, error) {
+	sp := &sprest.HTTPClient{SPClient: client}
 	endpoint := client.AuthCnfg.GetSiteURL() + "/_api/web/lists/getByTitle('Custom')/items"
-	req, err := http.NewRequest(
-		"POST",
-		endpoint,
-		bytes.NewBuffer([]byte(`{"__metadata":{"type":"SP.Data.CustomListItem"},"Title":"Test"}`)),
-	)
-	if err != nil {
-		return "", fmt.Errorf("unable to create a request: %v", err)
-	}
+	body := `{"__metadata":{"type":"SP.Data.CustomListItem"},"Title":"Test"}`
 
-	req.Header.Set("Accept", "application/json;odata=verbose")
-	req.Header.Set("Content-Type", "application/json;odata=verbose")
-
-	resp, err := client.Execute(req)
-	if err != nil {
-		return "", fmt.Errorf("unable to request api: %v", err)
-	}
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := sp.Post(endpoint, []byte(body), nil)
 	if err != nil {
 		return "", fmt.Errorf("unable to read a response: %v", err)
 	}
