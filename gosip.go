@@ -16,9 +16,12 @@ package gosip
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
+
+const version = "1.0.0"
 
 // AuthCnfg is an abstract auth config interface,
 // allows different authentications strategies' dependency injection
@@ -47,6 +50,8 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	if c.ConfigPath != "" && c.AuthCnfg.GetSiteURL() == "" {
 		c.AuthCnfg.ReadConfig(c.ConfigPath)
 	}
+
+	// Can't resolve context siteURL
 	if c.AuthCnfg.GetSiteURL() == "" {
 		res := &http.Response{
 			Status:     "400 Bad Request",
@@ -85,12 +90,28 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		req.Header.Add("X-RequestDigest", digest)
 	}
 
-	req.Header.Add("X-ClientService-ClientTag", "Gosip:@1.0.0")
+	// Default SP REST API headers
+	if req.Header.Get("Accept") == "" {
+		req.Header.Add("Accept", "application/json")
+	}
+	if req.Header.Get("Content-Type") == "" {
+		req.Header.Add("Content-Type", "application/json;odata=verbose;charset=utf-8")
+	}
+
+	// Vendor/client header
+	if req.Header.Get("X-ClientService-ClientTag") == "" {
+		req.Header.Add("X-ClientService-ClientTag", fmt.Sprintf("Gosip:@%s", version))
+	}
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Add("User-Agent", fmt.Sprintf("NONISV|Go|Gosip/@%s", version))
+	}
 
 	resp, err := c.Do(req)
 
 	if err == nil && !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
-		err = fmt.Errorf("%s", resp.Status)
+		defer resp.Body.Close()
+		details, _ := ioutil.ReadAll(resp.Body)
+		err = fmt.Errorf("%s :: %s", resp.Status, details)
 	}
 
 	return resp, err
