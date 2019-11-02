@@ -223,8 +223,7 @@ func main() {
 	configPath := "./config/private.ntlm.json"
 	auth := &strategy.AuthCnfg{}
 
-	err := auth.ReadConfig(configPath)
-	if err != nil {
+	if err := auth.ReadConfig(configPath); err != nil {
 		log.Fatalf("unable to get config: %v\n", err)
 	}
 
@@ -250,6 +249,53 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to read a response: %v\n", err)
 	}
+
+	fmt.Printf("response: %s\n", data)
+}
+```
+
+### SPRest helper
+
+Provides generic GET/POST helpers for REST operations, reducing amount of `http.NewRequest` scaffolded code.
+
+```golang
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+
+	"github.com/koltyakov/gosip"
+	"github.com/koltyakov/gosip/sprest"
+	strategy "github.com/koltyakov/gosip/auth/ntlm"
+)
+
+func main() {
+	configPath := "./config/private.ntlm.json"
+	auth := &strategy.AuthCnfg{}
+
+	if err := auth.ReadConfig(configPath); err != nil {
+		log.Fatalf("unable to get config: %v\n", err)
+	}
+
+	sp := &sprest.HttpClient{
+		SPClient: &gosip.SPClient{
+			AuthCnfg: auth,
+		},
+	}
+
+	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
+
+	data, err := sp.Get(endpoint, nil)
+	if err != nil {
+		log.Fatalf("%v\n", err)
+	}
+
+	// sp.Post(endpoint, []byte(body), nil) // generic POST
+	// sp.Delete(endpoint, nil) // generic DELETE helper crafts "X-Http-Method"="DELETE" header
+	// sp.Update(endpoint, nil) // generic UPDATE helper crafts "X-Http-Method"="MERGE" header
 
 	fmt.Printf("response: %s\n", data)
 }
