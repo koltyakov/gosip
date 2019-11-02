@@ -25,8 +25,8 @@ func (ctx *HTTPClient) Get(endpoint string, headers map[string]string) ([]byte, 
 	req.Header.Set("Accept", "application/json;odata=verbose") // default to SP2013 for backwards compatibility
 
 	// Apply custom headers
-	for _, key := range headers {
-		req.Header.Set(key, headers[key])
+	for key, value := range headers {
+		req.Header.Set(key, value)
 	}
 
 	resp, err := ctx.SPClient.Execute(req)
@@ -50,8 +50,8 @@ func (ctx *HTTPClient) Post(endpoint string, body []byte, headers map[string]str
 	req.Header.Set("Content-Type", "application/json;odata=verbose;charset=utf-8")
 
 	// Apply custom headers
-	for _, key := range headers {
-		req.Header.Set(key, headers[key])
+	for key, value := range headers {
+		req.Header.Set(key, value)
 	}
 
 	resp, err := ctx.SPClient.Execute(req)
@@ -77,8 +77,8 @@ func (ctx *HTTPClient) Delete(endpoint string, headers map[string]string) ([]byt
 	req.Header.Add("If-Match", "*")
 
 	// Apply custom headers
-	for _, key := range headers {
-		req.Header.Set(key, headers[key])
+	for key, value := range headers {
+		req.Header.Set(key, value)
 	}
 
 	resp, err := ctx.SPClient.Execute(req)
@@ -104,8 +104,8 @@ func (ctx *HTTPClient) Update(endpoint string, body []byte, headers map[string]s
 	req.Header.Add("If-Match", "*")
 
 	// Apply custom headers
-	for _, key := range headers {
-		req.Header.Set(key, headers[key])
+	for key, value := range headers {
+		req.Header.Set(key, value)
 	}
 
 	resp, err := ctx.SPClient.Execute(req)
