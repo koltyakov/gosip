@@ -280,7 +280,7 @@ func main() {
 		log.Fatalf("unable to get config: %v\n", err)
 	}
 
-	sp := &sprest.HttpClient{
+	sp := &sprest.HTTPClient{
 		SPClient: &gosip.SPClient{
 			AuthCnfg: auth,
 		},
