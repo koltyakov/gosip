@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -84,4 +85,45 @@ func (folder *Folder) Files() *Files {
 			folder.endpoint,
 		),
 	}
+}
+
+// GetItem ...
+func (folder *Folder) GetItem() (*Item, error) {
+	endpoint := fmt.Sprintf("%s/ListItemAllFields", folder.endpoint)
+	apiURL, _ := url.Parse(endpoint)
+	query := url.Values{}
+	query.Add("$select", "Id")
+	apiURL.RawQuery = query.Encode()
+	sp := &HTTPClient{SPClient: folder.client}
+
+	headers := make(map[string]string)
+	headers["Accept"] = "application/json;odata=verbose"
+	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
+
+	data, err := sp.Get(apiURL.String(), headers)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &struct {
+		D struct {
+			Metadata struct {
+				URI string `json:"id"`
+			} `json:"__metadata"`
+		} `json:"d"`
+	}{}
+
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Item{
+		client: folder.client,
+		conf:   folder.conf,
+		endpoint: fmt.Sprintf("%s/_api/%s",
+			folder.client.AuthCnfg.GetSiteURL(),
+			res.D.Metadata.URI,
+		),
+	}, nil
 }
