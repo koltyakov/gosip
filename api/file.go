@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -60,4 +61,46 @@ func (file *File) Recycle() ([]byte, error) {
 	sp := &HTTPClient{SPClient: file.client}
 	endpoint := fmt.Sprintf("%s/Recycle", file.endpoint)
 	return sp.Post(endpoint, nil, GetConfHeaders(file.conf))
+}
+
+// GetItem ...
+func (file *File) GetItem() (*Item, error) {
+	endpoint := fmt.Sprintf("%s/ListItemAllFields", file.endpoint)
+	apiURL, _ := url.Parse(endpoint)
+	query := url.Values{}
+	query.Add("$select", "Id")
+	apiURL.RawQuery = query.Encode()
+	sp := &HTTPClient{SPClient: file.client}
+
+	headers := map[string]string{
+		"Accept":       "application/json;odata=verbose",
+		"Content-Type": "application/json;odata=verbose;charset=utf-8",
+	}
+
+	data, err := sp.Get(apiURL.String(), headers)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &struct {
+		D struct {
+			Metadata struct {
+				URI string `json:"id"`
+			} `json:"__metadata"`
+		} `json:"d"`
+	}{}
+
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Item{
+		client: file.client,
+		conf:   file.conf,
+		endpoint: fmt.Sprintf("%s/_api/%s",
+			file.client.AuthCnfg.GetSiteURL(),
+			res.D.Metadata.URI,
+		),
+	}, nil
 }
