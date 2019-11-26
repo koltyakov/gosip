@@ -41,26 +41,26 @@ func (web *Web) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(web.endpoint)
 	query := url.Values{}
 	if web.oSelect != "" {
-		query.Add("$select", TrimMultiline(web.oSelect))
+		query.Add("$select", trimMultiline(web.oSelect))
 	}
 	if web.oExpand != "" {
-		query.Add("$expand", TrimMultiline(web.oExpand))
+		query.Add("$expand", trimMultiline(web.oExpand))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: web.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(web.conf))
+	sp := NewHTTPClient(web.client)
+	return sp.Get(apiURL.String(), getConfHeaders(web.conf))
 }
 
 // Delete ...
 func (web *Web) Delete() ([]byte, error) {
-	sp := &HTTPClient{SPClient: web.client}
-	return sp.Delete(web.endpoint, GetConfHeaders(web.conf))
+	sp := NewHTTPClient(web.client)
+	return sp.Delete(web.endpoint, getConfHeaders(web.conf))
 }
 
 // Update ...
 func (web *Web) Update(body []byte) ([]byte, error) {
-	sp := &HTTPClient{SPClient: web.client}
-	return sp.Update(web.endpoint, body, GetConfHeaders(web.conf))
+	sp := NewHTTPClient(web.client)
+	return sp.Update(web.endpoint, body, getConfHeaders(web.conf))
 }
 
 // Lists ...
@@ -77,7 +77,7 @@ func (web *Web) GetList(listURI string) *List {
 	// Prepend web relative URL to "Lists/ListPath" URIs
 	if string([]rune(listURI)[0]) != "/" {
 		absoluteURL := strings.Split(web.endpoint, "/_api")[0]
-		relativeURL := GetRelativeURL(absoluteURL)
+		relativeURL := getRelativeURL(absoluteURL)
 		listURI = fmt.Sprintf("%s/%s", relativeURL, listURI)
 	}
 	return &List{
@@ -93,10 +93,10 @@ func (web *Web) GetList(listURI string) *List {
 
 // EnsureUser ...
 func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
-	sp := &HTTPClient{SPClient: web.client}
+	sp := NewHTTPClient(web.client)
 	endpoint := fmt.Sprintf("%s/ensureUser", web.endpoint)
 
-	headers := GetConfHeaders(web.conf)
+	headers := getConfHeaders(web.conf)
 	headers["Accept"] = "application/json;odata=verbose"
 
 	body := fmt.Sprintf(`{"logonName": "%s"}`, loginName)

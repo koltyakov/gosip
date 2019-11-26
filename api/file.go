@@ -40,27 +40,27 @@ func (file *File) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(file.endpoint)
 	query := url.Values{}
 	if file.oSelect != "" {
-		query.Add("$select", TrimMultiline(file.oSelect))
+		query.Add("$select", trimMultiline(file.oSelect))
 	}
 	if file.oExpand != "" {
-		query.Add("$expand", TrimMultiline(file.oExpand))
+		query.Add("$expand", trimMultiline(file.oExpand))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: file.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(file.conf))
+	sp := NewHTTPClient(file.client)
+	return sp.Get(apiURL.String(), getConfHeaders(file.conf))
 }
 
 // Delete ...
 func (file *File) Delete() ([]byte, error) {
-	sp := &HTTPClient{SPClient: file.client}
-	return sp.Delete(file.endpoint, GetConfHeaders(file.conf))
+	sp := NewHTTPClient(file.client)
+	return sp.Delete(file.endpoint, getConfHeaders(file.conf))
 }
 
 // Recycle ...
 func (file *File) Recycle() ([]byte, error) {
-	sp := &HTTPClient{SPClient: file.client}
+	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/Recycle", file.endpoint)
-	return sp.Post(endpoint, nil, GetConfHeaders(file.conf))
+	return sp.Post(endpoint, nil, getConfHeaders(file.conf))
 }
 
 // GetItem ...
@@ -70,7 +70,7 @@ func (file *File) GetItem() (*Item, error) {
 	query := url.Values{}
 	query.Add("$select", "Id")
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: file.client}
+	sp := NewHTTPClient(file.client)
 
 	headers := map[string]string{
 		"Accept":       "application/json;odata=verbose",

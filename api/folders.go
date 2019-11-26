@@ -67,30 +67,30 @@ func (folders *Folders) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(folders.endpoint)
 	query := url.Values{}
 	if folders.oSelect != "" {
-		query.Add("$select", TrimMultiline(folders.oSelect))
+		query.Add("$select", trimMultiline(folders.oSelect))
 	}
 	if folders.oExpand != "" {
-		query.Add("$expand", TrimMultiline(folders.oExpand))
+		query.Add("$expand", trimMultiline(folders.oExpand))
 	}
 	if folders.oFilter != "" {
-		query.Add("$filter", TrimMultiline(folders.oFilter))
+		query.Add("$filter", trimMultiline(folders.oFilter))
 	}
 	if folders.oTop != 0 {
 		query.Add("$top", fmt.Sprintf("%d", folders.oTop))
 	}
 	if folders.oOrderBy != "" {
-		query.Add("$orderBy", TrimMultiline(folders.oOrderBy))
+		query.Add("$orderBy", trimMultiline(folders.oOrderBy))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: folders.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(folders.conf))
+	sp := NewHTTPClient(folders.client)
+	return sp.Get(apiURL.String(), getConfHeaders(folders.conf))
 }
 
 // Add ...
 func (folders *Folders) Add(folderName string) ([]byte, error) {
-	sp := &HTTPClient{SPClient: folders.client}
+	sp := NewHTTPClient(folders.client)
 	endpoint := fmt.Sprintf("%s/Add('%s')", folders.endpoint, folderName)
-	return sp.Post(endpoint, nil, GetConfHeaders(folders.conf))
+	return sp.Post(endpoint, nil, getConfHeaders(folders.conf))
 }
 
 // GetByName ...

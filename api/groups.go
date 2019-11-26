@@ -67,29 +67,29 @@ func (groups *Groups) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(groups.endpoint)
 	query := url.Values{}
 	if groups.oSelect != "" {
-		query.Add("$select", TrimMultiline(groups.oSelect))
+		query.Add("$select", trimMultiline(groups.oSelect))
 	}
 	if groups.oExpand != "" {
-		query.Add("$expand", TrimMultiline(groups.oExpand))
+		query.Add("$expand", trimMultiline(groups.oExpand))
 	}
 	if groups.oFilter != "" {
-		query.Add("$filter", TrimMultiline(groups.oFilter))
+		query.Add("$filter", trimMultiline(groups.oFilter))
 	}
 	if groups.oTop != 0 {
 		query.Add("$top", fmt.Sprintf("%d", groups.oTop))
 	}
 	if groups.oOrderBy != "" {
-		query.Add("$orderBy", TrimMultiline(groups.oOrderBy))
+		query.Add("$orderBy", trimMultiline(groups.oOrderBy))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: groups.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(groups.conf))
+	sp := NewHTTPClient(groups.client)
+	return sp.Get(apiURL.String(), getConfHeaders(groups.conf))
 }
 
 // Add ...
 func (groups *Groups) Add(body []byte) ([]byte, error) {
-	sp := &HTTPClient{SPClient: groups.client}
-	return sp.Post(groups.endpoint, body, GetConfHeaders(groups.conf))
+	sp := NewHTTPClient(groups.client)
+	return sp.Post(groups.endpoint, body, getConfHeaders(groups.conf))
 }
 
 // GetByID ...

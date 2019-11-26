@@ -36,47 +36,47 @@ type Roles struct {
 
 // ResetInheritance ...
 func (permissions *Roles) ResetInheritance() error {
-	sp := &HTTPClient{SPClient: permissions.client}
+	sp := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf("%s/ResetRoleInheritance", permissions.endpoint)
-	_, err := sp.Post(endpoint, nil, GetConfHeaders(permissions.conf))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.conf))
 	return err
 }
 
 // BreakInheritance ...
 func (permissions *Roles) BreakInheritance(copyRoleAssigments bool, clearSubScopes bool) error {
-	sp := &HTTPClient{SPClient: permissions.client}
+	sp := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf(
 		"%s/BreakRoleInheritance(copyroleassignments=%t,clearsubscopes=%t)",
 		permissions.endpoint,
 		copyRoleAssigments,
 		clearSubScopes,
 	)
-	_, err := sp.Post(endpoint, nil, GetConfHeaders(permissions.conf))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.conf))
 	return err
 }
 
 // AddAssigment ...
 func (permissions *Roles) AddAssigment(principalID int, roleDefID int) error {
-	sp := &HTTPClient{SPClient: permissions.client}
+	sp := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf(
 		"%s/RoleAssignments/AddRoleAssignment(principalid=%d,roledefid=%d)",
 		permissions.endpoint,
 		principalID,
 		roleDefID,
 	)
-	_, err := sp.Post(endpoint, nil, GetConfHeaders(permissions.conf))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.conf))
 	return err
 }
 
 // RemoveAssigment ...
 func (permissions *Roles) RemoveAssigment(principalID int, roleDefID int) error {
-	sp := &HTTPClient{SPClient: permissions.client}
+	sp := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf(
 		"%s/RoleAssignments/RemoveRoleAssignment(principalid=%d,roledefid=%d)",
 		permissions.endpoint,
 		principalID,
 		roleDefID,
 	)
-	_, err := sp.Post(endpoint, nil, GetConfHeaders(permissions.conf))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.conf))
 	return err
 }

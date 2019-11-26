@@ -67,22 +67,22 @@ func (lists *Lists) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(lists.endpoint)
 	query := url.Values{}
 	if lists.oSelect != "" {
-		query.Add("$select", TrimMultiline(lists.oSelect))
+		query.Add("$select", trimMultiline(lists.oSelect))
 	}
 	if lists.oExpand != "" {
-		query.Add("$expand", TrimMultiline(lists.oExpand))
+		query.Add("$expand", trimMultiline(lists.oExpand))
 	}
 	if lists.oFilter != "" {
-		query.Add("$filter", TrimMultiline(lists.oFilter))
+		query.Add("$filter", trimMultiline(lists.oFilter))
 	}
 	if lists.oTop != 0 {
 		query.Add("$top", fmt.Sprintf("%d", lists.oTop))
 	}
 	if lists.oOrderBy != "" {
-		query.Add("$orderBy", TrimMultiline(lists.oOrderBy))
+		query.Add("$orderBy", trimMultiline(lists.oOrderBy))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: lists.client}
+	sp := NewHTTPClient(lists.client)
 	headers := map[string]string{}
 	if lists.conf != nil {
 		headers = lists.conf.Headers

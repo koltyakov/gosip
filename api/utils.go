@@ -5,17 +5,8 @@ import (
 	"strings"
 )
 
-// TrimMultiline - trims multiline
-func TrimMultiline(multi string) string {
-	res := ""
-	for _, line := range strings.Split(multi, "\n") {
-		res += strings.Trim(line, "\t")
-	}
-	return res
-}
-
 // GetConfHeaders resolves headers from config overrides
-func GetConfHeaders(conf *Conf) map[string]string {
+func getConfHeaders(conf *Conf) map[string]string {
 	headers := map[string]string{}
 	if conf != nil {
 		headers = conf.Headers
@@ -23,8 +14,17 @@ func GetConfHeaders(conf *Conf) map[string]string {
 	return headers
 }
 
+// TrimMultiline - trims multiline
+func trimMultiline(multi string) string {
+	res := ""
+	for _, line := range strings.Split(multi, "\n") {
+		res += strings.Trim(line, "\t")
+	}
+	return res
+}
+
 // GetRelativeURL out of an absolute one
-func GetRelativeURL(absURL string) string {
+func getRelativeURL(absURL string) string {
 	url, _ := url.Parse(absURL)
 	return url.Path
 }

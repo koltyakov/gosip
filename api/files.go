@@ -67,23 +67,23 @@ func (files *Files) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(files.endpoint)
 	query := url.Values{}
 	if files.oSelect != "" {
-		query.Add("$select", TrimMultiline(files.oSelect))
+		query.Add("$select", trimMultiline(files.oSelect))
 	}
 	if files.oExpand != "" {
-		query.Add("$expand", TrimMultiline(files.oExpand))
+		query.Add("$expand", trimMultiline(files.oExpand))
 	}
 	if files.oFilter != "" {
-		query.Add("$filter", TrimMultiline(files.oFilter))
+		query.Add("$filter", trimMultiline(files.oFilter))
 	}
 	if files.oTop != 0 {
 		query.Add("$top", fmt.Sprintf("%d", files.oTop))
 	}
 	if files.oOrderBy != "" {
-		query.Add("$orderBy", TrimMultiline(files.oOrderBy))
+		query.Add("$orderBy", trimMultiline(files.oOrderBy))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: files.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(files.conf))
+	sp := NewHTTPClient(files.client)
+	return sp.Get(apiURL.String(), getConfHeaders(files.conf))
 }
 
 // GetByName ...
@@ -100,7 +100,7 @@ func (files *Files) GetByName(fileName string) *File {
 
 // Add ...
 func (files *Files) Add(name string, content []byte, overwrite bool) ([]byte, error) {
-	sp := &HTTPClient{SPClient: files.client}
+	sp := NewHTTPClient(files.client)
 	endpoint := fmt.Sprintf("%s/Add(overwrite=%t,url='%s')", files.endpoint, overwrite, name)
-	return sp.Post(endpoint, content, GetConfHeaders(files.conf))
+	return sp.Post(endpoint, content, getConfHeaders(files.conf))
 }

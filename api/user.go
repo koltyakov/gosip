@@ -50,14 +50,14 @@ func (user *User) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(user.endpoint)
 	query := url.Values{}
 	if user.oSelect != "" {
-		query.Add("$select", TrimMultiline(user.oSelect))
+		query.Add("$select", trimMultiline(user.oSelect))
 	}
 	if user.oExpand != "" {
-		query.Add("$expand", TrimMultiline(user.oExpand))
+		query.Add("$expand", trimMultiline(user.oExpand))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: user.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(user.conf))
+	sp := NewHTTPClient(user.client)
+	return sp.Get(apiURL.String(), getConfHeaders(user.conf))
 }
 
 // Groups ...

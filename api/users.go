@@ -67,23 +67,23 @@ func (users *Users) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(users.endpoint)
 	query := url.Values{}
 	if users.oSelect != "" {
-		query.Add("$select", TrimMultiline(users.oSelect))
+		query.Add("$select", trimMultiline(users.oSelect))
 	}
 	if users.oExpand != "" {
-		query.Add("$expand", TrimMultiline(users.oExpand))
+		query.Add("$expand", trimMultiline(users.oExpand))
 	}
 	if users.oFilter != "" {
-		query.Add("$filter", TrimMultiline(users.oFilter))
+		query.Add("$filter", trimMultiline(users.oFilter))
 	}
 	if users.oTop != 0 {
 		query.Add("$top", fmt.Sprintf("%d", users.oTop))
 	}
 	if users.oOrderBy != "" {
-		query.Add("$orderBy", TrimMultiline(users.oOrderBy))
+		query.Add("$orderBy", trimMultiline(users.oOrderBy))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: users.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(users.conf))
+	sp := NewHTTPClient(users.client)
+	return sp.Get(apiURL.String(), getConfHeaders(users.conf))
 }
 
 // GetByID ...

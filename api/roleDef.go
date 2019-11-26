@@ -29,7 +29,7 @@ type RoleDefInfo struct {
 }
 
 func getRoleDef(def *RoleDefinitions, endpoint string) (*RoleDefInfo, error) {
-	sp := &HTTPClient{SPClient: def.client}
+	sp := NewHTTPClient(def.client)
 
 	headers := map[string]string{
 		"Accept": "application/json;odata=verbose",
@@ -72,8 +72,8 @@ func (def *RoleDefinitions) GetByType(roleTypeKind int) (*RoleDefInfo, error) {
 
 // Get ...
 func (def *RoleDefinitions) Get() ([]*RoleDefInfo, error) {
-	sp := &HTTPClient{SPClient: def.client}
-	data, err := sp.Get(def.endpoint, GetConfHeaders(def.conf))
+	sp := NewHTTPClient(def.client)
+	data, err := sp.Get(def.endpoint, getConfHeaders(def.conf))
 	if err != nil {
 		return nil, err
 	}

@@ -40,27 +40,27 @@ func (folder *Folder) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(folder.endpoint)
 	query := url.Values{}
 	if folder.oSelect != "" {
-		query.Add("$select", TrimMultiline(folder.oSelect))
+		query.Add("$select", trimMultiline(folder.oSelect))
 	}
 	if folder.oExpand != "" {
-		query.Add("$expand", TrimMultiline(folder.oExpand))
+		query.Add("$expand", trimMultiline(folder.oExpand))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: folder.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(folder.conf))
+	sp := NewHTTPClient(folder.client)
+	return sp.Get(apiURL.String(), getConfHeaders(folder.conf))
 }
 
 // Delete ...
 func (folder *Folder) Delete() ([]byte, error) {
-	sp := &HTTPClient{SPClient: folder.client}
-	return sp.Delete(folder.endpoint, GetConfHeaders(folder.conf))
+	sp := NewHTTPClient(folder.client)
+	return sp.Delete(folder.endpoint, getConfHeaders(folder.conf))
 }
 
 // Recycle ...
 func (folder *Folder) Recycle() ([]byte, error) {
-	sp := &HTTPClient{SPClient: folder.client}
+	sp := NewHTTPClient(folder.client)
 	endpoint := fmt.Sprintf("%s/Recycle", folder.endpoint)
-	return sp.Post(endpoint, nil, GetConfHeaders(folder.conf))
+	return sp.Post(endpoint, nil, getConfHeaders(folder.conf))
 }
 
 // Folders ...
@@ -94,7 +94,7 @@ func (folder *Folder) GetItem() (*Item, error) {
 	query := url.Values{}
 	query.Add("$select", "Id")
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: folder.client}
+	sp := NewHTTPClient(folder.client)
 
 	headers := make(map[string]string)
 	headers["Accept"] = "application/json;odata=verbose"

@@ -254,7 +254,7 @@ func main() {
 }
 ```
 
-### SPRest helper
+### SPRest HTTP helper
 
 Provides generic GET/POST helpers for REST operations, reducing amount of `http.NewRequest` scaffolded code.
 
@@ -268,7 +268,7 @@ import (
 	"net/http"
 
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/sprest"
+	"github.com/koltyakov/gosip/api"
 	strategy "github.com/koltyakov/gosip/auth/ntlm"
 )
 
@@ -280,11 +280,7 @@ func main() {
 		log.Fatalf("unable to get config: %v\n", err)
 	}
 
-	sp := &sprest.HTTPClient{
-		SPClient: &gosip.SPClient{
-			AuthCnfg: auth,
-		},
-	}
+	sp := api.NewHTTPClient(&gosip.SPClient{AuthCnfg: auth})
 
 	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
 

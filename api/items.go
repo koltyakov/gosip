@@ -68,29 +68,29 @@ func (items *Items) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(items.endpoint)
 	query := url.Values{}
 	if items.oSelect != "" {
-		query.Add("$select", TrimMultiline(items.oSelect))
+		query.Add("$select", trimMultiline(items.oSelect))
 	}
 	if items.oExpand != "" {
-		query.Add("$expand", TrimMultiline(items.oExpand))
+		query.Add("$expand", trimMultiline(items.oExpand))
 	}
 	if items.oFilter != "" {
-		query.Add("$filter", TrimMultiline(items.oFilter))
+		query.Add("$filter", trimMultiline(items.oFilter))
 	}
 	if items.oTop != 0 {
 		query.Add("$top", fmt.Sprintf("%d", items.oTop))
 	}
 	if items.oOrderBy != "" {
-		query.Add("$orderBy", TrimMultiline(items.oOrderBy))
+		query.Add("$orderBy", trimMultiline(items.oOrderBy))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: items.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(items.conf))
+	sp := NewHTTPClient(items.client)
+	return sp.Get(apiURL.String(), getConfHeaders(items.conf))
 }
 
 // Add ...
 func (items *Items) Add(body []byte) ([]byte, error) {
-	sp := &HTTPClient{SPClient: items.client}
-	return sp.Post(items.endpoint, body, GetConfHeaders(items.conf))
+	sp := NewHTTPClient(items.client)
+	return sp.Post(items.endpoint, body, getConfHeaders(items.conf))
 }
 
 // GetByID ...
@@ -111,31 +111,31 @@ func (items *Items) GetByCAML(caml string) ([]byte, error) {
 	apiURL, _ := url.Parse(endpoint)
 	query := url.Values{}
 	if items.oSelect != "" {
-		query.Add("$select", TrimMultiline(items.oSelect))
+		query.Add("$select", trimMultiline(items.oSelect))
 	}
 	if items.oExpand != "" {
-		query.Add("$expand", TrimMultiline(items.oExpand))
+		query.Add("$expand", trimMultiline(items.oExpand))
 	}
 	if items.oFilter != "" {
-		query.Add("$filter", TrimMultiline(items.oFilter))
+		query.Add("$filter", trimMultiline(items.oFilter))
 	}
 	if items.oTop != 0 {
 		query.Add("$top", fmt.Sprintf("%d", items.oTop))
 	}
 	if items.oOrderBy != "" {
-		query.Add("$orderBy", TrimMultiline(items.oOrderBy))
+		query.Add("$orderBy", trimMultiline(items.oOrderBy))
 	}
 	apiURL.RawQuery = query.Encode()
 
-	body := TrimMultiline(`{
+	body := trimMultiline(`{
 		"query": {
 			"__metadata": {"type": "SP.CamlQuery"},
-			"ViewXml": "` + TrimMultiline(caml) + `"
+			"ViewXml": "` + trimMultiline(caml) + `"
 		}
 	}`)
 
-	sp := &HTTPClient{SPClient: items.client}
-	headers := GetConfHeaders(items.conf)
+	sp := NewHTTPClient(items.client)
+	headers := getConfHeaders(items.conf)
 
 	headers["Accept"] = "application/json;odata=verbose"
 	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"

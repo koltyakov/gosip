@@ -40,26 +40,26 @@ func (list *List) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(list.endpoint)
 	query := url.Values{}
 	if list.oSelect != "" {
-		query.Add("$select", TrimMultiline(list.oSelect))
+		query.Add("$select", trimMultiline(list.oSelect))
 	}
 	if list.oExpand != "" {
-		query.Add("$expand", TrimMultiline(list.oExpand))
+		query.Add("$expand", trimMultiline(list.oExpand))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: list.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(list.conf))
+	sp := NewHTTPClient(list.client)
+	return sp.Get(apiURL.String(), getConfHeaders(list.conf))
 }
 
 // Delete ...
 func (list *List) Delete() ([]byte, error) {
-	sp := &HTTPClient{SPClient: list.client}
-	return sp.Delete(list.endpoint, GetConfHeaders(list.conf))
+	sp := NewHTTPClient(list.client)
+	return sp.Delete(list.endpoint, getConfHeaders(list.conf))
 }
 
 // Update ...
 func (list *List) Update(body []byte) ([]byte, error) {
-	sp := &HTTPClient{SPClient: list.client}
-	return sp.Update(list.endpoint, body, GetConfHeaders(list.conf))
+	sp := NewHTTPClient(list.client)
+	return sp.Update(list.endpoint, body, getConfHeaders(list.conf))
 }
 
 // Items ...
@@ -73,7 +73,7 @@ func (list *List) Items() *Items {
 
 // GetEntityType ...
 func (list *List) GetEntityType() (string, error) {
-	headers := GetConfHeaders(list.conf)
+	headers := getConfHeaders(list.conf)
 	headers["Accept"] = "application/json;odata=verbose"
 
 	data, err := list.Select("ListItemEntityTypeFullName").Conf(&Conf{Headers: headers}).Get()

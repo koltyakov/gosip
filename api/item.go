@@ -38,26 +38,26 @@ func (item *Item) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(item.endpoint)
 	query := url.Values{}
 	if item.oSelect != "" {
-		query.Add("$select", TrimMultiline(item.oSelect))
+		query.Add("$select", trimMultiline(item.oSelect))
 	}
 	if item.oExpand != "" {
-		query.Add("$expand", TrimMultiline(item.oExpand))
+		query.Add("$expand", trimMultiline(item.oExpand))
 	}
 	apiURL.RawQuery = query.Encode()
-	sp := &HTTPClient{SPClient: item.client}
-	return sp.Get(apiURL.String(), GetConfHeaders(item.conf))
+	sp := NewHTTPClient(item.client)
+	return sp.Get(apiURL.String(), getConfHeaders(item.conf))
 }
 
 // Delete ...
 func (item *Item) Delete() ([]byte, error) {
-	sp := &HTTPClient{SPClient: item.client}
-	return sp.Delete(item.endpoint, GetConfHeaders(item.conf))
+	sp := NewHTTPClient(item.client)
+	return sp.Delete(item.endpoint, getConfHeaders(item.conf))
 }
 
 // Update ...
 func (item *Item) Update(body []byte) ([]byte, error) {
-	sp := &HTTPClient{SPClient: item.client}
-	return sp.Update(item.endpoint, body, GetConfHeaders(item.conf))
+	sp := NewHTTPClient(item.client)
+	return sp.Update(item.endpoint, body, getConfHeaders(item.conf))
 }
 
 // Roles ...
