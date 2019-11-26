@@ -59,3 +59,12 @@ func (item *Item) Update(body []byte) ([]byte, error) {
 	sp := &HTTPClient{SPClient: item.client}
 	return sp.Update(item.endpoint, body, GetConfHeaders(item.conf))
 }
+
+// Roles ...
+func (item *Item) Roles() *Roles {
+	return &Roles{
+		client:   item.client,
+		conf:     item.conf,
+		endpoint: item.endpoint,
+	}
+}
