@@ -1,0 +1,93 @@
+package api
+
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/koltyakov/gosip"
+)
+
+// RoleDefinitions ...
+type RoleDefinitions struct {
+	client   *gosip.SPClient
+	conf     *Conf
+	endpoint string
+}
+
+// RoleDefInfo ...
+type RoleDefInfo struct {
+	BasePermissions struct {
+		High int `json:"High,string"`
+		Low  int `json:"Low,string"`
+	} `json:"BasePermissions"`
+	Description  string `json:"Description"`
+	Hidden       bool   `json:"Hidden"`
+	ID           int    `json:"Id"`
+	Name         string `json:"Name"`
+	Order        int    `json:"Order"`
+	RoleTypeKind int    `json:"RoleTypeKind"`
+}
+
+func getRoleDef(def *RoleDefinitions, endpoint string) (*RoleDefInfo, error) {
+	sp := &HTTPClient{SPClient: def.client}
+
+	headers := map[string]string{
+		"Accept": "application/json;odata=verbose",
+	}
+
+	data, err := sp.Post(endpoint, nil, headers)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &struct {
+		RoleDefInfo *RoleDefInfo `json:"d"`
+	}{}
+
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.RoleDefInfo, nil
+}
+
+// GetByID ...
+func (def *RoleDefinitions) GetByID(roleDefID int) (*RoleDefInfo, error) {
+	endpoint := fmt.Sprintf("%s/GetById(%d)", def.endpoint, roleDefID)
+	return getRoleDef(def, endpoint)
+}
+
+// GetByName ...
+func (def *RoleDefinitions) GetByName(roleDefName string) (*RoleDefInfo, error) {
+	endpoint := fmt.Sprintf("%s/GetByName('%s')", def.endpoint, roleDefName)
+	return getRoleDef(def, endpoint)
+}
+
+// GetByType ...
+func (def *RoleDefinitions) GetByType(roleTypeKind int) (*RoleDefInfo, error) {
+	endpoint := fmt.Sprintf("%s/GetByType(%d)", def.endpoint, roleTypeKind)
+	return getRoleDef(def, endpoint)
+}
+
+// Get ...
+func (def *RoleDefinitions) Get() ([]*RoleDefInfo, error) {
+	sp := &HTTPClient{SPClient: def.client}
+	data, err := sp.Get(def.endpoint, GetConfHeaders(def.conf))
+	if err != nil {
+		return nil, err
+	}
+
+	res := &struct {
+		D struct {
+			Results []*RoleDefInfo `json:"results"`
+		} `json:"d"`
+	}{}
+
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.D.Results, nil
+}
