@@ -95,3 +95,12 @@ func (list *List) GetEntityType() (string, error) {
 
 	return res.D.Results.ListItemEntityTypeFullName, nil
 }
+
+// Roles ...
+func (list *List) Roles() *Roles {
+	return &Roles{
+		client:   list.client,
+		conf:     list.conf,
+		endpoint: list.endpoint,
+	}
+}
