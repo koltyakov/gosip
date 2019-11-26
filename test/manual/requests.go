@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/sprest"
+	"github.com/koltyakov/gosip/api"
 )
 
 // CheckBasicPost : try creating an item
 func CheckBasicPost(client *gosip.SPClient) (string, error) {
-	sp := &sprest.HTTPClient{SPClient: client}
+	sp := api.NewHTTPClient(client)
 	endpoint := client.AuthCnfg.GetSiteURL() + "/_api/web/lists/getByTitle('Custom')/items"
 	body := `{"__metadata":{"type":"SP.Data.CustomListItem"},"Title":"Test"}`
 
