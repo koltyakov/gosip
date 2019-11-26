@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/url"
 
 	"github.com/koltyakov/gosip"
@@ -74,4 +75,16 @@ func (group *Group) Delete() ([]byte, error) {
 func (group *Group) Update(body []byte) ([]byte, error) {
 	sp := &HTTPClient{SPClient: group.client}
 	return sp.Update(group.endpoint, body, GetConfHeaders(group.conf))
+}
+
+// Users ...
+func (group *Group) Users() *Users {
+	return &Users{
+		client: group.client,
+		conf:   group.conf,
+		endpoint: fmt.Sprintf(
+			"%s/Users",
+			group.endpoint,
+		),
+	}
 }
