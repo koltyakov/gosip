@@ -16,6 +16,15 @@ type Folder struct {
 	modifiers map[string]string
 }
 
+// NewFolder ...
+func NewFolder(client *gosip.SPClient, endpoint string, config *RequestConfig) *Folder {
+	return &Folder{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (folder *Folder) ToURL() string {
 	return folder.endpoint
@@ -72,26 +81,20 @@ func (folder *Folder) Recycle() ([]byte, error) {
 
 // Folders ...
 func (folder *Folder) Folders() *Folders {
-	return &Folders{
-		client: folder.client,
-		config: folder.config,
-		endpoint: fmt.Sprintf(
-			"%s/Folders",
-			folder.endpoint,
-		),
-	}
+	return NewFolders(
+		folder.client,
+		fmt.Sprintf("%s/Folders", folder.endpoint),
+		folder.config,
+	)
 }
 
 // Files ...
 func (folder *Folder) Files() *Files {
-	return &Files{
-		client: folder.client,
-		config: folder.config,
-		endpoint: fmt.Sprintf(
-			"%s/Files",
-			folder.endpoint,
-		),
-	}
+	return NewFiles(
+		folder.client,
+		fmt.Sprintf("%s/Files", folder.endpoint),
+		folder.config,
+	)
 }
 
 // GetItem ...
@@ -125,12 +128,14 @@ func (folder *Folder) GetItem() (*Item, error) {
 		return nil, err
 	}
 
-	return &Item{
-		client: folder.client,
-		config: folder.config,
-		endpoint: fmt.Sprintf("%s/_api/%s",
+	item := NewItem(
+		folder.client,
+		fmt.Sprintf(
+			"%s/_api/%s",
 			folder.client.AuthCnfg.GetSiteURL(),
 			res.D.Metadata.URI,
 		),
-	}, nil
+		folder.config,
+	)
+	return item, nil
 }

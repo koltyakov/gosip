@@ -26,6 +26,15 @@ type UserInfo struct {
 	Title         int    `json:"Title"`
 }
 
+// NewUser ...
+func NewUser(client *gosip.SPClient, endpoint string, config *RequestConfig) *User {
+	return &User{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (user *User) ToURL() string {
 	return user.endpoint
@@ -69,12 +78,9 @@ func (user *User) Get() ([]byte, error) {
 
 // Groups ...
 func (user *User) Groups() *Groups {
-	return &Groups{
-		client: user.client,
-		config: user.config,
-		endpoint: fmt.Sprintf(
-			"%s/Groups",
-			user.endpoint,
-		),
-	}
+	return NewGroups(
+		user.client,
+		fmt.Sprintf("%s/Groups", user.endpoint),
+		user.config,
+	)
 }

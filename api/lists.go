@@ -15,6 +15,15 @@ type Lists struct {
 	modifiers map[string]string
 }
 
+// NewLists ...
+func NewLists(client *gosip.SPClient, endpoint string, config *RequestConfig) *Lists {
+	return &Lists{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (lists *Lists) ToURL() string {
 	return lists.endpoint
@@ -96,28 +105,20 @@ func (lists *Lists) Get() ([]byte, error) {
 
 // GetByTitle ...
 func (lists *Lists) GetByTitle(listTitle string) *List {
-	list := &List{
-		client: lists.client,
-		config: lists.config,
-		endpoint: fmt.Sprintf(
-			"%s/GetByTitle('%s')",
-			lists.endpoint,
-			listTitle,
-		),
-	}
+	list := NewList(
+		lists.client,
+		fmt.Sprintf("%s/GetByTitle('%s')", lists.endpoint, listTitle),
+		lists.config,
+	)
 	return list
 }
 
 // GetByID ...
 func (lists *Lists) GetByID(listGUID string) *List {
-	list := &List{
-		client: lists.client,
-		config: lists.config,
-		endpoint: fmt.Sprintf(
-			"%s('%s')",
-			lists.endpoint,
-			listGUID,
-		),
-	}
+	list := NewList(
+		lists.client,
+		fmt.Sprintf("%s('%s')", lists.endpoint, listGUID),
+		lists.config,
+	)
 	return list
 }

@@ -34,6 +34,15 @@ type Roles struct {
 	endpoint string
 }
 
+// NewRoles ...
+func NewRoles(client *gosip.SPClient, endpoint string, config *RequestConfig) *Roles {
+	return &Roles{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ResetInheritance ...
 func (permissions *Roles) ResetInheritance() error {
 	sp := NewHTTPClient(permissions.client)

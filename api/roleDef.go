@@ -14,6 +14,15 @@ type RoleDefinitions struct {
 	endpoint string
 }
 
+// NewRoleDefinitions ...
+func NewRoleDefinitions(client *gosip.SPClient, endpoint string, config *RequestConfig) *RoleDefinitions {
+	return &RoleDefinitions{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // RoleDefInfo ...
 type RoleDefInfo struct {
 	BasePermissions struct {

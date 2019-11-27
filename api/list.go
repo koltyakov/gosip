@@ -16,6 +16,15 @@ type List struct {
 	modifiers map[string]string
 }
 
+// NewList ...
+func NewList(client *gosip.SPClient, endpoint string, config *RequestConfig) *List {
+	return &List{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (list *List) ToURL() string {
 	return list.endpoint
@@ -71,11 +80,11 @@ func (list *List) Update(body []byte) ([]byte, error) {
 
 // Items ...
 func (list *List) Items() *Items {
-	return &Items{
-		client:   list.client,
-		config:   list.config,
-		endpoint: fmt.Sprintf("%s/items", list.endpoint),
-	}
+	return NewItems(
+		list.client,
+		fmt.Sprintf("%s/items", list.endpoint),
+		list.config,
+	)
 }
 
 // GetEntityType ...
@@ -105,9 +114,5 @@ func (list *List) GetEntityType() (string, error) {
 
 // Roles ...
 func (list *List) Roles() *Roles {
-	return &Roles{
-		client:   list.client,
-		config:   list.config,
-		endpoint: list.endpoint,
-	}
+	return NewRoles(list.client, list.endpoint, list.config)
 }

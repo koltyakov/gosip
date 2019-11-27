@@ -15,6 +15,15 @@ type Users struct {
 	modifiers map[string]string
 }
 
+// NewUsers ...
+func NewUsers(client *gosip.SPClient, endpoint string, config *RequestConfig) *Users {
+	return &Users{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (users *Users) ToURL() string {
 	return users.endpoint
@@ -92,36 +101,27 @@ func (users *Users) Get() ([]byte, error) {
 
 // GetByID ...
 func (users *Users) GetByID(userID int) *User {
-	return &User{
-		client: users.client,
-		config: users.config,
-		endpoint: fmt.Sprintf("%s/GetById(%d)",
-			users.endpoint,
-			userID,
-		),
-	}
+	return NewUser(
+		users.client,
+		fmt.Sprintf("%s/GetById(%d)", users.endpoint, userID),
+		users.config,
+	)
 }
 
 // GetByLoginName ...
 func (users *Users) GetByLoginName(loginName string) *User {
-	return &User{
-		client: users.client,
-		config: users.config,
-		endpoint: fmt.Sprintf("%s('%s')",
-			users.endpoint,
-			loginName,
-		),
-	}
+	return NewUser(
+		users.client,
+		fmt.Sprintf("%s('%s')", users.endpoint, loginName),
+		users.config,
+	)
 }
 
 // GetByEmail ...
 func (users *Users) GetByEmail(email string) *User {
-	return &User{
-		client: users.client,
-		config: users.config,
-		endpoint: fmt.Sprintf("%s/GetByEmail('%s')",
-			users.endpoint,
-			email,
-		),
-	}
+	return NewUser(
+		users.client,
+		fmt.Sprintf("%s/GetByEmail('%s')", users.endpoint, email),
+		users.config,
+	)
 }

@@ -15,6 +15,15 @@ type Files struct {
 	modifiers map[string]string
 }
 
+// NewFiles ...
+func NewFiles(client *gosip.SPClient, endpoint string, config *RequestConfig) *Files {
+	return &Files{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (files *Files) ToURL() string {
 	return files.endpoint
@@ -92,14 +101,11 @@ func (files *Files) Get() ([]byte, error) {
 
 // GetByName ...
 func (files *Files) GetByName(fileName string) *File {
-	return &File{
-		client: files.client,
-		config: files.config,
-		endpoint: fmt.Sprintf("%s('%s')",
-			files.endpoint,
-			fileName,
-		),
-	}
+	return NewFile(
+		files.client,
+		fmt.Sprintf("%s('%s')", files.endpoint, fileName),
+		files.config,
+	)
 }
 
 // Add ...

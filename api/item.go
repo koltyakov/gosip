@@ -14,6 +14,15 @@ type Item struct {
 	modifiers map[string]string
 }
 
+// NewItem ...
+func NewItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *Item {
+	return &Item{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (item *Item) ToURL() string {
 	return item.endpoint
@@ -69,9 +78,5 @@ func (item *Item) Update(body []byte) ([]byte, error) {
 
 // Roles ...
 func (item *Item) Roles() *Roles {
-	return &Roles{
-		client:   item.client,
-		config:   item.config,
-		endpoint: item.endpoint,
-	}
+	return NewRoles(item.client, item.endpoint, item.config)
 }

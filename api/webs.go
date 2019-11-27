@@ -16,6 +16,15 @@ type Webs struct {
 	modifiers map[string]string
 }
 
+// NewWebs ...
+func NewWebs(client *gosip.SPClient, endpoint string, config *RequestConfig) *Webs {
+	return &Webs{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (webs *Webs) ToURL() string {
 	return webs.endpoint

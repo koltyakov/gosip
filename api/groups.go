@@ -15,6 +15,15 @@ type Groups struct {
 	modifiers map[string]string
 }
 
+// NewGroups ...
+func NewGroups(client *gosip.SPClient, endpoint string, config *RequestConfig) *Groups {
+	return &Groups{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (groups *Groups) ToURL() string {
 	return groups.endpoint
@@ -98,24 +107,18 @@ func (groups *Groups) Add(body []byte) ([]byte, error) {
 
 // GetByID ...
 func (groups *Groups) GetByID(groupID int) *Group {
-	return &Group{
-		client: groups.client,
-		config: groups.config,
-		endpoint: fmt.Sprintf("%s/GetById(%d)",
-			groups.endpoint,
-			groupID,
-		),
-	}
+	return NewGroup(
+		groups.client,
+		fmt.Sprintf("%s/GetById(%d)", groups.endpoint, groupID),
+		groups.config,
+	)
 }
 
 // GetByName ...
 func (groups *Groups) GetByName(groupName string) *Group {
-	return &Group{
-		client: groups.client,
-		config: groups.config,
-		endpoint: fmt.Sprintf("%s/GetByName('%s')",
-			groups.endpoint,
-			groupName,
-		),
-	}
+	return NewGroup(
+		groups.client,
+		fmt.Sprintf("%s/GetByName('%s')", groups.endpoint, groupName),
+		groups.config,
+	)
 }

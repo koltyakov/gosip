@@ -12,8 +12,8 @@ type SP struct {
 	config *RequestConfig
 }
 
-// NewSPCtx ...
-func NewSPCtx(client *gosip.SPClient) *SP {
+// NewSP ...
+func NewSP(client *gosip.SPClient) *SP {
 	return &SP{client: client}
 }
 
@@ -30,9 +30,9 @@ func (sp *SP) Conf(config *RequestConfig) *SP {
 
 // Web API object getter
 func (sp *SP) Web() *Web {
-	return &Web{
-		client:   sp.client,
-		config:   sp.config,
-		endpoint: fmt.Sprintf("%s/_api/Web", sp.client.AuthCnfg.GetSiteURL()),
-	}
+	return NewWeb(
+		sp.client,
+		fmt.Sprintf("%s/_api/Web", sp.ToURL()),
+		sp.config,
+	)
 }

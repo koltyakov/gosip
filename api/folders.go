@@ -15,6 +15,15 @@ type Folders struct {
 	modifiers map[string]string
 }
 
+// NewFolders ...
+func NewFolders(client *gosip.SPClient, endpoint string, config *RequestConfig) *Folders {
+	return &Folders{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (folders *Folders) ToURL() string {
 	return folders.endpoint
@@ -99,12 +108,9 @@ func (folders *Folders) Add(folderName string) ([]byte, error) {
 
 // GetByName ...
 func (folders *Folders) GetByName(folderName string) *Folder {
-	return &Folder{
-		client: folders.client,
-		config: folders.config,
-		endpoint: fmt.Sprintf("%s('%s')",
-			folders.endpoint,
-			folderName,
-		),
-	}
+	return NewFolder(
+		folders.client,
+		fmt.Sprintf("%s('%s')", folders.endpoint, folderName),
+		folders.config,
+	)
 }

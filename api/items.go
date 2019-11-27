@@ -16,6 +16,15 @@ type Items struct {
 	modifiers map[string]string
 }
 
+// NewItems ...
+func NewItems(client *gosip.SPClient, endpoint string, config *RequestConfig) *Items {
+	return &Items{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (items *Items) ToURL() string {
 	return items.endpoint
@@ -99,14 +108,11 @@ func (items *Items) Add(body []byte) ([]byte, error) {
 
 // GetByID ...
 func (items *Items) GetByID(itemID int) *Item {
-	return &Item{
-		client: items.client,
-		config: items.config,
-		endpoint: fmt.Sprintf("%s(%d)",
-			items.endpoint,
-			itemID,
-		),
-	}
+	return NewItem(
+		items.client,
+		fmt.Sprintf("%s(%d)", items.endpoint, itemID),
+		items.config,
+	)
 }
 
 // GetByCAML ...

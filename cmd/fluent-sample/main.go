@@ -18,7 +18,7 @@ func main() {
 	}
 
 	// Binding SharePoint API
-	sp := api.NewSPCtx(client)
+	sp := api.NewSP(client)
 
 	// Custom headers
 	headers := map[string]string{

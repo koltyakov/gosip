@@ -16,6 +16,15 @@ type File struct {
 	modifiers map[string]string
 }
 
+// NewFile ...
+func NewFile(client *gosip.SPClient, endpoint string, config *RequestConfig) *File {
+	return &File{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
 // ToURL ...
 func (file *File) ToURL() string {
 	return file.endpoint
@@ -102,12 +111,14 @@ func (file *File) GetItem() (*Item, error) {
 		return nil, err
 	}
 
-	return &Item{
-		client: file.client,
-		config: file.config,
-		endpoint: fmt.Sprintf("%s/_api/%s",
+	item := NewItem(
+		file.client,
+		fmt.Sprintf(
+			"%s/_api/%s",
 			file.client.AuthCnfg.GetSiteURL(),
 			res.D.Metadata.URI,
 		),
-	}, nil
+		file.config,
+	)
+	return item, nil
 }
