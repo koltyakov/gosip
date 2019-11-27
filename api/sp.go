@@ -17,6 +17,11 @@ func NewSPCtx(client *gosip.SPClient) *SP {
 	return &SP{client: client}
 }
 
+// ToURL ...
+func (sp *SP) ToURL() string {
+	return sp.client.AuthCnfg.GetSiteURL()
+}
+
 // Conf ...
 func (sp *SP) Conf(config *RequestConfig) *SP {
 	sp.config = config

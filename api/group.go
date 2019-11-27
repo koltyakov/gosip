@@ -31,6 +31,11 @@ type GroupInfo struct {
 	Title                          int    `json:"Title"`
 }
 
+// ToURL ...
+func (group *Group) ToURL() string {
+	return group.endpoint
+}
+
 // Conf ...
 func (group *Group) Conf(config *RequestConfig) *Group {
 	group.config = config

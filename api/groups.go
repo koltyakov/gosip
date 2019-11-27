@@ -15,6 +15,11 @@ type Groups struct {
 	modifiers map[string]string
 }
 
+// ToURL ...
+func (groups *Groups) ToURL() string {
+	return groups.endpoint
+}
+
 // Conf ...
 func (groups *Groups) Conf(config *RequestConfig) *Groups {
 	groups.config = config

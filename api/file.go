@@ -16,6 +16,11 @@ type File struct {
 	modifiers map[string]string
 }
 
+// ToURL ...
+func (file *File) ToURL() string {
+	return file.endpoint
+}
+
 // Conf ...
 func (file *File) Conf(config *RequestConfig) *File {
 	file.config = config

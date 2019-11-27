@@ -17,6 +17,11 @@ type Web struct {
 	modifiers map[string]string
 }
 
+// ToURL ...
+func (web *Web) ToURL() string {
+	return web.endpoint
+}
+
 // Conf ...
 func (web *Web) Conf(config *RequestConfig) *Web {
 	web.config = config

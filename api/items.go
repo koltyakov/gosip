@@ -16,6 +16,11 @@ type Items struct {
 	modifiers map[string]string
 }
 
+// ToURL ...
+func (items *Items) ToURL() string {
+	return items.endpoint
+}
+
 // Conf ...
 func (items *Items) Conf(config *RequestConfig) *Items {
 	items.config = config

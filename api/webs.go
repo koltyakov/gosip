@@ -16,6 +16,11 @@ type Webs struct {
 	modifiers map[string]string
 }
 
+// ToURL ...
+func (webs *Webs) ToURL() string {
+	return webs.endpoint
+}
+
 // Conf ...
 func (webs *Webs) Conf(config *RequestConfig) *Webs {
 	webs.config = config

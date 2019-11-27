@@ -15,6 +15,11 @@ type Lists struct {
 	modifiers map[string]string
 }
 
+// ToURL ...
+func (lists *Lists) ToURL() string {
+	return lists.endpoint
+}
+
 // Conf ...
 func (lists *Lists) Conf(config *RequestConfig) *Lists {
 	lists.config = config

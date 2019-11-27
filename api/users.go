@@ -15,6 +15,11 @@ type Users struct {
 	modifiers map[string]string
 }
 
+// ToURL ...
+func (users *Users) ToURL() string {
+	return users.endpoint
+}
+
 // Conf ...
 func (users *Users) Conf(config *RequestConfig) *Users {
 	users.config = config

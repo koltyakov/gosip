@@ -26,6 +26,11 @@ type UserInfo struct {
 	Title         int    `json:"Title"`
 }
 
+// ToURL ...
+func (user *User) ToURL() string {
+	return user.endpoint
+}
+
 // Conf ...
 func (user *User) Conf(config *RequestConfig) *User {
 	user.config = config
