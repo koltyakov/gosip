@@ -7,7 +7,7 @@ import (
 
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/api"
-	strategy "github.com/koltyakov/gosip/auth/addin"
+	strategy "github.com/koltyakov/gosip/auth/saml"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 	config := &api.RequestConfig{Headers: headers}
 
 	// Chainable request sample
-	data, err := sp.Conf(config).Web().Lists().Select("Id,Title").Get()
+	data, err := sp.Conf(config).Web().Webs().Select("Id,Title").Get()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -50,7 +50,7 @@ func main() {
 }
 
 func getAuthClient() (*gosip.SPClient, error) {
-	configPath := "./config/private.spo-addin.json"
+	configPath := "./config/private.spo-user.json"
 	auth := &strategy.AuthCnfg{}
 	if err := auth.ReadConfig(configPath); err != nil {
 		return nil, fmt.Errorf("unable to get config: %v", err)

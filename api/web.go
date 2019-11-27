@@ -72,6 +72,15 @@ func (web *Web) Lists() *Lists {
 	}
 }
 
+// Webs ...
+func (web *Web) Webs() *Webs {
+	return &Webs{
+		client:   web.client,
+		config:   web.config,
+		endpoint: fmt.Sprintf("%s/webs", web.endpoint),
+	}
+}
+
 // GetList ...
 func (web *Web) GetList(listURI string) *List {
 	// Prepend web relative URL to "Lists/ListPath" URIs
