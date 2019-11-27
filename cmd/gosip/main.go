@@ -28,7 +28,7 @@ func main() {
 	// }
 	// fmt.Printf("response from CheckBasicPost: %s\n", resp)
 
-	sp := api.SP{SPClient: client}
+	sp := api.NewSP(client)
 	res, err := sp.Web().Select("Title").Get()
 	if err != nil {
 		fmt.Println(err)
