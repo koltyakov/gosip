@@ -10,11 +10,10 @@ import (
 
 // List ...
 type List struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
-	oSelect  string
-	oExpand  string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
 }
 
 // Conf ...
@@ -25,13 +24,19 @@ func (list *List) Conf(config *RequestConfig) *List {
 
 // Select ...
 func (list *List) Select(oDataSelect string) *List {
-	list.oSelect = oDataSelect
+	if list.modifiers == nil {
+		list.modifiers = make(map[string]string)
+	}
+	list.modifiers["$select"] = oDataSelect
 	return list
 }
 
 // Expand ...
 func (list *List) Expand(oDataExpand string) *List {
-	list.oExpand = oDataExpand
+	if list.modifiers == nil {
+		list.modifiers = make(map[string]string)
+	}
+	list.modifiers["$expand"] = oDataExpand
 	return list
 }
 
@@ -39,11 +44,8 @@ func (list *List) Expand(oDataExpand string) *List {
 func (list *List) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(list.endpoint)
 	query := url.Values{}
-	if list.oSelect != "" {
-		query.Add("$select", trimMultiline(list.oSelect))
-	}
-	if list.oExpand != "" {
-		query.Add("$expand", trimMultiline(list.oExpand))
+	for k, v := range list.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(list.client)

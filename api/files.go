@@ -9,14 +9,10 @@ import (
 
 // Files ...
 type Files struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
-	oSelect  string
-	oExpand  string
-	oFilter  string
-	oTop     int
-	oOrderBy string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
 }
 
 // Conf ...
@@ -27,25 +23,37 @@ func (files *Files) Conf(config *RequestConfig) *Files {
 
 // Select ...
 func (files *Files) Select(oDataSelect string) *Files {
-	files.oSelect = oDataSelect
+	if files.modifiers == nil {
+		files.modifiers = make(map[string]string)
+	}
+	files.modifiers["$select"] = oDataSelect
 	return files
 }
 
 // Expand ...
 func (files *Files) Expand(oDataExpand string) *Files {
-	files.oExpand = oDataExpand
+	if files.modifiers == nil {
+		files.modifiers = make(map[string]string)
+	}
+	files.modifiers["$expand"] = oDataExpand
 	return files
 }
 
 // Filter ...
 func (files *Files) Filter(oDataFilter string) *Files {
-	files.oFilter = oDataFilter
+	if files.modifiers == nil {
+		files.modifiers = make(map[string]string)
+	}
+	files.modifiers["$filter"] = oDataFilter
 	return files
 }
 
 // Top ...
 func (files *Files) Top(oDataTop int) *Files {
-	files.oTop = oDataTop
+	if files.modifiers == nil {
+		files.modifiers = make(map[string]string)
+	}
+	files.modifiers["$top"] = string(oDataTop)
 	return files
 }
 
@@ -55,10 +63,13 @@ func (files *Files) OrderBy(oDataOrderBy string, ascending bool) *Files {
 	if !ascending {
 		direction = "desc"
 	}
-	if files.oOrderBy != "" {
-		files.oOrderBy += ","
+	if files.modifiers == nil {
+		files.modifiers = make(map[string]string)
 	}
-	files.oOrderBy += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	if files.modifiers["$orderby"] != "" {
+		files.modifiers["$orderby"] += ","
+	}
+	files.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
 	return files
 }
 
@@ -66,20 +77,8 @@ func (files *Files) OrderBy(oDataOrderBy string, ascending bool) *Files {
 func (files *Files) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(files.endpoint)
 	query := url.Values{}
-	if files.oSelect != "" {
-		query.Add("$select", trimMultiline(files.oSelect))
-	}
-	if files.oExpand != "" {
-		query.Add("$expand", trimMultiline(files.oExpand))
-	}
-	if files.oFilter != "" {
-		query.Add("$filter", trimMultiline(files.oFilter))
-	}
-	if files.oTop != 0 {
-		query.Add("$top", fmt.Sprintf("%d", files.oTop))
-	}
-	if files.oOrderBy != "" {
-		query.Add("$orderBy", trimMultiline(files.oOrderBy))
+	for k, v := range files.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(files.client)

@@ -10,11 +10,10 @@ import (
 
 // File ...
 type File struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
-	oSelect  string
-	oExpand  string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
 }
 
 // Conf ...
@@ -25,13 +24,19 @@ func (file *File) Conf(config *RequestConfig) *File {
 
 // Select ...
 func (file *File) Select(oDataSelect string) *File {
-	file.oSelect = oDataSelect
+	if file.modifiers == nil {
+		file.modifiers = make(map[string]string)
+	}
+	file.modifiers["$select"] = oDataSelect
 	return file
 }
 
 // Expand ...
 func (file *File) Expand(oDataExpand string) *File {
-	file.oExpand = oDataExpand
+	if file.modifiers == nil {
+		file.modifiers = make(map[string]string)
+	}
+	file.modifiers["$expand"] = oDataExpand
 	return file
 }
 
@@ -39,11 +44,8 @@ func (file *File) Expand(oDataExpand string) *File {
 func (file *File) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(file.endpoint)
 	query := url.Values{}
-	if file.oSelect != "" {
-		query.Add("$select", trimMultiline(file.oSelect))
-	}
-	if file.oExpand != "" {
-		query.Add("$expand", trimMultiline(file.oExpand))
+	for k, v := range file.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(file.client)

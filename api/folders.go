@@ -9,14 +9,10 @@ import (
 
 // Folders ...
 type Folders struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
-	oSelect  string
-	oExpand  string
-	oFilter  string
-	oTop     int
-	oOrderBy string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
 }
 
 // Conf ...
@@ -27,25 +23,37 @@ func (folders *Folders) Conf(config *RequestConfig) *Folders {
 
 // Select ...
 func (folders *Folders) Select(oDataSelect string) *Folders {
-	folders.oSelect = oDataSelect
+	if folders.modifiers == nil {
+		folders.modifiers = make(map[string]string)
+	}
+	folders.modifiers["$select"] = oDataSelect
 	return folders
 }
 
 // Expand ...
 func (folders *Folders) Expand(oDataExpand string) *Folders {
-	folders.oExpand = oDataExpand
+	if folders.modifiers == nil {
+		folders.modifiers = make(map[string]string)
+	}
+	folders.modifiers["$expand"] = oDataExpand
 	return folders
 }
 
 // Filter ...
 func (folders *Folders) Filter(oDataFilter string) *Folders {
-	folders.oFilter = oDataFilter
+	if folders.modifiers == nil {
+		folders.modifiers = make(map[string]string)
+	}
+	folders.modifiers["$filter"] = oDataFilter
 	return folders
 }
 
 // Top ...
 func (folders *Folders) Top(oDataTop int) *Folders {
-	folders.oTop = oDataTop
+	if folders.modifiers == nil {
+		folders.modifiers = make(map[string]string)
+	}
+	folders.modifiers["$top"] = string(oDataTop)
 	return folders
 }
 
@@ -55,10 +63,13 @@ func (folders *Folders) OrderBy(oDataOrderBy string, ascending bool) *Folders {
 	if !ascending {
 		direction = "desc"
 	}
-	if folders.oOrderBy != "" {
-		folders.oOrderBy += ","
+	if folders.modifiers == nil {
+		folders.modifiers = make(map[string]string)
 	}
-	folders.oOrderBy += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	if folders.modifiers["$orderby"] != "" {
+		folders.modifiers["$orderby"] += ","
+	}
+	folders.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
 	return folders
 }
 
@@ -66,20 +77,8 @@ func (folders *Folders) OrderBy(oDataOrderBy string, ascending bool) *Folders {
 func (folders *Folders) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(folders.endpoint)
 	query := url.Values{}
-	if folders.oSelect != "" {
-		query.Add("$select", trimMultiline(folders.oSelect))
-	}
-	if folders.oExpand != "" {
-		query.Add("$expand", trimMultiline(folders.oExpand))
-	}
-	if folders.oFilter != "" {
-		query.Add("$filter", trimMultiline(folders.oFilter))
-	}
-	if folders.oTop != 0 {
-		query.Add("$top", fmt.Sprintf("%d", folders.oTop))
-	}
-	if folders.oOrderBy != "" {
-		query.Add("$orderBy", trimMultiline(folders.oOrderBy))
+	for k, v := range folders.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(folders.client)

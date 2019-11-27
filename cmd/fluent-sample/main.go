@@ -27,7 +27,7 @@ func main() {
 	config := &api.RequestConfig{Headers: headers}
 
 	// Chainable request sample
-	data, err := sp.Conf(config).Web().Webs().Select("Id,Title").Get()
+	data, err := sp.Conf(config).Web().Webs().Get()
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -9,14 +9,10 @@ import (
 
 // Lists ...
 type Lists struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
-	oSelect  string
-	oExpand  string
-	oFilter  string
-	oTop     int
-	oOrderBy string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
 }
 
 // Conf ...
@@ -27,25 +23,37 @@ func (lists *Lists) Conf(config *RequestConfig) *Lists {
 
 // Select ...
 func (lists *Lists) Select(oDataSelect string) *Lists {
-	lists.oSelect = oDataSelect
+	if lists.modifiers == nil {
+		lists.modifiers = make(map[string]string)
+	}
+	lists.modifiers["$select"] = oDataSelect
 	return lists
 }
 
 // Expand ...
 func (lists *Lists) Expand(oDataExpand string) *Lists {
-	lists.oExpand = oDataExpand
+	if lists.modifiers == nil {
+		lists.modifiers = make(map[string]string)
+	}
+	lists.modifiers["$expand"] = oDataExpand
 	return lists
 }
 
 // Filter ...
 func (lists *Lists) Filter(oDataFilter string) *Lists {
-	lists.oFilter = oDataFilter
+	if lists.modifiers == nil {
+		lists.modifiers = make(map[string]string)
+	}
+	lists.modifiers["$filter"] = oDataFilter
 	return lists
 }
 
 // Top ...
 func (lists *Lists) Top(oDataTop int) *Lists {
-	lists.oTop = oDataTop
+	if lists.modifiers == nil {
+		lists.modifiers = make(map[string]string)
+	}
+	lists.modifiers["$top"] = string(oDataTop)
 	return lists
 }
 
@@ -55,10 +63,13 @@ func (lists *Lists) OrderBy(oDataOrderBy string, ascending bool) *Lists {
 	if !ascending {
 		direction = "desc"
 	}
-	if lists.oOrderBy != "" {
-		lists.oOrderBy += ","
+	if lists.modifiers == nil {
+		lists.modifiers = make(map[string]string)
 	}
-	lists.oOrderBy += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	if lists.modifiers["$orderby"] != "" {
+		lists.modifiers["$orderby"] += ","
+	}
+	lists.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
 	return lists
 }
 
@@ -66,20 +77,8 @@ func (lists *Lists) OrderBy(oDataOrderBy string, ascending bool) *Lists {
 func (lists *Lists) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(lists.endpoint)
 	query := url.Values{}
-	if lists.oSelect != "" {
-		query.Add("$select", trimMultiline(lists.oSelect))
-	}
-	if lists.oExpand != "" {
-		query.Add("$expand", trimMultiline(lists.oExpand))
-	}
-	if lists.oFilter != "" {
-		query.Add("$filter", trimMultiline(lists.oFilter))
-	}
-	if lists.oTop != 0 {
-		query.Add("$top", fmt.Sprintf("%d", lists.oTop))
-	}
-	if lists.oOrderBy != "" {
-		query.Add("$orderBy", trimMultiline(lists.oOrderBy))
+	for k, v := range lists.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(lists.client)

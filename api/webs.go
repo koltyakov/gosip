@@ -10,14 +10,10 @@ import (
 
 // Webs ...
 type Webs struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
-	oSelect  string
-	oExpand  string
-	oFilter  string
-	oTop     int
-	oOrderBy string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
 }
 
 // Conf ...
@@ -28,25 +24,37 @@ func (webs *Webs) Conf(config *RequestConfig) *Webs {
 
 // Select ...
 func (webs *Webs) Select(oDataSelect string) *Webs {
-	webs.oSelect = oDataSelect
+	if webs.modifiers == nil {
+		webs.modifiers = make(map[string]string)
+	}
+	webs.modifiers["$select"] = oDataSelect
 	return webs
 }
 
 // Expand ...
 func (webs *Webs) Expand(oDataExpand string) *Webs {
-	webs.oExpand = oDataExpand
+	if webs.modifiers == nil {
+		webs.modifiers = make(map[string]string)
+	}
+	webs.modifiers["$expand"] = oDataExpand
 	return webs
 }
 
 // Filter ...
 func (webs *Webs) Filter(oDataFilter string) *Webs {
-	webs.oFilter = oDataFilter
+	if webs.modifiers == nil {
+		webs.modifiers = make(map[string]string)
+	}
+	webs.modifiers["$filter"] = oDataFilter
 	return webs
 }
 
 // Top ...
 func (webs *Webs) Top(oDataTop int) *Webs {
-	webs.oTop = oDataTop
+	if webs.modifiers == nil {
+		webs.modifiers = make(map[string]string)
+	}
+	webs.modifiers["$top"] = string(oDataTop)
 	return webs
 }
 
@@ -56,10 +64,13 @@ func (webs *Webs) OrderBy(oDataOrderBy string, ascending bool) *Webs {
 	if !ascending {
 		direction = "desc"
 	}
-	if webs.oOrderBy != "" {
-		webs.oOrderBy += ","
+	if webs.modifiers == nil {
+		webs.modifiers = make(map[string]string)
 	}
-	webs.oOrderBy += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	if webs.modifiers["$orderby"] != "" {
+		webs.modifiers["$orderby"] += ","
+	}
+	webs.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
 	return webs
 }
 
@@ -67,20 +78,8 @@ func (webs *Webs) OrderBy(oDataOrderBy string, ascending bool) *Webs {
 func (webs *Webs) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(webs.endpoint)
 	query := url.Values{}
-	if webs.oSelect != "" {
-		query.Add("$select", trimMultiline(webs.oSelect))
-	}
-	if webs.oExpand != "" {
-		query.Add("$expand", trimMultiline(webs.oExpand))
-	}
-	if webs.oFilter != "" {
-		query.Add("$filter", trimMultiline(webs.oFilter))
-	}
-	if webs.oTop != 0 {
-		query.Add("$top", fmt.Sprintf("%d", webs.oTop))
-	}
-	if webs.oOrderBy != "" {
-		query.Add("$orderBy", trimMultiline(webs.oOrderBy))
+	for k, v := range webs.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(webs.client)

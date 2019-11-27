@@ -10,14 +10,10 @@ import (
 
 // Items ...
 type Items struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
-	oSelect  string
-	oExpand  string
-	oFilter  string
-	oTop     int
-	oOrderBy string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
 }
 
 // Conf ...
@@ -28,25 +24,37 @@ func (items *Items) Conf(config *RequestConfig) *Items {
 
 // Select ...
 func (items *Items) Select(oDataSelect string) *Items {
-	items.oSelect = oDataSelect
+	if items.modifiers == nil {
+		items.modifiers = make(map[string]string)
+	}
+	items.modifiers["$select"] = oDataSelect
 	return items
 }
 
 // Expand ...
 func (items *Items) Expand(oDataExpand string) *Items {
-	items.oExpand = oDataExpand
+	if items.modifiers == nil {
+		items.modifiers = make(map[string]string)
+	}
+	items.modifiers["$expand"] = oDataExpand
 	return items
 }
 
 // Filter ...
 func (items *Items) Filter(oDataFilter string) *Items {
-	items.oFilter = oDataFilter
+	if items.modifiers == nil {
+		items.modifiers = make(map[string]string)
+	}
+	items.modifiers["$filter"] = oDataFilter
 	return items
 }
 
 // Top ...
 func (items *Items) Top(oDataTop int) *Items {
-	items.oTop = oDataTop
+	if items.modifiers == nil {
+		items.modifiers = make(map[string]string)
+	}
+	items.modifiers["$top"] = string(oDataTop)
 	return items
 }
 
@@ -56,10 +64,13 @@ func (items *Items) OrderBy(oDataOrderBy string, ascending bool) *Items {
 	if !ascending {
 		direction = "desc"
 	}
-	if items.oOrderBy != "" {
-		items.oOrderBy += ","
+	if items.modifiers == nil {
+		items.modifiers = make(map[string]string)
 	}
-	items.oOrderBy += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	if items.modifiers["$orderby"] != "" {
+		items.modifiers["$orderby"] += ","
+	}
+	items.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
 	return items
 }
 
@@ -67,20 +78,8 @@ func (items *Items) OrderBy(oDataOrderBy string, ascending bool) *Items {
 func (items *Items) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(items.endpoint)
 	query := url.Values{}
-	if items.oSelect != "" {
-		query.Add("$select", trimMultiline(items.oSelect))
-	}
-	if items.oExpand != "" {
-		query.Add("$expand", trimMultiline(items.oExpand))
-	}
-	if items.oFilter != "" {
-		query.Add("$filter", trimMultiline(items.oFilter))
-	}
-	if items.oTop != 0 {
-		query.Add("$top", fmt.Sprintf("%d", items.oTop))
-	}
-	if items.oOrderBy != "" {
-		query.Add("$orderBy", trimMultiline(items.oOrderBy))
+	for k, v := range items.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(items.client)
@@ -110,20 +109,8 @@ func (items *Items) GetByCAML(caml string) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/GetItems", strings.TrimRight(items.endpoint, "/items"))
 	apiURL, _ := url.Parse(endpoint)
 	query := url.Values{}
-	if items.oSelect != "" {
-		query.Add("$select", trimMultiline(items.oSelect))
-	}
-	if items.oExpand != "" {
-		query.Add("$expand", trimMultiline(items.oExpand))
-	}
-	if items.oFilter != "" {
-		query.Add("$filter", trimMultiline(items.oFilter))
-	}
-	if items.oTop != 0 {
-		query.Add("$top", fmt.Sprintf("%d", items.oTop))
-	}
-	if items.oOrderBy != "" {
-		query.Add("$orderBy", trimMultiline(items.oOrderBy))
+	for k, v := range items.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 

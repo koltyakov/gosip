@@ -9,14 +9,10 @@ import (
 
 // Users ...
 type Users struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
-	oSelect  string
-	oExpand  string
-	oFilter  string
-	oTop     int
-	oOrderBy string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
 }
 
 // Conf ...
@@ -27,25 +23,37 @@ func (users *Users) Conf(config *RequestConfig) *Users {
 
 // Select ...
 func (users *Users) Select(oDataSelect string) *Users {
-	users.oSelect = oDataSelect
+	if users.modifiers == nil {
+		users.modifiers = make(map[string]string)
+	}
+	users.modifiers["$select"] = oDataSelect
 	return users
 }
 
 // Expand ...
 func (users *Users) Expand(oDataExpand string) *Users {
-	users.oExpand = oDataExpand
+	if users.modifiers == nil {
+		users.modifiers = make(map[string]string)
+	}
+	users.modifiers["$expand"] = oDataExpand
 	return users
 }
 
 // Filter ...
 func (users *Users) Filter(oDataFilter string) *Users {
-	users.oFilter = oDataFilter
+	if users.modifiers == nil {
+		users.modifiers = make(map[string]string)
+	}
+	users.modifiers["$filter"] = oDataFilter
 	return users
 }
 
 // Top ...
 func (users *Users) Top(oDataTop int) *Users {
-	users.oTop = oDataTop
+	if users.modifiers == nil {
+		users.modifiers = make(map[string]string)
+	}
+	users.modifiers["$top"] = string(oDataTop)
 	return users
 }
 
@@ -55,10 +63,13 @@ func (users *Users) OrderBy(oDataOrderBy string, ascending bool) *Users {
 	if !ascending {
 		direction = "desc"
 	}
-	if users.oOrderBy != "" {
-		users.oOrderBy += ","
+	if users.modifiers == nil {
+		users.modifiers = make(map[string]string)
 	}
-	users.oOrderBy += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	if users.modifiers["$orderby"] != "" {
+		users.modifiers["$orderby"] += ","
+	}
+	users.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
 	return users
 }
 
@@ -66,20 +77,8 @@ func (users *Users) OrderBy(oDataOrderBy string, ascending bool) *Users {
 func (users *Users) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(users.endpoint)
 	query := url.Values{}
-	if users.oSelect != "" {
-		query.Add("$select", trimMultiline(users.oSelect))
-	}
-	if users.oExpand != "" {
-		query.Add("$expand", trimMultiline(users.oExpand))
-	}
-	if users.oFilter != "" {
-		query.Add("$filter", trimMultiline(users.oFilter))
-	}
-	if users.oTop != 0 {
-		query.Add("$top", fmt.Sprintf("%d", users.oTop))
-	}
-	if users.oOrderBy != "" {
-		query.Add("$orderBy", trimMultiline(users.oOrderBy))
+	for k, v := range users.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(users.client)
@@ -98,7 +97,7 @@ func (users *Users) GetByID(userID int) *User {
 	}
 }
 
-// GetByName ...
+// GetByLoginName ...
 func (users *Users) GetByLoginName(loginName string) *User {
 	return &User{
 		client: users.client,
@@ -110,7 +109,7 @@ func (users *Users) GetByLoginName(loginName string) *User {
 	}
 }
 
-// GetByName ...
+// GetByEmail ...
 func (users *Users) GetByEmail(email string) *User {
 	return &User{
 		client: users.client,

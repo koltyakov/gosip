@@ -10,11 +10,10 @@ import (
 
 // Folder ...
 type Folder struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
-	oSelect  string
-	oExpand  string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
 }
 
 // Conf ...
@@ -25,13 +24,19 @@ func (folder *Folder) Conf(config *RequestConfig) *Folder {
 
 // Select ...
 func (folder *Folder) Select(oDataSelect string) *Folder {
-	folder.oSelect = oDataSelect
+	if folder.modifiers == nil {
+		folder.modifiers = make(map[string]string)
+	}
+	folder.modifiers["$select"] = oDataSelect
 	return folder
 }
 
 // Expand ...
 func (folder *Folder) Expand(oDataExpand string) *Folder {
-	folder.oExpand = oDataExpand
+	if folder.modifiers == nil {
+		folder.modifiers = make(map[string]string)
+	}
+	folder.modifiers["$expand"] = oDataExpand
 	return folder
 }
 
@@ -39,11 +44,8 @@ func (folder *Folder) Expand(oDataExpand string) *Folder {
 func (folder *Folder) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(folder.endpoint)
 	query := url.Values{}
-	if folder.oSelect != "" {
-		query.Add("$select", trimMultiline(folder.oSelect))
-	}
-	if folder.oExpand != "" {
-		query.Add("$expand", trimMultiline(folder.oExpand))
+	for k, v := range folder.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(folder.client)

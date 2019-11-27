@@ -9,14 +9,10 @@ import (
 
 // Groups ...
 type Groups struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
-	oSelect  string
-	oExpand  string
-	oFilter  string
-	oTop     int
-	oOrderBy string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
 }
 
 // Conf ...
@@ -27,25 +23,37 @@ func (groups *Groups) Conf(config *RequestConfig) *Groups {
 
 // Select ...
 func (groups *Groups) Select(oDataSelect string) *Groups {
-	groups.oSelect = oDataSelect
+	if groups.modifiers == nil {
+		groups.modifiers = make(map[string]string)
+	}
+	groups.modifiers["$select"] = oDataSelect
 	return groups
 }
 
 // Expand ...
 func (groups *Groups) Expand(oDataExpand string) *Groups {
-	groups.oExpand = oDataExpand
+	if groups.modifiers == nil {
+		groups.modifiers = make(map[string]string)
+	}
+	groups.modifiers["$expand"] = oDataExpand
 	return groups
 }
 
 // Filter ...
 func (groups *Groups) Filter(oDataFilter string) *Groups {
-	groups.oFilter = oDataFilter
+	if groups.modifiers == nil {
+		groups.modifiers = make(map[string]string)
+	}
+	groups.modifiers["$filter"] = oDataFilter
 	return groups
 }
 
 // Top ...
 func (groups *Groups) Top(oDataTop int) *Groups {
-	groups.oTop = oDataTop
+	if groups.modifiers == nil {
+		groups.modifiers = make(map[string]string)
+	}
+	groups.modifiers["$top"] = string(oDataTop)
 	return groups
 }
 
@@ -55,10 +63,13 @@ func (groups *Groups) OrderBy(oDataOrderBy string, ascending bool) *Groups {
 	if !ascending {
 		direction = "desc"
 	}
-	if groups.oOrderBy != "" {
-		groups.oOrderBy += ","
+	if groups.modifiers == nil {
+		groups.modifiers = make(map[string]string)
 	}
-	groups.oOrderBy += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	if groups.modifiers["$orderby"] != "" {
+		groups.modifiers["$orderby"] += ","
+	}
+	groups.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
 	return groups
 }
 
@@ -66,20 +77,8 @@ func (groups *Groups) OrderBy(oDataOrderBy string, ascending bool) *Groups {
 func (groups *Groups) Get() ([]byte, error) {
 	apiURL, _ := url.Parse(groups.endpoint)
 	query := url.Values{}
-	if groups.oSelect != "" {
-		query.Add("$select", trimMultiline(groups.oSelect))
-	}
-	if groups.oExpand != "" {
-		query.Add("$expand", trimMultiline(groups.oExpand))
-	}
-	if groups.oFilter != "" {
-		query.Add("$filter", trimMultiline(groups.oFilter))
-	}
-	if groups.oTop != 0 {
-		query.Add("$top", fmt.Sprintf("%d", groups.oTop))
-	}
-	if groups.oOrderBy != "" {
-		query.Add("$orderBy", trimMultiline(groups.oOrderBy))
+	for k, v := range groups.modifiers {
+		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(groups.client)
