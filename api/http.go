@@ -9,18 +9,23 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// httpClient HTTP methods helper
-type httpClient struct {
+// HTTPClient HTTP methods helper
+type HTTPClient struct {
 	sp *gosip.SPClient
 }
 
+// RequestConfig struct
+type RequestConfig struct {
+	Headers map[string]string
+}
+
 // NewHTTPClient creates an instance of httpClient
-func NewHTTPClient(spClient *gosip.SPClient) *httpClient {
-	return &httpClient{sp: spClient}
+func NewHTTPClient(spClient *gosip.SPClient) *HTTPClient {
+	return &HTTPClient{sp: spClient}
 }
 
 // Get - generic GET request wrapper
-func (ctx *httpClient) Get(endpoint string, headers map[string]string) ([]byte, error) {
+func (ctx *HTTPClient) Get(endpoint string, headers map[string]string) ([]byte, error) {
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)
@@ -44,7 +49,7 @@ func (ctx *httpClient) Get(endpoint string, headers map[string]string) ([]byte, 
 }
 
 // Post - generic POST request wrapper
-func (ctx *httpClient) Post(endpoint string, body []byte, headers map[string]string) ([]byte, error) {
+func (ctx *HTTPClient) Post(endpoint string, body []byte, headers map[string]string) ([]byte, error) {
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)
@@ -69,7 +74,7 @@ func (ctx *httpClient) Post(endpoint string, body []byte, headers map[string]str
 }
 
 // Delete - generic DELETE request wrapper
-func (ctx *httpClient) Delete(endpoint string, headers map[string]string) ([]byte, error) {
+func (ctx *HTTPClient) Delete(endpoint string, headers map[string]string) ([]byte, error) {
 	req, err := http.NewRequest("POST", endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)
@@ -96,7 +101,7 @@ func (ctx *httpClient) Delete(endpoint string, headers map[string]string) ([]byt
 }
 
 // Update - generic MERGE request wrapper
-func (ctx *httpClient) Update(endpoint string, body []byte, headers map[string]string) ([]byte, error) {
+func (ctx *HTTPClient) Update(endpoint string, body []byte, headers map[string]string) ([]byte, error) {
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)

@@ -11,15 +11,15 @@ import (
 // File ...
 type File struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
 }
 
 // Conf ...
-func (file *File) Conf(conf *Conf) *File {
-	file.conf = conf
+func (file *File) Conf(config *RequestConfig) *File {
+	file.config = config
 	return file
 }
 
@@ -47,20 +47,20 @@ func (file *File) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(file.client)
-	return sp.Get(apiURL.String(), getConfHeaders(file.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(file.config))
 }
 
 // Delete ...
 func (file *File) Delete() ([]byte, error) {
 	sp := NewHTTPClient(file.client)
-	return sp.Delete(file.endpoint, getConfHeaders(file.conf))
+	return sp.Delete(file.endpoint, getConfHeaders(file.config))
 }
 
 // Recycle ...
 func (file *File) Recycle() ([]byte, error) {
 	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/Recycle", file.endpoint)
-	return sp.Post(endpoint, nil, getConfHeaders(file.conf))
+	return sp.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
 // GetItem ...
@@ -97,7 +97,7 @@ func (file *File) GetItem() (*Item, error) {
 
 	return &Item{
 		client: file.client,
-		conf:   file.conf,
+		config: file.config,
 		endpoint: fmt.Sprintf("%s/_api/%s",
 			file.client.AuthCnfg.GetSiteURL(),
 			res.D.Metadata.URI,

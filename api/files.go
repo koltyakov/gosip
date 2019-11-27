@@ -10,7 +10,7 @@ import (
 // Files ...
 type Files struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
@@ -20,8 +20,8 @@ type Files struct {
 }
 
 // Conf ...
-func (files *Files) Conf(conf *Conf) *Files {
-	files.conf = conf
+func (files *Files) Conf(config *RequestConfig) *Files {
+	files.config = config
 	return files
 }
 
@@ -83,14 +83,14 @@ func (files *Files) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(files.client)
-	return sp.Get(apiURL.String(), getConfHeaders(files.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(files.config))
 }
 
 // GetByName ...
 func (files *Files) GetByName(fileName string) *File {
 	return &File{
 		client: files.client,
-		conf:   files.conf,
+		config: files.config,
 		endpoint: fmt.Sprintf("%s('%s')",
 			files.endpoint,
 			fileName,
@@ -102,5 +102,5 @@ func (files *Files) GetByName(fileName string) *File {
 func (files *Files) Add(name string, content []byte, overwrite bool) ([]byte, error) {
 	sp := NewHTTPClient(files.client)
 	endpoint := fmt.Sprintf("%s/Add(overwrite=%t,url='%s')", files.endpoint, overwrite, name)
-	return sp.Post(endpoint, content, getConfHeaders(files.conf))
+	return sp.Post(endpoint, content, getConfHeaders(files.config))
 }

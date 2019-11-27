@@ -10,7 +10,7 @@ import (
 // Groups ...
 type Groups struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
@@ -20,8 +20,8 @@ type Groups struct {
 }
 
 // Conf ...
-func (groups *Groups) Conf(conf *Conf) *Groups {
-	groups.conf = conf
+func (groups *Groups) Conf(config *RequestConfig) *Groups {
+	groups.config = config
 	return groups
 }
 
@@ -83,20 +83,20 @@ func (groups *Groups) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(groups.client)
-	return sp.Get(apiURL.String(), getConfHeaders(groups.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(groups.config))
 }
 
 // Add ...
 func (groups *Groups) Add(body []byte) ([]byte, error) {
 	sp := NewHTTPClient(groups.client)
-	return sp.Post(groups.endpoint, body, getConfHeaders(groups.conf))
+	return sp.Post(groups.endpoint, body, getConfHeaders(groups.config))
 }
 
 // GetByID ...
 func (groups *Groups) GetByID(groupID int) *Group {
 	return &Group{
 		client: groups.client,
-		conf:   groups.conf,
+		config: groups.config,
 		endpoint: fmt.Sprintf("%s/GetById(%d)",
 			groups.endpoint,
 			groupID,
@@ -108,7 +108,7 @@ func (groups *Groups) GetByID(groupID int) *Group {
 func (groups *Groups) GetByName(groupName string) *Group {
 	return &Group{
 		client: groups.client,
-		conf:   groups.conf,
+		config: groups.config,
 		endpoint: fmt.Sprintf("%s/GetByName('%s')",
 			groups.endpoint,
 			groupName,

@@ -11,7 +11,7 @@ import (
 // Items ...
 type Items struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
@@ -21,8 +21,8 @@ type Items struct {
 }
 
 // Conf ...
-func (items *Items) Conf(conf *Conf) *Items {
-	items.conf = conf
+func (items *Items) Conf(config *RequestConfig) *Items {
+	items.config = config
 	return items
 }
 
@@ -84,20 +84,20 @@ func (items *Items) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(items.client)
-	return sp.Get(apiURL.String(), getConfHeaders(items.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(items.config))
 }
 
 // Add ...
 func (items *Items) Add(body []byte) ([]byte, error) {
 	sp := NewHTTPClient(items.client)
-	return sp.Post(items.endpoint, body, getConfHeaders(items.conf))
+	return sp.Post(items.endpoint, body, getConfHeaders(items.config))
 }
 
 // GetByID ...
 func (items *Items) GetByID(itemID int) *Item {
 	return &Item{
 		client: items.client,
-		conf:   items.conf,
+		config: items.config,
 		endpoint: fmt.Sprintf("%s(%d)",
 			items.endpoint,
 			itemID,
@@ -135,7 +135,7 @@ func (items *Items) GetByCAML(caml string) ([]byte, error) {
 	}`)
 
 	sp := NewHTTPClient(items.client)
-	headers := getConfHeaders(items.conf)
+	headers := getConfHeaders(items.config)
 
 	headers["Accept"] = "application/json;odata=verbose"
 	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"

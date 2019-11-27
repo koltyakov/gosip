@@ -12,15 +12,15 @@ import (
 // Web ...
 type Web struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
 }
 
 // Conf ...
-func (web *Web) Conf(conf *Conf) *Web {
-	web.conf = conf
+func (web *Web) Conf(config *RequestConfig) *Web {
+	web.config = config
 	return web
 }
 
@@ -48,26 +48,26 @@ func (web *Web) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(web.client)
-	return sp.Get(apiURL.String(), getConfHeaders(web.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(web.config))
 }
 
 // Delete ...
 func (web *Web) Delete() ([]byte, error) {
 	sp := NewHTTPClient(web.client)
-	return sp.Delete(web.endpoint, getConfHeaders(web.conf))
+	return sp.Delete(web.endpoint, getConfHeaders(web.config))
 }
 
 // Update ...
 func (web *Web) Update(body []byte) ([]byte, error) {
 	sp := NewHTTPClient(web.client)
-	return sp.Update(web.endpoint, body, getConfHeaders(web.conf))
+	return sp.Update(web.endpoint, body, getConfHeaders(web.config))
 }
 
 // Lists ...
 func (web *Web) Lists() *Lists {
 	return &Lists{
 		client:   web.client,
-		conf:     web.conf,
+		config:   web.config,
 		endpoint: fmt.Sprintf("%s/lists", web.endpoint),
 	}
 }
@@ -82,7 +82,7 @@ func (web *Web) GetList(listURI string) *List {
 	}
 	return &List{
 		client: web.client,
-		conf:   web.conf,
+		config: web.config,
 		endpoint: fmt.Sprintf(
 			"%s/getList('%s')",
 			web.endpoint,
@@ -96,7 +96,7 @@ func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
 	sp := NewHTTPClient(web.client)
 	endpoint := fmt.Sprintf("%s/ensureUser", web.endpoint)
 
-	headers := getConfHeaders(web.conf)
+	headers := getConfHeaders(web.config)
 	headers["Accept"] = "application/json;odata=verbose"
 
 	body := fmt.Sprintf(`{"logonName": "%s"}`, loginName)
@@ -121,7 +121,7 @@ func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
 func (web *Web) SiteGroups() *Groups {
 	return &Groups{
 		client: web.client,
-		conf:   web.conf,
+		config: web.config,
 		endpoint: fmt.Sprintf(
 			"%s/SiteGroups",
 			web.endpoint,
@@ -133,7 +133,7 @@ func (web *Web) SiteGroups() *Groups {
 func (web *Web) SiteUsers() *Users {
 	return &Users{
 		client: web.client,
-		conf:   web.conf,
+		config: web.config,
 		endpoint: fmt.Sprintf(
 			"%s/SiteUsers",
 			web.endpoint,
@@ -145,7 +145,7 @@ func (web *Web) SiteUsers() *Users {
 func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 	return &Folder{
 		client: web.client,
-		conf:   web.conf,
+		config: web.config,
 		endpoint: fmt.Sprintf(
 			"%s/GetFolderByServerRelativeUrl('%s')",
 			web.endpoint,
@@ -158,7 +158,7 @@ func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 func (web *Web) GetFile(serverRelativeURL string) *File {
 	return &File{
 		client: web.client,
-		conf:   web.conf,
+		config: web.config,
 		endpoint: fmt.Sprintf(
 			"%s/GetFileByServerRelativeUrl('%s')",
 			web.endpoint,
@@ -171,7 +171,7 @@ func (web *Web) GetFile(serverRelativeURL string) *File {
 func (web *Web) Roles() *Roles {
 	return &Roles{
 		client:   web.client,
-		conf:     web.conf,
+		config:   web.config,
 		endpoint: web.endpoint,
 	}
 }
@@ -180,7 +180,7 @@ func (web *Web) Roles() *Roles {
 func (web *Web) RoleDefinitions() *RoleDefinitions {
 	return &RoleDefinitions{
 		client: web.client,
-		conf:   web.conf,
+		config: web.config,
 		endpoint: fmt.Sprintf(
 			"%s/RoleDefinitions",
 			web.endpoint,

@@ -10,7 +10,7 @@ import (
 // Users ...
 type Users struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
@@ -20,8 +20,8 @@ type Users struct {
 }
 
 // Conf ...
-func (users *Users) Conf(conf *Conf) *Users {
-	users.conf = conf
+func (users *Users) Conf(config *RequestConfig) *Users {
+	users.config = config
 	return users
 }
 
@@ -83,14 +83,14 @@ func (users *Users) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(users.client)
-	return sp.Get(apiURL.String(), getConfHeaders(users.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(users.config))
 }
 
 // GetByID ...
 func (users *Users) GetByID(userID int) *User {
 	return &User{
 		client: users.client,
-		conf:   users.conf,
+		config: users.config,
 		endpoint: fmt.Sprintf("%s/GetById(%d)",
 			users.endpoint,
 			userID,
@@ -102,7 +102,7 @@ func (users *Users) GetByID(userID int) *User {
 func (users *Users) GetByLoginName(loginName string) *User {
 	return &User{
 		client: users.client,
-		conf:   users.conf,
+		config: users.config,
 		endpoint: fmt.Sprintf("%s('%s')",
 			users.endpoint,
 			loginName,
@@ -114,7 +114,7 @@ func (users *Users) GetByLoginName(loginName string) *User {
 func (users *Users) GetByEmail(email string) *User {
 	return &User{
 		client: users.client,
-		conf:   users.conf,
+		config: users.config,
 		endpoint: fmt.Sprintf("%s/GetByEmail('%s')",
 			users.endpoint,
 			email,

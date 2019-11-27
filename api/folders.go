@@ -10,7 +10,7 @@ import (
 // Folders ...
 type Folders struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
@@ -20,8 +20,8 @@ type Folders struct {
 }
 
 // Conf ...
-func (folders *Folders) Conf(conf *Conf) *Folders {
-	folders.conf = conf
+func (folders *Folders) Conf(config *RequestConfig) *Folders {
+	folders.config = config
 	return folders
 }
 
@@ -83,21 +83,21 @@ func (folders *Folders) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(folders.client)
-	return sp.Get(apiURL.String(), getConfHeaders(folders.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(folders.config))
 }
 
 // Add ...
 func (folders *Folders) Add(folderName string) ([]byte, error) {
 	sp := NewHTTPClient(folders.client)
 	endpoint := fmt.Sprintf("%s/Add('%s')", folders.endpoint, folderName)
-	return sp.Post(endpoint, nil, getConfHeaders(folders.conf))
+	return sp.Post(endpoint, nil, getConfHeaders(folders.config))
 }
 
 // GetByName ...
 func (folders *Folders) GetByName(folderName string) *Folder {
 	return &Folder{
 		client: folders.client,
-		conf:   folders.conf,
+		config: folders.config,
 		endpoint: fmt.Sprintf("%s('%s')",
 			folders.endpoint,
 			folderName,

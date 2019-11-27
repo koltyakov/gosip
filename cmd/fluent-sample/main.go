@@ -18,16 +18,16 @@ func main() {
 	}
 
 	// Binding SharePoint API
-	sp := api.SP{SPClient: client}
+	sp := api.NewSPCtx(client)
 
 	// Custom headers
 	headers := map[string]string{
 		"Accept": "application/json;odata=minimalmetadata",
 	}
-	conf := &api.Conf{Headers: headers}
+	config := &api.RequestConfig{Headers: headers}
 
 	// Chainable request sample
-	data, err := sp.Conf(conf).Web().Lists().Select("Id,Title").Get()
+	data, err := sp.Conf(config).Web().Lists().Select("Id,Title").Get()
 	if err != nil {
 		log.Fatalln(err)
 	}

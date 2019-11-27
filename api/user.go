@@ -10,7 +10,7 @@ import (
 // User ...
 type User struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
@@ -28,8 +28,8 @@ type UserInfo struct {
 }
 
 // Conf ...
-func (user *User) Conf(conf *Conf) *User {
-	user.conf = conf
+func (user *User) Conf(config *RequestConfig) *User {
+	user.config = config
 	return user
 }
 
@@ -57,14 +57,14 @@ func (user *User) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(user.client)
-	return sp.Get(apiURL.String(), getConfHeaders(user.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(user.config))
 }
 
 // Groups ...
 func (user *User) Groups() *Groups {
 	return &Groups{
 		client: user.client,
-		conf:   user.conf,
+		config: user.config,
 		endpoint: fmt.Sprintf(
 			"%s/Groups",
 			user.endpoint,

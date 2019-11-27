@@ -10,7 +10,7 @@ import (
 // Lists ...
 type Lists struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
@@ -20,8 +20,8 @@ type Lists struct {
 }
 
 // Conf ...
-func (lists *Lists) Conf(conf *Conf) *Lists {
-	lists.conf = conf
+func (lists *Lists) Conf(config *RequestConfig) *Lists {
+	lists.config = config
 	return lists
 }
 
@@ -84,8 +84,8 @@ func (lists *Lists) Get() ([]byte, error) {
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(lists.client)
 	headers := map[string]string{}
-	if lists.conf != nil {
-		headers = lists.conf.Headers
+	if lists.config != nil {
+		headers = lists.config.Headers
 	}
 	return sp.Get(apiURL.String(), headers)
 }
@@ -94,7 +94,7 @@ func (lists *Lists) Get() ([]byte, error) {
 func (lists *Lists) GetByTitle(listTitle string) *List {
 	list := &List{
 		client: lists.client,
-		conf:   lists.conf,
+		config: lists.config,
 		endpoint: fmt.Sprintf(
 			"%s/GetByTitle('%s')",
 			lists.endpoint,
@@ -108,7 +108,7 @@ func (lists *Lists) GetByTitle(listTitle string) *List {
 func (lists *Lists) GetByID(listGUID string) *List {
 	list := &List{
 		client: lists.client,
-		conf:   lists.conf,
+		config: lists.config,
 		endpoint: fmt.Sprintf(
 			"%s('%s')",
 			lists.endpoint,

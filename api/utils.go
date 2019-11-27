@@ -6,10 +6,10 @@ import (
 )
 
 // GetConfHeaders resolves headers from config overrides
-func getConfHeaders(conf *Conf) map[string]string {
+func getConfHeaders(config *RequestConfig) map[string]string {
 	headers := map[string]string{}
-	if conf != nil {
-		headers = conf.Headers
+	if config != nil {
+		headers = config.Headers
 	}
 	return headers
 }

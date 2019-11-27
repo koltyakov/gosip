@@ -30,7 +30,7 @@ var RoleTypeKinds = struct {
 // Roles ...
 type Roles struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 }
 
@@ -38,7 +38,7 @@ type Roles struct {
 func (permissions *Roles) ResetInheritance() error {
 	sp := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf("%s/ResetRoleInheritance", permissions.endpoint)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.conf))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.config))
 	return err
 }
 
@@ -51,7 +51,7 @@ func (permissions *Roles) BreakInheritance(copyRoleAssigments bool, clearSubScop
 		copyRoleAssigments,
 		clearSubScopes,
 	)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.conf))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.config))
 	return err
 }
 
@@ -64,7 +64,7 @@ func (permissions *Roles) AddAssigment(principalID int, roleDefID int) error {
 		principalID,
 		roleDefID,
 	)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.conf))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.config))
 	return err
 }
 
@@ -77,6 +77,6 @@ func (permissions *Roles) RemoveAssigment(principalID int, roleDefID int) error 
 		principalID,
 		roleDefID,
 	)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.conf))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.config))
 	return err
 }

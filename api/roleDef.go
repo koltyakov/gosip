@@ -10,7 +10,7 @@ import (
 // RoleDefinitions ...
 type RoleDefinitions struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 }
 
@@ -73,7 +73,7 @@ func (def *RoleDefinitions) GetByType(roleTypeKind int) (*RoleDefInfo, error) {
 // Get ...
 func (def *RoleDefinitions) Get() ([]*RoleDefInfo, error) {
 	sp := NewHTTPClient(def.client)
-	data, err := sp.Get(def.endpoint, getConfHeaders(def.conf))
+	data, err := sp.Get(def.endpoint, getConfHeaders(def.config))
 	if err != nil {
 		return nil, err
 	}

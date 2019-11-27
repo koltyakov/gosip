@@ -10,7 +10,7 @@ import (
 // Group ...
 type Group struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
@@ -33,8 +33,8 @@ type GroupInfo struct {
 }
 
 // Conf ...
-func (group *Group) Conf(conf *Conf) *Group {
-	group.conf = conf
+func (group *Group) Conf(config *RequestConfig) *Group {
+	group.config = config
 	return group
 }
 
@@ -62,26 +62,26 @@ func (group *Group) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(group.client)
-	return sp.Get(apiURL.String(), getConfHeaders(group.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(group.config))
 }
 
 // Delete ...
 func (group *Group) Delete() ([]byte, error) {
 	sp := NewHTTPClient(group.client)
-	return sp.Delete(group.endpoint, getConfHeaders(group.conf))
+	return sp.Delete(group.endpoint, getConfHeaders(group.config))
 }
 
 // Update ...
 func (group *Group) Update(body []byte) ([]byte, error) {
 	sp := NewHTTPClient(group.client)
-	return sp.Update(group.endpoint, body, getConfHeaders(group.conf))
+	return sp.Update(group.endpoint, body, getConfHeaders(group.config))
 }
 
 // Users ...
 func (group *Group) Users() *Users {
 	return &Users{
 		client: group.client,
-		conf:   group.conf,
+		config: group.config,
 		endpoint: fmt.Sprintf(
 			"%s/Users",
 			group.endpoint,

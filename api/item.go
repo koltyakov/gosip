@@ -9,15 +9,15 @@ import (
 // Item ...
 type Item struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
 }
 
 // Conf ...
-func (item *Item) Conf(conf *Conf) *Item {
-	item.conf = conf
+func (item *Item) Conf(config *RequestConfig) *Item {
+	item.config = config
 	return item
 }
 
@@ -45,26 +45,26 @@ func (item *Item) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(item.client)
-	return sp.Get(apiURL.String(), getConfHeaders(item.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(item.config))
 }
 
 // Delete ...
 func (item *Item) Delete() ([]byte, error) {
 	sp := NewHTTPClient(item.client)
-	return sp.Delete(item.endpoint, getConfHeaders(item.conf))
+	return sp.Delete(item.endpoint, getConfHeaders(item.config))
 }
 
 // Update ...
 func (item *Item) Update(body []byte) ([]byte, error) {
 	sp := NewHTTPClient(item.client)
-	return sp.Update(item.endpoint, body, getConfHeaders(item.conf))
+	return sp.Update(item.endpoint, body, getConfHeaders(item.config))
 }
 
 // Roles ...
 func (item *Item) Roles() *Roles {
 	return &Roles{
 		client:   item.client,
-		conf:     item.conf,
+		config:   item.config,
 		endpoint: item.endpoint,
 	}
 }

@@ -47,13 +47,13 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 	if err != nil {
 		secret = c.ClientSecret
 	}
-	conf := &AuthCnfg{
+	config := &AuthCnfg{
 		SiteURL:      c.SiteURL,
 		ClientID:     c.ClientID,
 		ClientSecret: secret,
 		Realm:        c.Realm,
 	}
-	file, _ := json.MarshalIndent(conf, "", "  ")
+	file, _ := json.MarshalIndent(config, "", "  ")
 	return ioutil.WriteFile(privateFile, file, 0644)
 }
 

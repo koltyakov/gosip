@@ -11,15 +11,15 @@ import (
 // Folder ...
 type Folder struct {
 	client   *gosip.SPClient
-	conf     *Conf
+	config   *RequestConfig
 	endpoint string
 	oSelect  string
 	oExpand  string
 }
 
 // Conf ...
-func (folder *Folder) Conf(conf *Conf) *Folder {
-	folder.conf = conf
+func (folder *Folder) Conf(config *RequestConfig) *Folder {
+	folder.config = config
 	return folder
 }
 
@@ -47,27 +47,27 @@ func (folder *Folder) Get() ([]byte, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(folder.client)
-	return sp.Get(apiURL.String(), getConfHeaders(folder.conf))
+	return sp.Get(apiURL.String(), getConfHeaders(folder.config))
 }
 
 // Delete ...
 func (folder *Folder) Delete() ([]byte, error) {
 	sp := NewHTTPClient(folder.client)
-	return sp.Delete(folder.endpoint, getConfHeaders(folder.conf))
+	return sp.Delete(folder.endpoint, getConfHeaders(folder.config))
 }
 
 // Recycle ...
 func (folder *Folder) Recycle() ([]byte, error) {
 	sp := NewHTTPClient(folder.client)
 	endpoint := fmt.Sprintf("%s/Recycle", folder.endpoint)
-	return sp.Post(endpoint, nil, getConfHeaders(folder.conf))
+	return sp.Post(endpoint, nil, getConfHeaders(folder.config))
 }
 
 // Folders ...
 func (folder *Folder) Folders() *Folders {
 	return &Folders{
 		client: folder.client,
-		conf:   folder.conf,
+		config: folder.config,
 		endpoint: fmt.Sprintf(
 			"%s/Folders",
 			folder.endpoint,
@@ -79,7 +79,7 @@ func (folder *Folder) Folders() *Folders {
 func (folder *Folder) Files() *Files {
 	return &Files{
 		client: folder.client,
-		conf:   folder.conf,
+		config: folder.config,
 		endpoint: fmt.Sprintf(
 			"%s/Files",
 			folder.endpoint,
@@ -120,7 +120,7 @@ func (folder *Folder) GetItem() (*Item, error) {
 
 	return &Item{
 		client: folder.client,
-		conf:   folder.conf,
+		config: folder.config,
 		endpoint: fmt.Sprintf("%s/_api/%s",
 			folder.client.AuthCnfg.GetSiteURL(),
 			res.D.Metadata.URI,

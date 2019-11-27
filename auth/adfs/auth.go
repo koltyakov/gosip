@@ -59,7 +59,7 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 	if err != nil {
 		pass = c.Password
 	}
-	conf := &AuthCnfg{
+	config := &AuthCnfg{
 		SiteURL:      c.SiteURL,
 		Username:     c.Username,
 		Domain:       c.Domain,
@@ -68,7 +68,7 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 		AdfsURL:      c.AdfsURL,
 		AdfsCookie:   c.AdfsCookie,
 	}
-	file, _ := json.MarshalIndent(conf, "", "  ")
+	file, _ := json.MarshalIndent(config, "", "  ")
 	return ioutil.WriteFile(privateFile, file, 0644)
 }
 
