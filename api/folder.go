@@ -106,11 +106,7 @@ func (folder *Folder) GetItem() (*Item, error) {
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(folder.client)
 
-	headers := make(map[string]string)
-	headers["Accept"] = "application/json;odata=verbose"
-	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
-
-	data, err := sp.Get(apiURL.String(), headers)
+	data, err := sp.Get(apiURL.String(), HeadersPresets.Verbose.Headers)
 	if err != nil {
 		return nil, err
 	}

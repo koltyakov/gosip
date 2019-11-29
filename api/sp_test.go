@@ -29,6 +29,10 @@ func init() {
 	heavyTests = os.Getenv("SPAPI_HEAVY_TESTS") == "true"
 	envCode = os.Getenv("SPAUTH_ENVCODE")
 
+	if envCode == "" && !ci {
+		envCode = "spo"
+	}
+
 	envResolver := map[string]func() *gosip.SPClient{
 		"spo": func() *gosip.SPClient {
 			cnfgPath := "./config/integration/private.spo.json"
@@ -107,22 +111,7 @@ func checkClient(t *testing.T) {
 }
 
 func setHeadersPresets() {
-	headers.verbose = &RequestConfig{
-		Headers: map[string]string{
-			"Accept":       "application/json;odata=verbose",
-			"Content-Type": "application/json;odata=verbose",
-		},
-	}
-	headers.minimalmetadata = &RequestConfig{
-		Headers: map[string]string{
-			"Accept":       "application/json;odata=minimalmetadata",
-			"Content-Type": "application/json;odata=minimalmetadata",
-		},
-	}
-	headers.nometadata = &RequestConfig{
-		Headers: map[string]string{
-			"Accept":       "application/json;odata=nometadata",
-			"Content-Type": "application/json;odata=nometadata",
-		},
-	}
+	headers.verbose = HeadersPresets.Verbose
+	headers.minimalmetadata = HeadersPresets.Minimalmetadata
+	headers.nometadata = HeadersPresets.Nometadata
 }

@@ -19,6 +19,32 @@ type RequestConfig struct {
 	Headers map[string]string
 }
 
+// HeadersPresets : SP REST OData headers presets
+var HeadersPresets = struct {
+	Verbose         *RequestConfig
+	Minimalmetadata *RequestConfig
+	Nometadata      *RequestConfig
+}{
+	Verbose: &RequestConfig{
+		Headers: map[string]string{
+			"Accept":       "application/json;odata=verbose",
+			"Content-Type": "application/json;odata=verbose;charset=utf-8",
+		},
+	},
+	Minimalmetadata: &RequestConfig{
+		Headers: map[string]string{
+			"Accept":       "application/json;odata=minimalmetadata",
+			"Content-Type": "application/json;odata=minimalmetadata;charset=utf-8",
+		},
+	},
+	Nometadata: &RequestConfig{
+		Headers: map[string]string{
+			"Accept":       "application/json;odata=nometadata",
+			"Content-Type": "application/json;odata=nometadata;charset=utf-8",
+		},
+	},
+}
+
 // NewHTTPClient creates an instance of httpClient
 func NewHTTPClient(spClient *gosip.SPClient) *HTTPClient {
 	return &HTTPClient{sp: spClient}

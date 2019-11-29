@@ -106,7 +106,7 @@ func (webs *Webs) Get() ([]byte, error) {
 
 // Add ...
 func (webs *Webs) Add(title string, url string, metadata map[string]interface{}) ([]byte, error) {
-	endpoint := fmt.Sprintf("%s/add", webs.endpoint)
+	endpoint := fmt.Sprintf("%s/Add", webs.endpoint)
 
 	if metadata == nil {
 		metadata = make(map[string]interface{})

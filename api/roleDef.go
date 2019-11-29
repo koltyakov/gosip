@@ -40,11 +40,7 @@ type RoleDefInfo struct {
 func getRoleDef(def *RoleDefinitions, endpoint string) (*RoleDefInfo, error) {
 	sp := NewHTTPClient(def.client)
 
-	headers := map[string]string{
-		"Accept": "application/json;odata=verbose",
-	}
-
-	data, err := sp.Post(endpoint, nil, headers)
+	data, err := sp.Post(endpoint, nil, HeadersPresets.Verbose.Headers)
 	if err != nil {
 		return nil, err
 	}

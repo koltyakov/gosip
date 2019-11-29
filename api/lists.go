@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -117,4 +118,59 @@ func (lists *Lists) GetByID(listGUID string) *List {
 		lists.config,
 	)
 	return list
+}
+
+// Add ...
+func (lists *Lists) Add(title string, metadata map[string]interface{}) ([]byte, error) {
+	if metadata == nil {
+		metadata = make(map[string]interface{})
+	}
+
+	metadata["__metadata"] = map[string]string{
+		"type": "SP.List",
+	}
+
+	metadata["Title"] = title
+
+	// Default values
+	if metadata["BaseTemplate"] == nil {
+		metadata["BaseTemplate"] = 100
+	}
+	if metadata["AllowContentTypes"] == nil {
+		metadata["AllowContentTypes"] = false
+	}
+	if metadata["ContentTypesEnabled"] == nil {
+		metadata["ContentTypesEnabled"] = false
+	}
+
+	parameters, _ := json.Marshal(metadata)
+	body := fmt.Sprintf("%s", parameters)
+
+	sp := NewHTTPClient(lists.client)
+	headers := getConfHeaders(lists.config)
+
+	headers["Accept"] = "application/json;odata=verbose"
+	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
+
+	return sp.Post(lists.endpoint, []byte(body), headers)
+}
+
+// AddWithURI ...
+func (lists *Lists) AddWithURI(title string, uri string, metadata map[string]interface{}) ([]byte, error) {
+	data, err := lists.Conf(HeadersPresets.Verbose).Add(uri, metadata)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &struct {
+		D struct {
+			ID string `json:"Id"`
+		} `json:"d"`
+	}{}
+
+	if err := json.Unmarshal(data, &res); err != nil {
+		return nil, err
+	}
+
+	return lists.GetByID(res.D.ID).Update([]byte(`{"Title":"` + title + `"}`))
 }

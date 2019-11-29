@@ -88,12 +88,7 @@ func (file *File) GetItem() (*Item, error) {
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(file.client)
 
-	headers := map[string]string{
-		"Accept":       "application/json;odata=verbose",
-		"Content-Type": "application/json;odata=verbose;charset=utf-8",
-	}
-
-	data, err := sp.Get(apiURL.String(), headers)
+	data, err := sp.Get(apiURL.String(), HeadersPresets.Verbose.Headers)
 	if err != nil {
 		return nil, err
 	}
