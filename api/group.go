@@ -28,7 +28,7 @@ type GroupInfo struct {
 	OwnerTitle                     string `json:"OwnerTitle"`
 	PrincipalType                  int    `json:"PrincipalType"`
 	RequestToJoinLeaveEmailSetting bool   `json:"RequestToJoinLeaveEmailSetting"`
-	Title                          int    `json:"Title"`
+	Title                          string `json:"Title"`
 }
 
 // NewGroup ...
