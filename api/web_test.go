@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"net/url"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestWeb(t *testing.T) {
 
 	t.Run("Constructor", func(t *testing.T) {
 		web := NewWeb(spClient, endpoint, nil)
-		if _, err := web.Get(); err != nil {
+		if _, err := web.Select("Id").Get(); err != nil {
 			t.Error(err)
 		}
 	})
@@ -25,6 +26,33 @@ func TestWeb(t *testing.T) {
 				endpoint,
 				web.ToURL(),
 			)
+		}
+	})
+
+	t.Run("ToURLWithModifiers", func(t *testing.T) {
+		apiURL, _ := url.Parse(web.ToURL())
+		query := url.Values{
+			"$select": []string{"Title,Webs/Title"},
+			"$expand": []string{"Webs"},
+		}
+		apiURL.RawQuery = query.Encode()
+		expectedURL := apiURL.String()
+
+		resURL := web.Select("Title,Webs/Title").Expand("Webs").ToURL()
+		if resURL != expectedURL {
+			t.Errorf(
+				"incorrect endpoint URL, expected \"%s\", received \"%s\"",
+				expectedURL,
+				resURL,
+			)
+		}
+	})
+
+	t.Run("Conf", func(t *testing.T) {
+		web.config = nil
+		web.Conf(headers.verbose)
+		if web.config != headers.verbose {
+			t.Errorf("failed to apply config")
 		}
 	})
 
