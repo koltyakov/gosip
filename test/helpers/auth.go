@@ -16,11 +16,14 @@ func CheckAuth(auth gosip.AuthCnfg, cnfgPath string, required []string) error {
 		return err
 	}
 
-	for _, prop := range required {
-		v := getPropVal(auth, prop)
-		if v == "" {
-			return fmt.Errorf("doesn't contain required property value: %s", prop)
-		}
+	// for _, prop := range required {
+	// 	v := getPropVal(auth, prop)
+	// 	if v == "" {
+	// 		return fmt.Errorf("doesn't contain required property value: %s", prop)
+	// 	}
+	// }
+	if err := CheckAuthProps(auth, required); err != nil {
+		return err
 	}
 
 	if auth.GetStrategy() == "ntlm" {
@@ -48,6 +51,25 @@ func CheckAuth(auth gosip.AuthCnfg, cnfgPath string, required []string) error {
 		return fmt.Errorf("accessToken is blank")
 	}
 
+	return nil
+}
+
+// CheckAuthProps : checks if all required props are provided
+func CheckAuthProps(auth gosip.AuthCnfg, required []string) error {
+	missedProps := []string{}
+	for _, prop := range required {
+		v := getPropVal(auth, prop)
+		if v == "" {
+			// return fmt.Errorf("doesn't contain required property value: %s", prop)
+			missedProps = append(missedProps, prop)
+		}
+	}
+	if len(missedProps) == 1 {
+		return fmt.Errorf("doesn't contain required property value: %s", missedProps[0])
+	}
+	if len(missedProps) > 1 {
+		return fmt.Errorf("doesn't contain required properties: %+v", missedProps)
+	}
 	return nil
 }
 

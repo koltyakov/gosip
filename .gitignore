@@ -1,4 +1,5 @@
 config/private.*
+config/*/private.*
 bin/
 pkg/
 tmp/
