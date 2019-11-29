@@ -156,6 +156,15 @@ func (web *Web) SiteUsers() *Users {
 	)
 }
 
+// CurrentUser ...
+func (web *Web) CurrentUser() *User {
+	return NewUser(
+		web.client,
+		fmt.Sprintf("%s/CurrentUser", web.endpoint),
+		web.config,
+	)
+}
+
 // GetFolder ...
 func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 	return NewFolder(
