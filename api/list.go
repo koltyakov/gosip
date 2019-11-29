@@ -82,7 +82,7 @@ func (list *List) Update(body []byte) ([]byte, error) {
 func (list *List) Items() *Items {
 	return NewItems(
 		list.client,
-		fmt.Sprintf("%s/items", list.endpoint),
+		fmt.Sprintf("%s/Items", list.endpoint),
 		list.config,
 	)
 }
@@ -97,11 +97,11 @@ func (list *List) GetEntityType() (string, error) {
 		return "", err
 	}
 
+	fmt.Printf("%s\n", data)
+
 	res := &struct {
 		D struct {
-			Results struct {
-				ListItemEntityTypeFullName string `json:"ListItemEntityTypeFullName"`
-			} `json:"results"`
+			ListItemEntityTypeFullName string `json:"ListItemEntityTypeFullName"`
 		} `json:"d"`
 	}{}
 
@@ -109,10 +109,15 @@ func (list *List) GetEntityType() (string, error) {
 		return "", fmt.Errorf("unable to parse the response: %v", err)
 	}
 
-	return res.D.Results.ListItemEntityTypeFullName, nil
+	return res.D.ListItemEntityTypeFullName, nil
 }
 
 // Roles ...
 func (list *List) Roles() *Roles {
 	return NewRoles(list.client, list.endpoint, list.config)
 }
+
+// ToDo:
+// Fields
+// Content Type
+// Views
