@@ -117,3 +117,8 @@ func (file *File) GetItem() (*Item, error) {
 	)
 	return item, nil
 }
+
+// ToDo:
+// Move/Copy to
+// Declare as record
+// Check in/out

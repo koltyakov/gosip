@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestFiles(t *testing.T) {
+func TestFile(t *testing.T) {
 	checkClient(t)
 
 	web := NewSP(spClient).Web()
@@ -28,20 +28,20 @@ func TestFiles(t *testing.T) {
 		}
 	})
 
-	t.Run("Get", func(t *testing.T) {
-		if _, err := web.GetFolder(newFolderURI).Files().Get(); err != nil {
+	t.Run("Delete", func(t *testing.T) {
+		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Delete(); err != nil {
 			t.Error(err)
 		}
 	})
 
-	t.Run("GetByName", func(t *testing.T) {
-		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Get(); err != nil {
+	t.Run("Recycle", func(t *testing.T) {
+		if _, err := web.GetFile(newFolderURI + "/File_2.txt").Recycle(); err != nil {
 			t.Error(err)
 		}
 	})
 
-	t.Run("GetFile", func(t *testing.T) {
-		if _, err := web.GetFile(newFolderURI + "/File_2.txt").Get(); err != nil {
+	t.Run("GetItem", func(t *testing.T) {
+		if _, err := web.GetFile(newFolderURI + "/File_3.txt").Get(); err != nil {
 			t.Error(err)
 		}
 	})
