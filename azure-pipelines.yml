@@ -48,6 +48,7 @@ steps:
   displayName: 'Run API tests'
   env:
     SPAUTH_ENVCODE: spo
+    SPAPI_HEAVY_TESTS: true
     ENV_SPO_SITEURL: $(ci.spo.siteurl)
     ENV_SPO_USERNAME: $(ci.spo.username)
     ENV_SPO_PASSWORD: $(ci.spo.password)

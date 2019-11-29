@@ -13,10 +13,11 @@ import (
 )
 
 var (
-	ci       bool
-	envCode  string
-	spClient *gosip.SPClient
-	headers  struct {
+	ci         bool
+	heavyTests bool
+	envCode    string
+	spClient   *gosip.SPClient
+	headers    struct {
 		verbose         *RequestConfig
 		minimalmetadata *RequestConfig
 		nometadata      *RequestConfig
@@ -25,6 +26,7 @@ var (
 
 func init() {
 	ci = os.Getenv("SPAUTH_CI") == "true"
+	heavyTests = os.Getenv("SPAPI_HEAVY_TESTS") == "true"
 	envCode = os.Getenv("SPAUTH_ENVCODE")
 
 	envResolver := map[string]func() *gosip.SPClient{
