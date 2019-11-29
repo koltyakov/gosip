@@ -8,19 +8,13 @@ import (
 func TestUsers(t *testing.T) {
 	checkClient(t)
 
-	type UserInfo struct {
-		ID        int    `json:"Id"`
-		Email     string `json:"Email"`
-		LoginName string `json:"LoginName"`
-	}
-
 	users := NewSP(spClient).Web().SiteUsers()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web/SiteUsers"
 	user := &UserInfo{}
 
 	t.Run("Constructor", func(t *testing.T) {
 		users := NewUsers(spClient, endpoint, nil)
-		if _, err := users.Select("Name").Get(); err != nil {
+		if _, err := users.Select("Id").Get(); err != nil {
 			t.Error(err)
 		}
 	})
@@ -65,7 +59,7 @@ func TestUsers(t *testing.T) {
 	})
 
 	t.Run("GetUser", func(t *testing.T) {
-		data, err := NewSP(spClient).Web().Conf(headers.verbose).CurrentUser().Get()
+		data, err := NewSP(spClient).Web().CurrentUser().Conf(headers.verbose).Get()
 
 		if err != nil {
 			t.Error(err)
@@ -79,9 +73,7 @@ func TestUsers(t *testing.T) {
 			t.Error(err)
 		}
 
-		user.ID = res.User.ID
-		user.Email = res.User.Email
-		user.LoginName = res.User.LoginName
+		user = res.User
 	})
 
 	t.Run("GetByID", func(t *testing.T) {

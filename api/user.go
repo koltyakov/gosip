@@ -23,7 +23,7 @@ type UserInfo struct {
 	IsSiteAdmin   bool   `json:"IsSiteAdmin"`
 	LoginName     string `json:"LoginName"`
 	PrincipalType int    `json:"PrincipalType"`
-	Title         int    `json:"Title"`
+	Title         string `json:"Title"`
 }
 
 // NewUser ...
