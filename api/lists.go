@@ -73,7 +73,7 @@ func (lists *Lists) Top(oDataTop int) *Lists {
 	if lists.modifiers == nil {
 		lists.modifiers = make(map[string]string)
 	}
-	lists.modifiers["$top"] = string(oDataTop)
+	lists.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
 	return lists
 }
 

@@ -74,7 +74,7 @@ func (items *Items) Top(oDataTop int) *Items {
 	if items.modifiers == nil {
 		items.modifiers = make(map[string]string)
 	}
-	items.modifiers["$top"] = string(oDataTop)
+	items.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
 	return items
 }
 

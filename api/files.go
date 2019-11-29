@@ -73,7 +73,7 @@ func (files *Files) Top(oDataTop int) *Files {
 	if files.modifiers == nil {
 		files.modifiers = make(map[string]string)
 	}
-	files.modifiers["$top"] = string(oDataTop)
+	files.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
 	return files
 }
 

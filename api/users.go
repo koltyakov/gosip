@@ -73,7 +73,7 @@ func (users *Users) Top(oDataTop int) *Users {
 	if users.modifiers == nil {
 		users.modifiers = make(map[string]string)
 	}
-	users.modifiers["$top"] = string(oDataTop)
+	users.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
 	return users
 }
 

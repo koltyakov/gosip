@@ -67,7 +67,7 @@ func (folders *Folders) Top(oDataTop int) *Folders {
 	if folders.modifiers == nil {
 		folders.modifiers = make(map[string]string)
 	}
-	folders.modifiers["$top"] = string(oDataTop)
+	folders.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
 	return folders
 }
 

@@ -73,7 +73,7 @@ func (groups *Groups) Top(oDataTop int) *Groups {
 	if groups.modifiers == nil {
 		groups.modifiers = make(map[string]string)
 	}
-	groups.modifiers["$top"] = string(oDataTop)
+	groups.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
 	return groups
 }
 

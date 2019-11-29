@@ -74,7 +74,7 @@ func (webs *Webs) Top(oDataTop int) *Webs {
 	if webs.modifiers == nil {
 		webs.modifiers = make(map[string]string)
 	}
-	webs.modifiers["$top"] = string(oDataTop)
+	webs.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
 	return webs
 }
 
