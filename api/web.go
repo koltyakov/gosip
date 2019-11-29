@@ -204,3 +204,6 @@ func (web *Web) RoleDefinitions() *RoleDefinitions {
 		web.config,
 	)
 }
+
+// ToDo:
+// Property bags
