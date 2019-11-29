@@ -97,8 +97,6 @@ func (list *List) GetEntityType() (string, error) {
 		return "", err
 	}
 
-	fmt.Printf("%s\n", data)
-
 	res := &struct {
 		D struct {
 			ListItemEntityTypeFullName string `json:"ListItemEntityTypeFullName"`
