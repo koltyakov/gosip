@@ -26,7 +26,13 @@ func NewGroups(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 
 // ToURL ...
 func (groups *Groups) ToURL() string {
-	return groups.endpoint
+	apiURL, _ := url.Parse(groups.endpoint)
+	query := url.Values{}
+	for k, v := range groups.modifiers {
+		query.Add(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
 }
 
 // Conf ...
@@ -89,14 +95,8 @@ func (groups *Groups) OrderBy(oDataOrderBy string, ascending bool) *Groups {
 
 // Get ...
 func (groups *Groups) Get() ([]byte, error) {
-	apiURL, _ := url.Parse(groups.endpoint)
-	query := url.Values{}
-	for k, v := range groups.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(groups.client)
-	return sp.Get(apiURL.String(), getConfHeaders(groups.config))
+	return sp.Get(groups.ToURL(), getConfHeaders(groups.config))
 }
 
 // Add ...

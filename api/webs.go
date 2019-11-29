@@ -27,7 +27,13 @@ func NewWebs(client *gosip.SPClient, endpoint string, config *RequestConfig) *We
 
 // ToURL ...
 func (webs *Webs) ToURL() string {
-	return webs.endpoint
+	apiURL, _ := url.Parse(webs.endpoint)
+	query := url.Values{}
+	for k, v := range webs.modifiers {
+		query.Add(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
 }
 
 // Conf ...
@@ -90,18 +96,12 @@ func (webs *Webs) OrderBy(oDataOrderBy string, ascending bool) *Webs {
 
 // Get ...
 func (webs *Webs) Get() ([]byte, error) {
-	apiURL, _ := url.Parse(webs.endpoint)
-	query := url.Values{}
-	for k, v := range webs.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(webs.client)
 	headers := map[string]string{}
 	if webs.config != nil {
 		headers = webs.config.Headers
 	}
-	return sp.Get(apiURL.String(), headers)
+	return sp.Get(webs.ToURL(), headers)
 }
 
 // Add ...

@@ -26,7 +26,13 @@ func NewLists(client *gosip.SPClient, endpoint string, config *RequestConfig) *L
 
 // ToURL ...
 func (lists *Lists) ToURL() string {
-	return lists.endpoint
+	apiURL, _ := url.Parse(lists.endpoint)
+	query := url.Values{}
+	for k, v := range lists.modifiers {
+		query.Add(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
 }
 
 // Conf ...
@@ -89,18 +95,8 @@ func (lists *Lists) OrderBy(oDataOrderBy string, ascending bool) *Lists {
 
 // Get ...
 func (lists *Lists) Get() ([]byte, error) {
-	apiURL, _ := url.Parse(lists.endpoint)
-	query := url.Values{}
-	for k, v := range lists.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(lists.client)
-	headers := map[string]string{}
-	if lists.config != nil {
-		headers = lists.config.Headers
-	}
-	return sp.Get(apiURL.String(), headers)
+	return sp.Get(lists.ToURL(), getConfHeaders(lists.config))
 }
 
 // GetByTitle ...

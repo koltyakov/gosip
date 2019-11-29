@@ -42,7 +42,13 @@ func NewGroup(client *gosip.SPClient, endpoint string, config *RequestConfig) *G
 
 // ToURL ...
 func (group *Group) ToURL() string {
-	return group.endpoint
+	apiURL, _ := url.Parse(group.endpoint)
+	query := url.Values{}
+	for k, v := range group.modifiers {
+		query.Add(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
 }
 
 // Conf ...
@@ -71,14 +77,8 @@ func (group *Group) Expand(oDataExpand string) *Group {
 
 // Get ...
 func (group *Group) Get() ([]byte, error) {
-	apiURL, _ := url.Parse(group.endpoint)
-	query := url.Values{}
-	for k, v := range group.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(group.client)
-	return sp.Get(apiURL.String(), getConfHeaders(group.config))
+	return sp.Get(group.ToURL(), getConfHeaders(group.config))
 }
 
 // Delete ...

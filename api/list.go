@@ -27,7 +27,13 @@ func NewList(client *gosip.SPClient, endpoint string, config *RequestConfig) *Li
 
 // ToURL ...
 func (list *List) ToURL() string {
-	return list.endpoint
+	apiURL, _ := url.Parse(list.endpoint)
+	query := url.Values{}
+	for k, v := range list.modifiers {
+		query.Add(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
 }
 
 // Conf ...
@@ -56,14 +62,8 @@ func (list *List) Expand(oDataExpand string) *List {
 
 // Get ...
 func (list *List) Get() ([]byte, error) {
-	apiURL, _ := url.Parse(list.endpoint)
-	query := url.Values{}
-	for k, v := range list.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(list.client)
-	return sp.Get(apiURL.String(), getConfHeaders(list.config))
+	return sp.Get(list.ToURL(), getConfHeaders(list.config))
 }
 
 // Delete ...

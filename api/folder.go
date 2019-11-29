@@ -27,7 +27,13 @@ func NewFolder(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 
 // ToURL ...
 func (folder *Folder) ToURL() string {
-	return folder.endpoint
+	apiURL, _ := url.Parse(folder.endpoint)
+	query := url.Values{}
+	for k, v := range folder.modifiers {
+		query.Add(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
 }
 
 // Conf ...
@@ -56,14 +62,8 @@ func (folder *Folder) Expand(oDataExpand string) *Folder {
 
 // Get ...
 func (folder *Folder) Get() ([]byte, error) {
-	apiURL, _ := url.Parse(folder.endpoint)
-	query := url.Values{}
-	for k, v := range folder.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(folder.client)
-	return sp.Get(apiURL.String(), getConfHeaders(folder.config))
+	return sp.Get(folder.ToURL(), getConfHeaders(folder.config))
 }
 
 // Delete ...

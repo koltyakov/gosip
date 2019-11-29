@@ -26,7 +26,13 @@ func NewFiles(client *gosip.SPClient, endpoint string, config *RequestConfig) *F
 
 // ToURL ...
 func (files *Files) ToURL() string {
-	return files.endpoint
+	apiURL, _ := url.Parse(files.endpoint)
+	query := url.Values{}
+	for k, v := range files.modifiers {
+		query.Add(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
 }
 
 // Conf ...
@@ -89,14 +95,8 @@ func (files *Files) OrderBy(oDataOrderBy string, ascending bool) *Files {
 
 // Get ...
 func (files *Files) Get() ([]byte, error) {
-	apiURL, _ := url.Parse(files.endpoint)
-	query := url.Values{}
-	for k, v := range files.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(files.client)
-	return sp.Get(apiURL.String(), getConfHeaders(files.config))
+	return sp.Get(files.ToURL(), getConfHeaders(files.config))
 }
 
 // GetByName ...

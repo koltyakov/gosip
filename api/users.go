@@ -26,7 +26,13 @@ func NewUsers(client *gosip.SPClient, endpoint string, config *RequestConfig) *U
 
 // ToURL ...
 func (users *Users) ToURL() string {
-	return users.endpoint
+	apiURL, _ := url.Parse(users.endpoint)
+	query := url.Values{}
+	for k, v := range users.modifiers {
+		query.Add(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
 }
 
 // Conf ...
@@ -89,14 +95,8 @@ func (users *Users) OrderBy(oDataOrderBy string, ascending bool) *Users {
 
 // Get ...
 func (users *Users) Get() ([]byte, error) {
-	apiURL, _ := url.Parse(users.endpoint)
-	query := url.Values{}
-	for k, v := range users.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(users.client)
-	return sp.Get(apiURL.String(), getConfHeaders(users.config))
+	return sp.Get(users.ToURL(), getConfHeaders(users.config))
 }
 
 // GetByID ...

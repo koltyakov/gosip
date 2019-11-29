@@ -27,7 +27,13 @@ func NewFile(client *gosip.SPClient, endpoint string, config *RequestConfig) *Fi
 
 // ToURL ...
 func (file *File) ToURL() string {
-	return file.endpoint
+	apiURL, _ := url.Parse(file.endpoint)
+	query := url.Values{}
+	for k, v := range file.modifiers {
+		query.Add(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
 }
 
 // Conf ...
@@ -56,14 +62,8 @@ func (file *File) Expand(oDataExpand string) *File {
 
 // Get ...
 func (file *File) Get() ([]byte, error) {
-	apiURL, _ := url.Parse(file.endpoint)
-	query := url.Values{}
-	for k, v := range file.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(file.client)
-	return sp.Get(apiURL.String(), getConfHeaders(file.config))
+	return sp.Get(file.ToURL(), getConfHeaders(file.config))
 }
 
 // Delete ...

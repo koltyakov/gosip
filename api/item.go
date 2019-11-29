@@ -25,7 +25,13 @@ func NewItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *It
 
 // ToURL ...
 func (item *Item) ToURL() string {
-	return item.endpoint
+	apiURL, _ := url.Parse(item.endpoint)
+	query := url.Values{}
+	for k, v := range item.modifiers {
+		query.Add(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
 }
 
 // Conf ...
@@ -54,14 +60,8 @@ func (item *Item) Expand(oDataExpand string) *Item {
 
 // Get ...
 func (item *Item) Get() ([]byte, error) {
-	apiURL, _ := url.Parse(item.endpoint)
-	query := url.Values{}
-	for k, v := range item.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(item.client)
-	return sp.Get(apiURL.String(), getConfHeaders(item.config))
+	return sp.Get(item.ToURL(), getConfHeaders(item.config))
 }
 
 // Delete ...
