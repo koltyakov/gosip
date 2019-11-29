@@ -174,8 +174,7 @@ func (lists *Lists) AddWithURI(title string, uri string, metadata map[string]int
 	metadata["__metadata"] = map[string]string{"type": "SP.List"}
 	metadata["Title"] = title
 
-	parameters, _ := json.Marshal(metadata)
-	body := fmt.Sprintf("%s", parameters)
+	body, _ := json.Marshal(metadata)
 
-	return lists.GetByID(res.D.ID).Update([]byte(body))
+	return lists.GetByID(res.D.ID).Update(body)
 }

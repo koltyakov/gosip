@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/url"
 
 	"github.com/koltyakov/gosip"
@@ -74,6 +75,13 @@ func (item *Item) Delete() ([]byte, error) {
 func (item *Item) Update(body []byte) ([]byte, error) {
 	sp := NewHTTPClient(item.client)
 	return sp.Update(item.endpoint, body, getConfHeaders(item.config))
+}
+
+// Recycle ...
+func (item *Item) Recycle() ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/Recycle", item.endpoint)
+	sp := NewHTTPClient(item.client)
+	return sp.Post(endpoint, nil, getConfHeaders(item.config))
 }
 
 // Roles ...

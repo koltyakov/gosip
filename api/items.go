@@ -117,7 +117,7 @@ func (items *Items) GetByID(itemID int) *Item {
 
 // GetByCAML ...
 func (items *Items) GetByCAML(caml string) ([]byte, error) {
-	endpoint := fmt.Sprintf("%s/GetItems", strings.TrimRight(items.endpoint, "/items"))
+	endpoint := fmt.Sprintf("%s/GetItems", strings.TrimRight(items.endpoint, "/Items"))
 	apiURL, _ := url.Parse(endpoint)
 	query := url.Values{}
 	for k, v := range items.modifiers {
@@ -140,3 +140,10 @@ func (items *Items) GetByCAML(caml string) ([]byte, error) {
 
 	return sp.Post(apiURL.String(), []byte(body), headers)
 }
+
+// ToDo:
+// GetAll
+// Batch
+// GetPaged
+// SkipToken
+// RenderListDataAsStream
