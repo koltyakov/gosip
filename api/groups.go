@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -100,7 +101,15 @@ func (groups *Groups) Get() ([]byte, error) {
 }
 
 // Add ...
-func (groups *Groups) Add(body []byte) ([]byte, error) {
+func (groups *Groups) Add(title string, metadata map[string]interface{}) ([]byte, error) {
+	if metadata == nil {
+		metadata = make(map[string]interface{})
+	}
+	metadata["__metadata"] = map[string]string{
+		"type": "SP.Group",
+	}
+	metadata["Title"] = title
+	body, _ := json.Marshal(metadata)
 	sp := NewHTTPClient(groups.client)
 	return sp.Post(groups.endpoint, body, getConfHeaders(groups.config))
 }
@@ -121,4 +130,22 @@ func (groups *Groups) GetByName(groupName string) *Group {
 		fmt.Sprintf("%s/GetByName('%s')", groups.endpoint, groupName),
 		groups.config,
 	)
+}
+
+// RemoveByID ...
+func (groups *Groups) RemoveByID(groupID int) ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/RemoveById(%d)", groups.ToURL(), groupID)
+	sp := NewHTTPClient(groups.client)
+	return sp.Post(endpoint, nil, getConfHeaders(groups.config))
+}
+
+// RemoveByLoginName ...
+func (groups *Groups) RemoveByLoginName(loginName string) ([]byte, error) {
+	endpoint := fmt.Sprintf(
+		"%s/RemoveByLoginName('%s')",
+		groups.endpoint,
+		url.QueryEscape(loginName),
+	)
+	sp := NewHTTPClient(groups.client)
+	return sp.Post(endpoint, nil, getConfHeaders(groups.config))
 }

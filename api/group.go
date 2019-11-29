@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -81,12 +82,6 @@ func (group *Group) Get() ([]byte, error) {
 	return sp.Get(group.ToURL(), getConfHeaders(group.config))
 }
 
-// Delete ...
-func (group *Group) Delete() ([]byte, error) {
-	sp := NewHTTPClient(group.client)
-	return sp.Delete(group.endpoint, getConfHeaders(group.config))
-}
-
 // Update ...
 func (group *Group) Update(body []byte) ([]byte, error) {
 	sp := NewHTTPClient(group.client)
@@ -100,4 +95,18 @@ func (group *Group) Users() *Users {
 		fmt.Sprintf("%s/Users", group.endpoint),
 		group.config,
 	)
+}
+
+// AddUser ...
+func (group *Group) AddUser(loginName string) ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/Users", group.ToURL())
+	sp := NewHTTPClient(group.client)
+
+	metadata := make(map[string]interface{})
+	metadata["__metadata"] = map[string]string{
+		"type": "SP.User",
+	}
+	metadata["LoginName"] = loginName
+	body, _ := json.Marshal(metadata)
+	return sp.Post(endpoint, body, getConfHeaders(group.config))
 }

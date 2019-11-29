@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestGroups(t *testing.T) {
@@ -10,6 +12,7 @@ func TestGroups(t *testing.T) {
 
 	groups := NewSP(spClient).Web().SiteGroups()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web/SiteGroups"
+	newGroupName := uuid.New().String()
 	group := &GroupInfo{}
 
 	t.Run("Constructor", func(t *testing.T) {
@@ -129,6 +132,28 @@ func TestGroups(t *testing.T) {
 				group.Title,
 				res.Group.Title,
 			)
+		}
+	})
+
+	t.Run("Add", func(t *testing.T) {
+		data, err := groups.Conf(headers.verbose).Add(newGroupName, nil)
+		if err != nil {
+			t.Error(err)
+		}
+
+		res := &struct {
+			Group *GroupInfo `json:"d"`
+		}{}
+
+		if err := json.Unmarshal(data, &res); err != nil {
+			t.Error(err)
+		}
+		group = res.Group
+	})
+
+	t.Run("RemoveByLoginName", func(t *testing.T) {
+		if _, err := groups.RemoveByLoginName(group.LoginName); err != nil {
+			t.Error(err)
 		}
 	})
 
