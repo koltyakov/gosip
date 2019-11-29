@@ -18,7 +18,7 @@ func TestRoles(t *testing.T) {
 		t.Errorf("can't create a list to test permissions: %s", err)
 	}
 	list := web.Lists().GetByTitle(newListTitle)
-	userId, err := getCurrentUserID()
+	userID, err := getCurrentUserID()
 	if err != nil {
 		t.Error(err)
 	}
@@ -34,13 +34,13 @@ func TestRoles(t *testing.T) {
 	})
 
 	t.Run("AddAssigment", func(t *testing.T) {
-		if err := list.Roles().AddAssigment(userId, roleDef.ID); err != nil {
+		if err := list.Roles().AddAssigment(userID, roleDef.ID); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("RemoveAssigment", func(t *testing.T) {
-		if err := list.Roles().RemoveAssigment(userId, roleDef.ID); err != nil {
+		if err := list.Roles().RemoveAssigment(userID, roleDef.ID); err != nil {
 			t.Error(err)
 		}
 	})
