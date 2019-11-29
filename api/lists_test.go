@@ -64,7 +64,7 @@ func TestLists(t *testing.T) {
 
 	t.Run("GetListByURI", func(t *testing.T) {
 		listURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) +
-			"/Lists/" + strings.ReplaceAll(newListTitle, "-", "")
+			"/Lists/" + strings.Replace(newListTitle, "-", "", -1)
 		if _, err := web.GetList(listURI).Get(); err != nil {
 			t.Error(err)
 		}
