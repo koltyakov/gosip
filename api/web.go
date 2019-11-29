@@ -83,7 +83,7 @@ func (web *Web) Update(body []byte) ([]byte, error) {
 func (web *Web) Lists() *Lists {
 	return NewLists(
 		web.client,
-		fmt.Sprintf("%s/lists", web.endpoint),
+		fmt.Sprintf("%s/Lists", web.endpoint),
 		web.config,
 	)
 }
@@ -92,7 +92,7 @@ func (web *Web) Lists() *Lists {
 func (web *Web) Webs() *Webs {
 	return NewWebs(
 		web.client,
-		fmt.Sprintf("%s/webs", web.endpoint),
+		fmt.Sprintf("%s/Webs", web.endpoint),
 		web.config,
 	)
 }
@@ -107,7 +107,7 @@ func (web *Web) GetList(listURI string) *List {
 	}
 	return NewList(
 		web.client,
-		fmt.Sprintf("%s/getList('%s')", web.endpoint, listURI),
+		fmt.Sprintf("%s/GetList('%s')", web.endpoint, listURI),
 		web.config,
 	)
 }
@@ -115,7 +115,7 @@ func (web *Web) GetList(listURI string) *List {
 // EnsureUser ...
 func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
 	sp := NewHTTPClient(web.client)
-	endpoint := fmt.Sprintf("%s/ensureUser", web.endpoint)
+	endpoint := fmt.Sprintf("%s/EnsureUser", web.endpoint)
 
 	headers := getConfHeaders(web.config)
 	headers["Accept"] = "application/json;odata=verbose"
