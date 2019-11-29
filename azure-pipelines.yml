@@ -42,6 +42,16 @@ steps:
     SPAUTH_CLIENTID: $(ci.spo.clientid)
     SPAUTH_CLIENTSECRET: $(ci.spo.clientsecret)
 
+- script: |
+    go test ./api/... -v -count=1
+  workingDirectory: '$(modulePath)'
+  displayName: 'Run API tests'
+  env:
+    SPAUTH_ENVCODE: spo
+    ENV_SPO_SITEURL: $(ci.spo.siteurl)
+    ENV_SPO_USERNAME: $(ci.spo.username)
+    ENV_SPO_PASSWORD: $(ci.spo.password)
+
 # - task: FOSSA@0
 #   inputs:
 #     FOSSAService: 'FOSSA'

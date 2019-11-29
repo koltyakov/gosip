@@ -49,4 +49,25 @@ func TestWeb(t *testing.T) {
 		}
 	})
 
+	t.Run("NoTitle", func(t *testing.T) {
+		data, err := web.Select("Id").Conf(headers.verbose).Get()
+		if err != nil {
+			t.Error(err)
+		}
+
+		res := &struct {
+			D struct {
+				Title string `json:"Title"`
+			} `json:"d"`
+		}{}
+
+		if err := json.Unmarshal(data, &res); err != nil {
+			t.Error(err)
+		}
+
+		if res.D.Title != "" {
+			t.Error("can't get web title property")
+		}
+	})
+
 }
