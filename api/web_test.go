@@ -98,4 +98,29 @@ func TestWeb(t *testing.T) {
 		}
 	})
 
+	t.Run("CurrentUser", func(t *testing.T) {
+		if spClient.AuthCnfg.GetStrategy() == "addin" {
+			t.Skip("is not applicable for Addin Only auth strategy")
+		}
+
+		data, err := web.CurrentUser().Select("LoginName").Conf(headers.verbose).Get()
+		if err != nil {
+			t.Error(err)
+		}
+
+		res := &struct {
+			D struct {
+				LoginName string `json:"LoginName"`
+			} `json:"d"`
+		}{}
+
+		if err := json.Unmarshal(data, &res); err != nil {
+			t.Error(err)
+		}
+
+		if res.D.LoginName == "" {
+			t.Error("can't get current user")
+		}
+	})
+
 }

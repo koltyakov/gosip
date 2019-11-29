@@ -112,7 +112,7 @@ func (users *Users) GetByID(userID int) *User {
 func (users *Users) GetByLoginName(loginName string) *User {
 	return NewUser(
 		users.client,
-		fmt.Sprintf("%s('%s')", users.endpoint, loginName),
+		fmt.Sprintf("%s('%s')", users.endpoint, url.QueryEscape(loginName)),
 		users.config,
 	)
 }
@@ -121,7 +121,7 @@ func (users *Users) GetByLoginName(loginName string) *User {
 func (users *Users) GetByEmail(email string) *User {
 	return NewUser(
 		users.client,
-		fmt.Sprintf("%s/GetByEmail('%s')", users.endpoint, email),
+		fmt.Sprintf("%s/GetByEmail('%s')", users.endpoint, url.QueryEscape(email)),
 		users.config,
 	)
 }
