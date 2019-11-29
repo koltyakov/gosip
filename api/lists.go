@@ -126,9 +126,7 @@ func (lists *Lists) Add(title string, metadata map[string]interface{}) ([]byte, 
 		metadata = make(map[string]interface{})
 	}
 
-	metadata["__metadata"] = map[string]string{
-		"type": "SP.List",
-	}
+	metadata["__metadata"] = map[string]string{"type": "SP.List"}
 
 	metadata["Title"] = title
 
@@ -172,5 +170,12 @@ func (lists *Lists) AddWithURI(title string, uri string, metadata map[string]int
 		return nil, err
 	}
 
-	return lists.GetByID(res.D.ID).Update([]byte(`{"Title":"` + title + `"}`))
+	metadata = make(map[string]interface{})
+	metadata["__metadata"] = map[string]string{"type": "SP.List"}
+	metadata["Title"] = title
+
+	parameters, _ := json.Marshal(metadata)
+	body := fmt.Sprintf("%s", parameters)
+
+	return lists.GetByID(res.D.ID).Update([]byte(body))
 }
