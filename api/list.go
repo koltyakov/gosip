@@ -87,6 +87,15 @@ func (list *List) Items() *Items {
 	)
 }
 
+// ContentTypes ...
+func (list *List) ContentTypes() *ContentTypes {
+	return NewContentTypes(
+		list.client,
+		fmt.Sprintf("%s/ContentTypes", list.endpoint),
+		list.config,
+	)
+}
+
 // GetEntityType ...
 func (list *List) GetEntityType() (string, error) {
 	headers := getConfHeaders(list.config)

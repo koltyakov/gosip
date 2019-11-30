@@ -97,6 +97,24 @@ func (web *Web) Webs() *Webs {
 	)
 }
 
+// Props ...
+func (web *Web) Props() *WebProps {
+	return NewWebProps(
+		web.client,
+		fmt.Sprintf("%s/AllProperties", web.endpoint),
+		web.config,
+	)
+}
+
+// ContentTypes ...
+func (web *Web) ContentTypes() *ContentTypes {
+	return NewContentTypes(
+		web.client,
+		fmt.Sprintf("%s/ContentTypes", web.endpoint),
+		web.config,
+	)
+}
+
 // GetList ...
 func (web *Web) GetList(listURI string) *List {
 	// Prepend web relative URL to "Lists/ListPath" URIs

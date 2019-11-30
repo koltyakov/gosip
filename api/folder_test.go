@@ -11,7 +11,7 @@ func TestFolder(t *testing.T) {
 
 	web := NewSP(spClient).Web()
 	newFolderName := uuid.New().String()
-	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "Shared%20Documents"
+	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 
 	t.Run("Add", func(t *testing.T) {
 		if _, err := web.GetFolder(rootFolderURI).Folders().Add(newFolderName); err != nil {

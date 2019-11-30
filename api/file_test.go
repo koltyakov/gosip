@@ -12,7 +12,7 @@ func TestFile(t *testing.T) {
 
 	web := NewSP(spClient).Web()
 	newFolderName := uuid.New().String()
-	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "Shared%20Documents"
+	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 	newFolderURI := rootFolderURI + "/" + newFolderName
 	if _, err := web.GetFolder(rootFolderURI).Folders().Add(newFolderName); err != nil {
 		t.Error(err)
