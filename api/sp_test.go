@@ -96,6 +96,13 @@ func TestSP(t *testing.T) {
 			t.Errorf("failed to get Web object")
 		}
 	})
+
+	t.Run("Site", func(t *testing.T) {
+		sp := NewSP(spClient)
+		if sp.Site() == nil {
+			t.Errorf("failed to get Site object")
+		}
+	})
 }
 
 func resolveCnfgPath(relativePath string) string {
