@@ -105,6 +105,15 @@ func (list *List) Fields() *Fields {
 	)
 }
 
+// Views ...
+func (list *List) Views() *Views {
+	return NewViews(
+		list.client,
+		fmt.Sprintf("%s/Views", list.endpoint),
+		list.config,
+	)
+}
+
 // GetEntityType ...
 func (list *List) GetEntityType() (string, error) {
 	headers := getConfHeaders(list.config)

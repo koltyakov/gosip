@@ -110,4 +110,3 @@ func (contentTypes *ContentTypes) GetByID(contentTypeID string) *ContentType {
 
 // ToDo:
 // Add
-// Update
