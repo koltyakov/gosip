@@ -36,3 +36,12 @@ func (sp *SP) Web() *Web {
 		sp.config,
 	)
 }
+
+// Site API object getter
+func (sp *SP) Site() *Site {
+	return NewSite(
+		sp.client,
+		fmt.Sprintf("%s/_api/Site", sp.ToURL()),
+		sp.config,
+	)
+}
