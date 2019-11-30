@@ -115,6 +115,15 @@ func (web *Web) ContentTypes() *ContentTypes {
 	)
 }
 
+// Fields ...
+func (web *Web) Fields() *Fields {
+	return NewFields(
+		web.client,
+		fmt.Sprintf("%s/Fields", web.endpoint),
+		web.config,
+	)
+}
+
 // GetList ...
 func (web *Web) GetList(listURI string) *List {
 	// Prepend web relative URL to "Lists/ListPath" URIs

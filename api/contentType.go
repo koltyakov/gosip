@@ -108,3 +108,12 @@ func (ct *ContentType) Recycle() ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/Recycle", ct.endpoint)
 	return sp.Post(endpoint, nil, getConfHeaders(ct.config))
 }
+
+// Fields ...
+func (ct *ContentType) Fields() *Fields {
+	return NewFields(
+		ct.client,
+		fmt.Sprintf("%s/Fields", ct.endpoint),
+		ct.config,
+	)
+}

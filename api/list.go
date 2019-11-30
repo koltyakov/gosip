@@ -96,6 +96,15 @@ func (list *List) ContentTypes() *ContentTypes {
 	)
 }
 
+// Fields ...
+func (list *List) Fields() *Fields {
+	return NewFields(
+		list.client,
+		fmt.Sprintf("%s/Fields", list.endpoint),
+		list.config,
+	)
+}
+
 // GetEntityType ...
 func (list *List) GetEntityType() (string, error) {
 	headers := getConfHeaders(list.config)
