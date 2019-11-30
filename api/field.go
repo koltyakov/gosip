@@ -36,7 +36,7 @@ type FieldInfo struct {
 	JSLink               string `json:"JSLink"`
 	ReadOnlyField        bool   `json:"ReadOnlyField"`
 	Required             bool   `json:"Required"`
-	SchemaXml            string `json:"SchemaXml"`
+	SchemaXML            string `json:"SchemaXml"`
 	Scope                string `json:"Scope"`
 	Sealed               bool   `json:"Sealed"`
 	ShowInFiltersPane    int    `json:"ShowInFiltersPane"`
