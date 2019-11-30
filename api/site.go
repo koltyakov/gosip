@@ -78,9 +78,10 @@ func (site *Site) RootWeb() *Web {
 }
 
 // OpenWebByID ...
-func (site *Site) OpenWebByID(webID string) *Web {
+func (site *Site) OpenWebByID(webID string) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/OpenWebById('%s')", site.endpoint, webID)
-	return NewWeb(site.client, endpoint, site.config)
+	sp := NewHTTPClient(site.client)
+	return sp.Post(endpoint, nil, getConfHeaders(site.config))
 }
 
 // ToDo:
