@@ -16,8 +16,8 @@ type Field struct {
 	modifiers map[string]string
 }
 
-// FieldInfo ...
-type FieldInfo struct {
+// GenericFieldInfo ...
+type GenericFieldInfo struct {
 	AutoIndexed          bool   `json:"AutoIndexed"`
 	CanBeDeleted         bool   `json:"CanBeDeleted"`
 	DefaultValue         string `json:"DefaultValue"`
@@ -93,14 +93,14 @@ func (field *Field) Expand(oDataExpand string) *Field {
 }
 
 // Get ...
-func (field *Field) Get() (*FieldInfo, error) {
+func (field *Field) Get() (*GenericFieldInfo, error) {
 	sp := NewHTTPClient(field.client)
 	data, err := sp.Get(field.ToURL(), HeadersPresets.Verbose.Headers)
 	if err != nil {
 		return nil, err
 	}
 	res := &struct {
-		Field *FieldInfo `json:"d"`
+		Field *GenericFieldInfo `json:"d"`
 	}{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return nil, err

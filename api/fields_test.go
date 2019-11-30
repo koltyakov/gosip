@@ -60,7 +60,7 @@ func TestFields(t *testing.T) {
 
 }
 
-func getAnyField() (*FieldInfo, error) {
+func getAnyField() (*GenericFieldInfo, error) {
 	web := NewSP(spClient).Web()
 	data, err := web.Fields().Conf(headers.verbose).Top(1).Get()
 	if err != nil {
@@ -68,7 +68,7 @@ func getAnyField() (*FieldInfo, error) {
 	}
 	res := &struct {
 		D struct {
-			Results []*FieldInfo `json:"results"`
+			Results []*GenericFieldInfo `json:"results"`
 		} `json:"d"`
 	}{}
 	if err := json.Unmarshal(data, &res); err != nil {
