@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -14,6 +15,9 @@ type Views struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// ViewsResp ...
+type ViewsResp []byte
 
 // NewViews ...
 func NewViews(client *gosip.SPClient, endpoint string, config *RequestConfig) *Views {
@@ -94,7 +98,7 @@ func (views *Views) OrderBy(oDataOrderBy string, ascending bool) *Views {
 }
 
 // Get ...
-func (views *Views) Get() ([]byte, error) {
+func (views *Views) Get() (ViewsResp, error) {
 	sp := NewHTTPClient(views.client)
 	return sp.Get(views.ToURL(), getConfHeaders(views.config))
 }
@@ -119,3 +123,20 @@ func (views *Views) GetByTitle(title string) *View {
 
 // ToDo:
 // Add
+
+/* Response helpers */
+
+// Data : to get typed data
+func (viewsResp *ViewsResp) Data() []ViewResp {
+	collection := parseODataCollection(*viewsResp)
+	views := []ViewResp{}
+	for _, view := range collection {
+		views = append(views, ViewResp(view))
+	}
+	return views
+}
+
+// Unmarshal : to unmarshal to custom object
+func (viewsResp *ViewsResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*viewsResp, &obj)
+}

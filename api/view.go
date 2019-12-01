@@ -46,6 +46,9 @@ type ViewInfo struct {
 	ViewType                  string `json:"ViewType"`
 }
 
+// ViewResp ...
+type ViewResp []byte
+
 // NewView ...
 func NewView(client *gosip.SPClient, endpoint string, config *RequestConfig) *View {
 	return &View{
@@ -91,25 +94,13 @@ func (view *View) Expand(oDataExpand string) *View {
 }
 
 // Get ...
-func (view *View) Get() (*ViewInfo, error) {
+func (view *View) Get() (ViewResp, error) {
 	sp := NewHTTPClient(view.client)
-	data, err := sp.Get(view.ToURL(), HeadersPresets.Verbose.Headers)
+	data, err := sp.Get(view.ToURL(), getConfHeaders(view.config))
 	if err != nil {
 		return nil, err
 	}
-	res := &struct {
-		View *ViewInfo `json:"d"`
-	}{}
-	if err := json.Unmarshal(data, &res); err != nil {
-		return nil, err
-	}
-	return res.View, nil
-}
-
-// GetRaw ...
-func (view *View) GetRaw() ([]byte, error) {
-	sp := NewHTTPClient(view.client)
-	return sp.Get(view.ToURL(), getConfHeaders(view.config))
+	return ViewResp(data), nil
 }
 
 // Delete ...
@@ -123,4 +114,19 @@ func (view *View) Recycle() ([]byte, error) {
 	sp := NewHTTPClient(view.client)
 	endpoint := fmt.Sprintf("%s/Recycle", view.endpoint)
 	return sp.Post(endpoint, nil, getConfHeaders(view.config))
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (viewResp *ViewResp) Data() *ViewInfo {
+	data := parseODataItem(*viewResp)
+	res := &ViewInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (viewResp *ViewResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*viewResp, &obj)
 }
