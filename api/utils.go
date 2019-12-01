@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"reflect"
 	"strings"
 )
 
@@ -103,4 +104,25 @@ func parseODataCollection(payload []byte) [][]byte {
 		res = append(res, []byte(r))
 	}
 	return res
+}
+
+// normalizeMultiLookups normalizes verbose results for multilookup
+func normalizeMultiLookups(payload []byte) []byte {
+	item := map[string]interface{}{}
+	if err := json.Unmarshal(payload, &item); err != nil {
+		return payload
+	}
+	for key, val := range item {
+		if reflect.TypeOf(val).Kind().String() == "map" {
+			results := val.(map[string]interface{})["results"]
+			if results != nil {
+				item[key] = results
+			}
+		}
+	}
+	normalized, err := json.Marshal(item)
+	if err != nil {
+		return payload
+	}
+	return normalized
 }

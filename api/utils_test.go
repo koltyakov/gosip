@@ -138,4 +138,28 @@ func TestUtils(t *testing.T) {
 		}
 	})
 
+	t.Run("parseODataCollection/Empty", func(t *testing.T) {
+		minimal := []byte(`[]`)
+		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, minimal))
+		fromVerbose := []byte{}
+		for _, b := range parseODataCollection(verbose) {
+			fromVerbose = append(fromVerbose, b...)
+		}
+		fromMinimal := []byte{}
+		for _, b := range parseODataCollection(minimal) {
+			fromMinimal = append(fromMinimal, b...)
+		}
+		if bytes.Compare(fromVerbose, fromMinimal) != 0 {
+			t.Error("wrong OData transformation")
+		}
+	})
+
+	t.Run("normalizeMultiLookups", func(t *testing.T) {
+		minimal := []byte(`{"multi":[1,2,3],"single":"val1"}`)
+		verbose := []byte(`{"multi":{"results":[1,2,3]},"single":"val1"}`)
+		if bytes.Compare(normalizeMultiLookups(verbose), minimal) != 0 {
+			t.Error("wrong OData transformation")
+		}
+	})
+
 }
