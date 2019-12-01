@@ -68,6 +68,9 @@ func TestUtils(t *testing.T) {
 		if !containsMetadataType(p1) {
 			t.Error("payload was not enriched with metadata")
 		}
+		if strings.Index(fmt.Sprintf("%s", p1), `"prop":"val"`) == -1 {
+			t.Error("payload metadata lost prop(s)")
+		}
 
 		// should not add __metadata if present
 		m2 := []byte(`{"__metadata":{"type":"SP.Any"},"prop":"val"}`)
