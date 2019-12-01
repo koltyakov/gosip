@@ -22,6 +22,13 @@ func TestItems(t *testing.T) {
 		t.Error(err)
 	}
 
+	t.Run("AddWithoutMetadataType", func(t *testing.T) {
+		body := []byte(`{"Title":"Item"}`)
+		if _, err := list.Items().Add(body); err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("AddSeries", func(t *testing.T) {
 		for i := 1; i < 10; i++ {
 			metadata := make(map[string]interface{})

@@ -73,6 +73,12 @@ func (item *Item) Delete() ([]byte, error) {
 
 // Update ...
 func (item *Item) Update(body []byte) ([]byte, error) {
+	body = patchMetadataTypeCB(body, func() string {
+		endpoint := getPriorEndpoint(item.endpoint, "/Items")
+		list := NewList(item.client, endpoint, nil)
+		oDataType, _ := list.GetEntityType()
+		return oDataType
+	})
 	sp := NewHTTPClient(item.client)
 	return sp.Update(item.endpoint, body, getConfHeaders(item.config))
 }

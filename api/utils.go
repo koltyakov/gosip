@@ -31,6 +31,12 @@ func getRelativeURL(absURL string) string {
 	return url.Path
 }
 
+// getPriorEndpoint gets endpoint before the provided part ignoring case
+func getPriorEndpoint(endpoint string, part string) string {
+	strLen := len(strings.Split(strings.ToLower(endpoint), strings.ToLower(part))[0])
+	return endpoint[:strLen]
+}
+
 // containsMetadataType checks is byte array payload contains SP OData __metadata prop
 func containsMetadataType(payload []byte) bool {
 	return strings.Index(fmt.Sprintf("%s", payload), `"__metadata"`) != -1

@@ -50,6 +50,23 @@ func TestUtils(t *testing.T) {
 		}
 	})
 
+	t.Run("getPriorEndpoint", func(t *testing.T) {
+		endpoint := "https://contoso.sharepoint.com/sites/site/_api/web/Lists('UpperCaseList')"
+		part := "/Items"
+		endpoint1 := endpoint + "/Items/Item(1)"
+		endpoint2 := endpoint + "/items/item(1)"
+		endpoint3 := endpoint + "/IDK/Item(1)"
+		if getPriorEndpoint(endpoint1, part) != endpoint {
+			t.Error("incorrect endpoint reduction")
+		}
+		if getPriorEndpoint(endpoint2, part) != endpoint {
+			t.Error("incorrect endpoint reduction")
+		}
+		if getPriorEndpoint(endpoint3, part) == endpoint {
+			t.Error("incorrect endpoint reduction")
+		}
+	})
+
 	t.Run("containsMetadataType", func(t *testing.T) {
 		m1 := []byte(`{"prop":"val"}`)
 		if containsMetadataType(m1) {

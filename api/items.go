@@ -102,6 +102,12 @@ func (items *Items) Get() ([]byte, error) {
 
 // Add ...
 func (items *Items) Add(body []byte) ([]byte, error) {
+	body = patchMetadataTypeCB(body, func() string {
+		endpoint := getPriorEndpoint(items.endpoint, "/Items")
+		list := NewList(items.client, endpoint, nil)
+		oDataType, _ := list.GetEntityType()
+		return oDataType
+	})
 	sp := NewHTTPClient(items.client)
 	return sp.Post(items.endpoint, body, getConfHeaders(items.config))
 }
