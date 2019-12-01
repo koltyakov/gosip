@@ -70,15 +70,15 @@ func patchMetadataTypeCB(payload []byte, resolver func() string) []byte {
 // parseODataItem parses OData resp taking care of OData mode
 func parseODataItem(payload []byte) []byte {
 	v := &struct {
-		Verbose map[string]interface{} `json:"d"`
+		D map[string]interface{} `json:"d"`
 	}{}
 	if err := json.Unmarshal(payload, &v); err != nil {
 		return payload
 	}
-	if len(v.Verbose) == 0 {
+	if len(v.D) == 0 {
 		return payload
 	}
-	res, _ := json.Marshal(v.Verbose)
+	res, _ := json.Marshal(v.D)
 	return res
 }
 

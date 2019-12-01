@@ -48,6 +48,9 @@ type GenericFieldInfo struct {
 	TypeShortDescription string `json:"TypeShortDescription"`
 }
 
+// FieldResp ...
+type FieldResp []byte
+
 // NewField ...
 func NewField(client *gosip.SPClient, endpoint string, config *RequestConfig) *Field {
 	return &Field{
@@ -93,19 +96,13 @@ func (field *Field) Expand(oDataExpand string) *Field {
 }
 
 // Get ...
-func (field *Field) Get() (*GenericFieldInfo, error) {
+func (field *Field) Get() (FieldResp, error) {
 	sp := NewHTTPClient(field.client)
-	data, err := sp.Get(field.ToURL(), HeadersPresets.Verbose.Headers)
+	data, err := sp.Get(field.ToURL(), getConfHeaders(field.config))
 	if err != nil {
 		return nil, err
 	}
-	res := &struct {
-		Field *GenericFieldInfo `json:"d"`
-	}{}
-	if err := json.Unmarshal(data, &res); err != nil {
-		return nil, err
-	}
-	return res.Field, nil
+	return FieldResp(data), nil
 }
 
 // Delete ...
@@ -119,4 +116,19 @@ func (field *Field) Recycle() ([]byte, error) {
 	sp := NewHTTPClient(field.client)
 	endpoint := fmt.Sprintf("%s/Recycle", field.endpoint)
 	return sp.Post(endpoint, nil, getConfHeaders(field.config))
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (fieldResp *FieldResp) Data() *GenericFieldInfo {
+	data := parseODataItem(*fieldResp)
+	res := &GenericFieldInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (fieldResp *FieldResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*fieldResp, &obj)
 }

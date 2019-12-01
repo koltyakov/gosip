@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -14,6 +15,9 @@ type Fields struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// FieldsResp ...
+type FieldsResp []byte
 
 // NewFields ...
 func NewFields(client *gosip.SPClient, endpoint string, config *RequestConfig) *Fields {
@@ -94,7 +98,7 @@ func (fields *Fields) OrderBy(oDataOrderBy string, ascending bool) *Fields {
 }
 
 // Get ...
-func (fields *Fields) Get() ([]byte, error) {
+func (fields *Fields) Get() (FieldsResp, error) {
 	sp := NewHTTPClient(fields.client)
 	return sp.Get(fields.ToURL(), getConfHeaders(fields.config))
 }
@@ -128,3 +132,20 @@ func (fields *Fields) GetByInternalNameOrTitle(internalName string) *Field {
 
 // ToDo:
 // Add
+
+/* Response helpers */
+
+// Data : to get typed data
+func (fields *FieldsResp) Data() []FieldResp {
+	collection := parseODataCollection(*fields)
+	resFields := []FieldResp{}
+	for _, f := range collection {
+		resFields = append(resFields, FieldResp(f))
+	}
+	return resFields
+}
+
+// Unmarshal : to unmarshal to custom object
+func (fields *FieldsResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*fields, &obj)
+}
