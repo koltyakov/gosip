@@ -1,7 +1,9 @@
 package api
 
 import (
+	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -45,6 +47,46 @@ func TestUtils(t *testing.T) {
 				relURL,
 				resRelURL,
 			)
+		}
+	})
+
+	t.Run("containsMetadataType", func(t *testing.T) {
+		m1 := []byte(`{"prop":"val"}`)
+		if containsMetadataType(m1) {
+			t.Error("metadata was detected but actually should not")
+		}
+		m2 := []byte(`{"__metadata":{"type":"SP.Any"},"prop":"val"}`)
+		if !containsMetadataType(m2) {
+			t.Error("metadata was not detected but actually should")
+		}
+	})
+
+	t.Run("patchMetadataType", func(t *testing.T) {
+		// should add __metadata if missed
+		m1 := []byte(`{"prop":"val"}`)
+		p1 := patchMetadataType(m1, "SP.List")
+		if !containsMetadataType(p1) {
+			t.Error("payload was not enriched with metadata")
+		}
+
+		// should not add __metadata if present
+		m2 := []byte(`{"__metadata":{"type":"SP.Any"},"prop":"val"}`)
+		p2 := patchMetadataType(m2, "SP.List")
+		if !containsMetadataType(p2) {
+			t.Error("payload lost metadata prop")
+		}
+		if strings.Index(fmt.Sprintf("%s", p2), `"__metadata":{"type":"SP.Any"}`) == -1 {
+			t.Error("payload metadata prop was mutated")
+		}
+	})
+
+	t.Run("patchMetadataTypeCB", func(t *testing.T) {
+		m1 := []byte(`{"prop":"val"}`)
+		p1 := patchMetadataTypeCB(m1, func() string {
+			return "SP.List"
+		})
+		if !containsMetadataType(p1) {
+			t.Error("payload was not enriched with metadata")
 		}
 	})
 
