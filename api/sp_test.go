@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/koltyakov/gosip"
+	ntlm "github.com/koltyakov/gosip/auth/ntlm"
 	saml "github.com/koltyakov/gosip/auth/saml"
 	h "github.com/koltyakov/gosip/test/helpers"
 )
@@ -47,6 +48,24 @@ func init() {
 				}
 			}
 			if err := h.CheckAuthProps(auth, []string{"SiteURL", "Username", "Password"}); err != nil {
+				return nil
+			}
+			client := &gosip.SPClient{AuthCnfg: auth}
+			// Pre-auth for tests not include auth timing involved
+			if _, err := client.AuthCnfg.GetAuth(); err != nil {
+				fmt.Printf("can't auth, %s\n", err)
+				// Force all test being skipped in case of auth issues
+				return nil
+			}
+			return client
+		},
+		"2013": func() *gosip.SPClient {
+			cnfgPath := "./config/integration/private.2013.json"
+			auth := &ntlm.AuthCnfg{}
+			if err := auth.ReadConfig(resolveCnfgPath(cnfgPath)); err != nil {
+				return nil
+			}
+			if err := h.CheckAuthProps(auth, []string{"SiteURL", "Username", "Password", "Domain"}); err != nil {
 				return nil
 			}
 			client := &gosip.SPClient{AuthCnfg: auth}

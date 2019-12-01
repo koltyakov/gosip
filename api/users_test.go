@@ -104,6 +104,9 @@ func TestUsers(t *testing.T) {
 	})
 
 	t.Run("GetByLoginName", func(t *testing.T) {
+		if envCode == "2013" {
+			t.Skip("is not supported with SP 2013")
+		}
 		if user.LoginName == "" {
 			t.Skip("no user LoginName to use in the test")
 		}

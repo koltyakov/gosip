@@ -37,6 +37,10 @@ func TestWebProps(t *testing.T) {
 	})
 
 	t.Run("Get", func(t *testing.T) {
+		if envCode == "2013" {
+			t.Skip("is not supported with SP 2013")
+		}
+
 		data, err := webProps.Select("vti_x005f_defaultlanguage").Conf(headers.verbose).Get()
 		if err != nil {
 			t.Error(err)
