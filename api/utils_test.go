@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 	"strings"
@@ -107,6 +108,33 @@ func TestUtils(t *testing.T) {
 		})
 		if !containsMetadataType(p1) {
 			t.Error("payload was not enriched with metadata")
+		}
+	})
+
+	t.Run("parseODataItem", func(t *testing.T) {
+		minimal := []byte(`{"prop":"val"}`)
+		verbose := []byte(fmt.Sprintf(`{"d":%s}`, minimal))
+		if bytes.Compare(parseODataItem(verbose), minimal) != 0 {
+			t.Error("wrong OData transformation")
+		}
+		if bytes.Compare(parseODataItem(minimal), minimal) != 0 {
+			t.Error("wrong OData transformation")
+		}
+	})
+
+	t.Run("parseODataCollection", func(t *testing.T) {
+		minimal := []byte(`[{"prop":"val1"},{"prop":"val2"}]`)
+		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, minimal))
+		fromVerbose := []byte{}
+		for _, b := range parseODataCollection(verbose) {
+			fromVerbose = append(fromVerbose, b...)
+		}
+		fromMinimal := []byte{}
+		for _, b := range parseODataCollection(minimal) {
+			fromMinimal = append(fromMinimal, b...)
+		}
+		if bytes.Compare(fromVerbose, fromMinimal) != 0 {
+			t.Error("wrong OData transformation")
 		}
 	})
 

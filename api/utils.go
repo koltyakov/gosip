@@ -66,3 +66,41 @@ func patchMetadataTypeCB(payload []byte, resolver func() string) []byte {
 	}
 	return patchMetadataType(payload, resolver())
 }
+
+// parseODataItem parses OData resp taking care of OData mode
+func parseODataItem(payload []byte) []byte {
+	v := &struct {
+		Verbose map[string]interface{} `json:"d"`
+	}{}
+	if err := json.Unmarshal(payload, &v); err != nil {
+		return payload
+	}
+	if len(v.Verbose) == 0 {
+		return payload
+	}
+	res, _ := json.Marshal(v.Verbose)
+	return res
+}
+
+// parseODataCollection parses OData resp taking care of OData mode
+func parseODataCollection(payload []byte) [][]byte {
+	v := &struct {
+		D struct {
+			Results []map[string]interface{} `json:"results"`
+		} `json:"d"`
+	}{}
+	mapRes := make([]map[string]interface{}, 0)
+	if err := json.Unmarshal(payload, &v); err != nil {
+		if err := json.Unmarshal(payload, &mapRes); err != nil {
+			return [][]byte{payload}
+		}
+	} else {
+		mapRes = v.D.Results
+	}
+	res := [][]byte{}
+	for _, mapItem := range mapRes {
+		r, _ := json.Marshal(mapItem)
+		res = append(res, []byte(r))
+	}
+	return res
+}
