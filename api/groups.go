@@ -16,6 +16,9 @@ type Groups struct {
 	modifiers map[string]string
 }
 
+// GroupsResp ...
+type GroupsResp []byte
+
 // NewGroups ...
 func NewGroups(client *gosip.SPClient, endpoint string, config *RequestConfig) *Groups {
 	return &Groups{
@@ -95,13 +98,13 @@ func (groups *Groups) OrderBy(oDataOrderBy string, ascending bool) *Groups {
 }
 
 // Get ...
-func (groups *Groups) Get() ([]byte, error) {
+func (groups *Groups) Get() (GroupsResp, error) {
 	sp := NewHTTPClient(groups.client)
 	return sp.Get(groups.ToURL(), getConfHeaders(groups.config))
 }
 
 // Add ...
-func (groups *Groups) Add(title string, metadata map[string]interface{}) ([]byte, error) {
+func (groups *Groups) Add(title string, metadata map[string]interface{}) (GroupsResp, error) {
 	if metadata == nil {
 		metadata = make(map[string]interface{})
 	}
@@ -148,4 +151,21 @@ func (groups *Groups) RemoveByLoginName(loginName string) ([]byte, error) {
 	)
 	sp := NewHTTPClient(groups.client)
 	return sp.Post(endpoint, nil, getConfHeaders(groups.config))
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (groupsResp *GroupsResp) Data() []GroupResp {
+	collection := parseODataCollection(*groupsResp)
+	cts := []GroupResp{}
+	for _, ct := range collection {
+		cts = append(cts, GroupResp(ct))
+	}
+	return cts
+}
+
+// Unmarshal : to unmarshal to custom object
+func (groupsResp *GroupsResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*groupsResp, &obj)
 }

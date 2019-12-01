@@ -32,6 +32,9 @@ type GroupInfo struct {
 	Title                          string `json:"Title"`
 }
 
+// GroupResp ...
+type GroupResp []byte
+
 // NewGroup ...
 func NewGroup(client *gosip.SPClient, endpoint string, config *RequestConfig) *Group {
 	return &Group{
@@ -77,13 +80,14 @@ func (group *Group) Expand(oDataExpand string) *Group {
 }
 
 // Get ...
-func (group *Group) Get() ([]byte, error) {
+func (group *Group) Get() (GroupResp, error) {
 	sp := NewHTTPClient(group.client)
 	return sp.Get(group.ToURL(), getConfHeaders(group.config))
 }
 
 // Update ...
 func (group *Group) Update(body []byte) ([]byte, error) {
+	body = patchMetadataType(body, "SP.Group")
 	sp := NewHTTPClient(group.client)
 	return sp.Update(group.endpoint, body, getConfHeaders(group.config))
 }
@@ -109,4 +113,19 @@ func (group *Group) AddUser(loginName string) ([]byte, error) {
 	metadata["LoginName"] = loginName
 	body, _ := json.Marshal(metadata)
 	return sp.Post(endpoint, body, getConfHeaders(group.config))
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (groupResp *GroupResp) Data() *GroupInfo {
+	data := parseODataItem(*groupResp)
+	res := &GroupInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (groupResp *GroupResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*groupResp, &obj)
 }
