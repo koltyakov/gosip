@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -14,6 +15,9 @@ type Users struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// UsersResp ...
+type UsersResp []byte
 
 // NewUsers ...
 func NewUsers(client *gosip.SPClient, endpoint string, config *RequestConfig) *Users {
@@ -94,7 +98,7 @@ func (users *Users) OrderBy(oDataOrderBy string, ascending bool) *Users {
 }
 
 // Get ...
-func (users *Users) Get() ([]byte, error) {
+func (users *Users) Get() (UsersResp, error) {
 	sp := NewHTTPClient(users.client)
 	return sp.Get(users.ToURL(), getConfHeaders(users.config))
 }
@@ -124,4 +128,21 @@ func (users *Users) GetByEmail(email string) *User {
 		fmt.Sprintf("%s/GetByEmail('%s')", users.endpoint, url.QueryEscape(email)),
 		users.config,
 	)
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (usersResp *UsersResp) Data() []UsersResp {
+	collection := parseODataCollection(*usersResp)
+	users := []UsersResp{}
+	for _, user := range collection {
+		users = append(users, UsersResp(user))
+	}
+	return users
+}
+
+// Unmarshal : to unmarshal to custom object
+func (usersResp *UsersResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*usersResp, &obj)
 }

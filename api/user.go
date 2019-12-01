@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -25,6 +26,9 @@ type UserInfo struct {
 	PrincipalType int    `json:"PrincipalType"`
 	Title         string `json:"Title"`
 }
+
+// UserResp ...
+type UserResp []byte
 
 // NewUser ...
 func NewUser(client *gosip.SPClient, endpoint string, config *RequestConfig) *User {
@@ -71,7 +75,7 @@ func (user *User) Expand(oDataExpand string) *User {
 }
 
 // Get ...
-func (user *User) Get() ([]byte, error) {
+func (user *User) Get() (UserResp, error) {
 	sp := NewHTTPClient(user.client)
 	return sp.Get(user.ToURL(), getConfHeaders(user.config))
 }
@@ -83,4 +87,19 @@ func (user *User) Groups() *Groups {
 		fmt.Sprintf("%s/Groups", user.endpoint),
 		user.config,
 	)
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (userResp *UserResp) Data() *UserInfo {
+	data := parseODataItem(*userResp)
+	res := &UserInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (userResp *UserResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*userResp, &obj)
 }
