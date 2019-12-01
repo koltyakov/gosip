@@ -30,6 +30,9 @@ type ContentTypeInfo struct {
 	ID          string `json:"StringId"`
 }
 
+// ContentTypeResp ...
+type ContentTypeResp []byte
+
 // NewContentType ...
 func NewContentType(client *gosip.SPClient, endpoint string, config *RequestConfig) *ContentType {
 	return &ContentType{
@@ -75,25 +78,13 @@ func (ct *ContentType) Expand(oDataExpand string) *ContentType {
 }
 
 // Get ...
-func (ct *ContentType) Get() (*ContentTypeInfo, error) {
+func (ct *ContentType) Get() (ContentTypeResp, error) {
 	sp := NewHTTPClient(ct.client)
-	data, err := sp.Get(ct.ToURL(), HeadersPresets.Verbose.Headers)
+	data, err := sp.Get(ct.ToURL(), getConfHeaders(ct.config))
 	if err != nil {
 		return nil, err
 	}
-	res := &struct {
-		CT *ContentTypeInfo `json:"d"`
-	}{}
-	if err := json.Unmarshal(data, &res); err != nil {
-		return nil, err
-	}
-	return res.CT, nil
-}
-
-// GetRaw ...
-func (ct *ContentType) GetRaw() ([]byte, error) {
-	sp := NewHTTPClient(ct.client)
-	return sp.Get(ct.ToURL(), getConfHeaders(ct.config))
+	return ContentTypeResp(data), nil
 }
 
 // Delete ...
@@ -116,4 +107,19 @@ func (ct *ContentType) Fields() *Fields {
 		fmt.Sprintf("%s/Fields", ct.endpoint),
 		ct.config,
 	)
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (ctResp *ContentTypeResp) Data() *ContentTypeInfo {
+	data := parseODataItem(*ctResp)
+	res := &ContentTypeInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (ctResp *ContentTypeResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*ctResp, &obj)
 }

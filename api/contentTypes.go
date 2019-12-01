@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -14,6 +15,9 @@ type ContentTypes struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// ContentTypesResp ...
+type ContentTypesResp []byte
 
 // NewContentTypes ...
 func NewContentTypes(client *gosip.SPClient, endpoint string, config *RequestConfig) *ContentTypes {
@@ -94,7 +98,7 @@ func (contentTypes *ContentTypes) OrderBy(oDataOrderBy string, ascending bool) *
 }
 
 // Get ...
-func (contentTypes *ContentTypes) Get() ([]byte, error) {
+func (contentTypes *ContentTypes) Get() (ContentTypesResp, error) {
 	sp := NewHTTPClient(contentTypes.client)
 	return sp.Get(contentTypes.ToURL(), getConfHeaders(contentTypes.config))
 }
@@ -110,3 +114,20 @@ func (contentTypes *ContentTypes) GetByID(contentTypeID string) *ContentType {
 
 // ToDo:
 // Add
+
+/* Response helpers */
+
+// Data : to get typed data
+func (ctsResp *ContentTypesResp) Data() []ContentTypeResp {
+	collection := parseODataCollection(*ctsResp)
+	cts := []ContentTypeResp{}
+	for _, ct := range collection {
+		cts = append(cts, ContentTypeResp(ct))
+	}
+	return cts
+}
+
+// Unmarshal : to unmarshal to custom object
+func (ctsResp *ContentTypesResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*ctsResp, &obj)
+}

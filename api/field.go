@@ -108,12 +108,6 @@ func (field *Field) Get() (*GenericFieldInfo, error) {
 	return res.Field, nil
 }
 
-// GetRaw ...
-func (field *Field) GetRaw() ([]byte, error) {
-	sp := NewHTTPClient(field.client)
-	return sp.Get(field.ToURL(), getConfHeaders(field.config))
-}
-
 // Delete ...
 func (field *Field) Delete() ([]byte, error) {
 	sp := NewHTTPClient(field.client)

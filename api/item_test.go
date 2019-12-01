@@ -23,7 +23,7 @@ func TestItem(t *testing.T) {
 	}
 
 	t.Run("AddSeries", func(t *testing.T) {
-		for i := 1; i < 10; i++ {
+		for i := 1; i < 5; i++ {
 			metadata := make(map[string]interface{})
 			metadata["__metadata"] = map[string]string{"type": entType}
 			metadata["Title"] = fmt.Sprintf("Item %d", i)
@@ -46,6 +46,15 @@ func TestItem(t *testing.T) {
 		metadata["Title"] = "Updated Item 1"
 		body, _ := json.Marshal(metadata)
 		if _, err := list.Items().GetByID(1).Update(body); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("UpdateWithoutMetadataType", func(t *testing.T) {
+		metadata := make(map[string]interface{})
+		metadata["Title"] = "Updated Item 2"
+		body, _ := json.Marshal(metadata)
+		if _, err := list.Items().GetByID(2).Update(body); err != nil {
 			t.Error(err)
 		}
 	})
