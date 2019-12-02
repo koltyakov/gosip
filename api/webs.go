@@ -156,8 +156,8 @@ func (webs *Webs) Add(title string, url string, metadata map[string]interface{})
 func (websResp *WebsResp) Data() []WebResp {
 	collection := parseODataCollection(*websResp)
 	webs := []WebResp{}
-	for _, ct := range collection {
-		webs = append(webs, WebResp(ct))
+	for _, web := range collection {
+		webs = append(webs, WebResp(web))
 	}
 	return webs
 }

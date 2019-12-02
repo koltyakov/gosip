@@ -16,6 +16,9 @@ type Lists struct {
 	modifiers map[string]string
 }
 
+// ListsResp ...
+type ListsResp []byte
+
 // NewLists ...
 func NewLists(client *gosip.SPClient, endpoint string, config *RequestConfig) *Lists {
 	return &Lists{
@@ -95,7 +98,7 @@ func (lists *Lists) OrderBy(oDataOrderBy string, ascending bool) *Lists {
 }
 
 // Get ...
-func (lists *Lists) Get() ([]byte, error) {
+func (lists *Lists) Get() (ListsResp, error) {
 	sp := NewHTTPClient(lists.client)
 	return sp.Get(lists.ToURL(), getConfHeaders(lists.config))
 }
@@ -121,7 +124,7 @@ func (lists *Lists) GetByID(listGUID string) *List {
 }
 
 // Add ...
-func (lists *Lists) Add(title string, metadata map[string]interface{}) ([]byte, error) {
+func (lists *Lists) Add(title string, metadata map[string]interface{}) (ListResp, error) {
 	if metadata == nil {
 		metadata = make(map[string]interface{})
 	}
@@ -177,4 +180,23 @@ func (lists *Lists) AddWithURI(title string, uri string, metadata map[string]int
 	body, _ := json.Marshal(metadata)
 
 	return lists.GetByID(res.D.ID).Update(body)
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (listsResp *ListsResp) Data() []ListResp {
+	collection := parseODataCollection(*listsResp)
+	lists := []ListResp{}
+	for _, list := range collection {
+		lists = append(lists, ListResp(list))
+	}
+	return lists
+}
+
+// Unmarshal : to unmarshal to custom object
+func (listsResp *ListsResp) Unmarshal(obj interface{}) error {
+	collection := parseODataCollection(*listsResp)
+	data, _ := json.Marshal(collection)
+	return json.Unmarshal(data, &obj)
 }

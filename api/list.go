@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/koltyakov/gosip"
 )
@@ -15,6 +16,69 @@ type List struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// ListInfo ...
+type ListInfo struct {
+	ID                               string    `json:"Id"`
+	Title                            string    `json:"Title"`
+	AllowContentTypes                bool      `json:"AllowContentTypes"`
+	BaseTemplate                     int       `json:"BaseTemplate"`
+	BaseType                         int       `json:"BaseType"`
+	ContentTypesEnabled              bool      `json:"ContentTypesEnabled"`
+	CrawlNonDefaultViews             bool      `json:"CrawlNonDefaultViews"`
+	Created                          time.Time `json:"Created"`
+	DefaultContentApprovalWorkflowID string    `json:"DefaultContentApprovalWorkflowId"`
+	DefaultItemOpenUseListSetting    bool      `json:"DefaultItemOpenUseListSetting"`
+	Description                      string    `json:"Description"`
+	Direction                        string    `json:"Direction"`
+	DisableGridEditing               bool      `json:"DisableGridEditing"`
+	DocumentTemplateURL              string    `json:"DocumentTemplateUrl"`
+	DraftVersionVisibility           int       `json:"DraftVersionVisibility"`
+	EnableAttachments                bool      `json:"EnableAttachments"`
+	EnableFolderCreation             bool      `json:"EnableFolderCreation"`
+	EnableMinorVersions              bool      `json:"EnableMinorVersions"`
+	EnableModeration                 bool      `json:"EnableModeration"`
+	EnableRequestSignOff             bool      `json:"EnableRequestSignOff"`
+	EnableVersioning                 bool      `json:"EnableVersioning"`
+	EntityTypeName                   string    `json:"EntityTypeName"`
+	FileSavePostProcessingEnabled    bool      `json:"FileSavePostProcessingEnabled"`
+	ForceCheckout                    bool      `json:"ForceCheckout"`
+	HasExternalDataSource            bool      `json:"HasExternalDataSource"`
+	Hidden                           bool      `json:"Hidden"`
+	ImageURL                         string    `json:"ImageUrl"`
+	IrmEnabled                       bool      `json:"IrmEnabled"`
+	IrmExpire                        bool      `json:"IrmExpire"`
+	IrmReject                        bool      `json:"IrmReject"`
+	IsApplicationList                bool      `json:"IsApplicationList"`
+	IsCatalog                        bool      `json:"IsCatalog"`
+	IsPrivate                        bool      `json:"IsPrivate"`
+	ItemCount                        int       `json:"ItemCount"`
+	LastItemDeletedDate              time.Time `json:"LastItemDeletedDate"`
+	LastItemModifiedDate             time.Time `json:"LastItemModifiedDate"`
+	LastItemUserModifiedDate         time.Time `json:"LastItemUserModifiedDate"`
+	ListExperienceOptions            int       `json:"ListExperienceOptions"`
+	ListItemEntityTypeFullName       string    `json:"ListItemEntityTypeFullName"`
+	MajorVersionLimit                int       `json:"MajorVersionLimit"`
+	MajorWithMinorVersionsLimit      int       `json:"MajorWithMinorVersionsLimit"`
+	MultipleDataList                 bool      `json:"MultipleDataList"`
+	NoCrawl                          bool      `json:"NoCrawl"`
+	ParentWebURL                     string    `json:"ParentWebUrl"`
+	ParserDisabled                   bool      `json:"ParserDisabled"`
+	ServerTemplateCanCreateFolders   bool      `json:"ServerTemplateCanCreateFolders"`
+	TemplateFeatureID                string    `json:"TemplateFeatureId"`
+	ParentWebPath                    struct {
+		StringValue string `json:"StringValue"`
+	} `json:"ParentWebPath"`
+	ImagePath struct {
+		DecodedURL string `json:"DecodedUrl"`
+	} `json:"ImagePath"`
+	CurrentChangeToken struct {
+		StringValue string `json:"StringValue"`
+	} `json:"CurrentChangeToken"`
+}
+
+// ListResp ...
+type ListResp []byte
 
 // NewList ...
 func NewList(client *gosip.SPClient, endpoint string, config *RequestConfig) *List {
@@ -61,7 +125,7 @@ func (list *List) Expand(oDataExpand string) *List {
 }
 
 // Get ...
-func (list *List) Get() ([]byte, error) {
+func (list *List) Get() (ListResp, error) {
 	sp := NewHTTPClient(list.client)
 	return sp.Get(list.ToURL(), getConfHeaders(list.config))
 }
@@ -146,3 +210,19 @@ func (list *List) Roles() *Roles {
 // Fields
 // Content Type
 // Views
+
+/* Response helpers */
+
+// Data : to get typed data
+func (listResp *ListResp) Data() *ListInfo {
+	data := parseODataItem(*listResp)
+	res := &ListInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (listResp *ListResp) Unmarshal(obj interface{}) error {
+	data := parseODataItem(*listResp)
+	return json.Unmarshal(data, &obj)
+}
