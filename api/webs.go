@@ -16,6 +16,9 @@ type Webs struct {
 	modifiers map[string]string
 }
 
+// WebsResp ...
+type WebsResp []byte
+
 // NewWebs ...
 func NewWebs(client *gosip.SPClient, endpoint string, config *RequestConfig) *Webs {
 	return &Webs{
@@ -95,7 +98,7 @@ func (webs *Webs) OrderBy(oDataOrderBy string, ascending bool) *Webs {
 }
 
 // Get ...
-func (webs *Webs) Get() ([]byte, error) {
+func (webs *Webs) Get() (WebsResp, error) {
 	sp := NewHTTPClient(webs.client)
 	headers := map[string]string{}
 	if webs.config != nil {
@@ -105,7 +108,7 @@ func (webs *Webs) Get() ([]byte, error) {
 }
 
 // Add ...
-func (webs *Webs) Add(title string, url string, metadata map[string]interface{}) ([]byte, error) {
+func (webs *Webs) Add(title string, url string, metadata map[string]interface{}) (WebResp, error) {
 	endpoint := fmt.Sprintf("%s/Add", webs.endpoint)
 
 	if metadata == nil {
@@ -145,4 +148,23 @@ func (webs *Webs) Add(title string, url string, metadata map[string]interface{})
 	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
 
 	return sp.Post(endpoint, []byte(body), headers)
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (websResp *WebsResp) Data() []WebResp {
+	collection := parseODataCollection(*websResp)
+	webs := []WebResp{}
+	for _, ct := range collection {
+		webs = append(webs, WebResp(ct))
+	}
+	return webs
+}
+
+// Unmarshal : to unmarshal to custom object
+func (websResp *WebsResp) Unmarshal(obj interface{}) error {
+	collection := parseODataCollection(*websResp)
+	data, _ := json.Marshal(collection)
+	return json.Unmarshal(data, &obj)
 }

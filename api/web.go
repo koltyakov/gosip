@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/koltyakov/gosip"
 )
@@ -16,6 +17,62 @@ type Web struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// WebInfo ...
+type WebInfo struct {
+	ID                            string    `json:"Id"`
+	Title                         string    `json:"Title"`
+	AllowRssFeeds                 bool      `json:"AllowRssFeeds"`
+	AlternateCSSURL               string    `json:"AlternateCssUrl"`
+	AppInstanceID                 string    `json:"AppInstanceId"`
+	ClassicWelcomePage            string    `json:"ClassicWelcomePage"`
+	Configuration                 int       `json:"Configuration"`
+	Created                       time.Time `json:"Created"`
+	CustomMasterURL               string    `json:"CustomMasterUrl"`
+	Description                   string    `json:"Description"`
+	DesignPackageID               string    `json:"DesignPackageId"`
+	EnableMinimalDownload         bool      `json:"EnableMinimalDownload"`
+	FooterEmphasis                int       `json:"FooterEmphasis"`
+	FooterEnabled                 bool      `json:"FooterEnabled"`
+	FooterLayout                  int       `json:"FooterLayout"`
+	HeaderEmphasis                int       `json:"HeaderEmphasis"`
+	HeaderLayout                  int       `json:"HeaderLayout"`
+	HorizontalQuickLaunch         bool      `json:"HorizontalQuickLaunch"`
+	IsHomepageModernized          bool      `json:"IsHomepageModernized"`
+	IsMultilingual                bool      `json:"IsMultilingual"`
+	IsRevertHomepageLinkHidden    bool      `json:"IsRevertHomepageLinkHidden"`
+	Language                      int       `json:"Language"`
+	LastItemModifiedDate          time.Time `json:"LastItemModifiedDate"`
+	LastItemUserModifiedDate      time.Time `json:"LastItemUserModifiedDate"`
+	MasterURL                     string    `json:"MasterUrl"`
+	MegaMenuEnabled               bool      `json:"MegaMenuEnabled"`
+	NavAudienceTargetingEnabled   bool      `json:"NavAudienceTargetingEnabled"`
+	NoCrawl                       bool      `json:"NoCrawl"`
+	ObjectCacheEnabled            bool      `json:"ObjectCacheEnabled"`
+	OverwriteTranslationsOnChange bool      `json:"OverwriteTranslationsOnChange"`
+	QuickLaunchEnabled            bool      `json:"QuickLaunchEnabled"`
+	RecycleBinEnabled             bool      `json:"RecycleBinEnabled"`
+	SearchScope                   int       `json:"SearchScope"`
+	ServerRelativeURL             string    `json:"ServerRelativeUrl"`
+	SiteLogoURL                   string    `json:"SiteLogoUrl"`
+	SyndicationEnabled            bool      `json:"SyndicationEnabled"`
+	TenantAdminMembersCanShare    int       `json:"TenantAdminMembersCanShare"`
+	TreeViewEnabled               bool      `json:"TreeViewEnabled"`
+	UIVersion                     int       `json:"UIVersion"`
+	UIVersionConfigurationEnabled bool      `json:"UIVersionConfigurationEnabled"`
+	URL                           string    `json:"Url"`
+	WebTemplate                   string    `json:"WebTemplate"`
+	WelcomePage                   string    `json:"WelcomePage"`
+	CurrentChangeToken            struct {
+		StringValue string `json:"StringValue"`
+	} `json:"CurrentChangeToken"`
+	ResourcePath struct {
+		DecodedURL string `json:"DecodedUrl"`
+	} `json:"ResourcePath"`
+}
+
+// WebResp ...
+type WebResp []byte
 
 // NewWeb ...
 func NewWeb(client *gosip.SPClient, endpoint string, config *RequestConfig) *Web {
@@ -62,7 +119,7 @@ func (web *Web) Expand(oDataExpand string) *Web {
 }
 
 // Get ...
-func (web *Web) Get() ([]byte, error) {
+func (web *Web) Get() (WebResp, error) {
 	sp := NewHTTPClient(web.client)
 	return sp.Get(web.ToURL(), getConfHeaders(web.config))
 }
@@ -232,5 +289,18 @@ func (web *Web) RoleDefinitions() *RoleDefinitions {
 	)
 }
 
-// ToDo:
-// Property bags
+/* Response helpers */
+
+// Data : to get typed data
+func (webResp *WebResp) Data() *WebInfo {
+	data := parseODataItem(*webResp)
+	res := &WebInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (webResp *WebResp) Unmarshal(obj interface{}) error {
+	data := parseODataItem(*webResp)
+	return json.Unmarshal(data, &obj)
+}
