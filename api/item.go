@@ -1,8 +1,10 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/koltyakov/gosip"
 )
@@ -14,6 +16,21 @@ type Item struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// GenericItemInfo ...
+type GenericItemInfo struct {
+	ID            int       `json:"Id"`
+	Title         string    `json:"Title"`
+	ContentTypeID string    `json:"ContentTypeId"`
+	Attachments   bool      `json:"Attachments"`
+	AuthorID      int       `json:"AuthorId"`
+	EditorID      int       `json:"EditorId"`
+	Created       time.Time `json:"Created"`
+	Modified      time.Time `json:"Modified"`
+}
+
+// ItemResp ...
+type ItemResp []byte
 
 // NewItem ...
 func NewItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *Item {
@@ -60,7 +77,7 @@ func (item *Item) Expand(oDataExpand string) *Item {
 }
 
 // Get ...
-func (item *Item) Get() ([]byte, error) {
+func (item *Item) Get() (ItemResp, error) {
 	sp := NewHTTPClient(item.client)
 	return sp.Get(item.ToURL(), getConfHeaders(item.config))
 }
@@ -93,4 +110,19 @@ func (item *Item) Recycle() ([]byte, error) {
 // Roles ...
 func (item *Item) Roles() *Roles {
 	return NewRoles(item.client, item.endpoint, item.config)
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (itemResp *ItemResp) Data() *GenericItemInfo {
+	data := parseODataItem(*itemResp)
+	res := &GenericItemInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (itemResp *ItemResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*itemResp, &obj)
 }

@@ -8,4 +8,5 @@ This is the beta area. Changes to interfaces are expected in near future.
 
 - [ ] Solidify API (Go language terms)
 - [ ] Integration tests
+- [ ] Add docs
 - [ ] Extend SP coverage

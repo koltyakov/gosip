@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -15,6 +16,9 @@ type Items struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// ItemsResp ...
+type ItemsResp []byte
 
 // NewItems ...
 func NewItems(client *gosip.SPClient, endpoint string, config *RequestConfig) *Items {
@@ -95,13 +99,13 @@ func (items *Items) OrderBy(oDataOrderBy string, ascending bool) *Items {
 }
 
 // Get ...
-func (items *Items) Get() ([]byte, error) {
+func (items *Items) Get() (ItemsResp, error) {
 	sp := NewHTTPClient(items.client)
 	return sp.Get(items.ToURL(), getConfHeaders(items.config))
 }
 
 // Add ...
-func (items *Items) Add(body []byte) ([]byte, error) {
+func (items *Items) Add(body []byte) (ItemResp, error) {
 	body = patchMetadataTypeCB(body, func() string {
 		endpoint := getPriorEndpoint(items.endpoint, "/Items")
 		list := NewList(items.client, endpoint, nil)
@@ -153,3 +157,20 @@ func (items *Items) GetByCAML(caml string) ([]byte, error) {
 // GetPaged
 // SkipToken
 // RenderListDataAsStream
+
+/* Response helpers */
+
+// Data : to get typed data
+func (itemsResp *ItemsResp) Data() []ItemResp {
+	collection := parseODataCollection(*itemsResp)
+	items := []ItemResp{}
+	for _, item := range collection {
+		items = append(items, ItemResp(item))
+	}
+	return items
+}
+
+// Unmarshal : to unmarshal to custom object
+func (itemsResp *ItemsResp) Unmarshal(obj *interface{}) error {
+	return json.Unmarshal(*itemsResp, &obj)
+}

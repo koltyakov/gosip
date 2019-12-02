@@ -29,6 +29,17 @@ func TestItems(t *testing.T) {
 		}
 	})
 
+	t.Run("AddResponse", func(t *testing.T) {
+		body := []byte(`{"Title":"Item"}`)
+		item, err := list.Items().Add(body)
+		if err != nil {
+			t.Error(err)
+		}
+		if item.Data().ID == 0 {
+			t.Error("can't get item properly")
+		}
+	})
+
 	t.Run("AddSeries", func(t *testing.T) {
 		for i := 1; i < 10; i++ {
 			metadata := make(map[string]interface{})
@@ -42,14 +53,25 @@ func TestItems(t *testing.T) {
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		if _, err := list.Items().Top(100).OrderBy("Title", false).Get(); err != nil {
+		items, err := list.Items().Top(100).OrderBy("Title", false).Get()
+		if err != nil {
 			t.Error(err)
+		}
+		if len(items.Data()) == 0 {
+			t.Error("can't get items properly")
+		}
+		if items.Data()[0].Data().ID == 0 {
+			t.Error("can't get items properly")
 		}
 	})
 
 	t.Run("GetByID", func(t *testing.T) {
-		if _, err := list.Items().GetByID(1).Get(); err != nil {
+		item, err := list.Items().GetByID(1).Get()
+		if err != nil {
 			t.Error(err)
+		}
+		if item.Data().ID == 0 {
+			t.Error("can't get item properly")
 		}
 	})
 

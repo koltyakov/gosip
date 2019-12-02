@@ -35,8 +35,12 @@ func TestItem(t *testing.T) {
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		if _, err := list.Items().GetByID(1).Get(); err != nil {
+		item, err := list.Items().GetByID(1).Get()
+		if err != nil {
 			t.Error(err)
+		}
+		if item.Data().ID == 0 {
+			t.Error("can't get item properly")
 		}
 	})
 
@@ -71,4 +75,7 @@ func TestItem(t *testing.T) {
 		}
 	})
 
+	if _, err := list.Delete(); err != nil {
+		t.Error(err)
+	}
 }
