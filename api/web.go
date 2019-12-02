@@ -20,55 +20,51 @@ type Web struct {
 
 // WebInfo ...
 type WebInfo struct {
-	ID                            string    `json:"Id"`
-	Title                         string    `json:"Title"`
-	AllowRssFeeds                 bool      `json:"AllowRssFeeds"`
-	AlternateCSSURL               string    `json:"AlternateCssUrl"`
-	AppInstanceID                 string    `json:"AppInstanceId"`
-	ClassicWelcomePage            string    `json:"ClassicWelcomePage"`
-	Configuration                 int       `json:"Configuration"`
-	Created                       time.Time `json:"Created"`
-	CustomMasterURL               string    `json:"CustomMasterUrl"`
-	Description                   string    `json:"Description"`
-	DesignPackageID               string    `json:"DesignPackageId"`
-	EnableMinimalDownload         bool      `json:"EnableMinimalDownload"`
-	FooterEmphasis                int       `json:"FooterEmphasis"`
-	FooterEnabled                 bool      `json:"FooterEnabled"`
-	FooterLayout                  int       `json:"FooterLayout"`
-	HeaderEmphasis                int       `json:"HeaderEmphasis"`
-	HeaderLayout                  int       `json:"HeaderLayout"`
-	HorizontalQuickLaunch         bool      `json:"HorizontalQuickLaunch"`
-	IsHomepageModernized          bool      `json:"IsHomepageModernized"`
-	IsMultilingual                bool      `json:"IsMultilingual"`
-	IsRevertHomepageLinkHidden    bool      `json:"IsRevertHomepageLinkHidden"`
-	Language                      int       `json:"Language"`
-	LastItemModifiedDate          time.Time `json:"LastItemModifiedDate"`
-	LastItemUserModifiedDate      time.Time `json:"LastItemUserModifiedDate"`
-	MasterURL                     string    `json:"MasterUrl"`
-	MegaMenuEnabled               bool      `json:"MegaMenuEnabled"`
-	NavAudienceTargetingEnabled   bool      `json:"NavAudienceTargetingEnabled"`
-	NoCrawl                       bool      `json:"NoCrawl"`
-	ObjectCacheEnabled            bool      `json:"ObjectCacheEnabled"`
-	OverwriteTranslationsOnChange bool      `json:"OverwriteTranslationsOnChange"`
-	QuickLaunchEnabled            bool      `json:"QuickLaunchEnabled"`
-	RecycleBinEnabled             bool      `json:"RecycleBinEnabled"`
-	SearchScope                   int       `json:"SearchScope"`
-	ServerRelativeURL             string    `json:"ServerRelativeUrl"`
-	SiteLogoURL                   string    `json:"SiteLogoUrl"`
-	SyndicationEnabled            bool      `json:"SyndicationEnabled"`
-	TenantAdminMembersCanShare    int       `json:"TenantAdminMembersCanShare"`
-	TreeViewEnabled               bool      `json:"TreeViewEnabled"`
-	UIVersion                     int       `json:"UIVersion"`
-	UIVersionConfigurationEnabled bool      `json:"UIVersionConfigurationEnabled"`
-	URL                           string    `json:"Url"`
-	WebTemplate                   string    `json:"WebTemplate"`
-	WelcomePage                   string    `json:"WelcomePage"`
-	CurrentChangeToken            struct {
-		StringValue string `json:"StringValue"`
-	} `json:"CurrentChangeToken"`
-	ResourcePath struct {
-		DecodedURL string `json:"DecodedUrl"`
-	} `json:"ResourcePath"`
+	ID                            string       `json:"Id"`
+	Title                         string       `json:"Title"`
+	AllowRssFeeds                 bool         `json:"AllowRssFeeds"`
+	AlternateCSSURL               string       `json:"AlternateCssUrl"`
+	AppInstanceID                 string       `json:"AppInstanceId"`
+	ClassicWelcomePage            string       `json:"ClassicWelcomePage"`
+	Configuration                 int          `json:"Configuration"`
+	Created                       time.Time    `json:"Created"`
+	CustomMasterURL               string       `json:"CustomMasterUrl"`
+	Description                   string       `json:"Description"`
+	DesignPackageID               string       `json:"DesignPackageId"`
+	EnableMinimalDownload         bool         `json:"EnableMinimalDownload"`
+	FooterEmphasis                int          `json:"FooterEmphasis"`
+	FooterEnabled                 bool         `json:"FooterEnabled"`
+	FooterLayout                  int          `json:"FooterLayout"`
+	HeaderEmphasis                int          `json:"HeaderEmphasis"`
+	HeaderLayout                  int          `json:"HeaderLayout"`
+	HorizontalQuickLaunch         bool         `json:"HorizontalQuickLaunch"`
+	IsHomepageModernized          bool         `json:"IsHomepageModernized"`
+	IsMultilingual                bool         `json:"IsMultilingual"`
+	IsRevertHomepageLinkHidden    bool         `json:"IsRevertHomepageLinkHidden"`
+	Language                      int          `json:"Language"`
+	LastItemModifiedDate          time.Time    `json:"LastItemModifiedDate"`
+	LastItemUserModifiedDate      time.Time    `json:"LastItemUserModifiedDate"`
+	MasterURL                     string       `json:"MasterUrl"`
+	MegaMenuEnabled               bool         `json:"MegaMenuEnabled"`
+	NavAudienceTargetingEnabled   bool         `json:"NavAudienceTargetingEnabled"`
+	NoCrawl                       bool         `json:"NoCrawl"`
+	ObjectCacheEnabled            bool         `json:"ObjectCacheEnabled"`
+	OverwriteTranslationsOnChange bool         `json:"OverwriteTranslationsOnChange"`
+	QuickLaunchEnabled            bool         `json:"QuickLaunchEnabled"`
+	RecycleBinEnabled             bool         `json:"RecycleBinEnabled"`
+	SearchScope                   int          `json:"SearchScope"`
+	ServerRelativeURL             string       `json:"ServerRelativeUrl"`
+	SiteLogoURL                   string       `json:"SiteLogoUrl"`
+	SyndicationEnabled            bool         `json:"SyndicationEnabled"`
+	TenantAdminMembersCanShare    int          `json:"TenantAdminMembersCanShare"`
+	TreeViewEnabled               bool         `json:"TreeViewEnabled"`
+	UIVersion                     int          `json:"UIVersion"`
+	UIVersionConfigurationEnabled bool         `json:"UIVersionConfigurationEnabled"`
+	URL                           string       `json:"Url"`
+	WebTemplate                   string       `json:"WebTemplate"`
+	WelcomePage                   string       `json:"WelcomePage"`
+	CurrentChangeToken            *StringValue `json:"CurrentChangeToken"`
+	ResourcePath                  *DecodedURL  `json:"ResourcePath"`
 }
 
 // WebResp ...
@@ -152,6 +148,15 @@ func (web *Web) GetChangeToken() (string, error) {
 		return "", err
 	}
 	return data.Data().CurrentChangeToken.StringValue, nil
+}
+
+// GetChanges ...
+func (web *Web) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
+	return NewChanges(
+		web.client,
+		fmt.Sprintf("%s/GetChanges", web.endpoint),
+		web.config,
+	).GetChanges(changeQuery)
 }
 
 // Webs ...
