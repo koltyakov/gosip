@@ -127,7 +127,7 @@ func (viewResp *ViewResp) Data() *ViewInfo {
 }
 
 // Unmarshal : to unmarshal to custom object
-func (viewResp *ViewResp) Unmarshal(obj *interface{}) error {
+func (viewResp *ViewResp) Unmarshal(obj interface{}) error {
 	data := parseODataItem(*viewResp)
 	return json.Unmarshal(data, &obj)
 }

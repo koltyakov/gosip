@@ -146,7 +146,7 @@ func (fields *FieldsResp) Data() []FieldResp {
 }
 
 // Unmarshal : to unmarshal to custom object
-func (fields *FieldsResp) Unmarshal(obj *interface{}) error {
+func (fields *FieldsResp) Unmarshal(obj interface{}) error {
 	collection := parseODataCollection(*fields)
 	data, _ := json.Marshal(collection)
 	return json.Unmarshal(data, &obj)

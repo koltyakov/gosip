@@ -128,7 +128,7 @@ func (ctsResp *ContentTypesResp) Data() []ContentTypeResp {
 }
 
 // Unmarshal : to unmarshal to custom object
-func (ctsResp *ContentTypesResp) Unmarshal(obj *interface{}) error {
+func (ctsResp *ContentTypesResp) Unmarshal(obj interface{}) error {
 	collection := parseODataCollection(*ctsResp)
 	data, _ := json.Marshal(collection)
 	return json.Unmarshal(data, &obj)

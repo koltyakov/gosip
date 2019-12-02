@@ -126,7 +126,7 @@ func (groupResp *GroupResp) Data() *GroupInfo {
 }
 
 // Unmarshal : to unmarshal to custom object
-func (groupResp *GroupResp) Unmarshal(obj *interface{}) error {
+func (groupResp *GroupResp) Unmarshal(obj interface{}) error {
 	data := parseODataItem(*groupResp)
 	return json.Unmarshal(data, &obj)
 }
