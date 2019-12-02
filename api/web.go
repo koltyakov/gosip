@@ -145,6 +145,15 @@ func (web *Web) Lists() *Lists {
 	)
 }
 
+// GetChangeToken ...
+func (web *Web) GetChangeToken() (string, error) {
+	data, err := web.Select("CurrentChangeToken").Get()
+	if err != nil {
+		return "", err
+	}
+	return data.Data().CurrentChangeToken.StringValue, nil
+}
+
 // Webs ...
 func (web *Web) Webs() *Webs {
 	return NewWebs(

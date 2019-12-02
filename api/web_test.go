@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"net/url"
 	"testing"
 )
@@ -62,17 +61,7 @@ func TestWeb(t *testing.T) {
 			t.Error(err)
 		}
 
-		res := &struct {
-			D struct {
-				Title string `json:"Title"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if res.D.Title == "" {
+		if data.Data().Title == "" {
 			t.Error("can't get web title property")
 		}
 	})
@@ -83,17 +72,7 @@ func TestWeb(t *testing.T) {
 			t.Error(err)
 		}
 
-		res := &struct {
-			D struct {
-				Title string `json:"Title"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if res.D.Title != "" {
+		if data.Data().Title != "" {
 			t.Error("can't get web title property")
 		}
 	})
@@ -108,18 +87,18 @@ func TestWeb(t *testing.T) {
 			t.Error(err)
 		}
 
-		res := &struct {
-			D struct {
-				LoginName string `json:"LoginName"`
-			} `json:"d"`
-		}{}
+		if data.Data().LoginName == "" {
+			t.Error("can't get current user")
+		}
+	})
 
-		if err := json.Unmarshal(data, &res); err != nil {
+	t.Run("CurrentChangeToken", func(t *testing.T) {
+		token, err := web.GetChangeToken()
+		if err != nil {
 			t.Error(err)
 		}
-
-		if res.D.LoginName == "" {
-			t.Error("can't get current user")
+		if token == "" {
+			t.Error("can't get current change token")
 		}
 	})
 

@@ -160,6 +160,15 @@ func (list *List) ContentTypes() *ContentTypes {
 	)
 }
 
+// GetChangeToken ...
+func (list *List) GetChangeToken() (string, error) {
+	data, err := list.Select("CurrentChangeToken").Get()
+	if err != nil {
+		return "", err
+	}
+	return data.Data().CurrentChangeToken.StringValue, nil
+}
+
 // Fields ...
 func (list *List) Fields() *Fields {
 	return NewFields(
@@ -180,25 +189,11 @@ func (list *List) Views() *Views {
 
 // GetEntityType ...
 func (list *List) GetEntityType() (string, error) {
-	headers := getConfHeaders(list.config)
-	headers["Accept"] = "application/json;odata=verbose"
-
-	data, err := list.Select("ListItemEntityTypeFullName").Conf(&RequestConfig{Headers: headers}).Get()
+	data, err := list.Select("ListItemEntityTypeFullName").Get()
 	if err != nil {
 		return "", err
 	}
-
-	res := &struct {
-		D struct {
-			ListItemEntityTypeFullName string `json:"ListItemEntityTypeFullName"`
-		} `json:"d"`
-	}{}
-
-	if err := json.Unmarshal(data, &res); err != nil {
-		return "", fmt.Errorf("unable to parse the response: %v", err)
-	}
-
-	return res.D.ListItemEntityTypeFullName, nil
+	return data.Data().ListItemEntityTypeFullName, nil
 }
 
 // Roles ...
