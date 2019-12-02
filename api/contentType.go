@@ -121,5 +121,6 @@ func (ctResp *ContentTypeResp) Data() *ContentTypeInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (ctResp *ContentTypeResp) Unmarshal(obj *interface{}) error {
-	return json.Unmarshal(*ctResp, &obj)
+	data := parseODataItem(*ctResp)
+	return json.Unmarshal(data, &obj)
 }

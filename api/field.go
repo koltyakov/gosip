@@ -130,5 +130,6 @@ func (fieldResp *FieldResp) Data() *GenericFieldInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (fieldResp *FieldResp) Unmarshal(obj *interface{}) error {
-	return json.Unmarshal(*fieldResp, &obj)
+	data := parseODataItem(*fieldResp)
+	return json.Unmarshal(data, &obj)
 }

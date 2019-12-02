@@ -144,5 +144,7 @@ func (usersResp *UsersResp) Data() []UsersResp {
 
 // Unmarshal : to unmarshal to custom object
 func (usersResp *UsersResp) Unmarshal(obj *interface{}) error {
-	return json.Unmarshal(*usersResp, &obj)
+	collection := parseODataCollection(*usersResp)
+	data, _ := json.Marshal(collection)
+	return json.Unmarshal(data, &obj)
 }

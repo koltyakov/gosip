@@ -138,5 +138,7 @@ func (viewsResp *ViewsResp) Data() []ViewResp {
 
 // Unmarshal : to unmarshal to custom object
 func (viewsResp *ViewsResp) Unmarshal(obj *interface{}) error {
-	return json.Unmarshal(*viewsResp, &obj)
+	collection := parseODataCollection(*viewsResp)
+	data, _ := json.Marshal(collection)
+	return json.Unmarshal(data, &obj)
 }
