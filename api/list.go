@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/koltyakov/gosip"
 )
@@ -25,7 +26,7 @@ type ListInfo struct {
 	BaseType                         int          `json:"BaseType"`
 	ContentTypesEnabled              bool         `json:"ContentTypesEnabled"`
 	CrawlNonDefaultViews             bool         `json:"CrawlNonDefaultViews"`
-	Created                          string       `json:"Created"` // time.Time
+	Created                          time.Time    `json:"Created"`
 	DefaultContentApprovalWorkflowID string       `json:"DefaultContentApprovalWorkflowId"`
 	DefaultItemOpenUseListSetting    bool         `json:"DefaultItemOpenUseListSetting"`
 	Description                      string       `json:"Description"`
@@ -52,9 +53,9 @@ type ListInfo struct {
 	IsCatalog                        bool         `json:"IsCatalog"`
 	IsPrivate                        bool         `json:"IsPrivate"`
 	ItemCount                        int          `json:"ItemCount"`
-	LastItemDeletedDate              string       `json:"LastItemDeletedDate"`      // time.Time
-	LastItemModifiedDate             string       `json:"LastItemModifiedDate"`     // time.Time
-	LastItemUserModifiedDate         string       `json:"LastItemUserModifiedDate"` // time.Time
+	LastItemDeletedDate              time.Time    `json:"LastItemDeletedDate"`
+	LastItemModifiedDate             time.Time    `json:"LastItemModifiedDate"`
+	LastItemUserModifiedDate         time.Time    `json:"LastItemUserModifiedDate"`
 	ListExperienceOptions            int          `json:"ListExperienceOptions"`
 	ListItemEntityTypeFullName       string       `json:"ListItemEntityTypeFullName"`
 	MajorVersionLimit                int          `json:"MajorVersionLimit"`
@@ -155,7 +156,8 @@ func (list *List) ContentTypes() *ContentTypes {
 
 // GetChangeToken ...
 func (list *List) GetChangeToken() (string, error) {
-	data, err := list.Select("CurrentChangeToken").Get()
+	scoped := *list
+	data, err := scoped.Select("CurrentChangeToken").Get()
 	if err != nil {
 		return "", err
 	}
@@ -191,7 +193,8 @@ func (list *List) Views() *Views {
 
 // GetEntityType ...
 func (list *List) GetEntityType() (string, error) {
-	data, err := list.Select("ListItemEntityTypeFullName").Get()
+	scoped := *list
+	data, err := scoped.Select("ListItemEntityTypeFullName").Get()
 	if err != nil {
 		return "", err
 	}
@@ -213,6 +216,12 @@ func (list *List) Roles() *Roles {
 // Data : to get typed data
 func (listResp *ListResp) Data() *ListInfo {
 	data := parseODataItem(*listResp)
+	data = fixDatesInResponse(data, []string{
+		"Created",
+		"LastItemDeletedDate",
+		"LastItemModifiedDate",
+		"LastItemUserModifiedDate",
+	})
 	res := &ListInfo{}
 	json.Unmarshal(data, &res)
 	return res

@@ -126,7 +126,7 @@ func (items *Items) GetByID(itemID int) *Item {
 }
 
 // GetByCAML ...
-func (items *Items) GetByCAML(caml string) ([]byte, error) {
+func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 	endpoint := fmt.Sprintf("%s/GetItems", strings.TrimRight(items.endpoint, "/Items"))
 	apiURL, _ := url.Parse(endpoint)
 	query := url.Values{}
@@ -137,18 +137,12 @@ func (items *Items) GetByCAML(caml string) ([]byte, error) {
 
 	body := trimMultiline(`{
 		"query": {
-			"__metadata": {"type": "SP.CamlQuery"},
+			"__metadata": { "type": "SP.CamlQuery" },
 			"ViewXml": "` + trimMultiline(caml) + `"
 		}
 	}`)
-
 	sp := NewHTTPClient(items.client)
-	headers := getConfHeaders(items.config)
-
-	headers["Accept"] = "application/json;odata=verbose"
-	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
-
-	return sp.Post(apiURL.String(), []byte(body), headers)
+	return sp.Post(apiURL.String(), []byte(body), getConfHeaders(items.config))
 }
 
 // ToDo:

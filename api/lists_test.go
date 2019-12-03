@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -20,18 +19,7 @@ func TestLists(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			D struct {
-				Results []interface{} `json:"results"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if len(res.D.Results) == 0 {
+		if len(data.Data()) == 0 {
 			t.Error("can't get webs")
 		}
 	})
@@ -43,21 +31,21 @@ func TestLists(t *testing.T) {
 	})
 
 	t.Run("GetByID", func(t *testing.T) {
-		listID, _, err := getAnyList()
+		listInfo, err := getAnyList()
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := web.Lists().GetByID(listID).Get(); err != nil {
+		if _, err := web.Lists().GetByID(listInfo.ID).Get(); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("GetByTitle", func(t *testing.T) {
-		_, title, err := getAnyList()
+		listInfo, err := getAnyList()
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := web.Lists().GetByTitle(title).Get(); err != nil {
+		if _, err := web.Lists().GetByTitle(listInfo.Title).Get(); err != nil {
 			t.Error(err)
 		}
 	})
@@ -89,29 +77,14 @@ func TestLists(t *testing.T) {
 
 }
 
-func getAnyList() (string, string, error) {
+func getAnyList() (*ListInfo, error) {
 	web := NewSP(spClient).Web()
 	data, err := web.Lists().Select("Id,Title").Top(1).Conf(headers.verbose).Get()
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
-
-	res := &struct {
-		D struct {
-			Results []struct {
-				ID    string `json:"Id"`
-				Title string `json:"Title"`
-			} `json:"results"`
-		} `json:"d"`
-	}{}
-
-	if err := json.Unmarshal(data, &res); err != nil {
-		return "", "", err
+	if len(data.Data()) == 0 {
+		return nil, fmt.Errorf("can't get webs")
 	}
-
-	if len(res.D.Results) == 0 {
-		return "", "", fmt.Errorf("can't get webs")
-	}
-
-	return res.D.Results[0].ID, res.D.Results[0].Title, nil
+	return data.Data()[0].Data(), nil
 }

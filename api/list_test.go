@@ -8,11 +8,11 @@ func TestList(t *testing.T) {
 	checkClient(t)
 
 	web := NewSP(spClient).Web()
-	listID, _, err := getAnyList()
+	listInfo, err := getAnyList()
 	if err != nil {
 		t.Error(err)
 	}
-	list := web.Lists().GetByID(listID)
+	list := web.Lists().GetByID(listInfo.ID)
 
 	t.Run("GetEntityType", func(t *testing.T) {
 		entType, err := list.GetEntityType()
@@ -21,6 +21,16 @@ func TestList(t *testing.T) {
 		}
 		if entType == "" {
 			t.Error("can't get entity type")
+		}
+	})
+
+	t.Run("Get", func(t *testing.T) {
+		l, err := list.Get() // .Select("*")
+		if err != nil {
+			t.Error(err)
+		}
+		if l.Data().Title == "" {
+			t.Error("can't unmarshal list info")
 		}
 	})
 
