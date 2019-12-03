@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/koltyakov/gosip"
 )
@@ -27,7 +26,7 @@ type WebInfo struct {
 	AppInstanceID                 string       `json:"AppInstanceId"`
 	ClassicWelcomePage            string       `json:"ClassicWelcomePage"`
 	Configuration                 int          `json:"Configuration"`
-	Created                       time.Time    `json:"Created"`
+	Created                       string       `json:"Created"` // time.Time
 	CustomMasterURL               string       `json:"CustomMasterUrl"`
 	Description                   string       `json:"Description"`
 	DesignPackageID               string       `json:"DesignPackageId"`
@@ -42,8 +41,8 @@ type WebInfo struct {
 	IsMultilingual                bool         `json:"IsMultilingual"`
 	IsRevertHomepageLinkHidden    bool         `json:"IsRevertHomepageLinkHidden"`
 	Language                      int          `json:"Language"`
-	LastItemModifiedDate          time.Time    `json:"LastItemModifiedDate"`
-	LastItemUserModifiedDate      time.Time    `json:"LastItemUserModifiedDate"`
+	LastItemModifiedDate          string       `json:"LastItemModifiedDate"`     // time.Time
+	LastItemUserModifiedDate      string       `json:"LastItemUserModifiedDate"` // time.Time
 	MasterURL                     string       `json:"MasterUrl"`
 	MegaMenuEnabled               bool         `json:"MegaMenuEnabled"`
 	NavAudienceTargetingEnabled   bool         `json:"NavAudienceTargetingEnabled"`
@@ -317,4 +316,14 @@ func (webResp *WebResp) Data() *WebInfo {
 func (webResp *WebResp) Unmarshal(obj interface{}) error {
 	data := parseODataItem(*webResp)
 	return json.Unmarshal(data, &obj)
+}
+
+// Data1 : to get typed data
+func (webResp *WebResp) Data1() (*WebInfo, error) {
+	data := parseODataItem(*webResp)
+	res := &WebInfo{}
+	if err := json.Unmarshal(data, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
 }

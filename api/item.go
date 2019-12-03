@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"time"
 
 	"github.com/koltyakov/gosip"
 )
@@ -19,14 +18,14 @@ type Item struct {
 
 // GenericItemInfo ...
 type GenericItemInfo struct {
-	ID            int       `json:"Id"`
-	Title         string    `json:"Title"`
-	ContentTypeID string    `json:"ContentTypeId"`
-	Attachments   bool      `json:"Attachments"`
-	AuthorID      int       `json:"AuthorId"`
-	EditorID      int       `json:"EditorId"`
-	Created       time.Time `json:"Created"`
-	Modified      time.Time `json:"Modified"`
+	ID            int    `json:"Id"`
+	Title         string `json:"Title"`
+	ContentTypeID string `json:"ContentTypeId"`
+	Attachments   bool   `json:"Attachments"`
+	AuthorID      int    `json:"AuthorId"`
+	EditorID      int    `json:"EditorId"`
+	Created       string `json:"Created"`  // time.Time
+	Modified      string `json:"Modified"` // time.Time
 }
 
 // ItemResp ...

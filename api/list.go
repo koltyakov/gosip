@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"time"
 
 	"github.com/koltyakov/gosip"
 )
@@ -26,7 +25,7 @@ type ListInfo struct {
 	BaseType                         int          `json:"BaseType"`
 	ContentTypesEnabled              bool         `json:"ContentTypesEnabled"`
 	CrawlNonDefaultViews             bool         `json:"CrawlNonDefaultViews"`
-	Created                          time.Time    `json:"Created"`
+	Created                          string       `json:"Created"` // time.Time
 	DefaultContentApprovalWorkflowID string       `json:"DefaultContentApprovalWorkflowId"`
 	DefaultItemOpenUseListSetting    bool         `json:"DefaultItemOpenUseListSetting"`
 	Description                      string       `json:"Description"`
@@ -53,9 +52,9 @@ type ListInfo struct {
 	IsCatalog                        bool         `json:"IsCatalog"`
 	IsPrivate                        bool         `json:"IsPrivate"`
 	ItemCount                        int          `json:"ItemCount"`
-	LastItemDeletedDate              time.Time    `json:"LastItemDeletedDate"`
-	LastItemModifiedDate             time.Time    `json:"LastItemModifiedDate"`
-	LastItemUserModifiedDate         time.Time    `json:"LastItemUserModifiedDate"`
+	LastItemDeletedDate              string       `json:"LastItemDeletedDate"`      // time.Time
+	LastItemModifiedDate             string       `json:"LastItemModifiedDate"`     // time.Time
+	LastItemUserModifiedDate         string       `json:"LastItemUserModifiedDate"` // time.Time
 	ListExperienceOptions            int          `json:"ListExperienceOptions"`
 	ListItemEntityTypeFullName       string       `json:"ListItemEntityTypeFullName"`
 	MajorVersionLimit                int          `json:"MajorVersionLimit"`
