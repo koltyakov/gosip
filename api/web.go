@@ -142,7 +142,8 @@ func (web *Web) Lists() *Lists {
 
 // GetChangeToken ...
 func (web *Web) GetChangeToken() (string, error) {
-	data, err := web.Select("CurrentChangeToken").Get()
+	scoped := *web
+	data, err := scoped.Select("CurrentChangeToken").Get()
 	if err != nil {
 		return "", err
 	}

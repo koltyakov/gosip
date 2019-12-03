@@ -134,7 +134,8 @@ func (site *Site) OpenWebByID(webID string) (WebResp, error) {
 
 // GetChangeToken ...
 func (site *Site) GetChangeToken() (string, error) {
-	data, err := site.Select("CurrentChangeToken").Get()
+	scoped := *site
+	data, err := scoped.Select("CurrentChangeToken").Get()
 	if err != nil {
 		return "", err
 	}
