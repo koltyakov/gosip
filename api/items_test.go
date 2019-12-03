@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -21,6 +22,7 @@ func TestItems(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	startedOn := time.Now()
 
 	t.Run("AddWithoutMetadataType", func(t *testing.T) {
 		body := []byte(`{"Title":"Item"}`)
@@ -75,6 +77,25 @@ func TestItems(t *testing.T) {
 		}
 	})
 
+	t.Run("Get/Unmarshal", func(t *testing.T) {
+		item, err := list.Items().GetByID(1).Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if item.Data().ID == 0 {
+			t.Error("can't get item ID property properly")
+		}
+		if item.Data().Title == "" {
+			t.Error("can't get item Title property properly")
+		}
+		if item.Data().Created.Day() != startedOn.Day() {
+			t.Error("can't get item Created property properly")
+		}
+		if item.Data().Modified.Day() != startedOn.Day() {
+			t.Error("can't get item Modified property properly")
+		}
+	})
+
 	t.Run("GetByCAML", func(t *testing.T) {
 		caml := `
 			<View>
@@ -92,19 +113,11 @@ func TestItems(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			D struct {
-				Results []interface{} `json:"results"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if len(res.D.Results) != 1 {
+		if len(data.Data()) != 1 {
 			t.Error("incorrect number of items")
+		}
+		if data.Data()[0].Data().ID != 3 {
+			t.Error("incorrect response")
 		}
 	})
 

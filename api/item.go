@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/koltyakov/gosip"
 )
@@ -18,14 +19,14 @@ type Item struct {
 
 // GenericItemInfo ...
 type GenericItemInfo struct {
-	ID            int    `json:"Id"`
-	Title         string `json:"Title"`
-	ContentTypeID string `json:"ContentTypeId"`
-	Attachments   bool   `json:"Attachments"`
-	AuthorID      int    `json:"AuthorId"`
-	EditorID      int    `json:"EditorId"`
-	Created       string `json:"Created"`  // time.Time
-	Modified      string `json:"Modified"` // time.Time
+	ID            int       `json:"Id"`
+	Title         string    `json:"Title"`
+	ContentTypeID string    `json:"ContentTypeId"`
+	Attachments   bool      `json:"Attachments"`
+	AuthorID      int       `json:"AuthorId"`
+	EditorID      int       `json:"EditorId"`
+	Created       time.Time `json:"Created"`
+	Modified      time.Time `json:"Modified"`
 }
 
 // ItemResp ...
@@ -116,6 +117,7 @@ func (item *Item) Roles() *Roles {
 // Data : to get typed data
 func (itemResp *ItemResp) Data() *GenericItemInfo {
 	data := parseODataItem(*itemResp)
+	data = fixDatesInResponse(data, []string{"Created", "Modified"})
 	res := &GenericItemInfo{}
 	json.Unmarshal(data, &res)
 	return res
