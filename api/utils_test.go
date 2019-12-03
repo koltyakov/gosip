@@ -2,10 +2,12 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestUtils(t *testing.T) {
@@ -159,6 +161,24 @@ func TestUtils(t *testing.T) {
 		verbose := []byte(`{"multi":{"results":[1,2,3]},"single":"val1"}`)
 		if bytes.Compare(normalizeMultiLookups(verbose), minimal) != 0 {
 			t.Error("wrong OData transformation")
+		}
+	})
+
+	t.Run("fixDatesInResponse", func(t *testing.T) {
+		data := []byte(`{
+			"valid": "2019-12-03T12:19:45Z",
+			"invalid": "2019-12-03T12:19:45"
+		}`)
+		d := fixDatesInResponse(data, []string{"valid", "invalid"})
+		r := &struct {
+			Valid   time.Time `json:"valid"`
+			Invalid time.Time `json:"invalid"`
+		}{}
+		if err := json.Unmarshal(d, &r); err != nil {
+			t.Error(err)
+		}
+		if r.Valid != r.Invalid {
+			t.Error("dates have not been fixed in payload")
 		}
 	})
 

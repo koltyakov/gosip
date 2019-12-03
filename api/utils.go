@@ -126,3 +126,19 @@ func normalizeMultiLookups(payload []byte) []byte {
 	}
 	return normalized
 }
+
+// fixDateInResponse fixes incorrect date responses for a provided fields
+func fixDatesInResponse(data []byte, dateFields []string) []byte {
+	metadata := map[string]interface{}{}
+	json.Unmarshal(data, &metadata)
+	for _, k := range dateFields {
+		val := metadata[k]
+		if reflect.TypeOf(val).String() == "string" {
+			if len(fmt.Sprintf("%s", val)) == len("2019-12-03T12:19:45") {
+				metadata[k] = fmt.Sprintf("%sZ", val)
+			}
+		}
+	}
+	res, _ := json.Marshal(metadata)
+	return res
+}
