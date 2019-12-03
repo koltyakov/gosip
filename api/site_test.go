@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"testing"
 )
 
@@ -41,18 +40,7 @@ func TestSite(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			D struct {
-				URL string `json:"Url"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if res.D.URL == "" {
+		if data.Data().URL == "" {
 			t.Error("can't get site Url property")
 		}
 	})
@@ -62,18 +50,7 @@ func TestSite(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			D struct {
-				Title string `json:"Title"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if res.D.Title == "" {
+		if data.Data().Title == "" {
 			t.Error("can't get root web title property")
 		}
 	})
@@ -83,31 +60,15 @@ func TestSite(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			D struct {
-				ID string `json:"ID"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data0, &res); err != nil {
-			t.Error(err)
-		}
-
-		if res.D.ID == "" {
+		if data0.Data().ID == "" {
 			t.Error("can't get root web id property")
 		}
 
-		data, err := site.OpenWebByID(res.D.ID)
+		data, err := site.OpenWebByID(data0.Data().ID)
 		if err != nil {
 			t.Error(err)
 		}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if res.D.ID == "" {
+		if data.Data().ID == "" {
 			t.Error("can't open web by id property")
 		}
 	})
