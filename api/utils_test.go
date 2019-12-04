@@ -182,6 +182,31 @@ func TestUtils(t *testing.T) {
 		}
 	})
 
+	t.Run("normalizeMultiLookupsMap/WithNulls", func(t *testing.T) {
+		raw := []byte(`{
+			"ID": 144,
+			"SPFTaskCompeted": true,
+			"SPFTaskDescription": null,
+			"SPFTaskResult": "{\"completeAction\":\"RESEARCH_DONE\",\"routes\":[]}",
+			"SPFTaskType": "STUDY",
+			"__metadata": {
+				"etag": "\"4\"",
+				"id": "Web/Lists(guid'c0c8ab0e-2a5f-40cf-83e0-b7c0ec98eed6')/Items(144)",
+				"type": "SP.Data.TasksListItem",
+				"uri": "http://sp.contoso.com/sites/site/_api/Web/Lists(guid'c0c8ab0e-2a5f-40cf-83e0-b7c0ec98eed6')/Items(144)"
+			}
+		}`)
+
+		rawMap := map[string]interface{}{}
+		json.Unmarshal(raw, &rawMap)
+		resMap := normalizeMultiLookupsMap(rawMap)
+
+		_, err := json.Marshal(resMap)
+		if err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("fixDatesInResponse", func(t *testing.T) {
 		data := []byte(`{
 			"valid": "2019-12-03T12:19:45Z",

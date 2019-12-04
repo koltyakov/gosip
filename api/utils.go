@@ -148,7 +148,7 @@ func normalizeMultiLookups(payload []byte) []byte {
 // normalizeMultiLookupsMap normalizes verbose results for multilookup
 func normalizeMultiLookupsMap(item map[string]interface{}) map[string]interface{} {
 	for key, val := range item {
-		if reflect.TypeOf(val).Kind().String() == "map" {
+		if val != nil && reflect.TypeOf(val).Kind().String() == "map" {
 			results := val.(map[string]interface{})["results"]
 			if results != nil {
 				item[key] = results
