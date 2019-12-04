@@ -210,6 +210,9 @@ func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 	return sp.Post(endpoint, body, headers)
 }
 
+// ToDo:
+// _api/SP.UI.ApplicationPages.ClientPeoplePickerWebServiceInterface.ClientPeoplePickerSearchUser
+
 /* Response helpers */
 
 // Data : to get typed data
