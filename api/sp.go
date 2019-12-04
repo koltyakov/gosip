@@ -50,3 +50,12 @@ func (sp *SP) Site() *Site {
 func (sp *SP) Utility() *Utility {
 	return NewUtility(sp.client, sp.ToURL(), sp.config)
 }
+
+// Search getter
+func (sp *SP) Search() *Search {
+	return NewSearch(
+		sp.client,
+		fmt.Sprintf("%s/_api/Search", sp.ToURL()),
+		sp.config,
+	)
+}
