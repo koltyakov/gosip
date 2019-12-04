@@ -5,6 +5,7 @@ import (
 )
 
 func TestUtility(t *testing.T) {
+	checkClient(t)
 
 	sp := NewSP(spClient)
 
