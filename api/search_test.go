@@ -35,4 +35,18 @@ func TestSearch(t *testing.T) {
 		}
 	})
 
+	t.Run("Results", func(t *testing.T) {
+		sp := NewSP(spClient)
+		res, err := sp.Search().PostQuery(&SearchQuery{
+			QueryText: "*",
+			RowLimit:  10,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		if len(res.Results()) == 0 {
+			t.Error("incorrect response")
+		}
+	})
+
 }

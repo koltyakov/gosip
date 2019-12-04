@@ -219,3 +219,17 @@ func (searchResp *SearchResp) Data() *SearchResults {
 	json.Unmarshal(data, &res)
 	return res
 }
+
+// Results : to get typed data
+func (searchResp *SearchResp) Results() []map[string]string {
+	results := []map[string]string{}
+	rows := searchResp.Data().PrimaryQueryResult.RelevantResults.Table.Rows
+	for _, row := range rows {
+		rowMap := map[string]string{}
+		for _, cell := range row.Cells {
+			rowMap[cell.Key] = cell.Value
+		}
+		results = append(results, rowMap)
+	}
+	return results
+}
