@@ -9,6 +9,9 @@ func TestUtility(t *testing.T) {
 	sp := NewSP(spClient)
 
 	t.Run("SendEmail", func(t *testing.T) {
+		if spClient.AuthCnfg.GetStrategy() == "addin" {
+			t.Skip("not supported by addin auth")
+		}
 		user, err := sp.Web().CurrentUser().Get()
 		if err != nil {
 			t.Error(err)
