@@ -196,7 +196,8 @@ func (listsResp *ListsResp) Data() []ListResp {
 
 // Unmarshal : to unmarshal to custom object
 func (listsResp *ListsResp) Unmarshal(obj interface{}) error {
-	collection := parseODataCollection(*listsResp)
-	data, _ := json.Marshal(collection)
-	return json.Unmarshal(data, &obj)
+	// collection := parseODataCollection(*listsResp)
+	// data, _ := json.Marshal(collection)
+	data := parseODataCollectionPlain(*listsResp)
+	return json.Unmarshal(data, obj)
 }

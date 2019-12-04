@@ -126,5 +126,6 @@ func (itemResp *ItemResp) Data() *GenericItemInfo {
 // Unmarshal : to unmarshal to custom object
 func (itemResp *ItemResp) Unmarshal(obj interface{}) error {
 	data := parseODataItem(*itemResp)
-	return json.Unmarshal(data, &obj)
+	data = normalizeMultiLookups(data)
+	return json.Unmarshal(data, obj)
 }

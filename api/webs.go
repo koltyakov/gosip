@@ -164,7 +164,8 @@ func (websResp *WebsResp) Data() []WebResp {
 
 // Unmarshal : to unmarshal to custom object
 func (websResp *WebsResp) Unmarshal(obj interface{}) error {
-	collection := parseODataCollection(*websResp)
-	data, _ := json.Marshal(collection)
-	return json.Unmarshal(data, &obj)
+	// collection := parseODataCollection(*websResp)
+	// data, _ := json.Marshal(collection)
+	data := parseODataCollectionPlain(*websResp)
+	return json.Unmarshal(data, obj)
 }

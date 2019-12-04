@@ -106,12 +106,47 @@ func parseODataCollection(payload []byte) [][]byte {
 	return res
 }
 
+// parseODataCollection2 parses OData resp taking care of OData mode
+func parseODataCollectionPlain(payload []byte) []byte {
+	v := &struct {
+		D struct {
+			Results []map[string]interface{} `json:"results"`
+		} `json:"d"`
+	}{}
+	mapRes := make([]map[string]interface{}, 0)
+	if err := json.Unmarshal(payload, &v); err != nil {
+		if err := json.Unmarshal(payload, &mapRes); err != nil {
+			return payload
+		}
+	} else {
+		mapRes = v.D.Results
+	}
+	for k, m := range mapRes {
+		mapRes[k] = normalizeMultiLookupsMap(m)
+	}
+	res, err := json.Marshal(mapRes)
+	if err != nil {
+		return payload
+	}
+	return res
+}
+
 // normalizeMultiLookups normalizes verbose results for multilookup
 func normalizeMultiLookups(payload []byte) []byte {
 	item := map[string]interface{}{}
 	if err := json.Unmarshal(payload, &item); err != nil {
 		return payload
 	}
+	item = normalizeMultiLookupsMap(item)
+	normalized, err := json.Marshal(item)
+	if err != nil {
+		return payload
+	}
+	return normalized
+}
+
+// normalizeMultiLookupsMap normalizes verbose results for multilookup
+func normalizeMultiLookupsMap(item map[string]interface{}) map[string]interface{} {
 	for key, val := range item {
 		if reflect.TypeOf(val).Kind().String() == "map" {
 			results := val.(map[string]interface{})["results"]
@@ -120,11 +155,7 @@ func normalizeMultiLookups(payload []byte) []byte {
 			}
 		}
 	}
-	normalized, err := json.Marshal(item)
-	if err != nil {
-		return payload
-	}
-	return normalized
+	return item
 }
 
 // fixDateInResponse fixes incorrect date responses for a provided fields

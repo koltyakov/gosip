@@ -102,5 +102,5 @@ func (userResp *UserResp) Data() *UserInfo {
 // Unmarshal : to unmarshal to custom object
 func (userResp *UserResp) Unmarshal(obj interface{}) error {
 	data := parseODataItem(*userResp)
-	return json.Unmarshal(data, &obj)
+	return json.Unmarshal(data, obj)
 }

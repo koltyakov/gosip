@@ -136,8 +136,8 @@ func (fields *Fields) GetByInternalNameOrTitle(internalName string) *Field {
 /* Response helpers */
 
 // Data : to get typed data
-func (fields *FieldsResp) Data() []FieldResp {
-	collection := parseODataCollection(*fields)
+func (fieldsResp *FieldsResp) Data() []FieldResp {
+	collection := parseODataCollection(*fieldsResp)
 	resFields := []FieldResp{}
 	for _, f := range collection {
 		resFields = append(resFields, FieldResp(f))
@@ -146,8 +146,9 @@ func (fields *FieldsResp) Data() []FieldResp {
 }
 
 // Unmarshal : to unmarshal to custom object
-func (fields *FieldsResp) Unmarshal(obj interface{}) error {
-	collection := parseODataCollection(*fields)
-	data, _ := json.Marshal(collection)
-	return json.Unmarshal(data, &obj)
+func (fieldsResp *FieldsResp) Unmarshal(obj interface{}) error {
+	// collection := parseODataCollection(*fieldsResp)
+	// data, _ := json.Marshal(collection)
+	data := parseODataCollectionPlain(*fieldsResp)
+	return json.Unmarshal(data, obj)
 }

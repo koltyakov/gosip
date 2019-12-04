@@ -316,15 +316,5 @@ func (webResp *WebResp) Data() *WebInfo {
 // Unmarshal : to unmarshal to custom object
 func (webResp *WebResp) Unmarshal(obj interface{}) error {
 	data := parseODataItem(*webResp)
-	return json.Unmarshal(data, &obj)
-}
-
-// Data1 : to get typed data
-func (webResp *WebResp) Data1() (*WebInfo, error) {
-	data := parseODataItem(*webResp)
-	res := &WebInfo{}
-	if err := json.Unmarshal(data, &res); err != nil {
-		return nil, err
-	}
-	return res, nil
+	return json.Unmarshal(data, obj)
 }

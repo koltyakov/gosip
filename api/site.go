@@ -168,5 +168,5 @@ func (siteResp *SiteResp) Data() *SiteInfo {
 // Unmarshal : to unmarshal to custom object
 func (siteResp *SiteResp) Unmarshal(obj interface{}) error {
 	data := parseODataItem(*siteResp)
-	return json.Unmarshal(data, &obj)
+	return json.Unmarshal(data, obj)
 }

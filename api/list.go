@@ -230,5 +230,5 @@ func (listResp *ListResp) Data() *ListInfo {
 // Unmarshal : to unmarshal to custom object
 func (listResp *ListResp) Unmarshal(obj interface{}) error {
 	data := parseODataItem(*listResp)
-	return json.Unmarshal(data, &obj)
+	return json.Unmarshal(data, obj)
 }
