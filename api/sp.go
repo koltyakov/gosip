@@ -45,3 +45,8 @@ func (sp *SP) Site() *Site {
 		sp.config,
 	)
 }
+
+// Utility getter
+func (sp *SP) Utility() *Utility {
+	return NewUtility(sp.client, sp.ToURL(), sp.config)
+}
