@@ -164,6 +164,24 @@ func TestUtils(t *testing.T) {
 		}
 	})
 
+	t.Run("normalizeMultiLookupsMap", func(t *testing.T) {
+		raw := []byte(`{"test1":{"results":[1,2,3]},"test2":{"other":[1,2,3]}}`)
+		expected := []byte(`{"test1":[1,2,3],"test2":{"other":[1,2,3]}}`)
+
+		rawMap := map[string]interface{}{}
+		json.Unmarshal(raw, &rawMap)
+		resMap := normalizeMultiLookupsMap(rawMap)
+
+		res, err := json.Marshal(resMap)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if bytes.Compare(res, expected) != 0 {
+			t.Error("wrong transformation")
+		}
+	})
+
 	t.Run("fixDatesInResponse", func(t *testing.T) {
 		data := []byte(`{
 			"valid": "2019-12-03T12:19:45Z",
