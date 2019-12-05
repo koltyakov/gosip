@@ -17,8 +17,11 @@ package gosip
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 )
 
 const version = "1.0.0"
@@ -108,6 +111,30 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 
 	resp, err := c.Do(req)
 
+	// Wait and retry after a delay on 429 :: Too many requests throttling error response
+	if resp.StatusCode == 429 {
+		if retryAfter, err := strconv.Atoi(resp.Header.Get("Retry-After")); err == nil {
+			retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
+			if retry < 5 { // only retry 5 times
+				req.Header.Add("X-Gosip-Retry", strconv.Itoa(retry+1))
+				time.Sleep(time.Duration(retryAfter) * time.Second)
+				return c.Execute(req)
+			}
+		}
+	}
+
+	// Wait and retry on 503 :: Internal server error response
+	if resp.StatusCode == 503 {
+		time.Sleep(100 * time.Millisecond)
+		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
+		if retry < 5 { // only retry 5 times
+			req.Header.Add("X-Gosip-Retry", strconv.Itoa(retry+1))
+			time.Sleep(time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond)
+			return c.Execute(req)
+		}
+	}
+
+	// Return meaningful error message
 	if err == nil && !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
 		defer resp.Body.Close()
 		details, _ := ioutil.ReadAll(resp.Body)
