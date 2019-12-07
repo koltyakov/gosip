@@ -16,6 +16,61 @@ type Profiles struct {
 	modifiers map[string]string
 }
 
+// ProfileInfo ...
+type ProfileInfo struct {
+	AccountName                     string `json:"AccountName"`
+	DisplayName                     string `json:"DisplayName"`
+	FollowPersonalSiteURL           string `json:"FollowPersonalSiteUrl"`
+	IsDefaultDocumentLibraryBlocked bool   `json:"IsDefaultDocumentLibraryBlocked"`
+	IsPeopleListPublic              bool   `json:"IsPeopleListPublic"`
+	IsPrivacySettingOn              bool   `json:"IsPrivacySettingOn"`
+	IsSelf                          bool   `json:"IsSelf"`
+	JobTitle                        string `json:"JobTitle"`
+	MySiteFirstRunExperience        int    `json:"MySiteFirstRunExperience"`
+	MySiteHostURL                   string `json:"MySiteHostUrl"`
+	O15FirstRunExperience           int    `json:"O15FirstRunExperience"`
+	PersonalSiteCapabilities        int    `json:"PersonalSiteCapabilities"`
+	PersonalSiteFirstCreationError  string `json:"PersonalSiteFirstCreationError"`
+	PersonalSiteFirstCreationTime   string `json:"PersonalSiteFirstCreationTime"`
+	PersonalSiteInstantiationState  int    `json:"PersonalSiteInstantiationState"`
+	PersonalSiteLastCreationTime    string `json:"PersonalSiteLastCreationTime"`
+	PersonalSiteNumberOfRetries     int    `json:"PersonalSiteNumberOfRetries"`
+	PictureImportEnabled            bool   `json:"PictureImportEnabled"`
+	PictureURL                      string `json:"PictureUrl"`
+	PublicURL                       string `json:"PublicUrl"`
+	SipAddress                      string `json:"SipAddress"`
+	URLToCreatePersonalSite         string `json:"UrlToCreatePersonalSite"`
+}
+
+// ProfilePropsInto ...
+type ProfilePropsInto struct {
+	AccountName           string   `json:"AccountName"`
+	DirectReports         []string `json:"DirectReports"`
+	DisplayName           string   `json:"DisplayName"`
+	Email                 string   `json:"Email"`
+	ExtendedManagers      []string `json:"ExtendedManagers"`
+	ExtendedReports       []string `json:"ExtendedReports"`
+	Peers                 []string `json:"Peers"`
+	IsFollowed            bool     `json:"IsFollowed"`
+	PersonalSiteHostURL   string   `json:"PersonalSiteHostUrl"`
+	PersonalURL           string   `json:"PersonalUrl"`
+	PictureURL            string   `json:"PictureUrl"`
+	Title                 string   `json:"Title"`
+	UserURL               string   `json:"UserUrl"`
+	UserProfileProperties []struct {
+		Key       string `json:"Key"`
+		Value     string `json:"Value"`
+		ValueType string `json:"ValueType"`
+	} `json:"UserProfileProperties"`
+	// LatestPost       string `json:"LatestPost"`
+}
+
+// ProfileResp ...
+type ProfileResp []byte
+
+// ProfilePropsResp ...
+type ProfilePropsResp []byte
+
 // NewProfiles ...
 func NewProfiles(client *gosip.SPClient, endpoint string, config *RequestConfig) *Profiles {
 	return &Profiles{
@@ -67,7 +122,7 @@ func (profiles *Profiles) Get() ([]byte, error) {
 }
 
 // GetMyProperties ...
-func (profiles *Profiles) GetMyProperties() ([]byte, error) {
+func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(profiles.endpoint + "/GetMyProperties")
 	query := apiURL.Query()
@@ -79,7 +134,7 @@ func (profiles *Profiles) GetMyProperties() ([]byte, error) {
 }
 
 // GetPropertiesFor ...
-func (profiles *Profiles) GetPropertiesFor(loginName string) ([]byte, error) {
+func (profiles *Profiles) GetPropertiesFor(loginName string) (ProfilePropsResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
 		profiles.endpoint +
@@ -104,7 +159,7 @@ func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property s
 }
 
 // GetOwnerUserProfile ...
-func (profiles *Profiles) GetOwnerUserProfile() ([]byte, error) {
+func (profiles *Profiles) GetOwnerUserProfile() (ProfileResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
 		strings.Split(profiles.endpoint, "/_api")[0] +
@@ -119,11 +174,11 @@ func (profiles *Profiles) GetOwnerUserProfile() ([]byte, error) {
 }
 
 // UserProfile ...
-func (profiles *Profiles) UserProfile() ([]byte, error) {
+func (profiles *Profiles) UserProfile() (ProfileResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
 		strings.Split(profiles.endpoint, "/_api")[0] +
-			"/_api/sp.userprofiles.profileloader.getprofileloader/getuserprofile",
+			"/_api/sp.userprofiles.profileloader.getprofileloader/GetUserProfile",
 	)
 	query := apiURL.Query()
 	for k, v := range profiles.modifiers {
@@ -162,4 +217,36 @@ func (profiles *Profiles) HideSuggestion(loginName string) ([]byte, error) {
 	sp := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint + "/HideSuggestion('" + url.QueryEscape(loginName) + "')"
 	return sp.Post(endpoint, nil, getConfHeaders(profiles.config))
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (profileResp *ProfileResp) Data() *ProfileInfo {
+	data := parseODataItem(*profileResp)
+	data = normalizeMultiLookups(data)
+	res := &ProfileInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (profileResp *ProfileResp) Unmarshal(obj interface{}) error {
+	data := parseODataItem(*profileResp)
+	return json.Unmarshal(data, obj)
+}
+
+// Data : to get typed data
+func (profilePropsResp *ProfilePropsResp) Data() *ProfilePropsInto {
+	data := parseODataItem(*profilePropsResp)
+	data = normalizeMultiLookups(data)
+	res := &ProfilePropsInto{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (profilePropsResp *ProfilePropsResp) Unmarshal(obj interface{}) error {
+	data := parseODataItem(*profilePropsResp)
+	return json.Unmarshal(data, obj)
 }

@@ -21,14 +21,22 @@ func TestProfiles(t *testing.T) {
 	})
 
 	t.Run("GetMyProperties", func(t *testing.T) {
-		if _, err := profiles.GetMyProperties(); err != nil {
+		profile, err := profiles.GetMyProperties()
+		if err != nil {
 			t.Error(err)
+		}
+		if len(profile.Data().UserProfileProperties) == 0 {
+			t.Error("can't get user profile properties")
 		}
 	})
 
 	t.Run("GetPropertiesFor", func(t *testing.T) {
-		if _, err := profiles.GetPropertiesFor(user.Data().LoginName); err != nil {
+		profile, err := profiles.GetPropertiesFor(user.Data().LoginName)
+		if err != nil {
 			t.Error(err)
+		}
+		if len(profile.Data().UserProfileProperties) == 0 {
+			t.Error("can't get user profile properties")
 		}
 	})
 
@@ -39,14 +47,22 @@ func TestProfiles(t *testing.T) {
 	})
 
 	t.Run("GetOwnerUserProfile", func(t *testing.T) {
-		if _, err := profiles.GetOwnerUserProfile(); err != nil {
+		profile, err := profiles.GetOwnerUserProfile()
+		if err != nil {
 			t.Error(err)
+		}
+		if profile.Data().AccountName == "" {
+			t.Error("can't get profile")
 		}
 	})
 
 	t.Run("UserProfile", func(t *testing.T) {
-		if _, err := profiles.UserProfile(); err != nil {
+		profile, err := profiles.UserProfile()
+		if err != nil {
 			t.Error(err)
+		}
+		if profile.Data().AccountName == "" {
+			t.Error("can't get profile")
 		}
 	})
 
