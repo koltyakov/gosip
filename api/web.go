@@ -309,6 +309,12 @@ func (web *Web) Features() *Features {
 	return NewFeatures(web.client, endpoint, web.config)
 }
 
+// RecycleBin ...
+func (web *Web) RecycleBin() *RecycleBin {
+	endpoint := fmt.Sprintf("%s/RecycleBin", web.endpoint)
+	return NewRecycleBin(web.client, endpoint, web.config)
+}
+
 /* Response helpers */
 
 // Data : to get typed data

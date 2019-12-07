@@ -138,6 +138,12 @@ func (site *Site) Features() *Features {
 	return NewFeatures(site.client, endpoint, site.config)
 }
 
+// RecycleBin ...
+func (site *Site) RecycleBin() *RecycleBin {
+	endpoint := fmt.Sprintf("%s/RecycleBin", site.endpoint)
+	return NewRecycleBin(site.client, endpoint, site.config)
+}
+
 // GetChangeToken ...
 func (site *Site) GetChangeToken() (string, error) {
 	scoped := *site
