@@ -125,16 +125,39 @@ func TestUtils(t *testing.T) {
 	})
 
 	t.Run("parseODataCollection", func(t *testing.T) {
-		minimal := []byte(`[{"prop":"val1"},{"prop":"val2"}]`)
-		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, minimal))
+		resulted := []byte(`[{"prop":"val1"},{"prop":"val2"}]`)
+		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, resulted))
 		fromVerbose := []byte{}
-		for _, b := range parseODataCollection(verbose) {
+		coll, _ := parseODataCollection(verbose)
+		for _, b := range coll {
 			fromVerbose = append(fromVerbose, b...)
 		}
 		fromMinimal := []byte{}
-		for _, b := range parseODataCollection(minimal) {
+		coll, _ = parseODataCollection(resulted)
+		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
 		}
+		if bytes.Compare(fromVerbose, fromMinimal) != 0 {
+			t.Error("wrong OData transformation")
+		}
+	})
+
+	t.Run("parseODataCollection2", func(t *testing.T) {
+		resulted := []byte(`[{"prop":"val1"},{"prop":"val2"}]`)
+		minimal := []byte(fmt.Sprintf(`{"value":%s}`, resulted))
+		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, resulted))
+		fromVerbose := []byte{}
+		coll, _ := parseODataCollection(verbose)
+		for _, b := range coll {
+			fromVerbose = append(fromVerbose, b...)
+		}
+		fromMinimal := []byte{}
+		coll, _ = parseODataCollection(minimal)
+		for _, b := range coll {
+			fromMinimal = append(fromMinimal, b...)
+		}
+		fmt.Printf("fromVerbose %s\n", fromVerbose)
+		fmt.Printf("fromMinimal %s\n", fromMinimal)
 		if bytes.Compare(fromVerbose, fromMinimal) != 0 {
 			t.Error("wrong OData transformation")
 		}
@@ -144,11 +167,13 @@ func TestUtils(t *testing.T) {
 		minimal := []byte(`[]`)
 		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, minimal))
 		fromVerbose := []byte{}
-		for _, b := range parseODataCollection(verbose) {
+		coll, _ := parseODataCollection(verbose)
+		for _, b := range coll {
 			fromVerbose = append(fromVerbose, b...)
 		}
 		fromMinimal := []byte{}
-		for _, b := range parseODataCollection(minimal) {
+		coll, _ = parseODataCollection(minimal)
+		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
 		}
 		if bytes.Compare(fromVerbose, fromMinimal) != 0 {
@@ -222,6 +247,22 @@ func TestUtils(t *testing.T) {
 		}
 		if r.Valid != r.Invalid {
 			t.Error("dates have not been fixed in payload")
+		}
+	})
+
+	t.Run("getODataCollectionNextPageURL", func(t *testing.T) {
+		pageURL := "page-url"
+		verbose := []byte(`{ "d": { "__next": "` + pageURL + `" }}`)
+		minimal := []byte(`{ "odata.nextLink": "` + pageURL + `" }`)
+
+		vNextPage := getODataCollectionNextPageURL(verbose)
+		if vNextPage != pageURL {
+			t.Error("can't parse next page")
+		}
+
+		mNextPage := getODataCollectionNextPageURL(minimal)
+		if mNextPage != pageURL {
+			t.Error("can't parse next page")
 		}
 	})
 
