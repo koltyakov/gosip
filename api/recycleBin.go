@@ -17,14 +17,6 @@ type RecycleBin struct {
 	modifiers map[string]string
 }
 
-// RecycleBinItem ...
-type RecycleBinItem struct {
-	client    *gosip.SPClient
-	config    *RequestConfig
-	endpoint  string
-	modifiers map[string]string
-}
-
 // RecycledItem ...
 type RecycledItem struct {
 	AuthorEmail               string    `json:"AuthorEmail"`
@@ -51,21 +43,9 @@ type RecycledItem struct {
 // RecycleBinResp ...
 type RecycleBinResp []byte
 
-// RecycleBinItemResp ...
-type RecycleBinItemResp []byte
-
 // NewRecycleBin ...
 func NewRecycleBin(client *gosip.SPClient, endpoint string, config *RequestConfig) *RecycleBin {
 	return &RecycleBin{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
-	}
-}
-
-// NewRecycleBinItem ...
-func NewRecycleBinItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *RecycleBinItem {
-	return &RecycleBinItem{
 		client:   client,
 		endpoint: endpoint,
 		config:   config,
@@ -156,19 +136,6 @@ func (recycleBin *RecycleBin) GetByID(itemID string) *RecycleBinItem {
 	)
 }
 
-// Get ...
-func (recycleBinItem *RecycleBinItem) Get() (RecycleBinItemResp, error) {
-	sp := NewHTTPClient(recycleBinItem.client)
-	return sp.Get(recycleBinItem.endpoint, getConfHeaders(recycleBinItem.config))
-}
-
-// Restore ...
-func (recycleBinItem *RecycleBinItem) Restore() ([]byte, error) {
-	endpoint := fmt.Sprintf("%s/Restore()", recycleBinItem.endpoint)
-	sp := NewHTTPClient(recycleBinItem.client)
-	return sp.Post(endpoint, nil, getConfHeaders(recycleBinItem.config))
-}
-
 /* Response helpers */
 
 // Data : to get typed data
@@ -186,6 +153,43 @@ func (recycleBinResp *RecycleBinResp) Unmarshal(obj interface{}) error {
 	data, _ := parseODataCollectionPlain(*recycleBinResp)
 	return json.Unmarshal(data, obj)
 }
+
+/* Recycle bin item */
+
+// RecycleBinItem ...
+type RecycleBinItem struct {
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers map[string]string
+}
+
+// RecycleBinItemResp ...
+type RecycleBinItemResp []byte
+
+// NewRecycleBinItem ...
+func NewRecycleBinItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *RecycleBinItem {
+	return &RecycleBinItem{
+		client:   client,
+		endpoint: endpoint,
+		config:   config,
+	}
+}
+
+// Get ...
+func (recycleBinItem *RecycleBinItem) Get() (RecycleBinItemResp, error) {
+	sp := NewHTTPClient(recycleBinItem.client)
+	return sp.Get(recycleBinItem.endpoint, getConfHeaders(recycleBinItem.config))
+}
+
+// Restore ...
+func (recycleBinItem *RecycleBinItem) Restore() ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/Restore()", recycleBinItem.endpoint)
+	sp := NewHTTPClient(recycleBinItem.client)
+	return sp.Post(endpoint, nil, getConfHeaders(recycleBinItem.config))
+}
+
+/* Response helpers */
 
 // Data : to get typed data
 func (recycleBinItemResp *RecycleBinItemResp) Data() *RecycledItem {
