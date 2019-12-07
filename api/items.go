@@ -32,9 +32,9 @@ func NewItems(client *gosip.SPClient, endpoint string, config *RequestConfig) *I
 // ToURL ...
 func (items *Items) ToURL() string {
 	apiURL, _ := url.Parse(items.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range items.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()
@@ -82,6 +82,15 @@ func (items *Items) Top(oDataTop int) *Items {
 	return items
 }
 
+// Skip ...
+func (items *Items) Skip(skipToken string) *Items {
+	if items.modifiers == nil {
+		items.modifiers = make(map[string]string)
+	}
+	items.modifiers["$skiptoken"] = fmt.Sprintf("%s", skipToken)
+	return items
+}
+
 // OrderBy ...
 func (items *Items) OrderBy(oDataOrderBy string, ascending bool) *Items {
 	direction := "asc"
@@ -102,6 +111,61 @@ func (items *Items) OrderBy(oDataOrderBy string, ascending bool) *Items {
 func (items *Items) Get() (ItemsResp, error) {
 	sp := NewHTTPClient(items.client)
 	return sp.Get(items.ToURL(), getConfHeaders(items.config))
+}
+
+// GetPaged ...
+func (items *Items) GetPaged() (ItemsResp, func() (ItemsResp, error), error) {
+	sp := NewHTTPClient(items.client)
+	itemsResp, err := sp.Get(items.ToURL(), getConfHeaders(items.config))
+	if err != nil {
+		return nil, nil, err
+	}
+	getNextPage := func() (ItemsResp, error) {
+		nextURL := getODataCollectionNextPageURL(itemsResp)
+		if nextURL == "" {
+			return nil, fmt.Errorf("unable to get next page")
+		}
+		return NewItems(items.client, nextURL, items.config).Get()
+	}
+	return itemsResp, getNextPage, nil
+}
+
+// GetAll ...
+func (items *Items) GetAll() ([]ItemResp, error) {
+	return getAll(nil, nil, items)
+}
+
+func getAll(res []ItemResp, cur ItemsResp, items *Items) ([]ItemResp, error) {
+	if res == nil && cur == nil {
+		itemsCopy := NewItems(items.client, items.endpoint, items.config)
+		itemsCopy.modifiers = map[string]string{}
+		for key, val := range items.modifiers {
+			switch key {
+			case "$select":
+				itemsCopy.modifiers[key] = val
+			case "$expand":
+				itemsCopy.modifiers[key] = val
+			case "$top":
+				itemsCopy.modifiers[key] = val
+			}
+		}
+		itemsResp, err := itemsCopy.Get()
+		if err != nil {
+			return nil, err
+		}
+		res = itemsResp.Data()
+		cur = itemsResp
+	}
+	nextURL := getODataCollectionNextPageURL(cur)
+	if nextURL == "" {
+		return res, nil
+	}
+	nextItemsResp, err := NewItems(items.client, nextURL, items.config).Get()
+	if err != nil {
+		return res, err
+	}
+	res = append(res, nextItemsResp.Data()...)
+	return getAll(res, nextItemsResp, items)
 }
 
 // Add ...
@@ -148,15 +212,13 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 // ToDo:
 // GetAll
 // Batch
-// GetPaged
-// SkipToken
 // RenderListDataAsStream
 
 /* Response helpers */
 
 // Data : to get typed data
 func (itemsResp *ItemsResp) Data() []ItemResp {
-	collection := parseODataCollection(*itemsResp)
+	collection, _ := parseODataCollection(*itemsResp)
 	items := []ItemResp{}
 	for _, item := range collection {
 		items = append(items, ItemResp(item))
@@ -164,10 +226,15 @@ func (itemsResp *ItemsResp) Data() []ItemResp {
 	return items
 }
 
+// NextPageURL : gets next page OData collection
+func (itemsResp *ItemsResp) NextPageURL() string {
+	return getODataCollectionNextPageURL(*itemsResp)
+}
+
 // Unmarshal : to unmarshal to custom object
 func (itemsResp *ItemsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*itemsResp)
 	// data, _ := json.Marshal(collection)
-	data := parseODataCollectionPlain(*itemsResp)
+	data, _ := parseODataCollectionPlain(*itemsResp)
 	return json.Unmarshal(data, obj)
 }
