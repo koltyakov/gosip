@@ -123,6 +123,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		}
 	}
 
+<<<<<<< HEAD
 	// Wait and retry on 503 :: Service Unavailable
 	if resp.StatusCode == 503 {
 		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
@@ -142,11 +143,22 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	if resp.StatusCode == 500 {
 		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
 		if retry < 3 { // only retry 3 times
+=======
+	// Wait and retry on 503 :: Internal server error response
+	if resp.StatusCode == 503 {
+		time.Sleep(100 * time.Millisecond)
+		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
+		if retry < 5 { // only retry 5 times
+>>>>>>> beb8edbd3c96cf71ce29a639263348b2bd463e80
 			req.Header.Add("X-Gosip-Retry", strconv.Itoa(retry+1))
 			time.Sleep(time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond)
 			return c.Execute(req)
 		}
+<<<<<<< HEAD
 	} // temporary workaround to fix unstable SPO service (https://github.com/SharePoint/sp-dev-docs/issues/4952)
+=======
+	}
+>>>>>>> beb8edbd3c96cf71ce29a639263348b2bd463e80
 
 	// Return meaningful error message
 	if err == nil && !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
