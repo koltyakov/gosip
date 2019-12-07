@@ -12,13 +12,13 @@ func TestFeatures(t *testing.T) {
 
 	sp.Web().Features().Remove(mdsFeatureID, true)
 
-	t.Run("GetSiteFeatures", func(t *testing.T) {
+	t.Run("Get/Site", func(t *testing.T) {
 		if _, err := sp.Site().Features().Get(); err != nil {
 			t.Error(err)
 		}
 	})
 
-	t.Run("Get", func(t *testing.T) {
+	t.Run("Get/Web", func(t *testing.T) {
 		if _, err := sp.Web().Features().Get(); err != nil {
 			t.Error(err)
 		}

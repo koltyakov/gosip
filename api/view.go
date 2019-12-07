@@ -96,11 +96,7 @@ func (view *View) Expand(oDataExpand string) *View {
 // Get ...
 func (view *View) Get() (ViewResp, error) {
 	sp := NewHTTPClient(view.client)
-	data, err := sp.Get(view.ToURL(), getConfHeaders(view.config))
-	if err != nil {
-		return nil, err
-	}
-	return ViewResp(data), nil
+	return sp.Get(view.ToURL(), getConfHeaders(view.config))
 }
 
 // Delete ...
