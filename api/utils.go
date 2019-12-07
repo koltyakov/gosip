@@ -84,51 +84,77 @@ func parseODataItem(payload []byte) []byte {
 }
 
 // parseODataCollection parses OData resp taking care of OData mode
-func parseODataCollection(payload []byte) [][]byte {
-	v := &struct {
+func parseODataCollection(payload []byte) ([][]byte, string) {
+	r := &struct {
+		// Verbose OData structure
 		D struct {
 			Results []map[string]interface{} `json:"results"`
+			NextURL string                   `json:"__next"`
 		} `json:"d"`
+		// Minimalmatadata/Nometadata OData structure
+		Results []map[string]interface{} `json:"value"`
+		NextURL string                   `json:"odata.nextLink"`
 	}{}
 	mapRes := make([]map[string]interface{}, 0)
-	if err := json.Unmarshal(payload, &v); err != nil {
+	nextURL := ""
+	if err := json.Unmarshal(payload, &r); err == nil {
+		mapRes = r.Results
+		nextURL = r.NextURL
+	}
+	if r.Results == nil {
+		mapRes = r.D.Results
+		nextURL = r.D.NextURL
+	}
+	if r.D.Results == nil && r.Results == nil {
 		if err := json.Unmarshal(payload, &mapRes); err != nil {
-			return [][]byte{payload}
+			return [][]byte{payload}, ""
 		}
-	} else {
-		mapRes = v.D.Results
 	}
 	res := [][]byte{}
 	for _, mapItem := range mapRes {
 		r, _ := json.Marshal(mapItem)
 		res = append(res, []byte(r))
 	}
-	return res
+	return res, nextURL
+}
+
+// getODataCollectionNextPageURL parses OData resp taking care of OData mode
+func getODataCollectionNextPageURL(payload []byte) string {
+	r := &struct {
+		// Verbose OData structure
+		D struct {
+			NextURL string `json:"__next"`
+		} `json:"d"`
+		// Minimalmatadata/Nometadata OData structure
+		NextURL string `json:"odata.nextLink"`
+	}{}
+	if err := json.Unmarshal(payload, &r); err != nil {
+		return ""
+	}
+	if r.NextURL != "" {
+		return r.NextURL
+	}
+	if r.D.NextURL != "" {
+		return r.D.NextURL
+	}
+	return ""
 }
 
 // parseODataCollection2 parses OData resp taking care of OData mode
-func parseODataCollectionPlain(payload []byte) []byte {
-	v := &struct {
-		D struct {
-			Results []map[string]interface{} `json:"results"`
-		} `json:"d"`
-	}{}
-	mapRes := make([]map[string]interface{}, 0)
-	if err := json.Unmarshal(payload, &v); err != nil {
-		if err := json.Unmarshal(payload, &mapRes); err != nil {
-			return payload
+func parseODataCollectionPlain(payload []byte) ([]byte, string) {
+	bb, netxtURL := parseODataCollection(payload)
+	mapRes := []map[string]interface{}{}
+	for _, b := range bb {
+		mapItem := map[string]interface{}{}
+		if err := json.Unmarshal(b, &mapItem); err == nil {
+			mapRes = append(mapRes, normalizeMultiLookupsMap(mapItem))
 		}
-	} else {
-		mapRes = v.D.Results
-	}
-	for k, m := range mapRes {
-		mapRes[k] = normalizeMultiLookupsMap(m)
 	}
 	res, err := json.Marshal(mapRes)
 	if err != nil {
-		return payload
+		return payload, netxtURL
 	}
-	return res
+	return res, netxtURL
 }
 
 // normalizeMultiLookups normalizes verbose results for multilookup
