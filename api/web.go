@@ -303,6 +303,12 @@ func (web *Web) RoleDefinitions() *RoleDefinitions {
 	)
 }
 
+// Features ...
+func (web *Web) Features() *Features {
+	endpoint := fmt.Sprintf("%s/Features", web.endpoint)
+	return NewFeatures(web.client, endpoint, web.config)
+}
+
 /* Response helpers */
 
 // Data : to get typed data

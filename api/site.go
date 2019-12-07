@@ -132,6 +132,12 @@ func (site *Site) OpenWebByID(webID string) (WebResp, error) {
 	return sp.Post(endpoint, nil, getConfHeaders(site.config))
 }
 
+// Features ...
+func (site *Site) Features() *Features {
+	endpoint := fmt.Sprintf("%s/Features", site.endpoint)
+	return NewFeatures(site.client, endpoint, site.config)
+}
+
 // GetChangeToken ...
 func (site *Site) GetChangeToken() (string, error) {
 	scoped := *site
