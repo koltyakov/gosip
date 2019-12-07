@@ -156,8 +156,6 @@ func TestUtils(t *testing.T) {
 		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
 		}
-		fmt.Printf("fromVerbose %s\n", fromVerbose)
-		fmt.Printf("fromMinimal %s\n", fromMinimal)
 		if bytes.Compare(fromVerbose, fromMinimal) != 0 {
 			t.Error("wrong OData transformation")
 		}

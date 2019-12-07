@@ -76,9 +76,6 @@ func TestItemsPaged(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		for _, i := range items {
-			fmt.Printf("%v\n", i.Data())
-		}
 		if len(items) != 25 {
 			t.Errorf("incorrect items number, extected 25, got %d", len(items))
 		}
