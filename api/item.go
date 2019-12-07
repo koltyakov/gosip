@@ -44,9 +44,9 @@ func NewItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *It
 // ToURL ...
 func (item *Item) ToURL() string {
 	apiURL, _ := url.Parse(item.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range item.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()

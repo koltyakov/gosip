@@ -28,9 +28,9 @@ func NewFolder(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 // ToURL ...
 func (folder *Folder) ToURL() string {
 	apiURL, _ := url.Parse(folder.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range folder.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()

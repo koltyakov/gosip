@@ -31,9 +31,9 @@ func NewContentTypes(client *gosip.SPClient, endpoint string, config *RequestCon
 // ToURL ...
 func (contentTypes *ContentTypes) ToURL() string {
 	apiURL, _ := url.Parse(contentTypes.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range contentTypes.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()
@@ -119,7 +119,7 @@ func (contentTypes *ContentTypes) GetByID(contentTypeID string) *ContentType {
 
 // Data : to get typed data
 func (ctsResp *ContentTypesResp) Data() []ContentTypeResp {
-	collection := parseODataCollection(*ctsResp)
+	collection, _ := parseODataCollection(*ctsResp)
 	cts := []ContentTypeResp{}
 	for _, ct := range collection {
 		cts = append(cts, ContentTypeResp(ct))
@@ -131,6 +131,6 @@ func (ctsResp *ContentTypesResp) Data() []ContentTypeResp {
 func (ctsResp *ContentTypesResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*ctsResp)
 	// data, _ := json.Marshal(collection)
-	data := parseODataCollectionPlain(*ctsResp)
+	data, _ := parseODataCollectionPlain(*ctsResp)
 	return json.Unmarshal(data, obj)
 }

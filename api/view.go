@@ -61,9 +61,9 @@ func NewView(client *gosip.SPClient, endpoint string, config *RequestConfig) *Vi
 // ToURL ...
 func (view *View) ToURL() string {
 	apiURL, _ := url.Parse(view.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range view.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()

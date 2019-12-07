@@ -86,9 +86,9 @@ func NewList(client *gosip.SPClient, endpoint string, config *RequestConfig) *Li
 // ToURL ...
 func (list *List) ToURL() string {
 	apiURL, _ := url.Parse(list.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range list.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()

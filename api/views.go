@@ -31,9 +31,9 @@ func NewViews(client *gosip.SPClient, endpoint string, config *RequestConfig) *V
 // ToURL ...
 func (views *Views) ToURL() string {
 	apiURL, _ := url.Parse(views.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range views.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()
@@ -128,7 +128,7 @@ func (views *Views) GetByTitle(title string) *View {
 
 // Data : to get typed data
 func (viewsResp *ViewsResp) Data() []ViewResp {
-	collection := parseODataCollection(*viewsResp)
+	collection, _ := parseODataCollection(*viewsResp)
 	views := []ViewResp{}
 	for _, view := range collection {
 		views = append(views, ViewResp(view))
@@ -140,6 +140,6 @@ func (viewsResp *ViewsResp) Data() []ViewResp {
 func (viewsResp *ViewsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*viewsResp)
 	// data, _ := json.Marshal(collection)
-	data := parseODataCollectionPlain(*viewsResp)
+	data, _ := parseODataCollectionPlain(*viewsResp)
 	return json.Unmarshal(data, obj)
 }

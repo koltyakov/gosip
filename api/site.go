@@ -75,9 +75,9 @@ func NewSite(client *gosip.SPClient, endpoint string, config *RequestConfig) *Si
 // ToURL ...
 func (site *Site) ToURL() string {
 	apiURL, _ := url.Parse(site.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range site.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()

@@ -31,9 +31,9 @@ func NewLists(client *gosip.SPClient, endpoint string, config *RequestConfig) *L
 // ToURL ...
 func (lists *Lists) ToURL() string {
 	apiURL, _ := url.Parse(lists.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range lists.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()
@@ -186,7 +186,7 @@ func (lists *Lists) AddWithURI(title string, uri string, metadata map[string]int
 
 // Data : to get typed data
 func (listsResp *ListsResp) Data() []ListResp {
-	collection := parseODataCollection(*listsResp)
+	collection, _ := parseODataCollection(*listsResp)
 	lists := []ListResp{}
 	for _, list := range collection {
 		lists = append(lists, ListResp(list))
@@ -198,6 +198,6 @@ func (listsResp *ListsResp) Data() []ListResp {
 func (listsResp *ListsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*listsResp)
 	// data, _ := json.Marshal(collection)
-	data := parseODataCollectionPlain(*listsResp)
+	data, _ := parseODataCollectionPlain(*listsResp)
 	return json.Unmarshal(data, obj)
 }

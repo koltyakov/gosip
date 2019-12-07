@@ -31,9 +31,9 @@ func NewUsers(client *gosip.SPClient, endpoint string, config *RequestConfig) *U
 // ToURL ...
 func (users *Users) ToURL() string {
 	apiURL, _ := url.Parse(users.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range users.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()
@@ -134,7 +134,7 @@ func (users *Users) GetByEmail(email string) *User {
 
 // Data : to get typed data
 func (usersResp *UsersResp) Data() []UsersResp {
-	collection := parseODataCollection(*usersResp)
+	collection, _ := parseODataCollection(*usersResp)
 	users := []UsersResp{}
 	for _, user := range collection {
 		users = append(users, UsersResp(user))
@@ -146,6 +146,6 @@ func (usersResp *UsersResp) Data() []UsersResp {
 func (usersResp *UsersResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*usersResp)
 	// data, _ := json.Marshal(collection)
-	data := parseODataCollectionPlain(*usersResp)
+	data, _ := parseODataCollectionPlain(*usersResp)
 	return json.Unmarshal(data, obj)
 }

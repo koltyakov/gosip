@@ -42,9 +42,9 @@ func NewUser(client *gosip.SPClient, endpoint string, config *RequestConfig) *Us
 // ToURL ...
 func (user *User) ToURL() string {
 	apiURL, _ := url.Parse(user.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range user.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()

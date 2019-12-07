@@ -63,9 +63,9 @@ func NewField(client *gosip.SPClient, endpoint string, config *RequestConfig) *F
 // ToURL ...
 func (field *Field) ToURL() string {
 	apiURL, _ := url.Parse(field.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range field.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()

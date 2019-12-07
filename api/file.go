@@ -28,9 +28,9 @@ func NewFile(client *gosip.SPClient, endpoint string, config *RequestConfig) *Fi
 // ToURL ...
 func (file *File) ToURL() string {
 	apiURL, _ := url.Parse(file.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range file.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()

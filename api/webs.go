@@ -31,9 +31,9 @@ func NewWebs(client *gosip.SPClient, endpoint string, config *RequestConfig) *We
 // ToURL ...
 func (webs *Webs) ToURL() string {
 	apiURL, _ := url.Parse(webs.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range webs.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()
@@ -154,7 +154,7 @@ func (webs *Webs) Add(title string, url string, metadata map[string]interface{})
 
 // Data : to get typed data
 func (websResp *WebsResp) Data() []WebResp {
-	collection := parseODataCollection(*websResp)
+	collection, _ := parseODataCollection(*websResp)
 	webs := []WebResp{}
 	for _, web := range collection {
 		webs = append(webs, WebResp(web))
@@ -166,6 +166,6 @@ func (websResp *WebsResp) Data() []WebResp {
 func (websResp *WebsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*websResp)
 	// data, _ := json.Marshal(collection)
-	data := parseODataCollectionPlain(*websResp)
+	data, _ := parseODataCollectionPlain(*websResp)
 	return json.Unmarshal(data, obj)
 }

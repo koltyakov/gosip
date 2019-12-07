@@ -81,9 +81,9 @@ func NewWeb(client *gosip.SPClient, endpoint string, config *RequestConfig) *Web
 // ToURL ...
 func (web *Web) ToURL() string {
 	apiURL, _ := url.Parse(web.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range web.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()

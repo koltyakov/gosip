@@ -31,9 +31,9 @@ func NewFields(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 // ToURL ...
 func (fields *Fields) ToURL() string {
 	apiURL, _ := url.Parse(fields.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range fields.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()
@@ -137,7 +137,7 @@ func (fields *Fields) GetByInternalNameOrTitle(internalName string) *Field {
 
 // Data : to get typed data
 func (fieldsResp *FieldsResp) Data() []FieldResp {
-	collection := parseODataCollection(*fieldsResp)
+	collection, _ := parseODataCollection(*fieldsResp)
 	resFields := []FieldResp{}
 	for _, f := range collection {
 		resFields = append(resFields, FieldResp(f))
@@ -149,6 +149,6 @@ func (fieldsResp *FieldsResp) Data() []FieldResp {
 func (fieldsResp *FieldsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*fieldsResp)
 	// data, _ := json.Marshal(collection)
-	data := parseODataCollectionPlain(*fieldsResp)
+	data, _ := parseODataCollectionPlain(*fieldsResp)
 	return json.Unmarshal(data, obj)
 }

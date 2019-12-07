@@ -31,9 +31,9 @@ func NewGroups(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 // ToURL ...
 func (groups *Groups) ToURL() string {
 	apiURL, _ := url.Parse(groups.endpoint)
-	query := url.Values{}
+	query := apiURL.Query() // url.Values{}
 	for k, v := range groups.modifiers {
-		query.Add(k, trimMultiline(v))
+		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()
@@ -157,7 +157,7 @@ func (groups *Groups) RemoveByLoginName(loginName string) ([]byte, error) {
 
 // Data : to get typed data
 func (groupsResp *GroupsResp) Data() []GroupResp {
-	collection := parseODataCollection(*groupsResp)
+	collection, _ := parseODataCollection(*groupsResp)
 	cts := []GroupResp{}
 	for _, ct := range collection {
 		cts = append(cts, GroupResp(ct))
@@ -169,6 +169,6 @@ func (groupsResp *GroupsResp) Data() []GroupResp {
 func (groupsResp *GroupsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*groupsResp)
 	// data, _ := json.Marshal(collection)
-	data := parseODataCollectionPlain(*groupsResp)
+	data, _ := parseODataCollectionPlain(*groupsResp)
 	return json.Unmarshal(data, obj)
 }
