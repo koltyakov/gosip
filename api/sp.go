@@ -59,3 +59,12 @@ func (sp *SP) Search() *Search {
 		sp.config,
 	)
 }
+
+// Profiles getter
+func (sp *SP) Profiles() *Profiles {
+	return NewProfiles(
+		sp.client,
+		fmt.Sprintf("%s/_api/sp.userprofiles.peoplemanager", sp.ToURL()),
+		sp.config,
+	)
+}
