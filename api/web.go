@@ -197,15 +197,9 @@ func (web *Web) Fields() *Fields {
 
 // GetList ...
 func (web *Web) GetList(listURI string) *List {
-	// Prepend web relative URL to "Lists/ListPath" URIs
-	if string([]rune(listURI)[0]) != "/" {
-		absoluteURL := strings.Split(web.endpoint, "/_api")[0]
-		relativeURL := getRelativeURL(absoluteURL)
-		listURI = fmt.Sprintf("%s/%s", relativeURL, listURI)
-	}
 	return NewList(
 		web.client,
-		fmt.Sprintf("%s/GetList('%s')", web.endpoint, listURI),
+		fmt.Sprintf("%s/GetList('%s')", web.endpoint, checkGetRelativeURL(listURI, web.endpoint)),
 		web.config,
 	)
 }
@@ -270,10 +264,15 @@ func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 		fmt.Sprintf(
 			"%s/GetFolderByServerRelativeUrl('%s')",
 			web.endpoint,
-			serverRelativeURL,
+			checkGetRelativeURL(serverRelativeURL, web.endpoint),
 		),
 		web.config,
 	)
+}
+
+// EnsureFolder ...
+func (web *Web) EnsureFolder(serverRelativeURL string) ([]byte, error) {
+	return ensureFolder(web, serverRelativeURL, serverRelativeURL)
 }
 
 // GetFile ...
@@ -283,7 +282,7 @@ func (web *Web) GetFile(serverRelativeURL string) *File {
 		fmt.Sprintf(
 			"%s/GetFileByServerRelativeUrl('%s')",
 			web.endpoint,
-			serverRelativeURL,
+			checkGetRelativeURL(serverRelativeURL, web.endpoint),
 		),
 		web.config,
 	)
@@ -329,4 +328,37 @@ func (webResp *WebResp) Data() *WebInfo {
 func (webResp *WebResp) Unmarshal(obj interface{}) error {
 	data := parseODataItem(*webResp)
 	return json.Unmarshal(data, obj)
+}
+
+/* Miscellaneous */
+
+func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string) ([]byte, error) {
+	data, err := web.GetFolder(currentRelativeURL).Get()
+	if err != nil {
+		splitted := strings.Split(currentRelativeURL, "/")
+		if len(splitted) == 1 {
+			return nil, err
+		}
+		splitted = splitted[0 : len(splitted)-1]
+		currentRelativeURL = strings.Join(splitted, "/")
+		return ensureFolder(web, serverRelativeURL, currentRelativeURL)
+	}
+
+	curFolders := strings.Split(currentRelativeURL, "/")
+	expFolders := strings.Split(serverRelativeURL, "/")
+
+	if len(curFolders) == len(expFolders) {
+		return data, nil
+	}
+
+	createFolders := expFolders[len(curFolders):]
+	for _, folder := range createFolders {
+		data, err = web.GetFolder(currentRelativeURL).Folders().Add(folder)
+		if err != nil {
+			return nil, err
+		}
+		currentRelativeURL += "/" + folder
+	}
+
+	return data, nil
 }

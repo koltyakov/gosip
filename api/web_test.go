@@ -102,4 +102,19 @@ func TestWeb(t *testing.T) {
 		}
 	})
 
+	t.Run("EnsureFolder", func(t *testing.T) {
+		data, err := web.GetFolder("Shared Documents").Folders().Select("Name").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		for _, folder := range data.Data() {
+			if folder.Data().Name == "doc1" {
+				web.GetFolder("Shared Documents/doc1").Delete()
+			}
+		}
+		if _, err := web.EnsureFolder("Shared Documents/doc1/doc2/doc3/doc4"); err != nil {
+			t.Error(err)
+		}
+	})
+
 }
