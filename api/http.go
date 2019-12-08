@@ -158,7 +158,7 @@ func (ctx *HTTPClient) Update(endpoint string, body []byte, headers map[string]s
 // ProcessQuery - CSOM requests helper
 func (ctx *HTTPClient) ProcessQuery(endpoint string, body []byte) ([]byte, error) {
 	if strings.Index(strings.ToLower(endpoint), strings.ToLower("/_vti_bin/client.svc/ProcessQuery")) == -1 {
-		endpoint = fmt.Sprintf("%s/_vti_bin/client.svc/ProcessQuery", strings.Split(endpoint, "/_api")[0])
+		endpoint = fmt.Sprintf("%s/_vti_bin/client.svc/ProcessQuery", getPriorEndpoint(endpoint, "/_api"))
 	}
 
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))

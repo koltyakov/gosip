@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/koltyakov/gosip"
 )
@@ -38,7 +37,7 @@ func NewUtility(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 func (utility *Utility) SendEmail(options *EmailProps) ([]byte, error) {
 	endpoint := fmt.Sprintf(
 		"%s/_api/SP.Utilities.Utility.SendEmail",
-		strings.Split(utility.endpoint, "/_api")[0],
+		getPriorEndpoint(utility.endpoint, "/_api"),
 	)
 	sp := NewHTTPClient(utility.client)
 

@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/url"
-	"strings"
 
 	"github.com/koltyakov/gosip"
 )
@@ -162,7 +161,7 @@ func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property s
 func (profiles *Profiles) GetOwnerUserProfile() (ProfileResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
-		strings.Split(profiles.endpoint, "/_api")[0] +
+		getPriorEndpoint(profiles.endpoint, "/_api") +
 			"/_api/sp.userprofiles.profileloader.getowneruserprofile",
 	)
 	query := apiURL.Query()
@@ -177,7 +176,7 @@ func (profiles *Profiles) GetOwnerUserProfile() (ProfileResp, error) {
 func (profiles *Profiles) UserProfile() (ProfileResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
-		strings.Split(profiles.endpoint, "/_api")[0] +
+		getPriorEndpoint(profiles.endpoint, "/_api") +
 			"/_api/sp.userprofiles.profileloader.getprofileloader/GetUserProfile",
 	)
 	query := apiURL.Query()
