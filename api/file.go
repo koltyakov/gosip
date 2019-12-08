@@ -188,8 +188,25 @@ func (file *File) UndoCheckOut() ([]byte, error) {
 	return sp.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
+// MoveTo file to new location within the same site
+func (file *File) MoveTo(newURL string, overwrite bool) ([]byte, error) {
+	flag := 0
+	if overwrite {
+		flag = 1
+	}
+	endpoint := fmt.Sprintf("%s/MoveTo(newurl='%s',flags=%d)", file.endpoint, newURL, flag)
+	sp := NewHTTPClient(file.client)
+	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+}
+
+// CopyTo file to new location within the same site
+func (file *File) CopyTo(newURL string, overwrite bool) ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/CopyTo(strnewurl='%s',boverwrite=%t)", file.endpoint, newURL, overwrite)
+	sp := NewHTTPClient(file.client)
+	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+}
+
 // ToDo:
-// Move/Copy to
 // Declare as record
 
 /* Response helpers */
