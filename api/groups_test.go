@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/google/uuid"
@@ -13,7 +12,7 @@ func TestGroups(t *testing.T) {
 	groups := NewSP(spClient).Web().SiteGroups()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web/SiteGroups"
 	newGroupName := uuid.New().String()
-	group := &GroupInfo{}
+	newGroupNameRemove := uuid.New().String()
 
 	t.Run("Constructor", func(t *testing.T) {
 		groups := NewGroups(spClient, endpoint, nil)
@@ -45,116 +44,83 @@ func TestGroups(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			D struct {
-				Results []interface{} `json:"results"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if len(res.D.Results) == 0 {
-			t.Error("can't get users")
+		if len(data.Data()) == 0 {
+			t.Error("can't get groups")
 		}
 	})
 
 	t.Run("GetGroup", func(t *testing.T) {
-		data, err := groups.Select("Id,Title").Top(1).Conf(headers.verbose).Get()
-
+		data, err := groups.Select("Id,Title").Top(1).Get()
 		if err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			D struct {
-				Groups []*GroupInfo `json:"results"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
+		if len(data.Data()) == 0 {
+			t.Error("can't get groups")
 		}
-
-		group = res.D.Groups[0]
+		if data.Data()[0].Data().Title == "" {
+			t.Error("can't get groups")
+		}
 	})
 
 	t.Run("GetByID", func(t *testing.T) {
-		if group.ID == 0 {
-			t.Skip("no group ID to use in the test")
-		}
-
-		data, err := groups.GetByID(group.ID).Select("Id").Get()
+		data0, err := groups.Select("Id,Title").Top(1).Get()
 		if err != nil {
 			t.Error(err)
 		}
 
-		res := &struct {
-			Group *GroupInfo `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
+		groupID := data0.Data()[0].Data().ID
+		data, err := groups.GetByID(groupID).Select("Id").Get()
+		if err != nil {
 			t.Error(err)
 		}
 
-		if res.Group.ID != group.ID {
+		if groupID != data.Data().ID {
 			t.Errorf(
 				"incorrect group ID, expected \"%d\", received \"%d\"",
-				group.ID,
-				res.Group.ID,
+				groupID,
+				data.Data().ID,
 			)
 		}
 	})
 
 	t.Run("GetByName", func(t *testing.T) {
-		if group.Title == "" {
-			t.Skip("no group Title to use in the test")
-		}
-
-		data, err := groups.GetByName(group.Title).Select("Title").Get()
+		data0, err := groups.Select("Id,Title").Top(1).Get()
 		if err != nil {
 			t.Error(err)
 		}
 
-		res := &struct {
-			Group *GroupInfo `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
+		groupTitle := data0.Data()[0].Data().Title
+		data, err := groups.GetByName(groupTitle).Select("Title").Get()
+		if err != nil {
 			t.Error(err)
 		}
 
-		if res.Group.Title != group.Title {
+		if groupTitle != data.Data().Title {
 			t.Errorf(
 				"incorrect group Title, expected \"%s\", received \"%s\"",
-				group.Title,
-				res.Group.Title,
+				groupTitle,
+				data.Data().Title,
 			)
 		}
 	})
 
 	t.Run("Add", func(t *testing.T) {
-		data, err := groups.Conf(headers.verbose).Add(newGroupName, nil)
-		if err != nil {
+		if _, err := groups.Conf(headers.verbose).Add(newGroupName, nil); err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			Group *GroupInfo `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-		group = res.Group
 	})
 
 	t.Run("RemoveByLoginName", func(t *testing.T) {
-		if _, err := groups.RemoveByLoginName(group.LoginName); err != nil {
+		if _, err := groups.Conf(headers.verbose).Add(newGroupNameRemove, nil); err != nil {
+			t.Error(err)
+		}
+		if _, err := groups.RemoveByLoginName(newGroupNameRemove); err != nil {
 			t.Error(err)
 		}
 	})
+
+	if _, err := groups.RemoveByLoginName(newGroupName); err != nil {
+		t.Error(err)
+	}
 
 }
