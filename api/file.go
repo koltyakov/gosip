@@ -42,6 +42,21 @@ type FileInfo struct {
 	UniqueID             string    `json:"UniqueId"`
 }
 
+type checkInTypes struct {
+	Minor     int
+	Major     int
+	Overwrite int
+}
+
+// CheckInTypes - available check in types
+var CheckInTypes = func() *checkInTypes {
+	return &checkInTypes{
+		Minor:     0,
+		Major:     1,
+		Overwrite: 2,
+	}
+}()
+
 // FileResp ...
 type FileResp []byte
 
@@ -147,10 +162,35 @@ func (file *File) GetItem() (*Item, error) {
 	return item, nil
 }
 
+// CheckIn file, checkInType: 0 - Minor, 1 - Major, 2 - Overwrite
+func (file *File) CheckIn(comment string, checkInType int) ([]byte, error) {
+	endpoint := fmt.Sprintf(
+		"%s/CheckIn(comment='%s',checkintype=%d)",
+		file.endpoint,
+		comment,
+		checkInType,
+	)
+	sp := NewHTTPClient(file.client)
+	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+}
+
+// CheckOut file
+func (file *File) CheckOut() ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/CheckOut", file.endpoint)
+	sp := NewHTTPClient(file.client)
+	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+}
+
+// UndoCheckOut file
+func (file *File) UndoCheckOut() ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/UndoCheckOut", file.endpoint)
+	sp := NewHTTPClient(file.client)
+	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+}
+
 // ToDo:
 // Move/Copy to
 // Declare as record
-// Check in/out
 
 /* Response helpers */
 
