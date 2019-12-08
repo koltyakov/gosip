@@ -32,6 +32,17 @@ func getRelativeURL(absURL string) string {
 	return url.Path
 }
 
+// checkGetRelativeURL checks if URL is repative, prepends relative part if missed
+func checkGetRelativeURL(relativeURI string, ctxURL string) string {
+	// Prepend web relative URL to "Lists/ListPath" URIs
+	if string([]rune(relativeURI)[0]) != "/" {
+		absoluteURL := getPriorEndpoint(ctxURL, "/_api")
+		relativeURL := getRelativeURL(absoluteURL)
+		relativeURI = fmt.Sprintf("%s/%s", relativeURL, relativeURI)
+	}
+	return relativeURI
+}
+
 // getPriorEndpoint gets endpoint before the provided part ignoring case
 func getPriorEndpoint(endpoint string, part string) string {
 	strLen := len(strings.Split(strings.ToLower(endpoint), strings.ToLower(part))[0])

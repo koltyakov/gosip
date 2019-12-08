@@ -264,4 +264,14 @@ func TestUtils(t *testing.T) {
 		}
 	})
 
+	t.Run("checkGetRelativeURL", func(t *testing.T) {
+		ctxURL := "https://contoso.sharepoint.com/sites/site/my-site"
+		relativeURI := "Shared Documents/Folder"
+		resultURL := "/sites/site/my-site/Shared Documents/Folder"
+		res := checkGetRelativeURL(relativeURI, ctxURL)
+		if resultURL != res {
+			t.Errorf(`wrong URL transformation, expected "%s", received "%s"`, resultURL, res)
+		}
+	})
+
 }
