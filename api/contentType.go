@@ -80,11 +80,7 @@ func (ct *ContentType) Expand(oDataExpand string) *ContentType {
 // Get ...
 func (ct *ContentType) Get() (ContentTypeResp, error) {
 	sp := NewHTTPClient(ct.client)
-	data, err := sp.Get(ct.ToURL(), getConfHeaders(ct.config))
-	if err != nil {
-		return nil, err
-	}
-	return ContentTypeResp(data), nil
+	return sp.Get(ct.ToURL(), getConfHeaders(ct.config))
 }
 
 // Delete ...
