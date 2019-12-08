@@ -68,5 +68,29 @@ func (webProps *WebProps) Get() ([]byte, error) {
 	return sp.Get(webProps.ToURL(), headers)
 }
 
+// Set ...
+func (webProps *WebProps) Set(prop string, value string) ([]byte, error) {
+	sp := NewHTTPClient(webProps.client)
+	body := []byte(trimMultiline(`
+		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Gosip">
+			<Actions>
+				<Method Name="SetFieldValue" Id="9" ObjectPathId="4">
+					<Parameters>
+						<Parameter Type="String">` + prop + `</Parameter>
+						<Parameter Type="String">` + value + `</Parameter>
+					</Parameters>
+				</Method>
+				<Method Name="Update" Id="10" ObjectPathId="2" />
+			</Actions>
+			<ObjectPaths>
+				<StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" />
+				<Property Id="2" ParentId="0" Name="Web" />
+				<Property Id="4" ParentId="2" Name="AllProperties" />
+			</ObjectPaths>
+		</Request>
+	`))
+	return sp.ProcessQuery(webProps.endpoint, body)
+}
+
 // ToDo:
 // Write Props with CSOM

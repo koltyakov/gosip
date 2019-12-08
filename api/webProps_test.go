@@ -2,7 +2,9 @@ package api
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
+	"time"
 )
 
 func TestWebProps(t *testing.T) {
@@ -59,6 +61,17 @@ func TestWebProps(t *testing.T) {
 		if res.D.Lang == "" {
 			t.Error("can't get web prop")
 		}
+	})
+
+	t.Run("Set", func(t *testing.T) {
+		_, err := webProps.Set("test_gosip", time.Now().String())
+		if err != nil {
+			// By default is denied on Modern SPO sites, so ignore in tests
+			if strings.Index(err.Error(), "System.UnauthorizedAccessException") == -1 {
+				t.Error(err)
+			}
+		}
+		// fmt.Printf("%q\n", data)
 	})
 
 }
