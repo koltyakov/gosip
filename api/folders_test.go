@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/google/uuid"
@@ -25,19 +24,7 @@ func TestFolders(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			D struct {
-				Results []interface{} `json:"results"`
-			} `json:"d"`
-		}{}
-
-		err = json.Unmarshal(data, &res)
-		if err != nil {
-			t.Error(err)
-		}
-
-		if len(res.D.Results) == 0 {
+		if len(data.Data()) == 0 {
 			t.Error("can't get folders")
 		}
 	})
