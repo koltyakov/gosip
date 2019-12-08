@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/koltyakov/gosip"
 )
@@ -15,6 +16,23 @@ type Folder struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// FolderInfo ...
+type FolderInfo struct {
+	Exists            bool      `json:"Exists"`
+	IsWOPIEnabled     bool      `json:"IsWOPIEnabled"`
+	ItemCount         int       `json:"ItemCount"`
+	Name              string    `json:"Name"`
+	ProgID            string    `json:"ProgID"`
+	ServerRelativeURL string    `json:"ServerRelativeUrl"`
+	TimeCreated       time.Time `json:"TimeCreated"`
+	TimeLastModified  time.Time `json:"TimeLastModified"`
+	UniqueID          string    `json:"UniqueId"`
+	WelcomePage       string    `json:"WelcomePage"`
+}
+
+// FolderResp ...
+type FolderResp []byte
 
 // NewFolder ...
 func NewFolder(client *gosip.SPClient, endpoint string, config *RequestConfig) *Folder {
@@ -61,7 +79,7 @@ func (folder *Folder) Expand(oDataExpand string) *Folder {
 }
 
 // Get ...
-func (folder *Folder) Get() ([]byte, error) {
+func (folder *Folder) Get() (FolderResp, error) {
 	sp := NewHTTPClient(folder.client)
 	return sp.Get(folder.ToURL(), getConfHeaders(folder.config))
 }
@@ -134,4 +152,20 @@ func (folder *Folder) GetItem() (*Item, error) {
 		folder.config,
 	)
 	return item, nil
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (folderResp *FolderResp) Data() *FolderInfo {
+	data := parseODataItem(*folderResp)
+	res := &FolderInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (folderResp *FolderResp) Unmarshal(obj interface{}) error {
+	data := parseODataItem(*folderResp)
+	return json.Unmarshal(data, obj)
 }

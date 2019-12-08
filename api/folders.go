@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -14,6 +15,9 @@ type Folders struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// FoldersResp ...
+type FoldersResp []byte
 
 // NewFolders ...
 func NewFolders(client *gosip.SPClient, endpoint string, config *RequestConfig) *Folders {
@@ -88,7 +92,7 @@ func (folders *Folders) OrderBy(oDataOrderBy string, ascending bool) *Folders {
 }
 
 // Get ...
-func (folders *Folders) Get() ([]byte, error) {
+func (folders *Folders) Get() (FoldersResp, error) {
 	apiURL, _ := url.Parse(folders.endpoint)
 	query := url.Values{}
 	for k, v := range folders.modifiers {
@@ -100,7 +104,7 @@ func (folders *Folders) Get() ([]byte, error) {
 }
 
 // Add ...
-func (folders *Folders) Add(folderName string) ([]byte, error) {
+func (folders *Folders) Add(folderName string) (FolderResp, error) {
 	sp := NewHTTPClient(folders.client)
 	endpoint := fmt.Sprintf("%s/Add('%s')", folders.endpoint, folderName)
 	return sp.Post(endpoint, nil, getConfHeaders(folders.config))
@@ -113,4 +117,22 @@ func (folders *Folders) GetByName(folderName string) *Folder {
 		fmt.Sprintf("%s('%s')", folders.endpoint, folderName),
 		folders.config,
 	)
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (foldersResp *FoldersResp) Data() []FolderResp {
+	collection, _ := parseODataCollection(*foldersResp)
+	folders := []FolderResp{}
+	for _, ct := range collection {
+		folders = append(folders, FolderResp(ct))
+	}
+	return folders
+}
+
+// Unmarshal : to unmarshal to custom object
+func (foldersResp *FoldersResp) Unmarshal(obj interface{}) error {
+	data, _ := parseODataCollectionPlain(*foldersResp)
+	return json.Unmarshal(data, obj)
 }
