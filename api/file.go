@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -186,6 +188,34 @@ func (file *File) UndoCheckOut() ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/UndoCheckOut", file.endpoint)
 	sp := NewHTTPClient(file.client)
 	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+}
+
+// Download file bytes
+func (file *File) Download() ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/$value", file.endpoint)
+
+	req, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.TransferEncoding = []string{"null"}
+	for key, value := range getConfHeaders(file.config) {
+		req.Header.Set(key, value)
+	}
+
+	resp, err := file.client.Execute(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 // MoveTo file to new location within the same site

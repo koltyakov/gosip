@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 
@@ -67,13 +68,35 @@ func TestFile(t *testing.T) {
 		}
 	})
 
+	t.Run("Download", func(t *testing.T) {
+		fileContent := []byte("file content")
+		if _, err := web.GetFolder(newFolderURI).Files().Add("download.txt", fileContent, true); err != nil {
+			t.Error(err)
+		}
+		content, err := web.GetFile(newFolderURI + "/download.txt").Download()
+		if err != nil {
+			t.Error(err)
+		}
+		if bytes.Compare(fileContent, content) != 0 {
+			t.Error("incorrect file body")
+		}
+	})
+
 	t.Run("MoveTo", func(t *testing.T) {
+		if envCode == "2013" {
+			t.Skip("is not supported with SP 2013")
+		}
+
 		if _, err := web.GetFile(newFolderURI+"/File_4.txt").MoveTo(newFolderURI+"/File_4_moved.txt", true); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("CopyTo", func(t *testing.T) {
+		if envCode == "2013" {
+			t.Skip("is not supported with SP 2013")
+		}
+
 		if _, err := web.GetFile(newFolderURI+"/File_5.txt").CopyTo(newFolderURI+"/File_5_copyed.txt", true); err != nil {
 			t.Error(err)
 		}
