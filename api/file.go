@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/koltyakov/gosip"
 )
@@ -15,6 +16,34 @@ type File struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// FileInfo ...
+type FileInfo struct {
+	CheckInComment       string    `json:"CheckInComment"`
+	CheckOutType         int       `json:"CheckOutType"`
+	ContentTag           string    `json:"ContentTag"`
+	CustomizedPageStatus int       `json:"CustomizedPageStatus"`
+	ETag                 string    `json:"ETag"`
+	Exists               bool      `json:"Exists"`
+	IrmEnabled           bool      `json:"IrmEnabled"`
+	Length               int       `json:"Length,string"`
+	Level                int       `json:"Level"`
+	LinkingURI           string    `json:"LinkingUri"`
+	LinkingURL           string    `json:"LinkingUrl"`
+	MajorVersion         int       `json:"MajorVersion"`
+	MinorVersion         int       `json:"MinorVersion"`
+	Name                 string    `json:"Name"`
+	ServerRelativeURL    string    `json:"ServerRelativeUrl"`
+	TimeCreated          time.Time `json:"TimeCreated"`
+	TimeLastModified     time.Time `json:"TimeLastModified"`
+	Title                string    `json:"Title"`
+	UIVersion            int       `json:"UIVersion"`
+	UIVersionLabel       string    `json:"UIVersionLabel"`
+	UniqueID             string    `json:"UniqueId"`
+}
+
+// FileResp ...
+type FileResp []byte
 
 // NewFile ...
 func NewFile(client *gosip.SPClient, endpoint string, config *RequestConfig) *File {
@@ -61,7 +90,7 @@ func (file *File) Expand(oDataExpand string) *File {
 }
 
 // Get ...
-func (file *File) Get() ([]byte, error) {
+func (file *File) Get() (FileResp, error) {
 	sp := NewHTTPClient(file.client)
 	return sp.Get(file.ToURL(), getConfHeaders(file.config))
 }
@@ -122,3 +151,19 @@ func (file *File) GetItem() (*Item, error) {
 // Move/Copy to
 // Declare as record
 // Check in/out
+
+/* Response helpers */
+
+// Data : to get typed data
+func (fileResp *FileResp) Data() *FileInfo {
+	data := parseODataItem(*fileResp)
+	res := &FileInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Unmarshal : to unmarshal to custom object
+func (fileResp *FileResp) Unmarshal(obj interface{}) error {
+	data := parseODataItem(*fileResp)
+	return json.Unmarshal(data, obj)
+}

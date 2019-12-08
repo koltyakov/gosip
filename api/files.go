@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -14,6 +15,9 @@ type Files struct {
 	endpoint  string
 	modifiers map[string]string
 }
+
+// FilesResp ...
+type FilesResp []byte
 
 // NewFiles ...
 func NewFiles(client *gosip.SPClient, endpoint string, config *RequestConfig) *Files {
@@ -94,7 +98,7 @@ func (files *Files) OrderBy(oDataOrderBy string, ascending bool) *Files {
 }
 
 // Get ...
-func (files *Files) Get() ([]byte, error) {
+func (files *Files) Get() (FilesResp, error) {
 	sp := NewHTTPClient(files.client)
 	return sp.Get(files.ToURL(), getConfHeaders(files.config))
 }
@@ -109,8 +113,26 @@ func (files *Files) GetByName(fileName string) *File {
 }
 
 // Add ...
-func (files *Files) Add(name string, content []byte, overwrite bool) ([]byte, error) {
+func (files *Files) Add(name string, content []byte, overwrite bool) (FileResp, error) {
 	sp := NewHTTPClient(files.client)
 	endpoint := fmt.Sprintf("%s/Add(overwrite=%t,url='%s')", files.endpoint, overwrite, name)
 	return sp.Post(endpoint, content, getConfHeaders(files.config))
+}
+
+/* Response helpers */
+
+// Data : to get typed data
+func (filesResp *FilesResp) Data() []FileResp {
+	collection, _ := parseODataCollection(*filesResp)
+	files := []FileResp{}
+	for _, ct := range collection {
+		files = append(files, FileResp(ct))
+	}
+	return files
+}
+
+// Unmarshal : to unmarshal to custom object
+func (filesResp *FilesResp) Unmarshal(obj interface{}) error {
+	data, _ := parseODataCollectionPlain(*filesResp)
+	return json.Unmarshal(data, obj)
 }
