@@ -112,6 +112,15 @@ func (item *Item) Roles() *Roles {
 	return NewRoles(item.client, item.endpoint, item.config)
 }
 
+// Attachments ...
+func (item *Item) Attachments() *Attachments {
+	return NewAttachments(
+		item.client,
+		fmt.Sprintf("%s/AttachmentFiles", item.endpoint),
+		item.config,
+	)
+}
+
 /* Response helpers */
 
 // Data : to get typed data
