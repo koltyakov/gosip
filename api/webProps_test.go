@@ -64,14 +64,24 @@ func TestWebProps(t *testing.T) {
 	})
 
 	t.Run("Set", func(t *testing.T) {
-		_, err := webProps.Set("test_gosip", time.Now().String())
-		if err != nil {
+		if _, err := webProps.Set("test_gosip", time.Now().String()); err != nil {
 			// By default is denied on Modern SPO sites, so ignore in tests
 			if strings.Index(err.Error(), "System.UnauthorizedAccessException") == -1 {
 				t.Error(err)
 			}
 		}
-		// fmt.Printf("%q\n", data)
+	})
+
+	t.Run("SetProps", func(t *testing.T) {
+		if _, err := webProps.SetProps(map[string]string{
+			"test_gosip_prop1": time.Now().String(),
+			"test_gosip_prop2": time.Now().String(),
+		}); err != nil {
+			// By default is denied on Modern SPO sites, so ignore in tests
+			if strings.Index(err.Error(), "System.UnauthorizedAccessException") == -1 {
+				t.Error(err)
+			}
+		}
 	})
 
 }
