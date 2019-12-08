@@ -29,20 +29,32 @@ func TestFiles(t *testing.T) {
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		if _, err := web.GetFolder(newFolderURI).Files().Get(); err != nil {
+		data, err := web.GetFolder(newFolderURI).Files().Get()
+		if err != nil {
 			t.Error(err)
+		}
+		if len(data.Data()) == 0 {
+			t.Error("can't get files")
 		}
 	})
 
 	t.Run("GetByName", func(t *testing.T) {
-		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Get(); err != nil {
+		data, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Get()
+		if err != nil {
 			t.Error(err)
+		}
+		if data.Data().Length == 0 {
+			t.Error("can't get file props")
 		}
 	})
 
 	t.Run("GetFile", func(t *testing.T) {
-		if _, err := web.GetFile(newFolderURI + "/File_2.txt").Get(); err != nil {
+		data, err := web.GetFile(newFolderURI + "/File_2.txt").Get()
+		if err != nil {
 			t.Error(err)
+		}
+		if data.Data().Name == "" {
+			t.Error("can't get file props")
 		}
 	})
 
