@@ -90,23 +90,23 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 			}
 			return res, err
 		}
-		req.Header.Add("X-RequestDigest", digest)
+		req.Header.Set("X-RequestDigest", digest)
 	}
 
 	// Default SP REST API headers
 	if req.Header.Get("Accept") == "" {
-		req.Header.Add("Accept", "application/json")
+		req.Header.Set("Accept", "application/json")
 	}
 	if req.Header.Get("Content-Type") == "" {
-		req.Header.Add("Content-Type", "application/json;odata=verbose;charset=utf-8")
+		req.Header.Set("Content-Type", "application/json;odata=verbose;charset=utf-8")
 	}
 
 	// Vendor/client header
 	if req.Header.Get("X-ClientService-ClientTag") == "" {
-		req.Header.Add("X-ClientService-ClientTag", fmt.Sprintf("Gosip:@%s", version))
+		req.Header.Set("X-ClientService-ClientTag", fmt.Sprintf("Gosip:@%s", version))
 	}
 	if req.Header.Get("User-Agent") == "" {
-		req.Header.Add("User-Agent", fmt.Sprintf("NONISV|Go|Gosip/@%s", version))
+		req.Header.Set("User-Agent", fmt.Sprintf("NONISV|Go|Gosip/@%s", version))
 	}
 
 	resp, err := c.Do(req)
@@ -116,7 +116,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		if retryAfter, err := strconv.Atoi(resp.Header.Get("Retry-After")); err == nil {
 			retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
 			if retry < 5 { // only retry 5 times
-				req.Header.Add("X-Gosip-Retry", strconv.Itoa(retry+1))
+				req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
 				time.Sleep(time.Duration(retryAfter) * time.Second)
 				return c.Execute(req)
 			}
@@ -128,7 +128,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
 		if retry < 5 { // only retry 5 times
 			retryAfter, _ := strconv.Atoi(resp.Header.Get("Retry-After"))
-			req.Header.Add("X-Gosip-Retry", strconv.Itoa(retry+1))
+			req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
 			if retryAfter == 0 {
 				time.Sleep(time.Duration(retryAfter) * time.Second) // wait for Retry-After header info value
 			} else {
@@ -141,8 +141,8 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	// Wait and retry on 500 :: Internal Server Error
 	if resp.StatusCode == 500 {
 		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
-		if retry < 3 { // only retry 3 times
-			req.Header.Add("X-Gosip-Retry", strconv.Itoa(retry+1))
+		if retry < 1 { // only retry 1 time
+			req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
 			time.Sleep(time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond)
 			return c.Execute(req)
 		}
