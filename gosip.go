@@ -148,6 +148,16 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		}
 	} // temporary workaround to fix unstable SPO service (https://github.com/SharePoint/sp-dev-docs/issues/4952)
 
+	// Wait and retry on 401 :: Unauthorized
+	if resp.StatusCode == 401 {
+		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
+		if retry < 10 {
+			req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
+			time.Sleep(time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond)
+			return c.Execute(req)
+		}
+	}
+
 	// Return meaningful error message
 	if err == nil && !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
 		defer resp.Body.Close()
