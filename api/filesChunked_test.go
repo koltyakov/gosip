@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"testing"
@@ -19,15 +20,36 @@ func TestFilesChunked(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Run("AddChunked01", func(t *testing.T) {
+	t.Run("AddChunkedMicro", func(t *testing.T) {
 		fileName := fmt.Sprintf("TinyFile.txt")
-		stream := strings.NewReader(fmt.Sprintf("File %s data", fileName))
+		stream := strings.NewReader("Less than a chunk content")
 		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, nil); err != nil {
 			t.Error(err)
 		}
 	})
 
-	// if _, err := web.GetFolder(newFolderURI).Delete(); err != nil {
-	// 	t.Error(err)
-	// }
+	t.Run("AddChunked", func(t *testing.T) {
+		fileName := fmt.Sprintf("ChunkedFile.txt")
+		content := "Greater than a chunk content"
+		stream := strings.NewReader(content)
+		options := &AddChunkedOptions{
+			Owerwrite: true,
+			ChunkSize: 10,
+		}
+		fileResp, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options)
+		if err != nil {
+			t.Error(err)
+		}
+		data, err := web.GetFile(fileResp.Data().ServerRelativeURL).Download()
+		if err != nil {
+			t.Error(err)
+		}
+		if bytes.Compare([]byte(content), data) != 0 {
+			t.Error("wrong file content after chunked upload")
+		}
+	})
+
+	if _, err := web.GetFolder(newFolderURI).Delete(); err != nil {
+		t.Error(err)
+	}
 }

@@ -26,27 +26,23 @@ type FileUploadProgressData struct {
 
 // AddChunked ...
 func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunkedOptions) (FileResp, error) {
+	web := NewSP(files.client).Web().Conf(files.config)
+	var file *File
+	uploadID := uuid.New().String()
+
+	// Default props
 	if options == nil {
 		options = &AddChunkedOptions{
 			Owerwrite: true,
 			ChunkSize: 10485760,
 		}
 	}
-
-	sp := NewHTTPClient(files.client)
-	endpoint := fmt.Sprintf("%s/Add(overwrite=%t,url='%s')", files.endpoint, options.Owerwrite, name)
-	if _, err := sp.Post(endpoint, nil, getConfHeaders(files.config)); err != nil {
-		return nil, err
-	}
-
 	if options.Progress == nil {
 		options.Progress = func(data *FileUploadProgressData) {}
 	}
 	if options.ChunkSize == 0 {
 		options.ChunkSize = 10485760
 	}
-
-	uploadID := uuid.New().String()
 
 	progress := &FileUploadProgressData{
 		UploadID:    uploadID,
@@ -63,31 +59,52 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 			break
 		}
 		chunk := slot[:size]
-		var offset int
+
+		// Upload in a call if file size is less than chunk size
+		if size < options.ChunkSize && progress.BlockNumber == 0 {
+			return files.Add(name, chunk, options.Owerwrite)
+		}
+
+		// Finishing uploading chunked file
+		if size < options.ChunkSize && progress.BlockNumber > 0 {
+			progress.Stage = "finishing"
+			options.Progress(progress)
+			return file.finishUpload(uploadID, progress.FileOffset, chunk)
+		}
+
+		// Initial chunked upload
 		if progress.BlockNumber == 0 {
 			options.Progress(progress)
-			offset, err = files.startUpload(name, uploadID, chunk)
-		} else {
+			fileResp, err := files.Add(name, nil, options.Owerwrite)
+			if err != nil {
+				return nil, err
+			}
+			file = web.GetFile(fileResp.Data().ServerRelativeURL)
+			if _, err := file.startUpload(uploadID, chunk); err != nil {
+				return nil, err
+			}
+			progress.FileOffset += size
+		} else { // or continue chunk upload
 			progress.Stage = "continue"
 			options.Progress(progress)
-			offset, err = files.continueUpload(name, uploadID, progress.FileOffset, chunk)
+			if _, err := file.continueUpload(uploadID, progress.FileOffset, chunk); err != nil {
+				return nil, err
+			}
+			progress.FileOffset += size
 		}
-		if err != nil {
-			return nil, err
-		}
-		progress.FileOffset = offset
+
 		progress.BlockNumber++
 	}
 
 	progress.Stage = "finishing"
 	options.Progress(progress)
-	return files.finishUpload(name, uploadID, progress.FileOffset, nil)
+	return file.finishUpload(uploadID, progress.FileOffset, nil)
 }
 
-func (files *Files) startUpload(name string, uploadID string, chunk []byte) (int, error) {
-	sp := NewHTTPClient(files.client)
-	endpoint := fmt.Sprintf("%s/Files('%s')/StartUpload(uploadId=guid'%s')", files.endpoint, name, uploadID)
-	data, err := sp.Post(endpoint, chunk, getConfHeaders(files.config))
+func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
+	sp := NewHTTPClient(file.client)
+	endpoint := fmt.Sprintf("%s/StartUpload(uploadId=guid'%s')", file.endpoint, uploadID)
+	data, err := sp.Post(endpoint, chunk, getConfHeaders(file.config))
 	if err != nil {
 		return 0, err
 	}
@@ -103,10 +120,10 @@ func (files *Files) startUpload(name string, uploadID string, chunk []byte) (int
 	return res.StartUpload, nil
 }
 
-func (files *Files) continueUpload(name string, uploadID string, fileOffset int, chunk []byte) (int, error) {
-	sp := NewHTTPClient(files.client)
-	endpoint := fmt.Sprintf("%s/Files('%s')/ContinueUpload(uploadId=guid'%s',fileOffset=%d)", files.endpoint, name, uploadID, fileOffset)
-	data, err := sp.Post(endpoint, chunk, getConfHeaders(files.config))
+func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) (int, error) {
+	sp := NewHTTPClient(file.client)
+	endpoint := fmt.Sprintf("%s/ContinueUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)
+	data, err := sp.Post(endpoint, chunk, getConfHeaders(file.config))
 	if err != nil {
 		return 0, err
 	}
@@ -122,8 +139,8 @@ func (files *Files) continueUpload(name string, uploadID string, fileOffset int,
 	return res.ContinueUpload, nil
 }
 
-func (files *Files) finishUpload(name string, uploadID string, fileOffset int, chunk []byte) (FileResp, error) {
-	sp := NewHTTPClient(files.client)
-	endpoint := fmt.Sprintf("%s/Files('%s')/FinishUpload(uploadId=guid'%s',fileOffset=%d)", files.endpoint, name, uploadID, fileOffset)
-	return sp.Post(endpoint, chunk, getConfHeaders(files.config))
+func (file *File) finishUpload(uploadID string, fileOffset int, chunk []byte) (FileResp, error) {
+	sp := NewHTTPClient(file.client)
+	endpoint := fmt.Sprintf("%s/FinishUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)
+	return sp.Post(endpoint, chunk, getConfHeaders(file.config))
 }
