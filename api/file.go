@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -190,8 +191,8 @@ func (file *File) UndoCheckOut() ([]byte, error) {
 	return sp.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
-// Download file bytes
-func (file *File) Download() ([]byte, error) {
+// GetReader gets file io.ReadCloser
+func (file *File) GetReader() (io.ReadCloser, error) {
 	endpoint := fmt.Sprintf("%s/$value", file.endpoint)
 
 	req, err := http.NewRequest("GET", endpoint, nil)
@@ -208,9 +209,18 @@ func (file *File) Download() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	return resp.Body, nil
+}
 
-	data, err := ioutil.ReadAll(resp.Body)
+// Download file bytes
+func (file *File) Download() ([]byte, error) {
+	body, err := file.GetReader()
+	if err != nil {
+		return nil, err
+	}
+	defer body.Close()
+
+	data, err := ioutil.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}
