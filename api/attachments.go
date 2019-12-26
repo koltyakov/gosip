@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 
@@ -94,8 +95,8 @@ func (attachment *Attachment) Recycle() ([]byte, error) {
 	return sp.Post(endpoint, nil, getConfHeaders(attachment.config))
 }
 
-// Dowload ...
-func (attachment *Attachment) Dowload() ([]byte, error) {
+// GetReader ...
+func (attachment *Attachment) GetReader() (io.ReadCloser, error) {
 	endpoint := fmt.Sprintf("%s/$value", attachment.endpoint)
 
 	req, err := http.NewRequest("GET", endpoint, nil)
@@ -112,9 +113,18 @@ func (attachment *Attachment) Dowload() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	return resp.Body, err
+}
 
-	data, err := ioutil.ReadAll(resp.Body)
+// Dowload ...
+func (attachment *Attachment) Dowload() ([]byte, error) {
+	body, err := attachment.GetReader()
+	if err != nil {
+		return nil, err
+	}
+	defer body.Close()
+
+	data, err := ioutil.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}
