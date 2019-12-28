@@ -66,10 +66,6 @@ func TestWebs(t *testing.T) {
 		if err := json.Unmarshal(data, &res); err != nil {
 			t.Error(err)
 		}
-
-		// if len(res.D.Results) == 0 {
-		// 	t.Error("can't get webs")
-		// }
 	})
 
 	t.Run("DeleteWeb", func(t *testing.T) {
