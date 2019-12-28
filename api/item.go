@@ -130,6 +130,11 @@ func (item *Item) ParentList() *List {
 	)
 }
 
+// Records ...
+func (item *Item) Records() *Records {
+	return NewRecords(item)
+}
+
 /* Response helpers */
 
 // Data : to get typed data
