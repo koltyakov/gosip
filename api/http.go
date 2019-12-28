@@ -185,7 +185,12 @@ func (ctx *HTTPClient) ProcessQuery(endpoint string, body []byte) ([]byte, error
 		return nil, err
 	}
 
-	res := []*struct {
+	arrRes := []interface{}{}
+	if err := json.Unmarshal(data, &arrRes); err != nil {
+		return data, err
+	}
+
+	res := &struct {
 		SchemaVersion  string `json:"SchemaVersion"`
 		LibraryVersion string `json:"LibraryVersion"`
 		ErrorInfo      *struct {
@@ -197,17 +202,22 @@ func (ctx *HTTPClient) ProcessQuery(endpoint string, body []byte) ([]byte, error
 		TraceCorrelationID string `json:"TraceCorrelationId"`
 	}{}
 
-	if err := json.Unmarshal(data, &res); err != nil {
+	arrEl1, err := json.Marshal(arrRes[0])
+	if err != nil {
 		return data, err
 	}
 
-	if res[0].ErrorInfo != nil {
+	if err := json.Unmarshal(arrEl1, &res); err != nil {
+		return data, err
+	}
+
+	if res.ErrorInfo != nil {
 		return data, fmt.Errorf(
 			"%s (Code: %d, %s, Correlation ID: %s)",
-			res[0].ErrorInfo.ErrorMessage,
-			res[0].ErrorInfo.ErrorCode,
-			res[0].ErrorInfo.ErrorTypeName,
-			res[0].TraceCorrelationID,
+			res.ErrorInfo.ErrorMessage,
+			res.ErrorInfo.ErrorCode,
+			res.ErrorInfo.ErrorTypeName,
+			res.TraceCorrelationID,
 		)
 	}
 
