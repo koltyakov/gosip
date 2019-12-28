@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -143,7 +144,8 @@ func (file *File) GetItem() (*Item, error) {
 	res := &struct {
 		D struct {
 			Metadata struct {
-				URI string `json:"id"`
+				ID  string `json:"id"`
+				URI string `json:"uri"`
 			} `json:"__metadata"`
 		} `json:"d"`
 	}{}
@@ -158,7 +160,7 @@ func (file *File) GetItem() (*Item, error) {
 		fmt.Sprintf(
 			"%s/_api/%s",
 			file.client.AuthCnfg.GetSiteURL(),
-			res.D.Metadata.URI,
+			strings.Split(res.D.Metadata.URI, "/_api")[1],
 		),
 		file.config,
 	)
@@ -245,9 +247,6 @@ func (file *File) CopyTo(newURL string, overwrite bool) ([]byte, error) {
 	sp := NewHTTPClient(file.client)
 	return sp.Post(endpoint, nil, getConfHeaders(file.config))
 }
-
-// ToDo:
-// Declare as record
 
 /* Response helpers */
 

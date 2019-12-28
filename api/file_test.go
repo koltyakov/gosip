@@ -62,9 +62,23 @@ func TestFile(t *testing.T) {
 		}
 	})
 
-	t.Run("GetItem", func(t *testing.T) {
+	t.Run("Get", func(t *testing.T) {
 		if _, err := web.GetFile(newFolderURI + "/File_3.txt").Get(); err != nil {
 			t.Error(err)
+		}
+	})
+
+	t.Run("GetItem", func(t *testing.T) {
+		item, err := web.GetFile(newFolderURI + "/File_3.txt").GetItem()
+		if err != nil {
+			t.Error(err)
+		}
+		data, err := item.Select("Id").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if data.Data().ID == 0 {
+			t.Error("can't get file's item")
 		}
 	})
 
