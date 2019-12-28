@@ -70,6 +70,25 @@ func TestUtils(t *testing.T) {
 		}
 	})
 
+	t.Run("getIncludeEndpoint", func(t *testing.T) {
+		rootEndpoint := "https://contoso.sharepoint.com/sites/site/_api/web/Lists('UpperCaseList')"
+		part := "/Items"
+		endpoint := rootEndpoint + part + "/Item(1)"
+		if getIncludeEndpoint(endpoint, part) != rootEndpoint+part {
+			t.Error("incorrect endpoint reduction")
+		}
+	})
+
+	t.Run("getIncludeEndpoints", func(t *testing.T) {
+		rootEndpoint := "https://contoso.sharepoint.com/sites/site/_api/web/Lists('UpperCaseList')"
+		part := "/Items"
+		endpoint := rootEndpoint + part + "/Item(1)"
+		parts := []string{"/Items", "/SomethingElse"}
+		if getIncludeEndpoints(endpoint, parts) != rootEndpoint+part {
+			t.Error("incorrect endpoint reduction")
+		}
+	})
+
 	t.Run("containsMetadataType", func(t *testing.T) {
 		m1 := []byte(`{"prop":"val"}`)
 		if containsMetadataType(m1) {

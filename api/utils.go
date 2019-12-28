@@ -49,6 +49,27 @@ func getPriorEndpoint(endpoint string, part string) string {
 	return endpoint[:strLen]
 }
 
+// getIncludeEndpoint gets endpoint including the provided part ignoring case
+func getIncludeEndpoint(endpoint string, part string) string {
+	strLen := len(strings.Split(strings.ToLower(endpoint), strings.ToLower(part))[0])
+	if len(endpoint) == strLen {
+		return endpoint
+	}
+	return endpoint[:strLen] + part
+}
+
+// getIncludeEndpoints gets endpoint including the provided parts as array of values ignoring case
+func getIncludeEndpoints(endpoint string, parts []string) string {
+	result := endpoint
+	for _, part := range parts {
+		res := getIncludeEndpoint(endpoint, part)
+		if len(res) < len(endpoint) {
+			result = res
+		}
+	}
+	return result
+}
+
 // containsMetadataType checks is byte array payload contains SP OData __metadata prop
 func containsMetadataType(payload []byte) bool {
 	return strings.Index(fmt.Sprintf("%s", payload), `"__metadata"`) != -1
