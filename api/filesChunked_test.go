@@ -12,6 +12,10 @@ import (
 func TestFilesChunked(t *testing.T) {
 	checkClient(t)
 
+	if envCode == "2013" {
+		t.Skip("is not supported with SP 2013")
+	}
+
 	web := NewSP(spClient).Web()
 	newFolderName := uuid.New().String()
 	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
