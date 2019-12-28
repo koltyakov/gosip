@@ -92,6 +92,12 @@ func TestItem(t *testing.T) {
 		}
 	})
 
+	t.Run("ParentList", func(t *testing.T) {
+		if _, err := list.Items().GetByID(3).ParentList().Get(); err != nil {
+			t.Error(err)
+		}
+	})
+
 	if _, err := list.Delete(); err != nil {
 		t.Error(err)
 	}

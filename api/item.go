@@ -121,6 +121,15 @@ func (item *Item) Attachments() *Attachments {
 	)
 }
 
+// ParentList ...
+func (item *Item) ParentList() *List {
+	return NewList(
+		item.client,
+		fmt.Sprintf("%s/ParentList", item.endpoint),
+		item.config,
+	)
+}
+
 /* Response helpers */
 
 // Data : to get typed data
