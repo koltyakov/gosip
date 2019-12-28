@@ -191,6 +191,15 @@ func (list *List) Views() *Views {
 	)
 }
 
+// ParentWeb ...
+func (list *List) ParentWeb() *Web {
+	return NewWeb(
+		list.client,
+		fmt.Sprintf("%s/ParentWeb", list.endpoint),
+		list.config,
+	)
+}
+
 // GetEntityType ...
 func (list *List) GetEntityType() (string, error) {
 	scoped := *list

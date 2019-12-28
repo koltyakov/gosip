@@ -40,6 +40,12 @@ func TestList(t *testing.T) {
 		}
 	})
 
+	t.Run("ParentWeb", func(t *testing.T) {
+		if _, err := list.ParentWeb().Get(); err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("CurrentChangeToken", func(t *testing.T) {
 		token, err := list.GetChangeToken()
 		if err != nil {
