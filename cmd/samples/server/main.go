@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	strategy "github.com/koltyakov/gosip/auth/saml"
-	"github.com/koltyakov/gosip/cmd/server/handlers"
+	"github.com/koltyakov/gosip/cmd/samples/server/handlers"
 )
 
 func main() {
