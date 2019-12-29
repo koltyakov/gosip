@@ -16,7 +16,7 @@
 
 Simplifies SharePoint API consumption such as REST API, CSOM (client.svc/ProcessQuery), etc.
 
-Provides Fluent syntax to construct and consude SharePoint APIs.
+Provides Fluent syntax to construct and consume SharePoint APIs.
 
 ### Supported SharePoint versions:
 
