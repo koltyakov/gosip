@@ -11,6 +11,10 @@ import (
 func TestRecords(t *testing.T) {
 	checkClient(t)
 
+	if envCode == "2013" {
+		t.Skip("is not supported with SP 2013")
+	}
+
 	sp := NewSP(spClient)
 
 	// Activate in place record management feature

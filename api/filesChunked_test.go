@@ -34,7 +34,7 @@ func TestFilesChunked(t *testing.T) {
 
 	t.Run("AddChunked", func(t *testing.T) {
 		fileName := fmt.Sprintf("ChunkedFile.txt")
-		content := "Greater than a chunk content"
+		content := "Greater than a chunk content................."
 		stream := strings.NewReader(content)
 		options := &AddChunkedOptions{
 			Owerwrite: true,
