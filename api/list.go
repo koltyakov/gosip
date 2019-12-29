@@ -216,9 +216,7 @@ func (list *List) Roles() *Roles {
 }
 
 // ToDo:
-// Fields
-// Content Type
-// Views
+// RenderListData/AsStream
 
 /* Response helpers */
 

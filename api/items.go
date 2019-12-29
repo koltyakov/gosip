@@ -210,9 +210,7 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 }
 
 // ToDo:
-// GetAll
 // Batch
-// RenderListDataAsStream
 
 /* Response helpers */
 

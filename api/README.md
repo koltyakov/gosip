@@ -6,7 +6,7 @@ This is the beta area. Changes to interfaces are expected in near future.
 
 ## ToDo:
 
-- [ ] Solidify API (Go language terms)
-- [ ] Integration tests
+- [x] Solidify API (Go language terms)
+- [x] Integration tests
 - [ ] Add docs
 - [ ] Extend SP coverage
