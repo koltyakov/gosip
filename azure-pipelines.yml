@@ -7,7 +7,7 @@ pool:
 
 variables:
   GOBIN:  '$(GOPATH)/bin' # Go binaries path
-  GOROOT: '/usr/local/go1.11' # Go installation path
+  GOROOT: '/usr/local/go1.13' # Go installation path
   GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
   GO111MODULE: 'on'
@@ -52,12 +52,3 @@ steps:
     ENV_SPO_SITEURL: $(ci.spo.siteurl)
     ENV_SPO_USERNAME: $(ci.spo.username)
     ENV_SPO_PASSWORD: $(ci.spo.password)
-
-# - task: FOSSA@0
-#   inputs:
-#     FOSSAService: 'FOSSA'
-#     source: 'INSTALL'
-#     version: 'v0.7.32'
-#     cwd: '$(modulePath)'
-#     failOnError: 'SKIP'
-#   condition: and(succeeded(), contains(variables['Build.SourceVersionMessage'], '[fossa check]'))
