@@ -68,3 +68,8 @@ func (sp *SP) Profiles() *Profiles {
 		sp.config,
 	)
 }
+
+// ContextInfo ...
+func (sp *SP) ContextInfo() (*ContextInfo, error) {
+	return NewContext(sp.client, sp.ToURL(), sp.config).Get()
+}

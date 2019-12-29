@@ -215,6 +215,11 @@ func (list *List) Roles() *Roles {
 	return NewRoles(list.client, list.endpoint, list.config)
 }
 
+// ContextInfo ...
+func (list *List) ContextInfo() (*ContextInfo, error) {
+	return NewContext(list.client, list.ToURL(), list.config).Get()
+}
+
 // ToDo:
 // RenderListData/AsStream
 

@@ -154,6 +154,11 @@ func (folder *Folder) GetItem() (*Item, error) {
 	return item, nil
 }
 
+// ContextInfo ...
+func (folder *Folder) ContextInfo() (*ContextInfo, error) {
+	return NewContext(folder.client, folder.ToURL(), folder.config).Get()
+}
+
 /* Response helpers */
 
 // Data : to get typed data

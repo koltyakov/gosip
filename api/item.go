@@ -135,6 +135,11 @@ func (item *Item) Records() *Records {
 	return NewRecords(item)
 }
 
+// ContextInfo ...
+func (item *Item) ContextInfo() (*ContextInfo, error) {
+	return NewContext(item.client, item.ToURL(), item.config).Get()
+}
+
 /* Response helpers */
 
 // Data : to get typed data

@@ -124,3 +124,6 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, err
 	}
 	return results, nil
 }
+
+// ToDo:
+// Pagination

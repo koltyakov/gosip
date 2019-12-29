@@ -248,6 +248,11 @@ func (file *File) CopyTo(newURL string, overwrite bool) ([]byte, error) {
 	return sp.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
+// ContextInfo ...
+func (file *File) ContextInfo() (*ContextInfo, error) {
+	return NewContext(file.client, file.ToURL(), file.config).Get()
+}
+
 /* Response helpers */
 
 // Data : to get typed data

@@ -314,6 +314,11 @@ func (web *Web) RecycleBin() *RecycleBin {
 	return NewRecycleBin(web.client, endpoint, web.config)
 }
 
+// ContextInfo ...
+func (web *Web) ContextInfo() (*ContextInfo, error) {
+	return NewContext(web.client, web.ToURL(), web.config).Get()
+}
+
 /* Response helpers */
 
 // Data : to get typed data
