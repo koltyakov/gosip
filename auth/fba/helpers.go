@@ -19,19 +19,19 @@ var (
 )
 
 // GetAuth : get auth
-func GetAuth(creds *AuthCnfg) (string, error) {
-	parsedURL, err := url.Parse(creds.SiteURL)
+func GetAuth(c *AuthCnfg) (string, error) {
+	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Host + "@fba@" + creds.Username + "@" + creds.Password
+	cacheKey := parsedURL.Host + "@fba@" + c.Username + "@" + c.Password
 	if authCookie, found := storage.Get(cacheKey); found {
 		return authCookie.(string), nil
 	}
 
 	endpoint := fmt.Sprintf("%s://%s/_vti_bin/authentication.asmx", parsedURL.Scheme, parsedURL.Host)
-	soapBody, err := templates.FbaWsTemplate(creds.Username, creds.Password)
+	soapBody, err := templates.FbaWsTemplate(c.Username, c.Password)
 	if err != nil {
 		return "", err
 	}

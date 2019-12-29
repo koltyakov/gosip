@@ -20,13 +20,13 @@ var (
 )
 
 // GetAuth : get auth
-func GetAuth(creds *AuthCnfg) (string, error) {
-	parsedURL, err := url.Parse(creds.SiteURL)
+func GetAuth(c *AuthCnfg) (string, error) {
+	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Host + "@adfs@" + creds.Username + "@" + creds.Password
+	cacheKey := parsedURL.Host + "@adfs@" + c.Username + "@" + c.Password
 	if authCookie, found := storage.Get(cacheKey); found {
 		return authCookie.(string), nil
 	}
@@ -35,8 +35,8 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	var expirity time.Duration
 
 	// In case of WAP
-	if creds.AdfsCookie == "EdgeAccessCookie" {
-		authCookie, expires, err = wapAuthFlow(creds)
+	if c.AdfsCookie == "EdgeAccessCookie" {
+		authCookie, expires, err = wapAuthFlow(c)
 		if err != nil {
 			return "", err
 		}
@@ -44,7 +44,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 			expirity = 30 * time.Minute // ToDO: move to settings or dynamically get
 		}
 	} else {
-		authCookie, expires, err = adfsAuthFlow(creds, "")
+		authCookie, expires, err = adfsAuthFlow(c, "")
 		if err != nil {
 			return "", err
 		}
@@ -57,14 +57,14 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	return authCookie, nil
 }
 
-func adfsAuthFlow(creds *AuthCnfg, edgeCookie string) (string, string, error) {
-	parsedAdfsURL, err := url.Parse(creds.AdfsURL)
+func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
+	parsedAdfsURL, err := url.Parse(c.AdfsURL)
 	if err != nil {
 		return "", "", err
 	}
 
 	usernameMixedURL := fmt.Sprintf("%s://%s/adfs/services/trust/13/usernamemixed", parsedAdfsURL.Scheme, parsedAdfsURL.Host)
-	samlBody, err := templates.AdfsSamlWsfedTemplate(usernameMixedURL, creds.Username, creds.Password, creds.RelyingParty)
+	samlBody, err := templates.AdfsSamlWsfedTemplate(usernameMixedURL, c.Username, c.Password, c.RelyingParty)
 	if err != nil {
 		return "", "", err
 	}
@@ -129,12 +129,12 @@ func adfsAuthFlow(creds *AuthCnfg, edgeCookie string) (string, string, error) {
 		expires = result.Response.Lifetime.Expires
 	}
 
-	wresult, err := templates.AdfsSamlTokenTemplate(result.Response.Token.Inner, created, expires, creds.RelyingParty)
+	wresult, err := templates.AdfsSamlTokenTemplate(result.Response.Token.Inner, created, expires, c.RelyingParty)
 	if err != nil {
 		return "", "", err
 	}
 
-	parsedURL, err := url.Parse(creds.SiteURL)
+	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", "", err
 	}
@@ -178,7 +178,7 @@ func adfsAuthFlow(creds *AuthCnfg, edgeCookie string) (string, string, error) {
 }
 
 // WAP auth flow - TODO: refactor
-func wapAuthFlow(creds *AuthCnfg) (string, string, error) {
+func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	client := &http.Client{
 		// Disabling redirect so response 302 location can be resolved
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -186,7 +186,7 @@ func wapAuthFlow(creds *AuthCnfg) (string, string, error) {
 		},
 	}
 
-	resp, err := client.Get(creds.SiteURL)
+	resp, err := client.Get(c.SiteURL)
 	if err != nil {
 		return "", "", err
 	}
@@ -200,8 +200,8 @@ func wapAuthFlow(creds *AuthCnfg) (string, string, error) {
 	redirectURL := fmt.Sprintf("%s", redirect)
 
 	params := url.Values{}
-	params.Set("UserName", creds.Username)
-	params.Set("Password", creds.Password)
+	params.Set("UserName", c.Username)
+	params.Set("Password", c.Password)
 	params.Set("AuthMethod", "FormsAuthentication")
 
 	resp, err = client.Post(redirectURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
@@ -272,11 +272,11 @@ func wapAuthFlow(creds *AuthCnfg) (string, string, error) {
 				return "", "", err
 			}
 
-			c := *creds
-			c.RelyingParty = resp.Request.URL.Query().Get("wtrealm")
-			c.AdfsCookie = "FedAuth"
+			cc := *c
+			cc.RelyingParty = resp.Request.URL.Query().Get("wtrealm")
+			cc.AdfsCookie = "FedAuth"
 
-			fedAuthCookie, expire, err := adfsAuthFlow(&c, authCookie)
+			fedAuthCookie, expire, err := adfsAuthFlow(&cc, authCookie)
 			if err != nil {
 				return "", "", err
 			}

@@ -226,7 +226,6 @@ func (file *File) Download() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return data, nil
 }
 

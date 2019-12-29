@@ -22,18 +22,18 @@ var (
 )
 
 // GetAuth : get auth
-func GetAuth(creds *AuthCnfg) (string, error) {
-	parsedURL, err := url.Parse(creds.SiteURL)
+func GetAuth(c *AuthCnfg) (string, error) {
+	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Host + "@saml@" + creds.Username + "@" + creds.Password
+	cacheKey := parsedURL.Host + "@saml@" + c.Username + "@" + c.Password
 	if authToken, found := storage.Get(cacheKey); found {
 		return authToken.(string), nil
 	}
 
-	authCookie, notAfter, err := getSecurityToken(creds)
+	authCookie, notAfter, err := getSecurityToken(c)
 	if err != nil {
 		return "", nil
 	}
@@ -45,11 +45,11 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	return authCookie, nil
 }
 
-func getSecurityToken(creds *AuthCnfg) (string, string, error) {
+func getSecurityToken(c *AuthCnfg) (string, string, error) {
 	endpoint := "https://login.microsoftonline.com/GetUserRealm.srf" // TODO: endpoints mapping
 
 	params := url.Values{}
-	params.Set("login", creds.Username)
+	params.Set("login", c.Username)
 
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -91,24 +91,24 @@ func getSecurityToken(creds *AuthCnfg) (string, string, error) {
 	}
 
 	if userRealm.NameSpaceType == "Managed" {
-		return getSecurityTokenWithOnline(creds)
+		return getSecurityTokenWithOnline(c)
 	}
 
 	if userRealm.NameSpaceType == "Federated" {
-		return getSecurityTokenWithAdfs(userRealm.AuthURL, creds)
+		return getSecurityTokenWithAdfs(userRealm.AuthURL, c)
 	}
 
 	return "", "", fmt.Errorf("Unable to resolve namespace authentiation type. Type received: %s", userRealm.NameSpaceType)
 }
 
-func getSecurityTokenWithOnline(creds *AuthCnfg) (string, string, error) {
-	parsedURL, err := url.Parse(creds.SiteURL)
+func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
+	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", "", err
 	}
 
 	formsEndpoint := fmt.Sprintf("%s://%s/_forms/default.aspx?wa=wsignin1.0", parsedURL.Scheme, parsedURL.Host)
-	samlBody, err := templates.OnlineSamlWsfedTemplate(formsEndpoint, creds.Username, creds.Password)
+	samlBody, err := templates.OnlineSamlWsfedTemplate(formsEndpoint, c.Username, c.Password)
 	if err != nil {
 		return "", "", err
 	}
@@ -177,7 +177,7 @@ func getSecurityTokenWithOnline(creds *AuthCnfg) (string, string, error) {
 }
 
 // TODO: test the method, it possibly contains issues and extra complexity
-func getSecurityTokenWithAdfs(adfsURL string, creds *AuthCnfg) (string, string, error) {
+func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, error) {
 	parsedAdfsURL, err := url.Parse(adfsURL)
 	if err != nil {
 		return "", "", err
@@ -187,7 +187,7 @@ func getSecurityTokenWithAdfs(adfsURL string, creds *AuthCnfg) (string, string, 
 	// http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyURL), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 
 	usernameMixedURL := fmt.Sprintf("%s://%s/adfs/services/trust/13/usernamemixed", parsedAdfsURL.Scheme, parsedAdfsURL.Host)
-	samlBody, err := templates.AdfsSamlWsfedTemplate(usernameMixedURL, creds.Username, creds.Password, "urn:federation:MicrosoftOnline")
+	samlBody, err := templates.AdfsSamlWsfedTemplate(usernameMixedURL, c.Username, c.Password, "urn:federation:MicrosoftOnline")
 	if err != nil {
 		return "", "", err
 	}
@@ -238,7 +238,7 @@ func getSecurityTokenWithAdfs(adfsURL string, creds *AuthCnfg) (string, string, 
 	}
 
 	// parsedURL, err := url.Parse(adfsURL)
-	parsedURL, err := url.Parse(creds.SiteURL)
+	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", "", err
 	}

@@ -15,18 +15,18 @@ var (
 )
 
 // GetAuth : get auth
-func GetAuth(creds *AuthCnfg) (string, error) {
-	parsedURL, err := url.Parse(creds.SiteURL)
+func GetAuth(c *AuthCnfg) (string, error) {
+	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Host + "@tmg@" + creds.Username + "@" + creds.Password
+	cacheKey := parsedURL.Host + "@tmg@" + c.Username + "@" + c.Password
 	if accessToken, found := storage.Get(cacheKey); found {
 		return accessToken.(string), nil
 	}
 
-	redirect, err := detectCookieAuthURL(creds.SiteURL)
+	redirect, err := detectCookieAuthURL(c.SiteURL)
 	if err != nil {
 		return "", err
 	}
@@ -46,8 +46,8 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 		}
 	}
 
-	params.Set("username", creds.Username)
-	params.Set("password", creds.Password)
+	params.Set("username", c.Username)
+	params.Set("password", c.Password)
 
 	// TODO: keepalive agent for https
 

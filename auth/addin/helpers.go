@@ -18,31 +18,31 @@ var (
 )
 
 // GetAuth : get auth
-func GetAuth(creds *AuthCnfg) (string, error) {
-	parsedURL, err := url.Parse(creds.SiteURL)
+func GetAuth(c *AuthCnfg) (string, error) {
+	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Host + "@addinonly@" + creds.ClientID + "@" + creds.ClientSecret
+	cacheKey := parsedURL.Host + "@addinonly@" + c.ClientID + "@" + c.ClientSecret
 	if accessToken, found := storage.Get(cacheKey); found {
 		return accessToken.(string), nil
 	}
 
-	realm, err := getRealm(creds)
+	realm, err := getRealm(c)
 	if err != nil {
 		return "", err
 	}
-	creds.Realm = realm
+	c.Realm = realm
 
-	authURL, err := getAuthURL(creds.Realm)
+	authURL, err := getAuthURL(c.Realm)
 	if err != nil {
 		return "", err
 	}
 
 	servicePrincipal := "00000003-0000-0ff1-ce00-000000000000" // TODO: move to constants
-	resource := fmt.Sprintf("%s/%s@%s", servicePrincipal, parsedURL.Host, creds.Realm)
-	fullClientID := fmt.Sprintf("%s@%s", creds.ClientID, creds.Realm)
+	resource := fmt.Sprintf("%s/%s@%s", servicePrincipal, parsedURL.Host, c.Realm)
+	fullClientID := fmt.Sprintf("%s@%s", c.ClientID, c.Realm)
 
 	// type getAuthForm struct {
 	// 	GrantType    string `json:"grant_type"`
@@ -69,7 +69,7 @@ func GetAuth(creds *AuthCnfg) (string, error) {
 	params := url.Values{}
 	params.Set("grant_type", "client_credentials")
 	params.Set("client_id", fullClientID)
-	params.Set("client_secret", creds.ClientSecret)
+	params.Set("client_secret", c.ClientSecret)
 	params.Set("resource", resource)
 
 	// reqBodyJSON, err := json.Marshal(reqBody)
@@ -162,12 +162,12 @@ func getAuthURL(realm string) (string, error) {
 	return "", errors.New("no OAuth2 protocol location found")
 }
 
-func getRealm(creds *AuthCnfg) (string, error) {
-	if creds.Realm != "" {
-		return creds.Realm, nil
+func getRealm(c *AuthCnfg) (string, error) {
+	if c.Realm != "" {
+		return c.Realm, nil
 	}
 
-	parsedURL, err := url.Parse(creds.SiteURL)
+	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
 	}
@@ -177,7 +177,7 @@ func getRealm(creds *AuthCnfg) (string, error) {
 		return realm.(string), nil
 	}
 
-	endpoint := creds.SiteURL + "/_vti_bin/client.svc"
+	endpoint := c.SiteURL + "/_vti_bin/client.svc"
 	req, err := http.NewRequest("POST", endpoint, nil)
 	if err != nil {
 		return "", err

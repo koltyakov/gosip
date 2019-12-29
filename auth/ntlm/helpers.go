@@ -12,13 +12,13 @@ var (
 )
 
 // GetAuth : get auth
-func GetAuth(creds *AuthCnfg) (string, error) {
-	parsedURL, err := url.Parse(creds.SiteURL)
+func GetAuth(c *AuthCnfg) (string, error) {
+	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Host + "@ntlm@" + creds.Username + "@" + creds.Password
+	cacheKey := parsedURL.Host + "@ntlm@" + c.Username + "@" + c.Password
 	if accessToken, found := storage.Get(cacheKey); found {
 		return accessToken.(string), nil
 	}
