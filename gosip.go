@@ -163,6 +163,10 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		defer resp.Body.Close()
 		details, _ := ioutil.ReadAll(resp.Body)
 		err = fmt.Errorf("%s :: %s", resp.Status, details)
+		// Unescape unicode-escaped error messages for non Latin languages
+		if unescaped, e := strconv.Unquote(`"` + strings.Replace(fmt.Sprintf("%s", details), `"`, `\"`, -1) + `"`); e == nil {
+			err = fmt.Errorf("%s :: %s", resp.Status, unescaped)
+		}
 	}
 
 	return resp, err
