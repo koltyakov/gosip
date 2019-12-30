@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -73,6 +74,22 @@ type ListInfo struct {
 
 // ListResp ...
 type ListResp []byte
+
+// RenderListDataInfo ...
+type RenderListDataInfo struct {
+	Row                    []map[string]interface{} `json:"Row"`
+	FirstRow               int                      `json:"FirstRow"`
+	FolderPermissions      string                   `json:"FolderPermissions"`
+	LastRow                int                      `json:"LastRow"`
+	RowLimit               int                      `json:"RowLimit"`
+	FilterLink             string                   `json:"FilterLink"`
+	ForceNoHierarchy       string                   `json:"ForceNoHierarchy"`
+	HierarchyHasIndention  string                   `json:"HierarchyHasIndention"`
+	CurrentFolderSpItemURL string                   `json:"CurrentFolderSpItemUrl"`
+}
+
+// RenderListDataResp ...
+type RenderListDataResp []byte
 
 // NewList ...
 func NewList(client *gosip.SPClient, endpoint string, config *RequestConfig) *List {
@@ -210,6 +227,58 @@ func (list *List) GetEntityType() (string, error) {
 	return data.Data().ListItemEntityTypeFullName, nil
 }
 
+// ReserveListItemID ...
+func (list *List) ReserveListItemID() (int, error) {
+	sp := NewHTTPClient(list.client)
+	endpoint := fmt.Sprintf("%s/ReserveListItemId", list.endpoint)
+	data, err := sp.Post(endpoint, nil, getConfHeaders(list.config))
+	if err != nil {
+		return 0, err
+	}
+	data = parseODataItem(data)
+	if res, err := strconv.Atoi(fmt.Sprintf("%s", data)); err == nil {
+		return res, nil
+	}
+	res := &struct {
+		ReserveListItemID int `json:"ReserveListItemId"`
+	}{}
+	if err := json.Unmarshal(data, &res); err != nil {
+		return 0, err
+	}
+	return res.ReserveListItemID, nil
+}
+
+// RenderListData ...
+func (list *List) RenderListData(viewXML string) (RenderListDataResp, error) {
+	sp := NewHTTPClient(list.client)
+	apiURL, _ := url.Parse(fmt.Sprintf("%s/RenderListData(@viewXml)", list.endpoint))
+	query := apiURL.Query()
+	query.Set("@viewXml", `'`+trimMultiline(viewXML)+`'`)
+	apiURL.RawQuery = query.Encode()
+	data, err := sp.Post(apiURL.String(), nil, getConfHeaders(list.config))
+	if err != nil {
+		return nil, err
+	}
+	data = parseODataItem(data)
+	res := &struct {
+		Value          string `json:"value"`
+		RenderListData string `json:"RenderListData"`
+	}{}
+	if err := json.Unmarshal(data, &res); err != nil {
+		return nil, err
+	}
+	if res.RenderListData != "" {
+		data = []byte(res.RenderListData)
+	}
+	if res.Value != "" {
+		data = []byte(res.Value)
+	}
+	return []byte(data), nil
+}
+
+// RenderListDataAsStream ...
+// ToDo
+
 // Roles ...
 func (list *List) Roles() *Roles {
 	return NewRoles(list.client, list.endpoint, list.config)
@@ -219,9 +288,6 @@ func (list *List) Roles() *Roles {
 func (list *List) ContextInfo() (*ContextInfo, error) {
 	return NewContext(list.client, list.ToURL(), list.config).Get()
 }
-
-// ToDo:
-// RenderListData/AsStream
 
 /* Response helpers */
 
@@ -243,4 +309,12 @@ func (listResp *ListResp) Data() *ListInfo {
 func (listResp *ListResp) Unmarshal(obj interface{}) error {
 	data := parseODataItem(*listResp)
 	return json.Unmarshal(data, obj)
+}
+
+// Data : to get typed data
+func (listData *RenderListDataResp) Data() *RenderListDataInfo {
+	// data := parseODataItem(*listData)
+	res := &RenderListDataInfo{}
+	json.Unmarshal(*listData, &res)
+	return res
 }

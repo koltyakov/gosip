@@ -56,4 +56,24 @@ func TestList(t *testing.T) {
 		}
 	})
 
+	t.Run("ReserveListItemID", func(t *testing.T) {
+		nextID, err := list.ReserveListItemID()
+		if err != nil {
+			t.Error(err)
+		}
+		if nextID == 0 {
+			t.Error("can't reserve list item ID")
+		}
+	})
+
+	t.Run("RenderListData", func(t *testing.T) {
+		listData, err := list.RenderListData(`<View></View>`)
+		if err != nil {
+			t.Error(err)
+		}
+		if listData.Data().FolderPermissions == "" {
+			t.Error("incorrect data")
+		}
+	})
+
 }
