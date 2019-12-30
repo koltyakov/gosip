@@ -3,9 +3,10 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"io"
 	"strconv"
+
+	"github.com/google/uuid"
 )
 
 // AddChunkedOptions ...
@@ -80,17 +81,19 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 				return nil, err
 			}
 			file = web.GetFile(fileResp.Data().ServerRelativeURL)
-			if _, err := file.startUpload(uploadID, chunk); err != nil {
+			offset, err := file.startUpload(uploadID, chunk)
+			if err != nil {
 				return nil, err
 			}
-			progress.FileOffset += size
+			progress.FileOffset = offset
 		} else { // or continue chunk upload
 			progress.Stage = "continue"
 			options.Progress(progress)
-			if _, err := file.continueUpload(uploadID, progress.FileOffset, chunk); err != nil {
+			offset, err := file.continueUpload(uploadID, progress.FileOffset, chunk)
+			if err != nil {
 				return nil, err
 			}
-			progress.FileOffset += size
+			progress.FileOffset = offset
 		}
 
 		progress.BlockNumber++
@@ -108,11 +111,12 @@ func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	data = parseODataItem(data)
 	if res, err := strconv.Atoi(fmt.Sprintf("%s", data)); err == nil {
 		return res, nil
 	}
 	res := &struct {
-		StartUpload int `json:"StartUpload"`
+		StartUpload int `json:"StartUpload,string"`
 	}{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return 0, err
@@ -127,11 +131,12 @@ func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) 
 	if err != nil {
 		return 0, err
 	}
+	data = parseODataItem(data)
 	if res, err := strconv.Atoi(fmt.Sprintf("%s", data)); err == nil {
 		return res, nil
 	}
 	res := &struct {
-		ContinueUpload int `json:"ContinueUpload"`
+		ContinueUpload int `json:"ContinueUpload,string"`
 	}{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return 0, err

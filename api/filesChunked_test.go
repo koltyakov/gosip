@@ -34,11 +34,11 @@ func TestFilesChunked(t *testing.T) {
 
 	t.Run("AddChunked", func(t *testing.T) {
 		fileName := fmt.Sprintf("ChunkedFile.txt")
-		content := "Greater than a chunk content................."
+		content := "Greater than a chunk content..."
 		stream := strings.NewReader(content)
 		options := &AddChunkedOptions{
 			Owerwrite: true,
-			ChunkSize: 10,
+			ChunkSize: 5,
 		}
 		fileResp, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options)
 		if err != nil {
