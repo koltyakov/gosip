@@ -104,6 +104,14 @@ func (file *File) Get() (FileResp, error) {
 	return sp.Get(file.ToURL(), getConfHeaders(file.config))
 }
 
+// Update updates Field's metadata with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.File object
+func (file *File) Update(body []byte) ([]byte, error) {
+	body = patchMetadataType(body, "SP.File")
+	sp := NewHTTPClient(file.client)
+	return sp.Update(file.endpoint, body, getConfHeaders(file.config))
+}
+
 // Delete ...
 func (file *File) Delete() ([]byte, error) {
 	sp := NewHTTPClient(file.client)

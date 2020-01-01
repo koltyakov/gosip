@@ -74,6 +74,14 @@ func (folder *Folder) Get() (FolderResp, error) {
 	return sp.Get(folder.ToURL(), getConfHeaders(folder.config))
 }
 
+// Update updates Folder's metadata with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.Folder object
+func (folder *Folder) Update(body []byte) ([]byte, error) {
+	body = patchMetadataType(body, "SP.Folder")
+	sp := NewHTTPClient(folder.client)
+	return sp.Update(folder.endpoint, body, getConfHeaders(folder.config))
+}
+
 // Delete ...
 func (folder *Folder) Delete() ([]byte, error) {
 	sp := NewHTTPClient(folder.client)

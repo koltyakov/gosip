@@ -94,6 +94,14 @@ func (field *Field) Get() (FieldResp, error) {
 	return FieldResp(data), nil
 }
 
+// Update updates Field's metadata with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.Field object
+func (field *Field) Update(body []byte) ([]byte, error) {
+	body = patchMetadataType(body, "SP.Field")
+	sp := NewHTTPClient(field.client)
+	return sp.Update(field.endpoint, body, getConfHeaders(field.config))
+}
+
 // Delete ...
 func (field *Field) Delete() ([]byte, error) {
 	sp := NewHTTPClient(field.client)

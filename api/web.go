@@ -117,6 +117,7 @@ func (web *Web) Delete() ([]byte, error) {
 // Update updates Web's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Web object
 func (web *Web) Update(body []byte) ([]byte, error) {
+	body = patchMetadataType(body, "SP.Web")
 	sp := NewHTTPClient(web.client)
 	return sp.Update(web.endpoint, body, getConfHeaders(web.config))
 }

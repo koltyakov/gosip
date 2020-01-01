@@ -88,6 +88,14 @@ func (view *View) Get() (ViewResp, error) {
 	return sp.Get(view.ToURL(), getConfHeaders(view.config))
 }
 
+// Update updates View's metadata with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.View object
+func (view *View) Update(body []byte) ([]byte, error) {
+	body = patchMetadataType(body, "SP.View")
+	sp := NewHTTPClient(view.client)
+	return sp.Update(view.endpoint, body, getConfHeaders(view.config))
+}
+
 // Delete deletes this View (can't be restored from a recycle bin)
 func (view *View) Delete() ([]byte, error) {
 	sp := NewHTTPClient(view.client)

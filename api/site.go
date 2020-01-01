@@ -102,6 +102,14 @@ func (site *Site) Get() (SiteResp, error) {
 	return sp.Get(site.ToURL(), getConfHeaders(site.config))
 }
 
+// Update updates Site's metadata with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.Site object
+func (site *Site) Update(body []byte) ([]byte, error) {
+	body = patchMetadataType(body, "SP.Site")
+	sp := NewHTTPClient(site.client)
+	return sp.Update(site.endpoint, body, getConfHeaders(site.config))
+}
+
 // Delete deletes current site (can't be restored from a recycle bin)
 func (site *Site) Delete() ([]byte, error) {
 	sp := NewHTTPClient(site.client)

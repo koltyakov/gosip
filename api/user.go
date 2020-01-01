@@ -69,6 +69,14 @@ func (user *User) Get() (UserResp, error) {
 	return sp.Get(user.ToURL(), getConfHeaders(user.config))
 }
 
+// Update updates User's metadata with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.User object
+func (user *User) Update(body []byte) ([]byte, error) {
+	body = patchMetadataType(body, "SP.User")
+	sp := NewHTTPClient(user.client)
+	return sp.Update(user.endpoint, body, getConfHeaders(user.config))
+}
+
 // Groups gets Groups API instance queryable collection for this User
 func (user *User) Groups() *Groups {
 	return NewGroups(
