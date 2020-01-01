@@ -71,13 +71,13 @@ func (users *Users) OrderBy(oDataOrderBy string, ascending bool) *Users {
 	return users
 }
 
-// Get ...
+// Get gets Users queryable collection
 func (users *Users) Get() (UsersResp, error) {
 	sp := NewHTTPClient(users.client)
 	return sp.Get(users.ToURL(), getConfHeaders(users.config))
 }
 
-// GetByID ...
+// GetByID gets a user by his/her ID (numeric ID from User Information List)
 func (users *Users) GetByID(userID int) *User {
 	return NewUser(
 		users.client,
@@ -86,7 +86,7 @@ func (users *Users) GetByID(userID int) *User {
 	)
 }
 
-// GetByLoginName ...
+// GetByLoginName gets a user by his/her login name
 func (users *Users) GetByLoginName(loginName string) *User {
 	return NewUser(
 		users.client,
@@ -95,7 +95,7 @@ func (users *Users) GetByLoginName(loginName string) *User {
 	)
 }
 
-// GetByEmail ...
+// GetByEmail gets a user by his/her email address
 func (users *Users) GetByEmail(email string) *User {
 	return NewUser(
 		users.client,
