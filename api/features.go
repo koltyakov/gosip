@@ -29,7 +29,7 @@ func NewFeatures(client *gosip.SPClient, endpoint string, config *RequestConfig)
 	}
 }
 
-// Get ...
+// Get gets features collection (IDs)
 func (features *Features) Get() ([]*FeatureInfo, error) {
 	sp := NewHTTPClient(features.client)
 	data, err := sp.Get(features.endpoint, getConfHeaders(features.config))
@@ -44,23 +44,7 @@ func (features *Features) Get() ([]*FeatureInfo, error) {
 	return res, nil
 }
 
-// GetByID ...
-// func (features *Features) GetByID(featureID string) (*FeatureInfo, error) {
-// 	sp := NewHTTPClient(features.client)
-// 	endpoint := fmt.Sprintf("%s('%s')", features.endpoint, featureID)
-// 	data, err := sp.Get(endpoint, getConfHeaders(features.config))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	data = parseODataItem(data)
-// 	res := &FeatureInfo{}
-// 	if err := json.Unmarshal(data, &res); err != nil {
-// 		return nil, err
-// 	}
-// 	return res, nil
-// }
-
-// Add ...
+// Add activates a feature by its ID (GUID) in the parent container (Site or Web)
 func (features *Features) Add(featureID string, force bool) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/Add", features.endpoint)
 	sp := NewHTTPClient(features.client)
@@ -68,7 +52,7 @@ func (features *Features) Add(featureID string, force bool) ([]byte, error) {
 	return sp.Post(endpoint, body, getConfHeaders(features.config))
 }
 
-// Remove ...
+// Remove deactivates a feature by its ID (GUID) in the parent container (Site or Web)
 func (features *Features) Remove(featureID string, force bool) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/Remove", features.endpoint)
 	sp := NewHTTPClient(features.client)
