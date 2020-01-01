@@ -66,7 +66,7 @@ func (ct *ContentType) Expand(oDataExpand string) *ContentType {
 	return ct
 }
 
-// Get ...
+// Get gets content type data object
 func (ct *ContentType) Get() (ContentTypeResp, error) {
 	sp := NewHTTPClient(ct.client)
 	return sp.Get(ct.ToURL(), getConfHeaders(ct.config))
@@ -80,20 +80,20 @@ func (ct *ContentType) Update(body []byte) ([]byte, error) {
 	return sp.Update(ct.endpoint, body, getConfHeaders(ct.config))
 }
 
-// Delete ...
+// Delete deletes a content type skipping recycle bin
 func (ct *ContentType) Delete() ([]byte, error) {
 	sp := NewHTTPClient(ct.client)
 	return sp.Delete(ct.endpoint, getConfHeaders(ct.config))
 }
 
-// Recycle ...
+// Recycle moves a content type to the recycle bin
 func (ct *ContentType) Recycle() ([]byte, error) {
 	sp := NewHTTPClient(ct.client)
 	endpoint := fmt.Sprintf("%s/Recycle", ct.endpoint)
 	return sp.Post(endpoint, nil, getConfHeaders(ct.config))
 }
 
-// Fields ...
+// Fields gets Fields API instance queryable collection
 func (ct *ContentType) Fields() *Fields {
 	return NewFields(
 		ct.client,

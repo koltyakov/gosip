@@ -70,13 +70,13 @@ func (contentTypes *ContentTypes) OrderBy(oDataOrderBy string, ascending bool) *
 	return contentTypes
 }
 
-// Get ...
+// Get gets content typed queryable collection response
 func (contentTypes *ContentTypes) Get() (ContentTypesResp, error) {
 	sp := NewHTTPClient(contentTypes.client)
 	return sp.Get(contentTypes.ToURL(), getConfHeaders(contentTypes.config))
 }
 
-// GetByID ...
+// GetByID gets a content type by its ID (GUID)
 func (contentTypes *ContentTypes) GetByID(contentTypeID string) *ContentType {
 	return NewContentType(
 		contentTypes.client,
