@@ -26,8 +26,16 @@ func TestFolder(t *testing.T) {
 	})
 
 	t.Run("GetItem", func(t *testing.T) {
-		if _, err := web.GetFolder(rootFolderURI + "/" + newFolderName).GetItem(); err != nil {
+		item, err := web.GetFolder(rootFolderURI + "/" + newFolderName).GetItem()
+		if err != nil {
 			t.Error(err)
+		}
+		data, err := item.Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if data.Data().ID == 0 {
+			t.Error("can't get folder's item")
 		}
 	})
 

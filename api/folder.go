@@ -126,7 +126,7 @@ func (folder *Folder) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(folder.client)
 
-	data, err := sp.Get(apiURL.String(), HeadersPresets.Verbose.Headers)
+	data, err := sp.Get(apiURL.String(), getConfHeaders(folder.config))
 	if err != nil {
 		return nil, err
 	}
@@ -138,14 +138,13 @@ func (folder *Folder) ListItemAllFields() (ListItemAllFieldsResp, error) {
 func (folder *Folder) GetItem() (*Item, error) {
 	scoped := NewFolder(folder.client, folder.endpoint, folder.config)
 	data, err := scoped.Conf(HeadersPresets.Verbose).Select("Id").ListItemAllFields()
-
 	if err != nil {
 		return nil, err
 	}
 
 	res := &struct {
 		Metadata struct {
-			URI string `json:"id"`
+			URI string `json:"uri"`
 		} `json:"__metadata"`
 	}{}
 
@@ -156,11 +155,7 @@ func (folder *Folder) GetItem() (*Item, error) {
 
 	item := NewItem(
 		folder.client,
-		fmt.Sprintf(
-			"%s/_api/%s",
-			folder.client.AuthCnfg.GetSiteURL(),
-			res.Metadata.URI,
-		),
+		res.Metadata.URI,
 		folder.config,
 	)
 	return item, nil

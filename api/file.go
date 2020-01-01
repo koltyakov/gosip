@@ -137,7 +137,7 @@ func (file *File) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(file.client)
 
-	data, err := sp.Get(apiURL.String(), HeadersPresets.Verbose.Headers)
+	data, err := sp.Get(apiURL.String(), getConfHeaders(file.config))
 	if err != nil {
 		return nil, err
 	}
@@ -149,14 +149,13 @@ func (file *File) ListItemAllFields() (ListItemAllFieldsResp, error) {
 func (file *File) GetItem() (*Item, error) {
 	scoped := NewFile(file.client, file.endpoint, file.config)
 	data, err := scoped.Conf(HeadersPresets.Verbose).Select("Id").ListItemAllFields()
-
 	if err != nil {
 		return nil, err
 	}
 
 	res := &struct {
 		Metadata struct {
-			URI string `json:"id"`
+			URI string `json:"uri"`
 		} `json:"__metadata"`
 	}{}
 
@@ -167,11 +166,7 @@ func (file *File) GetItem() (*Item, error) {
 
 	item := NewItem(
 		file.client,
-		fmt.Sprintf(
-			"%s/_api/%s",
-			file.client.AuthCnfg.GetSiteURL(),
-			res.Metadata.URI,
-		),
+		res.Metadata.URI,
 		file.config,
 	)
 	return item, nil
