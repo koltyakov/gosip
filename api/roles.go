@@ -96,3 +96,6 @@ func (permissions *Roles) RemoveAssigment(principalID int, roleDefID int) error 
 	_, err := sp.Post(endpoint, nil, getConfHeaders(permissions.config))
 	return err
 }
+
+// ToDo:
+// Has permissions helper method
