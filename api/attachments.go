@@ -56,20 +56,20 @@ func NewAttachment(client *gosip.SPClient, endpoint string, config *RequestConfi
 	}
 }
 
-// Get ...
+// Get gets attachments collection response
 func (attachments *Attachments) Get() (AttachmentsResp, error) {
 	sp := NewHTTPClient(attachments.client)
 	return sp.Get(attachments.endpoint, getConfHeaders(attachments.config))
 }
 
-// Add ...
+// Add uploads new attachment to the item
 func (attachments *Attachments) Add(name string, content []byte) (FileResp, error) {
 	sp := NewHTTPClient(attachments.client)
 	endpoint := fmt.Sprintf("%s/Add(FileName='%s')", attachments.endpoint, name)
 	return sp.Post(endpoint, content, getConfHeaders(attachments.config))
 }
 
-// GetByName ...
+// GetByName gets an attachment by its name
 func (attachments *Attachments) GetByName(fileName string) *Attachment {
 	return NewAttachment(
 		attachments.client,
@@ -78,26 +78,26 @@ func (attachments *Attachments) GetByName(fileName string) *Attachment {
 	)
 }
 
-// Get ...
+// Get gets attachment data object
 func (attachment *Attachment) Get() (AttachmentResp, error) {
 	sp := NewHTTPClient(attachment.client)
 	return sp.Get(attachment.endpoint, getConfHeaders(attachment.config))
 }
 
-// Delete ...
+// Delete delete an attachment skipping recycle bin
 func (attachment *Attachment) Delete() ([]byte, error) {
 	sp := NewHTTPClient(attachment.client)
 	return sp.Delete(attachment.endpoint, getConfHeaders(attachment.config))
 }
 
-// Recycle ...
+// Recycle moves an attachment to the recycle bin
 func (attachment *Attachment) Recycle() ([]byte, error) {
 	sp := NewHTTPClient(attachment.client)
 	endpoint := fmt.Sprintf("%s/RecycleObject", attachment.endpoint)
 	return sp.Post(endpoint, nil, getConfHeaders(attachment.config))
 }
 
-// GetReader ...
+// GetReader gets attachment body data reader
 func (attachment *Attachment) GetReader() (io.ReadCloser, error) {
 	endpoint := fmt.Sprintf("%s/$value", attachment.endpoint)
 
@@ -118,7 +118,7 @@ func (attachment *Attachment) GetReader() (io.ReadCloser, error) {
 	return resp.Body, err
 }
 
-// Dowload ...
+// Dowload downloads attachment's as byte array
 func (attachment *Attachment) Dowload() ([]byte, error) {
 	body, err := attachment.GetReader()
 	if err != nil {
