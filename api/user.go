@@ -63,13 +63,13 @@ func (user *User) Expand(oDataExpand string) *User {
 	return user
 }
 
-// Get ...
+// Get gets this user data object
 func (user *User) Get() (UserResp, error) {
 	sp := NewHTTPClient(user.client)
 	return sp.Get(user.ToURL(), getConfHeaders(user.config))
 }
 
-// Groups ...
+// Groups gets Groups API instance queryable collection for this User
 func (user *User) Groups() *Groups {
 	return NewGroups(
 		user.client,
