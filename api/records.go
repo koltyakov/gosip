@@ -12,12 +12,12 @@ type Records struct {
 	item *Item
 }
 
-// NewRecords ...
+// NewRecords - Records struct constructor function
 func NewRecords(item *Item) *Records {
 	return &Records{item: item}
 }
 
-// IsRecord ...
+// IsRecord checks is current item is declared as a record
 func (records *Records) IsRecord() (bool, error) {
 	// // It is better using REST and OData__vti_ItemDeclaredRecord field value
 	// jsomResp, err := csomItemRecordMethod(records.item, "IsRecord", nil)
@@ -44,7 +44,7 @@ func (records *Records) IsRecord() (bool, error) {
 	return true, nil
 }
 
-// RecordDate ...
+// RecordDate checks record declaration date of this item
 func (records *Records) RecordDate() (time.Time, error) {
 	data, err := records.item.Select("OData__vti_ItemDeclaredRecord").Get()
 	if err != nil {
@@ -59,19 +59,19 @@ func (records *Records) RecordDate() (time.Time, error) {
 	return res.RecordDate, nil
 }
 
-// Declare ...
+// Declare declares this item as a record (CSOM helper)
 func (records *Records) Declare() error {
 	_, err := csomItemRecordMethod(records.item, "DeclareItemAsRecord", nil)
 	return err
 }
 
-// DeclareWithDate ...
+// DeclareWithDate declares this item as a record with record declaration date (CSOM helper)
 func (records *Records) DeclareWithDate(date time.Time) error {
 	_, err := csomItemRecordMethod(records.item, "DeclareItemAsRecordWithDeclarationDate", &date)
 	return err
 }
 
-// Undeclare ...
+// Undeclare undeclared this item as a record (the item is not a record after an action is done) (CSOM helper)
 func (records *Records) Undeclare() error {
 	_, err := csomItemRecordMethod(records.item, "UndeclareItemAsRecord", nil)
 	return err
@@ -181,6 +181,7 @@ func (records *Records) Undeclare() error {
 // 	return jsomResp, nil
 // }
 
+// csomItemRecordMethod conscructs CSOM API process query to cover missed REST API functionality
 func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) ([]byte, error) {
 	sp := NewHTTPClient(item.client)
 	site := NewSP(item.client).Site().Conf(item.config)
