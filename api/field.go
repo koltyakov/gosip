@@ -84,7 +84,7 @@ func (field *Field) Expand(oDataExpand string) *Field {
 	return field
 }
 
-// Get ...
+// Get gets field data object
 func (field *Field) Get() (FieldResp, error) {
 	sp := NewHTTPClient(field.client)
 	data, err := sp.Get(field.ToURL(), getConfHeaders(field.config))
@@ -102,13 +102,13 @@ func (field *Field) Update(body []byte) ([]byte, error) {
 	return sp.Update(field.endpoint, body, getConfHeaders(field.config))
 }
 
-// Delete ...
+// Delete deletes a field skipping recycle bin
 func (field *Field) Delete() ([]byte, error) {
 	sp := NewHTTPClient(field.client)
 	return sp.Delete(field.endpoint, getConfHeaders(field.config))
 }
 
-// Recycle ...
+// Recycle moves a field to the recycle bin
 func (field *Field) Recycle() ([]byte, error) {
 	sp := NewHTTPClient(field.client)
 	endpoint := fmt.Sprintf("%s/Recycle", field.endpoint)

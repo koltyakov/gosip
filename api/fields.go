@@ -70,13 +70,13 @@ func (fields *Fields) OrderBy(oDataOrderBy string, ascending bool) *Fields {
 	return fields
 }
 
-// Get ...
+// Get gets fieds response collection
 func (fields *Fields) Get() (FieldsResp, error) {
 	sp := NewHTTPClient(fields.client)
 	return sp.Get(fields.ToURL(), getConfHeaders(fields.config))
 }
 
-// GetByID ...
+// GetByID gets a field by its ID (GUID)
 func (fields *Fields) GetByID(fieldID string) *Field {
 	return NewField(
 		fields.client,
@@ -85,7 +85,7 @@ func (fields *Fields) GetByID(fieldID string) *Field {
 	)
 }
 
-// GetByTitle ...
+// GetByTitle gets a field by its Display Name
 func (fields *Fields) GetByTitle(title string) *Field {
 	return NewField(
 		fields.client,
@@ -94,7 +94,7 @@ func (fields *Fields) GetByTitle(title string) *Field {
 	)
 }
 
-// GetByInternalNameOrTitle ...
+// GetByInternalNameOrTitle gets a field by its Internal or Display name
 func (fields *Fields) GetByInternalNameOrTitle(internalName string) *Field {
 	return NewField(
 		fields.client,
@@ -105,6 +105,7 @@ func (fields *Fields) GetByInternalNameOrTitle(internalName string) *Field {
 
 // ToDo:
 // Add
+// CreateFieldAsXml
 
 /* Response helpers */
 
@@ -120,8 +121,6 @@ func (fieldsResp *FieldsResp) Data() []FieldResp {
 
 // Unmarshal : to unmarshal to custom object
 func (fieldsResp *FieldsResp) Unmarshal(obj interface{}) error {
-	// collection := parseODataCollection(*fieldsResp)
-	// data, _ := json.Marshal(collection)
 	data, _ := parseODataCollectionPlain(*fieldsResp)
 	return json.Unmarshal(data, obj)
 }
