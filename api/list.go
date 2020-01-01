@@ -10,7 +10,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// List ...
+// List represents SharePoint List API queryable object struct
 type List struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -18,7 +18,7 @@ type List struct {
 	modifiers map[string]string
 }
 
-// ListInfo ...
+// ListInfo - list instance response payload structure
 type ListInfo struct {
 	ID                               string       `json:"Id"`
 	Title                            string       `json:"Title"`
@@ -72,7 +72,7 @@ type ListInfo struct {
 	CurrentChangeToken               *StringValue `json:"CurrentChangeToken"`
 }
 
-// ListResp ...
+// ListResp - list response type with helper processor methods
 type ListResp []byte
 
 // RenderListDataInfo ...
@@ -88,10 +88,10 @@ type RenderListDataInfo struct {
 	CurrentFolderSpItemURL string                   `json:"CurrentFolderSpItemUrl"`
 }
 
-// RenderListDataResp ...
+// RenderListDataResp - renderListData method response type with helper processor methods
 type RenderListDataResp []byte
 
-// NewList ...
+// NewList - List struct constructor function
 func NewList(client *gosip.SPClient, endpoint string, config *RequestConfig) *List {
 	return &List{
 		client:   client,

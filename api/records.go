@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Records ...
+// Records represents SharePoint Item Records throught REST+CSOM API object struct
 type Records struct {
 	item *Item
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Field ...
+// Field represents SharePoint Field (Site Column) API queryable object struct
 type Field struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,7 +16,7 @@ type Field struct {
 	modifiers map[string]string
 }
 
-// GenericFieldInfo ...
+// GenericFieldInfo - generic field API response payload structure
 type GenericFieldInfo struct {
 	AutoIndexed          bool   `json:"AutoIndexed"`
 	CanBeDeleted         bool   `json:"CanBeDeleted"`
@@ -48,10 +48,10 @@ type GenericFieldInfo struct {
 	TypeShortDescription string `json:"TypeShortDescription"`
 }
 
-// FieldResp ...
+// FieldResp - field response type with helper processor methods
 type FieldResp []byte
 
-// NewField ...
+// NewField - Field struct constructor function
 func NewField(client *gosip.SPClient, endpoint string, config *RequestConfig) *Field {
 	return &Field{
 		client:   client,

@@ -6,13 +6,13 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// SP - SharePoint REST API root struct
+// SP represents SharePoint REST+ API root struct
 type SP struct {
 	client *gosip.SPClient
 	config *RequestConfig
 }
 
-// NewSP ...
+// NewSP - SP struct constructor function
 func NewSP(client *gosip.SPClient) *SP {
 	return &SP{client: client}
 }

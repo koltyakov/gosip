@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Profiles ...
+// Profiles  represent SharePoint User Profiles API queryable collection struct
 type Profiles struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -15,7 +15,7 @@ type Profiles struct {
 	modifiers map[string]string
 }
 
-// ProfileInfo ...
+// ProfileInfo - user profile API response payload structure
 type ProfileInfo struct {
 	AccountName                     string `json:"AccountName"`
 	DisplayName                     string `json:"DisplayName"`
@@ -64,13 +64,13 @@ type ProfilePropsInto struct {
 	// LatestPost       string `json:"LatestPost"`
 }
 
-// ProfileResp ...
+// ProfileResp - user profile response type with helper processor methods
 type ProfileResp []byte
 
-// ProfilePropsResp ...
+// ProfilePropsResp - user profile props response type with helper processor methods
 type ProfilePropsResp []byte
 
-// NewProfiles ...
+// NewProfiles - Profiles struct constructor function
 func NewProfiles(client *gosip.SPClient, endpoint string, config *RequestConfig) *Profiles {
 	return &Profiles{
 		client:   client,

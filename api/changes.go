@@ -7,14 +7,14 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Changes ...
+// Changes represent SharePoint Changes API queryable collection struct
 type Changes struct {
 	client   *gosip.SPClient
 	config   *RequestConfig
 	endpoint string
 }
 
-// ChangeInfo ...
+// ChangeInfo - changes API response payload structure
 type ChangeInfo struct {
 	ChangeToken       *StringValue `json:"ChangeToken"`
 	ChangeType        int          `json:"ChangeType"`
@@ -65,7 +65,7 @@ type ChangeQuery struct {
 	Web                   bool
 }
 
-// NewChanges ...
+// NewChanges - Changes struct constructor function
 func NewChanges(client *gosip.SPClient, endpoint string, config *RequestConfig) *Changes {
 	return &Changes{
 		client:   client,

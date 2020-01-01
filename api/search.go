@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Search ...
+// Search represents SharePoint Search API object struct
 type Search struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,10 +16,10 @@ type Search struct {
 	modifiers map[string]string
 }
 
-// SearchResp ...
+// SearchResp - search response type with helper processor methods
 type SearchResp []byte
 
-// SearchQuery ...
+// SearchQuery - strongly typed struct for search method parameters
 type SearchQuery struct {
 	QueryText                             string                  `json:"Querytext"`
 	QueryTemplate                         string                  `json:"QueryTemplate"`
@@ -64,19 +64,26 @@ type SearchQuery struct {
 	ReorderingRules                       []*SearchReorderingRule `json:"ReorderingRules"`
 }
 
-// SearchSort ...
+// SearchSort - search sort property type
 type SearchSort struct {
 	Property  string `json:"Property"`
 	Direction int    `json:"Direction"` // Ascending = 0, Descending = 1, FQLFormula = 2
 }
 
-// SearchProperty ...
+// SearchProperty - search property type
 type SearchProperty struct {
 	Name  string              `json:"Name"`
 	Value SearchPropertyValue `json:"Value"`
 }
 
-// SearchPropertyValue ...
+// SearchKeyValue - search key value type
+type SearchKeyValue struct {
+	Key       string `json:"Key"`
+	Value     string `json:"Value"`
+	ValueType string `json:"ValueType"`
+}
+
+// SearchPropertyValue - search property value type
 type SearchPropertyValue struct {
 	StrVal                      string   `json:"StrVal"`
 	BoolVal                     bool     `json:"BoolVal"`
@@ -85,28 +92,24 @@ type SearchPropertyValue struct {
 	QueryPropertyValueTypeIndex int      `json:"QueryPropertyValueTypeIndex"` // None = 0, StringType = 1, Int32Type = 2, BooleanType = 3, StringArrayType = 4, UnSupportedType = 5
 }
 
-// SearchReorderingRule ...
+// SearchReorderingRule - search reordering rule type
 type SearchReorderingRule struct {
 	MatchValue string `json:"MatchValue"`
 	Boost      int    `json:"Boost"`
 	MatchType  int    `json:"MatchType"` // ResultContainsKeyword = 0, TitleContainsKeyword = 1, TitleMatchesKeyword = 2, UrlStartsWith = 3, UrlExactlyMatches = 4, ContentTypeIs = 5, FileExtensionMatches = 6, ResultHasTag = 7, ManualCondition = 8
 }
 
-// SearchResults ...
+// SearchResults - search results response type
 type SearchResults struct {
-	ElapsedTime        int                    `json:"ElapsedTime"`
-	PrimaryQueryResult *ResultTableCollection `json:"PrimaryQueryResult"`
-	Properties         []struct {
-		Key       string `json:"Key"`
-		Value     string `json:"Value"`
-		ValueType string `json:"ValueType"`
-	} `json:"Properties"`
+	ElapsedTime           int                      `json:"ElapsedTime"`
+	PrimaryQueryResult    *ResultTableCollection   `json:"PrimaryQueryResult"`
+	Properties            []*SearchKeyValue        `json:"Properties"`
 	SecondaryQueryResults []*ResultTableCollection `json:"SecondaryQueryResults"`
 	SpellingSuggestion    string                   `json:"SpellingSuggestion"`
 	TriggeredRules        []interface{}            `json:"TriggeredRules"`
 }
 
-// ResultTableCollection ...
+// ResultTableCollection - search results table collecton type
 type ResultTableCollection struct {
 	QueryErrors        map[string]interface{} `json:"QueryErrors"`
 	QueryID            string                 `json:"QueryId"`
@@ -117,28 +120,20 @@ type ResultTableCollection struct {
 	SpecialTermResults *ResultTable           `json:"SpecialTermResults"`
 }
 
-// ResultTable ...
+// ResultTable - search result table type
 type ResultTable struct {
-	GroupTemplateID              string `json:"GroupTemplateId"`
-	ItemTemplateID               string `json:"ItemTemplateId"`
-	ResultTitle                  string `json:"ResultTitle"`
-	ResultTitleURL               string `json:"ResultTitleUrl"`
-	RowCount                     int    `json:"RowCount"`
-	TableType                    string `json:"TableType"`
-	TotalRows                    int    `json:"TotalRows"`
-	TotalRowsIncludingDuplicates int    `json:"TotalRowsIncludingDuplicates"`
-	Properties                   []*struct {
-		Key       string `json:"Key"`
-		Value     string `json:"Value"`
-		ValueType string `json:"ValueType"`
-	} `json:"Properties"`
-	Table *struct {
+	GroupTemplateID              string            `json:"GroupTemplateId"`
+	ItemTemplateID               string            `json:"ItemTemplateId"`
+	ResultTitle                  string            `json:"ResultTitle"`
+	ResultTitleURL               string            `json:"ResultTitleUrl"`
+	RowCount                     int               `json:"RowCount"`
+	TableType                    string            `json:"TableType"`
+	TotalRows                    int               `json:"TotalRows"`
+	TotalRowsIncludingDuplicates int               `json:"TotalRowsIncludingDuplicates"`
+	Properties                   []*SearchKeyValue `json:"Properties"`
+	Table                        *struct {
 		Rows []*struct {
-			Cells []*struct {
-				Key       string `json:"Key"`
-				Value     string `json:"Value"`
-				ValueType string `json:"ValueType"`
-			} `json:"Cells"`
+			Cells []*SearchKeyValue `json:"Cells"`
 		} `json:"Rows"`
 	} `json:"Table"`
 	Refiners []*struct {
@@ -152,7 +147,7 @@ type ResultTable struct {
 	} `json:"Refiners"`
 }
 
-// NewSearch ...
+// NewSearch - Search struct constructor function
 func NewSearch(client *gosip.SPClient, endpoint string, config *RequestConfig) *Search {
 	return &Search{
 		client:   client,

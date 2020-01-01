@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Folders ...
+// Folders represent SharePoint Lists & Document Libraries Folders API queryable collection struct
 type Folders struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,10 +16,10 @@ type Folders struct {
 	modifiers map[string]string
 }
 
-// FoldersResp ...
+// FoldersResp - folders response type with helper processor methods
 type FoldersResp []byte
 
-// NewFolders ...
+// NewFolders - Folders struct constructor function
 func NewFolders(client *gosip.SPClient, endpoint string, config *RequestConfig) *Folders {
 	return &Folders{
 		client:   client,

@@ -13,7 +13,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// File ...
+// File represents SharePoint File API queryable object struct
 type File struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -21,7 +21,7 @@ type File struct {
 	modifiers map[string]string
 }
 
-// FileInfo ...
+// FileInfo - file API response payload structure
 type FileInfo struct {
 	CheckInComment       string    `json:"CheckInComment"`
 	CheckOutType         int       `json:"CheckOutType"`
@@ -61,10 +61,10 @@ var CheckInTypes = func() *checkInTypes {
 	}
 }()
 
-// FileResp ...
+// FileResp - file response type with helper processor methods
 type FileResp []byte
 
-// NewFile ...
+// NewFile - File struct constructor function
 func NewFile(client *gosip.SPClient, endpoint string, config *RequestConfig) *File {
 	return &File{
 		client:   client,

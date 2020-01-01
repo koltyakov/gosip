@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Group ...
+// Group represents SharePoint Site Groups API queryable object struct
 type Group struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,7 +16,7 @@ type Group struct {
 	modifiers map[string]string
 }
 
-// GroupInfo ...
+// GroupInfo - site group API response payload structure
 type GroupInfo struct {
 	AllowMembersEditMembership     bool   `json:"AllowMembersEditMembership"`
 	AllowRequestToJoinLeave        bool   `json:"AllowRequestToJoinLeave"`
@@ -32,10 +32,10 @@ type GroupInfo struct {
 	Title                          string `json:"Title"`
 }
 
-// GroupResp ...
+// GroupResp - group response type with helper processor methods
 type GroupResp []byte
 
-// NewGroup ...
+// NewGroup - Group struct constructor function
 func NewGroup(client *gosip.SPClient, endpoint string, config *RequestConfig) *Group {
 	return &Group{
 		client:   client,

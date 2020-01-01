@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// View ...
+// View represents SharePoint List View API queryable object struct
 type View struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,7 +16,7 @@ type View struct {
 	modifiers map[string]string
 }
 
-// ViewInfo ...
+// ViewInfo - list view API response payload structure
 type ViewInfo struct {
 	BaseViewID                string `json:"BaseViewId"`
 	DefaultView               bool   `json:"DefaultView"`
@@ -46,10 +46,10 @@ type ViewInfo struct {
 	ViewType                  string `json:"ViewType"`
 }
 
-// ViewResp ...
+// ViewResp - list view response type with helper processor methods
 type ViewResp []byte
 
-// NewView ...
+// NewView - View struct constructor function
 func NewView(client *gosip.SPClient, endpoint string, config *RequestConfig) *View {
 	return &View{
 		client:   client,

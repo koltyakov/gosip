@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Site ...
+// Site represents SharePoint Site API queryable object struct
 type Site struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,7 +16,7 @@ type Site struct {
 	modifiers map[string]string
 }
 
-// SiteInfo ...
+// SiteInfo - site API response payload structure
 type SiteInfo struct {
 	AllowCreateDeclarativeWorkflow         bool         `json:"AllowCreateDeclarativeWorkflow"`
 	AllowDesigner                          bool         `json:"AllowDesigner"`
@@ -60,10 +60,10 @@ type SiteInfo struct {
 	URL                                    string       `json:"Url"`
 }
 
-// SiteResp ...
+// SiteResp - site response type with helper processor methods
 type SiteResp []byte
 
-// NewSite ...
+// NewSite - Site struct constructor function
 func NewSite(client *gosip.SPClient, endpoint string, config *RequestConfig) *Site {
 	return &Site{
 		client:   client,

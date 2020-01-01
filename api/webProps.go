@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// WebProps ...
+// WebProps represent SharePoint Web Properties API queryable collection struct
 type WebProps struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -15,7 +15,7 @@ type WebProps struct {
 	modifiers map[string]string
 }
 
-// NewWebProps ...
+// NewWebProps - WebProps struct constructor function
 func NewWebProps(client *gosip.SPClient, endpoint string, config *RequestConfig) *WebProps {
 	return &WebProps{
 		client:   client,

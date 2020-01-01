@@ -7,14 +7,14 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// RoleDefinitions ...
+// RoleDefinitions represents SharePoint permissions Role Definitions API queryable object struct
 type RoleDefinitions struct {
 	client   *gosip.SPClient
 	config   *RequestConfig
 	endpoint string
 }
 
-// NewRoleDefinitions ...
+// NewRoleDefinitions - RoleDefinitions struct constructor function
 func NewRoleDefinitions(client *gosip.SPClient, endpoint string, config *RequestConfig) *RoleDefinitions {
 	return &RoleDefinitions{
 		client:   client,
@@ -23,7 +23,7 @@ func NewRoleDefinitions(client *gosip.SPClient, endpoint string, config *Request
 	}
 }
 
-// RoleDefInfo ...
+// RoleDefInfo - permissions role definition API response payload structure
 type RoleDefInfo struct {
 	BasePermissions struct {
 		High int `json:"High,string"`

@@ -9,7 +9,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Items ...
+// Items represent SharePoint Lists & Document Libraries Items API queryable collection struct
 type Items struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -17,10 +17,10 @@ type Items struct {
 	modifiers map[string]string
 }
 
-// ItemsResp ...
+// ItemsResp - items response type with helper processor methods
 type ItemsResp []byte
 
-// NewItems ...
+// NewItems - Items struct constructor function
 func NewItems(client *gosip.SPClient, endpoint string, config *RequestConfig) *Items {
 	return &Items{
 		client:   client,

@@ -7,19 +7,19 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Features ...
+// Features represent SharePoint Webs & SIte Features API queryable collection struct
 type Features struct {
 	client   *gosip.SPClient
 	config   *RequestConfig
 	endpoint string
 }
 
-// FeatureInfo ...
+// FeatureInfo - features API response payload structure
 type FeatureInfo struct {
 	DefinitionID string `json:"DefinitionId"`
 }
 
-// NewFeatures ...
+// NewFeatures - Features struct constructor function
 func NewFeatures(client *gosip.SPClient, endpoint string, config *RequestConfig) *Features {
 	return &Features{
 		client:   client,

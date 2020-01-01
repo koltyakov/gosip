@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// ContentTypes ...
+// ContentTypes represent SharePoint Content Types API queryable collection struct
 type ContentTypes struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,10 +16,10 @@ type ContentTypes struct {
 	modifiers map[string]string
 }
 
-// ContentTypesResp ...
+// ContentTypesResp - content types response type with helper processor methods
 type ContentTypesResp []byte
 
-// NewContentTypes ...
+// NewContentTypes - ContentTypes struct constructor function
 func NewContentTypes(client *gosip.SPClient, endpoint string, config *RequestConfig) *ContentTypes {
 	return &ContentTypes{
 		client:   client,

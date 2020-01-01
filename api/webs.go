@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Webs ...
+// Webs represent SharePoint Webs API queryable collection struct
 type Webs struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,10 +16,10 @@ type Webs struct {
 	modifiers map[string]string
 }
 
-// WebsResp ...
+// WebsResp - webs response type with helper processor methods
 type WebsResp []byte
 
-// NewWebs ...
+// NewWebs - Webs struct constructor function
 func NewWebs(client *gosip.SPClient, endpoint string, config *RequestConfig) *Webs {
 	return &Webs{
 		client:   client,

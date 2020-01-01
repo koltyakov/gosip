@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Utility ...
+// Utility represents SharePoint Utilities namespace API object struct
 type Utility struct {
 	client   *gosip.SPClient
 	config   *RequestConfig
@@ -24,7 +24,7 @@ type EmailProps struct {
 	From    string
 }
 
-// NewUtility ...
+// NewUtility - Utility struct constructor function
 func NewUtility(client *gosip.SPClient, endpoint string, config *RequestConfig) *Utility {
 	return &Utility{
 		client:   client,

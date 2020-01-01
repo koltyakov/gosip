@@ -7,14 +7,14 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Context ...
+// Context represents SharePoint Content Info API object struct
 type Context struct {
 	client   *gosip.SPClient
 	config   *RequestConfig
 	endpoint string
 }
 
-// ContextInfo ...
+// ContextInfo - context info response payload structure
 type ContextInfo struct {
 	FormDigestTimeoutSeconds int      `json:"FormDigestTimeoutSeconds"`
 	FormDigestValue          string   `json:"FormDigestValue"`
@@ -24,7 +24,7 @@ type ContextInfo struct {
 	WebFullURL               string   `json:"WebFullUrl"`
 }
 
-// NewContext ...
+// NewContext - Context struct constructor function
 func NewContext(client *gosip.SPClient, endpoint string, config *RequestConfig) *Context {
 	return &Context{
 		client:   client,

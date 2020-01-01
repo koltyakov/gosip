@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Lists ...
+// Lists represent SharePoint Lists API queryable collection struct
 type Lists struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,10 +16,10 @@ type Lists struct {
 	modifiers map[string]string
 }
 
-// ListsResp ...
+// ListsResp - lists response type with helper processor methods
 type ListsResp []byte
 
-// NewLists ...
+// NewLists - Lists struct constructor function
 func NewLists(client *gosip.SPClient, endpoint string, config *RequestConfig) *Lists {
 	return &Lists{
 		client:   client,

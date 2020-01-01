@@ -9,7 +9,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Web ...
+// Web represents SharePoint Web API queryable object struct
 type Web struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -17,7 +17,7 @@ type Web struct {
 	modifiers map[string]string
 }
 
-// WebInfo ...
+// WebInfo - web API response payload structure
 type WebInfo struct {
 	ID                            string       `json:"Id"`
 	Title                         string       `json:"Title"`
@@ -66,10 +66,10 @@ type WebInfo struct {
 	ResourcePath                  *DecodedURL  `json:"ResourcePath"`
 }
 
-// WebResp ...
+// WebResp - web response type with helper processor methods
 type WebResp []byte
 
-// NewWeb ...
+// NewWeb - Web struct constructor function
 func NewWeb(client *gosip.SPClient, endpoint string, config *RequestConfig) *Web {
 	return &Web{
 		client:   client,

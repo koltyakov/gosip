@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Fields ...
+// Fields represent SharePoint Fields (Site Columns) API queryable collection struct
 type Fields struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,10 +16,10 @@ type Fields struct {
 	modifiers map[string]string
 }
 
-// FieldsResp ...
+// FieldsResp - fields response type with helper processor methods
 type FieldsResp []byte
 
-// NewFields ...
+// NewFields - Fields struct constructor function
 func NewFields(client *gosip.SPClient, endpoint string, config *RequestConfig) *Fields {
 	return &Fields{
 		client:   client,

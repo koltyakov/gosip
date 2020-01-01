@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Groups ...
+// Groups represent SharePoint Site Groups API queryable collection struct
 type Groups struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,10 +16,10 @@ type Groups struct {
 	modifiers map[string]string
 }
 
-// GroupsResp ...
+// GroupsResp - groups response type with helper processor methods
 type GroupsResp []byte
 
-// NewGroups ...
+// NewGroups - Groups struct constructor function
 func NewGroups(client *gosip.SPClient, endpoint string, config *RequestConfig) *Groups {
 	return &Groups{
 		client:   client,

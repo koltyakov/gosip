@@ -27,14 +27,14 @@ var RoleTypeKinds = struct {
 	System:        7,
 }
 
-// Roles ...
+// Roles  represent SharePoint Permissions Roles API queryable collection struct
 type Roles struct {
 	client   *gosip.SPClient
 	config   *RequestConfig
 	endpoint string
 }
 
-// NewRoles ...
+// NewRoles - Roles struct constructor function
 func NewRoles(client *gosip.SPClient, endpoint string, config *RequestConfig) *Roles {
 	return &Roles{
 		client:   client,

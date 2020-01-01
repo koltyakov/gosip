@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Files ...
+// Files represent SharePoint Files API queryable collection struct
 type Files struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,10 +16,10 @@ type Files struct {
 	modifiers map[string]string
 }
 
-// FilesResp ...
+// FilesResp - files response type with helper processor methods
 type FilesResp []byte
 
-// NewFiles ...
+// NewFiles - Files struct constructor function
 func NewFiles(client *gosip.SPClient, endpoint string, config *RequestConfig) *Files {
 	return &Files{
 		client:   client,

@@ -10,33 +10,33 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Attachments ...
+// Attachments represent SharePoint List Items Attachments API queryable collection struct
 type Attachments struct {
 	client   *gosip.SPClient
 	config   *RequestConfig
 	endpoint string
 }
 
-// Attachment ...
+// Attachment represents SharePoint List Items Attachment API queryable object struct
 type Attachment struct {
 	client   *gosip.SPClient
 	config   *RequestConfig
 	endpoint string
 }
 
-// AttachmentInfo ...
+// AttachmentInfo - attachment API response payload structure
 type AttachmentInfo struct {
 	FileName          string `json:"FileName"`
 	ServerRelativeURL string `json:"ServerRelativeUrl"`
 }
 
-// AttachmentsResp ...
+// AttachmentsResp - attachments response type with helper processor methods
 type AttachmentsResp []byte
 
-// AttachmentResp ...
+// AttachmentResp - attachment response type with helper processor methods
 type AttachmentResp []byte
 
-// NewAttachments ...
+// NewAttachments - Attachments struct constructor function
 func NewAttachments(client *gosip.SPClient, endpoint string, config *RequestConfig) *Attachments {
 	return &Attachments{
 		client:   client,
@@ -45,7 +45,7 @@ func NewAttachments(client *gosip.SPClient, endpoint string, config *RequestConf
 	}
 }
 
-// NewAttachment ...
+// NewAttachment - Attachment struct constructor function
 func NewAttachment(client *gosip.SPClient, endpoint string, config *RequestConfig) *Attachment {
 	return &Attachment{
 		client:   client,

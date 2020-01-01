@@ -9,7 +9,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// RecycleBin ...
+// RecycleBin represents SharePoint Recycle Bin API queryable collection struct
 type RecycleBin struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -40,10 +40,10 @@ type RecycledItem struct {
 	} `json:"DirNamePath"`
 }
 
-// RecycleBinResp ...
+// RecycleBinResp - recycle bin response type with helper processor methods
 type RecycleBinResp []byte
 
-// NewRecycleBin ...
+// NewRecycleBin - RecycleBin struct constructor function
 func NewRecycleBin(client *gosip.SPClient, endpoint string, config *RequestConfig) *RecycleBin {
 	return &RecycleBin{
 		client:   client,
@@ -156,7 +156,7 @@ func (recycleBinResp *RecycleBinResp) Unmarshal(obj interface{}) error {
 
 /* Recycle bin item */
 
-// RecycleBinItem ...
+// RecycleBinItem represent SharePoint Recycle Bin Item API queryable object struct
 type RecycleBinItem struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -164,10 +164,10 @@ type RecycleBinItem struct {
 	modifiers map[string]string
 }
 
-// RecycleBinItemResp ...
+// RecycleBinItemResp - recycle bin item response type with helper processor methods
 type RecycleBinItemResp []byte
 
-// NewRecycleBinItem ...
+// NewRecycleBinItem - RecycleBinItem struct constructor function
 func NewRecycleBinItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *RecycleBinItem {
 	return &RecycleBinItem{
 		client:   client,

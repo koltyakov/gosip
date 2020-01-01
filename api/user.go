@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// User ...
+// User represents SharePoint Site User API queryable object struct
 type User struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -16,7 +16,7 @@ type User struct {
 	modifiers map[string]string
 }
 
-// UserInfo ...
+// UserInfo - site user API response payload structure
 type UserInfo struct {
 	Email         string `json:"Email"`
 	ID            int    `json:"Id"`
@@ -27,10 +27,10 @@ type UserInfo struct {
 	Title         string `json:"Title"`
 }
 
-// UserResp ...
+// UserResp - site user response type with helper processor methods
 type UserResp []byte
 
-// NewUser ...
+// NewUser - User struct constructor function
 func NewUser(client *gosip.SPClient, endpoint string, config *RequestConfig) *User {
 	return &User{
 		client:   client,

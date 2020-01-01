@@ -9,7 +9,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Folder ...
+// Folder represents SharePoint Lists & Document Libraries Folder API queryable object struct
 type Folder struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
@@ -17,7 +17,7 @@ type Folder struct {
 	modifiers map[string]string
 }
 
-// FolderInfo ...
+// FolderInfo - folder API response payload structure
 type FolderInfo struct {
 	Exists            bool      `json:"Exists"`
 	IsWOPIEnabled     bool      `json:"IsWOPIEnabled"`
@@ -31,7 +31,7 @@ type FolderInfo struct {
 	WelcomePage       string    `json:"WelcomePage"`
 }
 
-// FolderResp ...
+// FolderResp - folder response type with helper processor methods
 type FolderResp []byte
 
 // NewFolder ...
