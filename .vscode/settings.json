@@ -1,9 +1,14 @@
 {
   "files.trimTrailingWhitespace": true,
   "editor.tabSize": 2,
-  "editor.autoIndent": true,
+  "editor.autoIndent": "full",
   "editor.renderWhitespace": "all",
   "window.zoomLevel": 0,
   "go.formatTool": "goimports",
-  "go.testFlags": ["-count=1"]
+  "go.testFlags": ["-count=1", "-v"],
+  "go.formatFlags": ["-s", "-w"],
+  "go.lintOnSave": "file",
+  "files.exclude": {
+    "**/*_test.go": true
+  }
 }
