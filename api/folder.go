@@ -68,7 +68,7 @@ func (folder *Folder) Expand(oDataExpand string) *Folder {
 	return folder
 }
 
-// Get ...
+// Get gets this folder data object
 func (folder *Folder) Get() (FolderResp, error) {
 	sp := NewHTTPClient(folder.client)
 	return sp.Get(folder.ToURL(), getConfHeaders(folder.config))
@@ -82,20 +82,20 @@ func (folder *Folder) Update(body []byte) ([]byte, error) {
 	return sp.Update(folder.endpoint, body, getConfHeaders(folder.config))
 }
 
-// Delete ...
+// Delete deletes this folder (can't be restored from a recycle bin)
 func (folder *Folder) Delete() ([]byte, error) {
 	sp := NewHTTPClient(folder.client)
 	return sp.Delete(folder.endpoint, getConfHeaders(folder.config))
 }
 
-// Recycle ...
+// Recycle moves this folder to the recycle bin
 func (folder *Folder) Recycle() ([]byte, error) {
 	sp := NewHTTPClient(folder.client)
 	endpoint := fmt.Sprintf("%s/Recycle", folder.endpoint)
 	return sp.Post(endpoint, nil, getConfHeaders(folder.config))
 }
 
-// Folders ...
+// Folders gets subfolders queryable collection
 func (folder *Folder) Folders() *Folders {
 	return NewFolders(
 		folder.client,
@@ -104,7 +104,7 @@ func (folder *Folder) Folders() *Folders {
 	)
 }
 
-// Files ...
+// Files gets files queryable collection in this folder
 func (folder *Folder) Files() *Files {
 	return NewFiles(
 		folder.client,
@@ -113,12 +113,16 @@ func (folder *Folder) Files() *Files {
 	)
 }
 
-// GetItem ...
-func (folder *Folder) GetItem() (*Item, error) {
+// ListItemAllFields gets this folder Item data object metadata
+func (folder *Folder) ListItemAllFields() ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/ListItemAllFields", folder.endpoint)
 	apiURL, _ := url.Parse(endpoint)
-	query := url.Values{}
-	query.Add("$select", "Id")
+
+	query := apiURL.Query()
+	for k, v := range folder.modifiers.Get() {
+		query.Set(k, trimMultiline(v))
+	}
+
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(folder.client)
 
@@ -126,13 +130,23 @@ func (folder *Folder) GetItem() (*Item, error) {
 	if err != nil {
 		return nil, err
 	}
+	data = parseODataItem(data)
+	return data, nil
+}
+
+// GetItem gets this folder Item API object metadata
+func (folder *Folder) GetItem() (*Item, error) {
+	scoped := NewFolder(folder.client, folder.endpoint, folder.config)
+	data, err := scoped.Conf(HeadersPresets.Verbose).Select("Id").ListItemAllFields()
+
+	if err != nil {
+		return nil, err
+	}
 
 	res := &struct {
-		D struct {
-			Metadata struct {
-				URI string `json:"id"`
-			} `json:"__metadata"`
-		} `json:"d"`
+		Metadata struct {
+			URI string `json:"id"`
+		} `json:"__metadata"`
 	}{}
 
 	err = json.Unmarshal(data, &res)
@@ -145,14 +159,14 @@ func (folder *Folder) GetItem() (*Item, error) {
 		fmt.Sprintf(
 			"%s/_api/%s",
 			folder.client.AuthCnfg.GetSiteURL(),
-			res.D.Metadata.URI,
+			res.Metadata.URI,
 		),
 		folder.config,
 	)
 	return item, nil
 }
 
-// ContextInfo ...
+// ContextInfo gets current Context Info object data
 func (folder *Folder) ContextInfo() (*ContextInfo, error) {
 	return NewContext(folder.client, folder.ToURL(), folder.config).Get()
 }

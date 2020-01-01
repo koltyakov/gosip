@@ -71,7 +71,7 @@ func (folders *Folders) OrderBy(oDataOrderBy string, ascending bool) *Folders {
 	return folders
 }
 
-// Get gets this folder data object
+// Get gets folders collection response in this folder
 func (folders *Folders) Get() (FoldersResp, error) {
 	sp := NewHTTPClient(folders.client)
 	return sp.Get(folders.ToURL(), getConfHeaders(folders.config))
