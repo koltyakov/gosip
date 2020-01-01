@@ -79,13 +79,14 @@ func (items *Items) OrderBy(oDataOrderBy string, ascending bool) *Items {
 	return items
 }
 
-// Get ...
+// Get gets Items API queryable collection
 func (items *Items) Get() (ItemsResp, error) {
 	sp := NewHTTPClient(items.client)
 	return sp.Get(items.ToURL(), getConfHeaders(items.config))
 }
 
-// GetPaged ...
+// GetPaged gets Items API queryable paged collection. Returns paged result and next page collection callback.
+// `getNextPage` callback returns the same for the next page or `unable to get next page` error if there is no more data.
 func (items *Items) GetPaged() (ItemsResp, func() (ItemsResp, error), error) {
 	sp := NewHTTPClient(items.client)
 	itemsResp, err := sp.Get(items.ToURL(), getConfHeaders(items.config))
@@ -102,7 +103,8 @@ func (items *Items) GetPaged() (ItemsResp, func() (ItemsResp, error), error) {
 	return itemsResp, getNextPage, nil
 }
 
-// GetAll ...
+// GetAll gets all items in a list using internal page helper. The use case of the method is getting all the content from large lists.
+// Method ignores custom sorting and filtering as not supported for the large lists due to throttling limitations.
 func (items *Items) GetAll() ([]ItemResp, error) {
 	return getAll(nil, nil, items)
 }
@@ -140,19 +142,19 @@ func getAll(res []ItemResp, cur ItemsResp, items *Items) ([]ItemResp, error) {
 	return getAll(res, nextItemsResp, items)
 }
 
-// Add ...
+// Add adds new item in this list. `body` parameter is byte array representation of JSON string payload relevalt to item metadata object.
 func (items *Items) Add(body []byte) (ItemResp, error) {
 	body = patchMetadataTypeCB(body, func() string {
 		endpoint := getPriorEndpoint(items.endpoint, "/Items")
 		list := NewList(items.client, endpoint, nil)
-		oDataType, _ := list.GetEntityType()
+		oDataType, _ := list.GetEntityType() // ToDo: add caching for Entity Types
 		return oDataType
 	})
 	sp := NewHTTPClient(items.client)
 	return sp.Post(items.endpoint, body, getConfHeaders(items.config))
 }
 
-// GetByID ...
+// GetByID gets item data object by its ID
 func (items *Items) GetByID(itemID int) *Item {
 	return NewItem(
 		items.client,
@@ -161,7 +163,7 @@ func (items *Items) GetByID(itemID int) *Item {
 	)
 }
 
-// GetByCAML ...
+// GetByCAML gets items data using CAML query
 func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 	endpoint := fmt.Sprintf("%s/GetItems", strings.TrimRight(items.endpoint, "/Items"))
 	apiURL, _ := url.Parse(endpoint)
