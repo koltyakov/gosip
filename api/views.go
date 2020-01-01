@@ -70,13 +70,13 @@ func (views *Views) OrderBy(oDataOrderBy string, ascending bool) *Views {
 	return views
 }
 
-// Get ...
+// Get gets this List or Document Library views collection
 func (views *Views) Get() (ViewsResp, error) {
 	sp := NewHTTPClient(views.client)
 	return sp.Get(views.ToURL(), getConfHeaders(views.config))
 }
 
-// GetByID ...
+// GetByID gets a view by its ID (GUID)
 func (views *Views) GetByID(viewID string) *View {
 	return NewView(
 		views.client,
@@ -85,7 +85,7 @@ func (views *Views) GetByID(viewID string) *View {
 	)
 }
 
-// GetByTitle ...
+// GetByTitle gets a view by its Display Name (Title)
 func (views *Views) GetByTitle(title string) *View {
 	return NewView(
 		views.client,
