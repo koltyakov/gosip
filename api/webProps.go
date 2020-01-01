@@ -48,22 +48,18 @@ func (webProps *WebProps) Expand(oDataExpand string) *WebProps {
 	return webProps
 }
 
-// Get ...
+// Get gets Web Properties collection
 func (webProps *WebProps) Get() ([]byte, error) {
 	sp := NewHTTPClient(webProps.client)
-	headers := map[string]string{}
-	if webProps.config != nil {
-		headers = webProps.config.Headers
-	}
-	return sp.Get(webProps.ToURL(), headers)
+	return sp.Get(webProps.ToURL(), getConfHeaders(webProps.config))
 }
 
-// Set ...
+// Set sets a single Web Property (CSOM helper)
 func (webProps *WebProps) Set(prop string, value string) ([]byte, error) {
 	return webProps.SetProps(map[string]string{prop: value})
 }
 
-// SetProps ...
+// SetProps sets multiple Web Properties defined in string map object (CSOM helper)
 func (webProps *WebProps) SetProps(props map[string]string) ([]byte, error) {
 	site := NewSP(webProps.client).Site()
 	web := NewWeb(webProps.client, getPriorEndpoint(webProps.endpoint, "/AllProperties"), webProps.config)
