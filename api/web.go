@@ -9,11 +9,12 @@ import (
 )
 
 // Web represents SharePoint Web API queryable object struct
+// Always use NewWeb constructor instead of &Web{}
 type Web struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // WebInfo - web API response payload structure
@@ -71,18 +72,19 @@ type WebResp []byte
 // NewWeb - Web struct constructor function
 func NewWeb(client *gosip.SPClient, endpoint string, config *RequestConfig) *Web {
 	return &Web{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (web *Web) ToURL() string {
 	return toURL(web.endpoint, web.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (web *Web) Conf(config *RequestConfig) *Web {
 	web.config = config
 	return web
@@ -90,19 +92,13 @@ func (web *Web) Conf(config *RequestConfig) *Web {
 
 // Select ...
 func (web *Web) Select(oDataSelect string) *Web {
-	if web.modifiers == nil {
-		web.modifiers = make(map[string]string)
-	}
-	web.modifiers["$select"] = oDataSelect
+	web.modifiers.AddSelect(oDataSelect)
 	return web
 }
 
 // Expand ...
 func (web *Web) Expand(oDataExpand string) *Web {
-	if web.modifiers == nil {
-		web.modifiers = make(map[string]string)
-	}
-	web.modifiers["$expand"] = oDataExpand
+	web.modifiers.AddExpand(oDataExpand)
 	return web
 }
 
@@ -135,7 +131,7 @@ func (web *Web) Lists() *Lists {
 
 // GetChangeToken ...
 func (web *Web) GetChangeToken() (string, error) {
-	scoped := *web
+	scoped := NewWeb(web.client, web.endpoint, web.config)
 	data, err := scoped.Select("CurrentChangeToken").Get()
 	if err != nil {
 		return "", err

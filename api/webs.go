@@ -8,11 +8,12 @@ import (
 )
 
 // Webs represent SharePoint Webs API queryable collection struct
+// Always use NewWebs constructor instead of &Webs{}
 type Webs struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // WebsResp - webs response type with helper processor methods
@@ -21,18 +22,19 @@ type WebsResp []byte
 // NewWebs - Webs struct constructor function
 func NewWebs(client *gosip.SPClient, endpoint string, config *RequestConfig) *Webs {
 	return &Webs{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (webs *Webs) ToURL() string {
 	return toURL(webs.endpoint, webs.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (webs *Webs) Conf(config *RequestConfig) *Webs {
 	webs.config = config
 	return webs
@@ -40,53 +42,31 @@ func (webs *Webs) Conf(config *RequestConfig) *Webs {
 
 // Select ...
 func (webs *Webs) Select(oDataSelect string) *Webs {
-	if webs.modifiers == nil {
-		webs.modifiers = make(map[string]string)
-	}
-	webs.modifiers["$select"] = oDataSelect
+	webs.modifiers.AddSelect(oDataSelect)
 	return webs
 }
 
 // Expand ...
 func (webs *Webs) Expand(oDataExpand string) *Webs {
-	if webs.modifiers == nil {
-		webs.modifiers = make(map[string]string)
-	}
-	webs.modifiers["$expand"] = oDataExpand
+	webs.modifiers.AddExpand(oDataExpand)
 	return webs
 }
 
 // Filter ...
 func (webs *Webs) Filter(oDataFilter string) *Webs {
-	if webs.modifiers == nil {
-		webs.modifiers = make(map[string]string)
-	}
-	webs.modifiers["$filter"] = oDataFilter
+	webs.modifiers.AddFilter(oDataFilter)
 	return webs
 }
 
 // Top ...
 func (webs *Webs) Top(oDataTop int) *Webs {
-	if webs.modifiers == nil {
-		webs.modifiers = make(map[string]string)
-	}
-	webs.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
+	webs.modifiers.AddTop(oDataTop)
 	return webs
 }
 
 // OrderBy ...
 func (webs *Webs) OrderBy(oDataOrderBy string, ascending bool) *Webs {
-	direction := "asc"
-	if !ascending {
-		direction = "desc"
-	}
-	if webs.modifiers == nil {
-		webs.modifiers = make(map[string]string)
-	}
-	if webs.modifiers["$orderby"] != "" {
-		webs.modifiers["$orderby"] += ","
-	}
-	webs.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	webs.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return webs
 }
 

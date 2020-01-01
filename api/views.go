@@ -8,11 +8,12 @@ import (
 )
 
 // Views  represent SharePoint List Views API queryable collection struct
+// Always use NewViews constructor instead of &Views{}
 type Views struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // ViewsResp - list views response type with helper processor methods
@@ -21,18 +22,19 @@ type ViewsResp []byte
 // NewViews - Views struct constructor function
 func NewViews(client *gosip.SPClient, endpoint string, config *RequestConfig) *Views {
 	return &Views{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (views *Views) ToURL() string {
 	return toURL(views.endpoint, views.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (views *Views) Conf(config *RequestConfig) *Views {
 	views.config = config
 	return views
@@ -40,53 +42,31 @@ func (views *Views) Conf(config *RequestConfig) *Views {
 
 // Select ...
 func (views *Views) Select(oDataSelect string) *Views {
-	if views.modifiers == nil {
-		views.modifiers = make(map[string]string)
-	}
-	views.modifiers["$select"] = oDataSelect
+	views.modifiers.AddSelect(oDataSelect)
 	return views
 }
 
 // Expand ...
 func (views *Views) Expand(oDataExpand string) *Views {
-	if views.modifiers == nil {
-		views.modifiers = make(map[string]string)
-	}
-	views.modifiers["$expand"] = oDataExpand
+	views.modifiers.AddExpand(oDataExpand)
 	return views
 }
 
 // Filter ...
 func (views *Views) Filter(oDataFilter string) *Views {
-	if views.modifiers == nil {
-		views.modifiers = make(map[string]string)
-	}
-	views.modifiers["$filter"] = oDataFilter
+	views.modifiers.AddFilter(oDataFilter)
 	return views
 }
 
 // Top ...
 func (views *Views) Top(oDataTop int) *Views {
-	if views.modifiers == nil {
-		views.modifiers = make(map[string]string)
-	}
-	views.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
+	views.modifiers.AddTop(oDataTop)
 	return views
 }
 
 // OrderBy ...
 func (views *Views) OrderBy(oDataOrderBy string, ascending bool) *Views {
-	direction := "asc"
-	if !ascending {
-		direction = "desc"
-	}
-	if views.modifiers == nil {
-		views.modifiers = make(map[string]string)
-	}
-	if views.modifiers["$orderby"] != "" {
-		views.modifiers["$orderby"] += ","
-	}
-	views.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	views.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return views
 }
 

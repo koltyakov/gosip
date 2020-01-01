@@ -10,11 +10,12 @@ import (
 )
 
 // Folder represents SharePoint Lists & Document Libraries Folder API queryable object struct
+// Always use NewFolder constructor instead of &Folder{}
 type Folder struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // FolderInfo - folder API response payload structure
@@ -37,18 +38,19 @@ type FolderResp []byte
 // NewFolder ...
 func NewFolder(client *gosip.SPClient, endpoint string, config *RequestConfig) *Folder {
 	return &Folder{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (folder *Folder) ToURL() string {
 	return toURL(folder.endpoint, folder.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (folder *Folder) Conf(config *RequestConfig) *Folder {
 	folder.config = config
 	return folder
@@ -56,19 +58,13 @@ func (folder *Folder) Conf(config *RequestConfig) *Folder {
 
 // Select ...
 func (folder *Folder) Select(oDataSelect string) *Folder {
-	if folder.modifiers == nil {
-		folder.modifiers = make(map[string]string)
-	}
-	folder.modifiers["$select"] = oDataSelect
+	folder.modifiers.AddSelect(oDataSelect)
 	return folder
 }
 
 // Expand ...
 func (folder *Folder) Expand(oDataExpand string) *Folder {
-	if folder.modifiers == nil {
-		folder.modifiers = make(map[string]string)
-	}
-	folder.modifiers["$expand"] = oDataExpand
+	folder.modifiers.AddExpand(oDataExpand)
 	return folder
 }
 

@@ -7,28 +7,30 @@ import (
 )
 
 // WebProps represent SharePoint Web Properties API queryable collection struct
+// Always use NewWebProps constructor instead of &WebProps{}
 type WebProps struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // NewWebProps - WebProps struct constructor function
 func NewWebProps(client *gosip.SPClient, endpoint string, config *RequestConfig) *WebProps {
 	return &WebProps{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (webProps *WebProps) ToURL() string {
 	return toURL(webProps.endpoint, webProps.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (webProps *WebProps) Conf(config *RequestConfig) *WebProps {
 	webProps.config = config
 	return webProps
@@ -36,19 +38,13 @@ func (webProps *WebProps) Conf(config *RequestConfig) *WebProps {
 
 // Select ...
 func (webProps *WebProps) Select(oDataSelect string) *WebProps {
-	if webProps.modifiers == nil {
-		webProps.modifiers = make(map[string]string)
-	}
-	webProps.modifiers["$select"] = oDataSelect
+	webProps.modifiers.AddSelect(oDataSelect)
 	return webProps
 }
 
 // Expand ...
 func (webProps *WebProps) Expand(oDataExpand string) *WebProps {
-	if webProps.modifiers == nil {
-		webProps.modifiers = make(map[string]string)
-	}
-	webProps.modifiers["$expand"] = oDataExpand
+	webProps.modifiers.AddExpand(oDataExpand)
 	return webProps
 }
 

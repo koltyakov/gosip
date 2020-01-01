@@ -9,11 +9,12 @@ import (
 )
 
 // Item represents SharePoint Lists & Document Libraries Items API queryable object struct
+// Always use NewItem constructor instead of &Item{}
 type Item struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // GenericItemInfo - list's generic item response payload structure
@@ -34,18 +35,19 @@ type ItemResp []byte
 // NewItem - Item struct constructor function
 func NewItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *Item {
 	return &Item{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (item *Item) ToURL() string {
 	return toURL(item.endpoint, item.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (item *Item) Conf(config *RequestConfig) *Item {
 	item.config = config
 	return item
@@ -53,19 +55,13 @@ func (item *Item) Conf(config *RequestConfig) *Item {
 
 // Select ...
 func (item *Item) Select(oDataSelect string) *Item {
-	if item.modifiers == nil {
-		item.modifiers = make(map[string]string)
-	}
-	item.modifiers["$select"] = oDataSelect
+	item.modifiers.AddSelect(oDataSelect)
 	return item
 }
 
 // Expand ...
 func (item *Item) Expand(oDataExpand string) *Item {
-	if item.modifiers == nil {
-		item.modifiers = make(map[string]string)
-	}
-	item.modifiers["$expand"] = oDataExpand
+	item.modifiers.AddExpand(oDataExpand)
 	return item
 }
 

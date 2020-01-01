@@ -234,13 +234,16 @@ func fixDatesInResponse(data []byte, dateFields []string) []byte {
 	return res
 }
 
-// Endpoint with OData modifiers toURL helper method
-func toURL(endpoint string, modifiers map[string]string) string {
-	apiURL, _ := url.Parse(endpoint)
-	query := apiURL.Query() // url.Values{}
-	for k, v := range modifiers {
-		query.Set(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
-	return apiURL.String()
-}
+// // cloneValue clones value of one object to another
+// func cloneValue(source interface{}, destin interface{}) {
+// 	x := reflect.ValueOf(source)
+// 	if x.Kind() == reflect.Ptr {
+// 		starX := x.Elem()
+// 		y := reflect.New(starX.Type())
+// 		starY := y.Elem()
+// 		starY.Set(starX)
+// 		reflect.ValueOf(destin).Elem().Set(y.Elem())
+// 	} else {
+// 		destin = x.Interface()
+// 	}
+// }

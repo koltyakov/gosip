@@ -3,17 +3,17 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 
 	"github.com/koltyakov/gosip"
 )
 
 // Folders represent SharePoint Lists & Document Libraries Folders API queryable collection struct
+// Always use NewFolders constructor instead of &Folders{}
 type Folders struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // FoldersResp - folders response type with helper processor methods
@@ -22,19 +22,20 @@ type FoldersResp []byte
 // NewFolders - Folders struct constructor function
 func NewFolders(client *gosip.SPClient, endpoint string, config *RequestConfig) *Folders {
 	return &Folders{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (folders *Folders) ToURL() string {
 	// return folders.endpoint
 	return toURL(folders.endpoint, folders.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (folders *Folders) Conf(config *RequestConfig) *Folders {
 	folders.config = config
 	return folders
@@ -42,66 +43,38 @@ func (folders *Folders) Conf(config *RequestConfig) *Folders {
 
 // Select ...
 func (folders *Folders) Select(oDataSelect string) *Folders {
-	if folders.modifiers == nil {
-		folders.modifiers = make(map[string]string)
-	}
-	folders.modifiers["$select"] = oDataSelect
+	folders.modifiers.AddSelect(oDataSelect)
 	return folders
 }
 
 // Expand ...
 func (folders *Folders) Expand(oDataExpand string) *Folders {
-	if folders.modifiers == nil {
-		folders.modifiers = make(map[string]string)
-	}
-	folders.modifiers["$expand"] = oDataExpand
+	folders.modifiers.AddExpand(oDataExpand)
 	return folders
 }
 
 // Filter ...
 func (folders *Folders) Filter(oDataFilter string) *Folders {
-	if folders.modifiers == nil {
-		folders.modifiers = make(map[string]string)
-	}
-	folders.modifiers["$filter"] = oDataFilter
+	folders.modifiers.AddFilter(oDataFilter)
 	return folders
 }
 
 // Top ...
 func (folders *Folders) Top(oDataTop int) *Folders {
-	if folders.modifiers == nil {
-		folders.modifiers = make(map[string]string)
-	}
-	folders.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
+	folders.modifiers.AddTop(oDataTop)
 	return folders
 }
 
 // OrderBy ...
 func (folders *Folders) OrderBy(oDataOrderBy string, ascending bool) *Folders {
-	direction := "asc"
-	if !ascending {
-		direction = "desc"
-	}
-	if folders.modifiers == nil {
-		folders.modifiers = make(map[string]string)
-	}
-	if folders.modifiers["$orderby"] != "" {
-		folders.modifiers["$orderby"] += ","
-	}
-	folders.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	folders.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return folders
 }
 
 // Get ...
 func (folders *Folders) Get() (FoldersResp, error) {
-	apiURL, _ := url.Parse(folders.endpoint)
-	query := url.Values{}
-	for k, v := range folders.modifiers {
-		query.Add(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(folders.client)
-	return sp.Get(apiURL.String(), getConfHeaders(folders.config))
+	return sp.Get(folders.ToURL(), getConfHeaders(folders.config))
 }
 
 // Add ...

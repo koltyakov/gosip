@@ -8,11 +8,12 @@ import (
 )
 
 // ContentType represents SharePoint Content Types API queryable object struct
+// Always use NewContentType constructor instead of &ContentType{}
 type ContentType struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // ContentTypeInfo - content type API response payload structure
@@ -35,18 +36,19 @@ type ContentTypeResp []byte
 // NewContentType - ContentType struct constructor function
 func NewContentType(client *gosip.SPClient, endpoint string, config *RequestConfig) *ContentType {
 	return &ContentType{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (ct *ContentType) ToURL() string {
 	return toURL(ct.endpoint, ct.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (ct *ContentType) Conf(config *RequestConfig) *ContentType {
 	ct.config = config
 	return ct
@@ -54,19 +56,13 @@ func (ct *ContentType) Conf(config *RequestConfig) *ContentType {
 
 // Select ...
 func (ct *ContentType) Select(oDataSelect string) *ContentType {
-	if ct.modifiers == nil {
-		ct.modifiers = make(map[string]string)
-	}
-	ct.modifiers["$select"] = oDataSelect
+	ct.modifiers.AddSelect(oDataSelect)
 	return ct
 }
 
 // Expand ...
 func (ct *ContentType) Expand(oDataExpand string) *ContentType {
-	if ct.modifiers == nil {
-		ct.modifiers = make(map[string]string)
-	}
-	ct.modifiers["$expand"] = oDataExpand
+	ct.modifiers.AddExpand(oDataExpand)
 	return ct
 }
 

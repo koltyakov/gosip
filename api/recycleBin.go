@@ -9,11 +9,12 @@ import (
 )
 
 // RecycleBin represents SharePoint Recycle Bin API queryable collection struct
+// Always use NewRecycleBin constructor instead of &RecycleBin{}
 type RecycleBin struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // RecycledItem ...
@@ -41,18 +42,19 @@ type RecycleBinResp []byte
 // NewRecycleBin - RecycleBin struct constructor function
 func NewRecycleBin(client *gosip.SPClient, endpoint string, config *RequestConfig) *RecycleBin {
 	return &RecycleBin{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (recycleBin *RecycleBin) ToURL() string {
 	return toURL(recycleBin.endpoint, recycleBin.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (recycleBin *RecycleBin) Conf(config *RequestConfig) *RecycleBin {
 	recycleBin.config = config
 	return recycleBin
@@ -60,53 +62,31 @@ func (recycleBin *RecycleBin) Conf(config *RequestConfig) *RecycleBin {
 
 // Select ...
 func (recycleBin *RecycleBin) Select(oDataSelect string) *RecycleBin {
-	if recycleBin.modifiers == nil {
-		recycleBin.modifiers = make(map[string]string)
-	}
-	recycleBin.modifiers["$select"] = oDataSelect
+	recycleBin.modifiers.AddSelect(oDataSelect)
 	return recycleBin
 }
 
 // Expand ...
 func (recycleBin *RecycleBin) Expand(oDataExpand string) *RecycleBin {
-	if recycleBin.modifiers == nil {
-		recycleBin.modifiers = make(map[string]string)
-	}
-	recycleBin.modifiers["$expand"] = oDataExpand
+	recycleBin.modifiers.AddExpand(oDataExpand)
 	return recycleBin
 }
 
 // Filter ...
 func (recycleBin *RecycleBin) Filter(oDataFilter string) *RecycleBin {
-	if recycleBin.modifiers == nil {
-		recycleBin.modifiers = make(map[string]string)
-	}
-	recycleBin.modifiers["$filter"] = oDataFilter
+	recycleBin.modifiers.AddFilter(oDataFilter)
 	return recycleBin
 }
 
 // Top ...
 func (recycleBin *RecycleBin) Top(oDataTop int) *RecycleBin {
-	if recycleBin.modifiers == nil {
-		recycleBin.modifiers = make(map[string]string)
-	}
-	recycleBin.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
+	recycleBin.modifiers.AddTop(oDataTop)
 	return recycleBin
 }
 
 // OrderBy ...
 func (recycleBin *RecycleBin) OrderBy(oDataOrderBy string, ascending bool) *RecycleBin {
-	direction := "asc"
-	if !ascending {
-		direction = "desc"
-	}
-	if recycleBin.modifiers == nil {
-		recycleBin.modifiers = make(map[string]string)
-	}
-	if recycleBin.modifiers["$orderby"] != "" {
-		recycleBin.modifiers["$orderby"] += ","
-	}
-	recycleBin.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	recycleBin.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return recycleBin
 }
 
@@ -146,11 +126,12 @@ func (recycleBinResp *RecycleBinResp) Unmarshal(obj interface{}) error {
 /* Recycle bin item */
 
 // RecycleBinItem represent SharePoint Recycle Bin Item API queryable object struct
+// Always use NewRecycleBinItem constructor instead of &RecycleBinItem{}
 type RecycleBinItem struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // RecycleBinItemResp - recycle bin item response type with helper processor methods
@@ -159,9 +140,10 @@ type RecycleBinItemResp []byte
 // NewRecycleBinItem - RecycleBinItem struct constructor function
 func NewRecycleBinItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *RecycleBinItem {
 	return &RecycleBinItem{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 

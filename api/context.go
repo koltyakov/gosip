@@ -8,6 +8,7 @@ import (
 )
 
 // Context represents SharePoint Content Info API object struct
+// Always use NewContext constructor instead of &Context{}
 type Context struct {
 	client   *gosip.SPClient
 	config   *RequestConfig

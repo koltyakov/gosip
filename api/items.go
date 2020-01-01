@@ -4,17 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/koltyakov/gosip"
 )
 
 // Items represent SharePoint Lists & Document Libraries Items API queryable collection struct
+// Always use NewItems constructor instead of &Items{}
 type Items struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // ItemsResp - items response type with helper processor methods
@@ -23,18 +25,19 @@ type ItemsResp []byte
 // NewItems - Items struct constructor function
 func NewItems(client *gosip.SPClient, endpoint string, config *RequestConfig) *Items {
 	return &Items{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (items *Items) ToURL() string {
 	return toURL(items.endpoint, items.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (items *Items) Conf(config *RequestConfig) *Items {
 	items.config = config
 	return items
@@ -42,62 +45,37 @@ func (items *Items) Conf(config *RequestConfig) *Items {
 
 // Select ...
 func (items *Items) Select(oDataSelect string) *Items {
-	if items.modifiers == nil {
-		items.modifiers = make(map[string]string)
-	}
-	items.modifiers["$select"] = oDataSelect
+	items.modifiers.AddSelect(oDataSelect)
 	return items
 }
 
 // Expand ...
 func (items *Items) Expand(oDataExpand string) *Items {
-	if items.modifiers == nil {
-		items.modifiers = make(map[string]string)
-	}
-	items.modifiers["$expand"] = oDataExpand
+	items.modifiers.AddExpand(oDataExpand)
 	return items
 }
 
 // Filter ...
 func (items *Items) Filter(oDataFilter string) *Items {
-	if items.modifiers == nil {
-		items.modifiers = make(map[string]string)
-	}
-	items.modifiers["$filter"] = oDataFilter
+	items.modifiers.AddFilter(oDataFilter)
 	return items
 }
 
 // Top ...
 func (items *Items) Top(oDataTop int) *Items {
-	if items.modifiers == nil {
-		items.modifiers = make(map[string]string)
-	}
-	items.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
+	items.modifiers.AddTop(oDataTop)
 	return items
 }
 
 // Skip ...
 func (items *Items) Skip(skipToken string) *Items {
-	if items.modifiers == nil {
-		items.modifiers = make(map[string]string)
-	}
-	items.modifiers["$skiptoken"] = fmt.Sprintf("%s", skipToken)
+	items.modifiers.AddSkip(skipToken)
 	return items
 }
 
 // OrderBy ...
 func (items *Items) OrderBy(oDataOrderBy string, ascending bool) *Items {
-	direction := "asc"
-	if !ascending {
-		direction = "desc"
-	}
-	if items.modifiers == nil {
-		items.modifiers = make(map[string]string)
-	}
-	if items.modifiers["$orderby"] != "" {
-		items.modifiers["$orderby"] += ","
-	}
-	items.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	items.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return items
 }
 
@@ -132,15 +110,15 @@ func (items *Items) GetAll() ([]ItemResp, error) {
 func getAll(res []ItemResp, cur ItemsResp, items *Items) ([]ItemResp, error) {
 	if res == nil && cur == nil {
 		itemsCopy := NewItems(items.client, items.endpoint, items.config)
-		itemsCopy.modifiers = map[string]string{}
-		for key, val := range items.modifiers {
+		for key, val := range items.modifiers.Get() {
 			switch key {
 			case "$select":
-				itemsCopy.modifiers[key] = val
+				itemsCopy.modifiers.AddSelect(val)
 			case "$expand":
-				itemsCopy.modifiers[key] = val
+				itemsCopy.modifiers.AddExpand(val)
 			case "$top":
-				itemsCopy.modifiers[key] = val
+				top, _ := strconv.Atoi(val)
+				itemsCopy.modifiers.AddTop(top)
 			}
 		}
 		itemsResp, err := itemsCopy.Get()
@@ -188,7 +166,7 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 	endpoint := fmt.Sprintf("%s/GetItems", strings.TrimRight(items.endpoint, "/Items"))
 	apiURL, _ := url.Parse(endpoint)
 	query := url.Values{}
-	for k, v := range items.modifiers {
+	for k, v := range items.modifiers.Get() {
 		query.Add(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()

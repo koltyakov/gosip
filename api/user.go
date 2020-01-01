@@ -8,11 +8,12 @@ import (
 )
 
 // User represents SharePoint Site User API queryable object struct
+// Always use NewUser constructor instead of &User{}
 type User struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // UserInfo - site user API response payload structure
@@ -32,18 +33,19 @@ type UserResp []byte
 // NewUser - User struct constructor function
 func NewUser(client *gosip.SPClient, endpoint string, config *RequestConfig) *User {
 	return &User{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (user *User) ToURL() string {
 	return toURL(user.endpoint, user.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (user *User) Conf(config *RequestConfig) *User {
 	user.config = config
 	return user
@@ -51,19 +53,13 @@ func (user *User) Conf(config *RequestConfig) *User {
 
 // Select ...
 func (user *User) Select(oDataSelect string) *User {
-	if user.modifiers == nil {
-		user.modifiers = make(map[string]string)
-	}
-	user.modifiers["$select"] = oDataSelect
+	user.modifiers.AddSelect(oDataSelect)
 	return user
 }
 
 // Expand ...
 func (user *User) Expand(oDataExpand string) *User {
-	if user.modifiers == nil {
-		user.modifiers = make(map[string]string)
-	}
-	user.modifiers["$expand"] = oDataExpand
+	user.modifiers.AddExpand(oDataExpand)
 	return user
 }
 

@@ -7,6 +7,7 @@ import (
 )
 
 // Records represents SharePoint Item Records throught REST+CSOM API object struct
+// Always use NewRecords constructor instead of &Records{}
 type Records struct {
 	item *Item
 }

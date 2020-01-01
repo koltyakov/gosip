@@ -8,11 +8,12 @@ import (
 )
 
 // View represents SharePoint List View API queryable object struct
+// Always use NewView constructor instead of &View{}
 type View struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // ViewInfo - list view API response payload structure
@@ -51,18 +52,19 @@ type ViewResp []byte
 // NewView - View struct constructor function
 func NewView(client *gosip.SPClient, endpoint string, config *RequestConfig) *View {
 	return &View{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (view *View) ToURL() string {
 	return toURL(view.endpoint, view.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (view *View) Conf(config *RequestConfig) *View {
 	view.config = config
 	return view
@@ -70,19 +72,13 @@ func (view *View) Conf(config *RequestConfig) *View {
 
 // Select ...
 func (view *View) Select(oDataSelect string) *View {
-	if view.modifiers == nil {
-		view.modifiers = make(map[string]string)
-	}
-	view.modifiers["$select"] = oDataSelect
+	view.modifiers.AddSelect(oDataSelect)
 	return view
 }
 
 // Expand ...
 func (view *View) Expand(oDataExpand string) *View {
-	if view.modifiers == nil {
-		view.modifiers = make(map[string]string)
-	}
-	view.modifiers["$expand"] = oDataExpand
+	view.modifiers.AddExpand(oDataExpand)
 	return view
 }
 

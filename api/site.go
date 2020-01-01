@@ -8,11 +8,12 @@ import (
 )
 
 // Site represents SharePoint Site API queryable object struct
+// Always use NewSite constructor instead of &Site{}
 type Site struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // SiteInfo - site API response payload structure
@@ -65,18 +66,19 @@ type SiteResp []byte
 // NewSite - Site struct constructor function
 func NewSite(client *gosip.SPClient, endpoint string, config *RequestConfig) *Site {
 	return &Site{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (site *Site) ToURL() string {
 	return toURL(site.endpoint, site.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (site *Site) Conf(config *RequestConfig) *Site {
 	site.config = config
 	return site
@@ -84,19 +86,13 @@ func (site *Site) Conf(config *RequestConfig) *Site {
 
 // Select ...
 func (site *Site) Select(oDataSelect string) *Site {
-	if site.modifiers == nil {
-		site.modifiers = make(map[string]string)
-	}
-	site.modifiers["$select"] = oDataSelect
+	site.modifiers.AddSelect(oDataSelect)
 	return site
 }
 
 // Expand ...
 func (site *Site) Expand(oDataExpand string) *Site {
-	if site.modifiers == nil {
-		site.modifiers = make(map[string]string)
-	}
-	site.modifiers["$expand"] = oDataExpand
+	site.modifiers.AddExpand(oDataExpand)
 	return site
 }
 
@@ -139,7 +135,7 @@ func (site *Site) RecycleBin() *RecycleBin {
 
 // GetChangeToken ...
 func (site *Site) GetChangeToken() (string, error) {
-	scoped := *site
+	scoped := NewSite(site.client, site.endpoint, site.config)
 	data, err := scoped.Select("CurrentChangeToken").Get()
 	if err != nil {
 		return "", err

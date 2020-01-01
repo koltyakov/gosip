@@ -8,11 +8,12 @@ import (
 )
 
 // Lists represent SharePoint Lists API queryable collection struct
+// Always use NewLists constructor instead of &Lists{}
 type Lists struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // ListsResp - lists response type with helper processor methods
@@ -21,18 +22,19 @@ type ListsResp []byte
 // NewLists - Lists struct constructor function
 func NewLists(client *gosip.SPClient, endpoint string, config *RequestConfig) *Lists {
 	return &Lists{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (lists *Lists) ToURL() string {
 	return toURL(lists.endpoint, lists.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (lists *Lists) Conf(config *RequestConfig) *Lists {
 	lists.config = config
 	return lists
@@ -40,53 +42,31 @@ func (lists *Lists) Conf(config *RequestConfig) *Lists {
 
 // Select ...
 func (lists *Lists) Select(oDataSelect string) *Lists {
-	if lists.modifiers == nil {
-		lists.modifiers = make(map[string]string)
-	}
-	lists.modifiers["$select"] = oDataSelect
+	lists.modifiers.AddSelect(oDataSelect)
 	return lists
 }
 
 // Expand ...
 func (lists *Lists) Expand(oDataExpand string) *Lists {
-	if lists.modifiers == nil {
-		lists.modifiers = make(map[string]string)
-	}
-	lists.modifiers["$expand"] = oDataExpand
+	lists.modifiers.AddExpand(oDataExpand)
 	return lists
 }
 
 // Filter ...
 func (lists *Lists) Filter(oDataFilter string) *Lists {
-	if lists.modifiers == nil {
-		lists.modifiers = make(map[string]string)
-	}
-	lists.modifiers["$filter"] = oDataFilter
+	lists.modifiers.AddFilter(oDataFilter)
 	return lists
 }
 
 // Top ...
 func (lists *Lists) Top(oDataTop int) *Lists {
-	if lists.modifiers == nil {
-		lists.modifiers = make(map[string]string)
-	}
-	lists.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
+	lists.modifiers.AddTop(oDataTop)
 	return lists
 }
 
 // OrderBy ...
 func (lists *Lists) OrderBy(oDataOrderBy string, ascending bool) *Lists {
-	direction := "asc"
-	if !ascending {
-		direction = "desc"
-	}
-	if lists.modifiers == nil {
-		lists.modifiers = make(map[string]string)
-	}
-	if lists.modifiers["$orderby"] != "" {
-		lists.modifiers["$orderby"] += ","
-	}
-	lists.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	lists.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return lists
 }
 

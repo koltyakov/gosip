@@ -11,6 +11,7 @@ import (
 )
 
 // Attachments represent SharePoint List Items Attachments API queryable collection struct
+// Always use NewAttachments constructor instead of &Attachments{}
 type Attachments struct {
 	client   *gosip.SPClient
 	config   *RequestConfig
@@ -18,6 +19,7 @@ type Attachments struct {
 }
 
 // Attachment represents SharePoint List Items Attachment API queryable object struct
+// Always use NewAttachment constructor instead of &Attachment{}
 type Attachment struct {
 	client   *gosip.SPClient
 	config   *RequestConfig

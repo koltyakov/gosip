@@ -8,11 +8,12 @@ import (
 )
 
 // Field represents SharePoint Field (Site Column) API queryable object struct
+// Always use NewField constructor instead of &Field{}
 type Field struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // GenericFieldInfo - generic field API response payload structure
@@ -53,18 +54,19 @@ type FieldResp []byte
 // NewField - Field struct constructor function
 func NewField(client *gosip.SPClient, endpoint string, config *RequestConfig) *Field {
 	return &Field{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (field *Field) ToURL() string {
 	return toURL(field.endpoint, field.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (field *Field) Conf(config *RequestConfig) *Field {
 	field.config = config
 	return field
@@ -72,19 +74,13 @@ func (field *Field) Conf(config *RequestConfig) *Field {
 
 // Select ...
 func (field *Field) Select(oDataSelect string) *Field {
-	if field.modifiers == nil {
-		field.modifiers = make(map[string]string)
-	}
-	field.modifiers["$select"] = oDataSelect
+	field.modifiers.AddSelect(oDataSelect)
 	return field
 }
 
 // Expand ...
 func (field *Field) Expand(oDataExpand string) *Field {
-	if field.modifiers == nil {
-		field.modifiers = make(map[string]string)
-	}
-	field.modifiers["$expand"] = oDataExpand
+	field.modifiers.AddExpand(oDataExpand)
 	return field
 }
 

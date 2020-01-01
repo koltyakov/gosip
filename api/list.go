@@ -11,11 +11,12 @@ import (
 )
 
 // List represents SharePoint List API queryable object struct
+// Always use NewList constructor instead of &List{}
 type List struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // ListInfo - list instance response payload structure
@@ -94,18 +95,19 @@ type RenderListDataResp []byte
 // NewList - List struct constructor function
 func NewList(client *gosip.SPClient, endpoint string, config *RequestConfig) *List {
 	return &List{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (list *List) ToURL() string {
 	return toURL(list.endpoint, list.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (list *List) Conf(config *RequestConfig) *List {
 	list.config = config
 	return list
@@ -113,19 +115,13 @@ func (list *List) Conf(config *RequestConfig) *List {
 
 // Select ...
 func (list *List) Select(oDataSelect string) *List {
-	if list.modifiers == nil {
-		list.modifiers = make(map[string]string)
-	}
-	list.modifiers["$select"] = oDataSelect
+	list.modifiers.AddSelect(oDataSelect)
 	return list
 }
 
 // Expand ...
 func (list *List) Expand(oDataExpand string) *List {
-	if list.modifiers == nil {
-		list.modifiers = make(map[string]string)
-	}
-	list.modifiers["$expand"] = oDataExpand
+	list.modifiers.AddExpand(oDataExpand)
 	return list
 }
 
@@ -167,7 +163,7 @@ func (list *List) ContentTypes() *ContentTypes {
 
 // GetChangeToken ...
 func (list *List) GetChangeToken() (string, error) {
-	scoped := *list
+	scoped := NewList(list.client, list.endpoint, list.config)
 	data, err := scoped.Select("CurrentChangeToken").Get()
 	if err != nil {
 		return "", err
@@ -213,7 +209,7 @@ func (list *List) ParentWeb() *Web {
 
 // GetEntityType ...
 func (list *List) GetEntityType() (string, error) {
-	scoped := *list
+	scoped := NewList(list.client, list.endpoint, list.config)
 	data, err := scoped.Select("ListItemEntityTypeFullName").Get()
 	if err != nil {
 		return "", err

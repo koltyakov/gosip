@@ -8,11 +8,12 @@ import (
 )
 
 // ContentTypes represent SharePoint Content Types API queryable collection struct
+// Always use NewContentTypes constructor instead of &ContentTypes{}
 type ContentTypes struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // ContentTypesResp - content types response type with helper processor methods
@@ -21,18 +22,19 @@ type ContentTypesResp []byte
 // NewContentTypes - ContentTypes struct constructor function
 func NewContentTypes(client *gosip.SPClient, endpoint string, config *RequestConfig) *ContentTypes {
 	return &ContentTypes{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (contentTypes *ContentTypes) ToURL() string {
 	return toURL(contentTypes.endpoint, contentTypes.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (contentTypes *ContentTypes) Conf(config *RequestConfig) *ContentTypes {
 	contentTypes.config = config
 	return contentTypes
@@ -40,53 +42,31 @@ func (contentTypes *ContentTypes) Conf(config *RequestConfig) *ContentTypes {
 
 // Select ...
 func (contentTypes *ContentTypes) Select(oDataSelect string) *ContentTypes {
-	if contentTypes.modifiers == nil {
-		contentTypes.modifiers = make(map[string]string)
-	}
-	contentTypes.modifiers["$select"] = oDataSelect
+	contentTypes.modifiers.AddSelect(oDataSelect)
 	return contentTypes
 }
 
 // Expand ...
 func (contentTypes *ContentTypes) Expand(oDataExpand string) *ContentTypes {
-	if contentTypes.modifiers == nil {
-		contentTypes.modifiers = make(map[string]string)
-	}
-	contentTypes.modifiers["$expand"] = oDataExpand
+	contentTypes.modifiers.AddExpand(oDataExpand)
 	return contentTypes
 }
 
 // Filter ...
 func (contentTypes *ContentTypes) Filter(oDataFilter string) *ContentTypes {
-	if contentTypes.modifiers == nil {
-		contentTypes.modifiers = make(map[string]string)
-	}
-	contentTypes.modifiers["$filter"] = oDataFilter
+	contentTypes.modifiers.AddFilter(oDataFilter)
 	return contentTypes
 }
 
 // Top ...
 func (contentTypes *ContentTypes) Top(oDataTop int) *ContentTypes {
-	if contentTypes.modifiers == nil {
-		contentTypes.modifiers = make(map[string]string)
-	}
-	contentTypes.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
+	contentTypes.modifiers.AddTop(oDataTop)
 	return contentTypes
 }
 
 // OrderBy ...
 func (contentTypes *ContentTypes) OrderBy(oDataOrderBy string, ascending bool) *ContentTypes {
-	direction := "asc"
-	if !ascending {
-		direction = "desc"
-	}
-	if contentTypes.modifiers == nil {
-		contentTypes.modifiers = make(map[string]string)
-	}
-	if contentTypes.modifiers["$orderby"] != "" {
-		contentTypes.modifiers["$orderby"] += ","
-	}
-	contentTypes.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	contentTypes.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return contentTypes
 }
 

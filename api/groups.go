@@ -9,11 +9,12 @@ import (
 )
 
 // Groups represent SharePoint Site Groups API queryable collection struct
+// Always use NewGroups constructor instead of &Groups{}
 type Groups struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // GroupsResp - groups response type with helper processor methods
@@ -22,18 +23,19 @@ type GroupsResp []byte
 // NewGroups - Groups struct constructor function
 func NewGroups(client *gosip.SPClient, endpoint string, config *RequestConfig) *Groups {
 	return &Groups{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (groups *Groups) ToURL() string {
 	return toURL(groups.endpoint, groups.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (groups *Groups) Conf(config *RequestConfig) *Groups {
 	groups.config = config
 	return groups
@@ -41,53 +43,31 @@ func (groups *Groups) Conf(config *RequestConfig) *Groups {
 
 // Select ...
 func (groups *Groups) Select(oDataSelect string) *Groups {
-	if groups.modifiers == nil {
-		groups.modifiers = make(map[string]string)
-	}
-	groups.modifiers["$select"] = oDataSelect
+	groups.modifiers.AddSelect(oDataSelect)
 	return groups
 }
 
 // Expand ...
 func (groups *Groups) Expand(oDataExpand string) *Groups {
-	if groups.modifiers == nil {
-		groups.modifiers = make(map[string]string)
-	}
-	groups.modifiers["$expand"] = oDataExpand
+	groups.modifiers.AddExpand(oDataExpand)
 	return groups
 }
 
 // Filter ...
 func (groups *Groups) Filter(oDataFilter string) *Groups {
-	if groups.modifiers == nil {
-		groups.modifiers = make(map[string]string)
-	}
-	groups.modifiers["$filter"] = oDataFilter
+	groups.modifiers.AddFilter(oDataFilter)
 	return groups
 }
 
 // Top ...
 func (groups *Groups) Top(oDataTop int) *Groups {
-	if groups.modifiers == nil {
-		groups.modifiers = make(map[string]string)
-	}
-	groups.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
+	groups.modifiers.AddTop(oDataTop)
 	return groups
 }
 
 // OrderBy ...
 func (groups *Groups) OrderBy(oDataOrderBy string, ascending bool) *Groups {
-	direction := "asc"
-	if !ascending {
-		direction = "desc"
-	}
-	if groups.modifiers == nil {
-		groups.modifiers = make(map[string]string)
-	}
-	if groups.modifiers["$orderby"] != "" {
-		groups.modifiers["$orderby"] += ","
-	}
-	groups.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	groups.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return groups
 }
 

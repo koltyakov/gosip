@@ -8,6 +8,7 @@ import (
 )
 
 // Utility represents SharePoint Utilities namespace API object struct
+// Always use NewUtility constructor instead of &Utility{}
 type Utility struct {
 	client   *gosip.SPClient
 	config   *RequestConfig

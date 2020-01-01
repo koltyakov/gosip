@@ -8,11 +8,12 @@ import (
 )
 
 // Profiles  represent SharePoint User Profiles API queryable collection struct
+// Always use NewProfiles constructor instead of &Profiles{}
 type Profiles struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // ProfileInfo - user profile API response payload structure
@@ -69,18 +70,19 @@ type ProfilePropsResp []byte
 // NewProfiles - Profiles struct constructor function
 func NewProfiles(client *gosip.SPClient, endpoint string, config *RequestConfig) *Profiles {
 	return &Profiles{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (profiles *Profiles) ToURL() string {
 	return toURL(profiles.endpoint, profiles.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (profiles *Profiles) Conf(config *RequestConfig) *Profiles {
 	profiles.config = config
 	return profiles
@@ -88,19 +90,13 @@ func (profiles *Profiles) Conf(config *RequestConfig) *Profiles {
 
 // Select ...
 func (profiles *Profiles) Select(oDataSelect string) *Profiles {
-	if profiles.modifiers == nil {
-		profiles.modifiers = make(map[string]string)
-	}
-	profiles.modifiers["$select"] = oDataSelect
+	profiles.modifiers.AddSelect(oDataSelect)
 	return profiles
 }
 
 // Expand ...
 func (profiles *Profiles) Expand(oDataExpand string) *Profiles {
-	if profiles.modifiers == nil {
-		profiles.modifiers = make(map[string]string)
-	}
-	profiles.modifiers["$expand"] = oDataExpand
+	profiles.modifiers.AddExpand(oDataExpand)
 	return profiles
 }
 
@@ -115,7 +111,7 @@ func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(profiles.endpoint + "/GetMyProperties")
 	query := apiURL.Query()
-	for k, v := range profiles.modifiers {
+	for k, v := range profiles.modifiers.Get() {
 		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
@@ -130,7 +126,7 @@ func (profiles *Profiles) GetPropertiesFor(loginName string) (ProfilePropsResp, 
 			"/GetPropertiesFor('" + url.QueryEscape(loginName) + "')",
 	)
 	query := apiURL.Query()
-	for k, v := range profiles.modifiers {
+	for k, v := range profiles.modifiers.Get() {
 		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
@@ -155,7 +151,7 @@ func (profiles *Profiles) GetOwnerUserProfile() (ProfileResp, error) {
 			"/_api/sp.userprofiles.profileloader.getowneruserprofile",
 	)
 	query := apiURL.Query()
-	for k, v := range profiles.modifiers {
+	for k, v := range profiles.modifiers.Get() {
 		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
@@ -170,7 +166,7 @@ func (profiles *Profiles) UserProfile() (ProfileResp, error) {
 			"/_api/sp.userprofiles.profileloader.getprofileloader/GetUserProfile",
 	)
 	query := apiURL.Query()
-	for k, v := range profiles.modifiers {
+	for k, v := range profiles.modifiers.Get() {
 		query.Set(k, trimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()

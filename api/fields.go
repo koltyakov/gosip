@@ -8,11 +8,12 @@ import (
 )
 
 // Fields represent SharePoint Fields (Site Columns) API queryable collection struct
+// Always use NewFields constructor instead of &Fields{}
 type Fields struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // FieldsResp - fields response type with helper processor methods
@@ -21,18 +22,19 @@ type FieldsResp []byte
 // NewFields - Fields struct constructor function
 func NewFields(client *gosip.SPClient, endpoint string, config *RequestConfig) *Fields {
 	return &Fields{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (fields *Fields) ToURL() string {
 	return toURL(fields.endpoint, fields.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (fields *Fields) Conf(config *RequestConfig) *Fields {
 	fields.config = config
 	return fields
@@ -40,53 +42,31 @@ func (fields *Fields) Conf(config *RequestConfig) *Fields {
 
 // Select ...
 func (fields *Fields) Select(oDataSelect string) *Fields {
-	if fields.modifiers == nil {
-		fields.modifiers = make(map[string]string)
-	}
-	fields.modifiers["$select"] = oDataSelect
+	fields.modifiers.AddSelect(oDataSelect)
 	return fields
 }
 
 // Expand ...
 func (fields *Fields) Expand(oDataExpand string) *Fields {
-	if fields.modifiers == nil {
-		fields.modifiers = make(map[string]string)
-	}
-	fields.modifiers["$expand"] = oDataExpand
+	fields.modifiers.AddExpand(oDataExpand)
 	return fields
 }
 
 // Filter ...
 func (fields *Fields) Filter(oDataFilter string) *Fields {
-	if fields.modifiers == nil {
-		fields.modifiers = make(map[string]string)
-	}
-	fields.modifiers["$filter"] = oDataFilter
+	fields.modifiers.AddFilter(oDataFilter)
 	return fields
 }
 
 // Top ...
 func (fields *Fields) Top(oDataTop int) *Fields {
-	if fields.modifiers == nil {
-		fields.modifiers = make(map[string]string)
-	}
-	fields.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
+	fields.modifiers.AddTop(oDataTop)
 	return fields
 }
 
 // OrderBy ...
 func (fields *Fields) OrderBy(oDataOrderBy string, ascending bool) *Fields {
-	direction := "asc"
-	if !ascending {
-		direction = "desc"
-	}
-	if fields.modifiers == nil {
-		fields.modifiers = make(map[string]string)
-	}
-	if fields.modifiers["$orderby"] != "" {
-		fields.modifiers["$orderby"] += ","
-	}
-	fields.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	fields.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return fields
 }
 

@@ -8,6 +8,7 @@ import (
 )
 
 // RoleDefinitions represents SharePoint permissions Role Definitions API queryable object struct
+// Always use NewRoleDefinitions constructor instead of &RoleDefinitions{}
 type RoleDefinitions struct {
 	client   *gosip.SPClient
 	config   *RequestConfig

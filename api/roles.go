@@ -28,6 +28,7 @@ var RoleTypeKinds = struct {
 }
 
 // Roles  represent SharePoint Permissions Roles API queryable collection struct
+// Always use NewRoles constructor instead of &Roles{}
 type Roles struct {
 	client   *gosip.SPClient
 	config   *RequestConfig

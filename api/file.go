@@ -14,11 +14,12 @@ import (
 )
 
 // File represents SharePoint File API queryable object struct
+// Always use NewFile constructor instead of &File{}
 type File struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // FileInfo - file API response payload structure
@@ -67,18 +68,19 @@ type FileResp []byte
 // NewFile - File struct constructor function
 func NewFile(client *gosip.SPClient, endpoint string, config *RequestConfig) *File {
 	return &File{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (file *File) ToURL() string {
 	return toURL(file.endpoint, file.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (file *File) Conf(config *RequestConfig) *File {
 	file.config = config
 	return file
@@ -86,19 +88,13 @@ func (file *File) Conf(config *RequestConfig) *File {
 
 // Select ...
 func (file *File) Select(oDataSelect string) *File {
-	if file.modifiers == nil {
-		file.modifiers = make(map[string]string)
-	}
-	file.modifiers["$select"] = oDataSelect
+	file.modifiers.AddSelect(oDataSelect)
 	return file
 }
 
 // Expand ...
 func (file *File) Expand(oDataExpand string) *File {
-	if file.modifiers == nil {
-		file.modifiers = make(map[string]string)
-	}
-	file.modifiers["$expand"] = oDataExpand
+	file.modifiers.AddExpand(oDataExpand)
 	return file
 }
 

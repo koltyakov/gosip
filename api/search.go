@@ -9,11 +9,12 @@ import (
 )
 
 // Search represents SharePoint Search API object struct
+// Always use NewSearch constructor instead of &Search{}
 type Search struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // SearchResp - search response type with helper processor methods
@@ -143,9 +144,10 @@ type ResultTable struct {
 // NewSearch - Search struct constructor function
 func NewSearch(client *gosip.SPClient, endpoint string, config *RequestConfig) *Search {
 	return &Search{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 

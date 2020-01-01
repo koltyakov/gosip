@@ -8,11 +8,12 @@ import (
 )
 
 // Group represents SharePoint Site Groups API queryable object struct
+// Always use NewGroup constructor instead of &Group{}
 type Group struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // GroupInfo - site group API response payload structure
@@ -37,18 +38,19 @@ type GroupResp []byte
 // NewGroup - Group struct constructor function
 func NewGroup(client *gosip.SPClient, endpoint string, config *RequestConfig) *Group {
 	return &Group{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (group *Group) ToURL() string {
 	return toURL(group.endpoint, group.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (group *Group) Conf(config *RequestConfig) *Group {
 	group.config = config
 	return group
@@ -56,19 +58,13 @@ func (group *Group) Conf(config *RequestConfig) *Group {
 
 // Select ...
 func (group *Group) Select(oDataSelect string) *Group {
-	if group.modifiers == nil {
-		group.modifiers = make(map[string]string)
-	}
-	group.modifiers["$select"] = oDataSelect
+	group.modifiers.AddSelect(oDataSelect)
 	return group
 }
 
 // Expand ...
 func (group *Group) Expand(oDataExpand string) *Group {
-	if group.modifiers == nil {
-		group.modifiers = make(map[string]string)
-	}
-	group.modifiers["$expand"] = oDataExpand
+	group.modifiers.AddExpand(oDataExpand)
 	return group
 }
 

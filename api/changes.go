@@ -8,6 +8,7 @@ import (
 )
 
 // Changes represent SharePoint Changes API queryable collection struct
+// Always use NewChanges constructor instead of &Changes{}
 type Changes struct {
 	client   *gosip.SPClient
 	config   *RequestConfig
@@ -79,7 +80,7 @@ func (changes *Changes) ToURL() string {
 	return changes.endpoint
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (changes *Changes) Conf(config *RequestConfig) *Changes {
 	changes.config = config
 	return changes

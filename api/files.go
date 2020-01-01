@@ -8,11 +8,12 @@ import (
 )
 
 // Files represent SharePoint Files API queryable collection struct
+// Always use NewFiles constructor instead of &Files{}
 type Files struct {
 	client    *gosip.SPClient
 	config    *RequestConfig
 	endpoint  string
-	modifiers map[string]string
+	modifiers *ODataMods
 }
 
 // FilesResp - files response type with helper processor methods
@@ -21,18 +22,19 @@ type FilesResp []byte
 // NewFiles - Files struct constructor function
 func NewFiles(client *gosip.SPClient, endpoint string, config *RequestConfig) *Files {
 	return &Files{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL ...
+// ToURL gets endpoint with modificators raw URL
 func (files *Files) ToURL() string {
 	return toURL(files.endpoint, files.modifiers)
 }
 
-// Conf ...
+// Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (files *Files) Conf(config *RequestConfig) *Files {
 	files.config = config
 	return files
@@ -40,53 +42,31 @@ func (files *Files) Conf(config *RequestConfig) *Files {
 
 // Select ...
 func (files *Files) Select(oDataSelect string) *Files {
-	if files.modifiers == nil {
-		files.modifiers = make(map[string]string)
-	}
-	files.modifiers["$select"] = oDataSelect
+	files.modifiers.AddSelect(oDataSelect)
 	return files
 }
 
 // Expand ...
 func (files *Files) Expand(oDataExpand string) *Files {
-	if files.modifiers == nil {
-		files.modifiers = make(map[string]string)
-	}
-	files.modifiers["$expand"] = oDataExpand
+	files.modifiers.AddExpand(oDataExpand)
 	return files
 }
 
 // Filter ...
 func (files *Files) Filter(oDataFilter string) *Files {
-	if files.modifiers == nil {
-		files.modifiers = make(map[string]string)
-	}
-	files.modifiers["$filter"] = oDataFilter
+	files.modifiers.AddFilter(oDataFilter)
 	return files
 }
 
 // Top ...
 func (files *Files) Top(oDataTop int) *Files {
-	if files.modifiers == nil {
-		files.modifiers = make(map[string]string)
-	}
-	files.modifiers["$top"] = fmt.Sprintf("%d", oDataTop)
+	files.modifiers.AddTop(oDataTop)
 	return files
 }
 
 // OrderBy ...
 func (files *Files) OrderBy(oDataOrderBy string, ascending bool) *Files {
-	direction := "asc"
-	if !ascending {
-		direction = "desc"
-	}
-	if files.modifiers == nil {
-		files.modifiers = make(map[string]string)
-	}
-	if files.modifiers["$orderby"] != "" {
-		files.modifiers["$orderby"] += ","
-	}
-	files.modifiers["$orderby"] += fmt.Sprintf("%s %s", oDataOrderBy, direction)
+	files.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return files
 }
 
