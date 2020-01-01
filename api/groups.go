@@ -71,13 +71,14 @@ func (groups *Groups) OrderBy(oDataOrderBy string, ascending bool) *Groups {
 	return groups
 }
 
-// Get ...
+// Get gets site Groups response - a collection of GroupInfo
 func (groups *Groups) Get() (GroupsResp, error) {
 	sp := NewHTTPClient(groups.client)
 	return sp.Get(groups.ToURL(), getConfHeaders(groups.config))
 }
 
-// Add ...
+// Add creates new group with a specified name. Additional metadata can optionally be provided as string map object.
+// `metadata` should correspond to SP.Group type.
 func (groups *Groups) Add(title string, metadata map[string]interface{}) (GroupsResp, error) {
 	if metadata == nil {
 		metadata = make(map[string]interface{})
@@ -91,7 +92,7 @@ func (groups *Groups) Add(title string, metadata map[string]interface{}) (Groups
 	return sp.Post(groups.endpoint, body, getConfHeaders(groups.config))
 }
 
-// GetByID ...
+// GetByID gets a group object by its ID
 func (groups *Groups) GetByID(groupID int) *Group {
 	return NewGroup(
 		groups.client,
@@ -100,7 +101,7 @@ func (groups *Groups) GetByID(groupID int) *Group {
 	)
 }
 
-// GetByName ...
+// GetByName gets a group object by its name
 func (groups *Groups) GetByName(groupName string) *Group {
 	return NewGroup(
 		groups.client,
@@ -109,14 +110,14 @@ func (groups *Groups) GetByName(groupName string) *Group {
 	)
 }
 
-// RemoveByID ...
+// RemoveByID deletes a group object by its ID
 func (groups *Groups) RemoveByID(groupID int) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/RemoveById(%d)", groups.ToURL(), groupID)
 	sp := NewHTTPClient(groups.client)
 	return sp.Post(endpoint, nil, getConfHeaders(groups.config))
 }
 
-// RemoveByLoginName ...
+// RemoveByLoginName deletes a group object by its login name
 func (groups *Groups) RemoveByLoginName(loginName string) ([]byte, error) {
 	endpoint := fmt.Sprintf(
 		"%s/RemoveByLoginName('%s')",
