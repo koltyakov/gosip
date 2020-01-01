@@ -70,7 +70,7 @@ func (sp *SP) Profiles() *Profiles {
 	)
 }
 
-// ContextInfo ...
+// ContextInfo gets current Context Info object data
 func (sp *SP) ContextInfo() (*ContextInfo, error) {
 	return NewContext(sp.client, sp.ToURL(), sp.config).Get()
 }

@@ -312,6 +312,9 @@ func (web *Web) ContextInfo() (*ContextInfo, error) {
 	return NewContext(web.client, web.ToURL(), web.config).Get()
 }
 
+// ToDo:
+// Custom actions
+
 /* Response helpers */
 
 // Data : to get typed data

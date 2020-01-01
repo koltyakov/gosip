@@ -96,44 +96,44 @@ func (site *Site) Expand(oDataExpand string) *Site {
 	return site
 }
 
-// Get ...
+// Get gets this Site data object
 func (site *Site) Get() (SiteResp, error) {
 	sp := NewHTTPClient(site.client)
 	return sp.Get(site.ToURL(), getConfHeaders(site.config))
 }
 
-// Delete ...
+// Delete deletes current site (can't be restored from a recycle bin)
 func (site *Site) Delete() ([]byte, error) {
 	sp := NewHTTPClient(site.client)
 	return sp.Delete(site.endpoint, getConfHeaders(site.config))
 }
 
-// RootWeb ...
+// RootWeb gets Site's root web queryable API object
 func (site *Site) RootWeb() *Web {
 	endpoint := fmt.Sprintf("%s/RootWeb", site.endpoint)
 	return NewWeb(site.client, endpoint, site.config)
 }
 
-// OpenWebByID ...
+// OpenWebByID gets a Web data object by its ID (GUID)
 func (site *Site) OpenWebByID(webID string) (WebResp, error) {
 	endpoint := fmt.Sprintf("%s/OpenWebById('%s')", site.endpoint, webID)
 	sp := NewHTTPClient(site.client)
 	return sp.Post(endpoint, nil, getConfHeaders(site.config))
 }
 
-// Features ...
+// Features gets Features API instance queryable collection for this Site
 func (site *Site) Features() *Features {
 	endpoint := fmt.Sprintf("%s/Features", site.endpoint)
 	return NewFeatures(site.client, endpoint, site.config)
 }
 
-// RecycleBin ...
+// RecycleBin gets RecycleBin API instance object for this Site
 func (site *Site) RecycleBin() *RecycleBin {
 	endpoint := fmt.Sprintf("%s/RecycleBin", site.endpoint)
 	return NewRecycleBin(site.client, endpoint, site.config)
 }
 
-// GetChangeToken ...
+// GetChangeToken gets current change token for this Site
 func (site *Site) GetChangeToken() (string, error) {
 	scoped := NewSite(site.client, site.endpoint, site.config)
 	data, err := scoped.Select("CurrentChangeToken").Get()
@@ -143,7 +143,7 @@ func (site *Site) GetChangeToken() (string, error) {
 	return data.Data().CurrentChangeToken.StringValue, nil
 }
 
-// GetChanges ...
+// GetChanges gets changes on this Site due to the configuration provided as `changeQuery` parameter
 func (site *Site) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
 	return NewChanges(
 		site.client,
@@ -153,7 +153,6 @@ func (site *Site) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
 }
 
 // ToDo:
-// Features
 // Custom actions
 
 /* Response helpers */
