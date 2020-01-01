@@ -68,20 +68,21 @@ func (group *Group) Expand(oDataExpand string) *Group {
 	return group
 }
 
-// Get ...
+// Get gets group data object
 func (group *Group) Get() (GroupResp, error) {
 	sp := NewHTTPClient(group.client)
 	return sp.Get(group.ToURL(), getConfHeaders(group.config))
 }
 
-// Update ...
+// Update updates Group's metadata with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.Group object
 func (group *Group) Update(body []byte) ([]byte, error) {
 	body = patchMetadataType(body, "SP.Group")
 	sp := NewHTTPClient(group.client)
 	return sp.Update(group.endpoint, body, getConfHeaders(group.config))
 }
 
-// Users ...
+// Users gets Users API queryable collection
 func (group *Group) Users() *Users {
 	return NewUsers(
 		group.client,
@@ -90,7 +91,7 @@ func (group *Group) Users() *Users {
 	)
 }
 
-// AddUser ...
+// AddUser adds a user by his/her login name to this group
 func (group *Group) AddUser(loginName string) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/Users", group.ToURL())
 	sp := NewHTTPClient(group.client)
