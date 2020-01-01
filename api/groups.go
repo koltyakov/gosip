@@ -28,15 +28,9 @@ func NewGroups(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 	}
 }
 
-// ToURL ...
+// ToURL gets endpoint with modificators raw URL ...
 func (groups *Groups) ToURL() string {
-	apiURL, _ := url.Parse(groups.endpoint)
-	query := apiURL.Query() // url.Values{}
-	for k, v := range groups.modifiers {
-		query.Set(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
-	return apiURL.String()
+	return toURL(groups.endpoint, groups.modifiers)
 }
 
 // Conf ...

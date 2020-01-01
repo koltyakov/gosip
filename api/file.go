@@ -73,15 +73,9 @@ func NewFile(client *gosip.SPClient, endpoint string, config *RequestConfig) *Fi
 	}
 }
 
-// ToURL ...
+// ToURL gets endpoint with modificators raw URL ...
 func (file *File) ToURL() string {
-	apiURL, _ := url.Parse(file.endpoint)
-	query := apiURL.Query() // url.Values{}
-	for k, v := range file.modifiers {
-		query.Set(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
-	return apiURL.String()
+	return toURL(file.endpoint, file.modifiers)
 }
 
 // Conf ...

@@ -233,3 +233,14 @@ func fixDatesInResponse(data []byte, dateFields []string) []byte {
 	res, _ := json.Marshal(metadata)
 	return res
 }
+
+// Endpoint with OData modifiers toURL helper method
+func toURL(endpoint string, modifiers map[string]string) string {
+	apiURL, _ := url.Parse(endpoint)
+	query := apiURL.Query() // url.Values{}
+	for k, v := range modifiers {
+		query.Set(k, trimMultiline(v))
+	}
+	apiURL.RawQuery = query.Encode()
+	return apiURL.String()
+}

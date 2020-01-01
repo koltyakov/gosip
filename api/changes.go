@@ -74,7 +74,7 @@ func NewChanges(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 	}
 }
 
-// ToURL ...
+// ToURL gets endpoint with modificators raw URL gets endpoint with modificators raw URL
 func (changes *Changes) ToURL() string {
 	return changes.endpoint
 }

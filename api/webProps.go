@@ -1,7 +1,6 @@
 package api
 
 import (
-	"net/url"
 	"strconv"
 
 	"github.com/koltyakov/gosip"
@@ -24,15 +23,9 @@ func NewWebProps(client *gosip.SPClient, endpoint string, config *RequestConfig)
 	}
 }
 
-// ToURL ...
+// ToURL gets endpoint with modificators raw URL ...
 func (webProps *WebProps) ToURL() string {
-	apiURL, _ := url.Parse(webProps.endpoint)
-	query := apiURL.Query() // url.Values{}
-	for k, v := range webProps.modifiers {
-		query.Set(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
-	return apiURL.String()
+	return toURL(webProps.endpoint, webProps.modifiers)
 }
 
 // Conf ...

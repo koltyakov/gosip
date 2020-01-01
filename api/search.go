@@ -76,13 +76,6 @@ type SearchProperty struct {
 	Value SearchPropertyValue `json:"Value"`
 }
 
-// SearchKeyValue - search key value type
-type SearchKeyValue struct {
-	Key       string `json:"Key"`
-	Value     string `json:"Value"`
-	ValueType string `json:"ValueType"`
-}
-
 // SearchPropertyValue - search property value type
 type SearchPropertyValue struct {
 	StrVal                      string   `json:"StrVal"`
@@ -103,7 +96,7 @@ type SearchReorderingRule struct {
 type SearchResults struct {
 	ElapsedTime           int                      `json:"ElapsedTime"`
 	PrimaryQueryResult    *ResultTableCollection   `json:"PrimaryQueryResult"`
-	Properties            []*SearchKeyValue        `json:"Properties"`
+	Properties            []*TypedKeyValue         `json:"Properties"`
 	SecondaryQueryResults []*ResultTableCollection `json:"SecondaryQueryResults"`
 	SpellingSuggestion    string                   `json:"SpellingSuggestion"`
 	TriggeredRules        []interface{}            `json:"TriggeredRules"`
@@ -122,18 +115,18 @@ type ResultTableCollection struct {
 
 // ResultTable - search result table type
 type ResultTable struct {
-	GroupTemplateID              string            `json:"GroupTemplateId"`
-	ItemTemplateID               string            `json:"ItemTemplateId"`
-	ResultTitle                  string            `json:"ResultTitle"`
-	ResultTitleURL               string            `json:"ResultTitleUrl"`
-	RowCount                     int               `json:"RowCount"`
-	TableType                    string            `json:"TableType"`
-	TotalRows                    int               `json:"TotalRows"`
-	TotalRowsIncludingDuplicates int               `json:"TotalRowsIncludingDuplicates"`
-	Properties                   []*SearchKeyValue `json:"Properties"`
+	GroupTemplateID              string           `json:"GroupTemplateId"`
+	ItemTemplateID               string           `json:"ItemTemplateId"`
+	ResultTitle                  string           `json:"ResultTitle"`
+	ResultTitleURL               string           `json:"ResultTitleUrl"`
+	RowCount                     int              `json:"RowCount"`
+	TableType                    string           `json:"TableType"`
+	TotalRows                    int              `json:"TotalRows"`
+	TotalRowsIncludingDuplicates int              `json:"TotalRowsIncludingDuplicates"`
+	Properties                   []*TypedKeyValue `json:"Properties"`
 	Table                        *struct {
 		Rows []*struct {
-			Cells []*SearchKeyValue `json:"Cells"`
+			Cells []*TypedKeyValue `json:"Cells"`
 		} `json:"Rows"`
 	} `json:"Table"`
 	Refiners []*struct {

@@ -17,7 +17,7 @@ func NewSP(client *gosip.SPClient) *SP {
 	return &SP{client: client}
 }
 
-// ToURL ...
+// ToURL gets endpoint with modificators raw URL ...
 func (sp *SP) ToURL() string {
 	return sp.client.AuthCnfg.GetSiteURL()
 }

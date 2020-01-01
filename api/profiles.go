@@ -43,24 +43,20 @@ type ProfileInfo struct {
 
 // ProfilePropsInto ...
 type ProfilePropsInto struct {
-	AccountName           string   `json:"AccountName"`
-	DirectReports         []string `json:"DirectReports"`
-	DisplayName           string   `json:"DisplayName"`
-	Email                 string   `json:"Email"`
-	ExtendedManagers      []string `json:"ExtendedManagers"`
-	ExtendedReports       []string `json:"ExtendedReports"`
-	Peers                 []string `json:"Peers"`
-	IsFollowed            bool     `json:"IsFollowed"`
-	PersonalSiteHostURL   string   `json:"PersonalSiteHostUrl"`
-	PersonalURL           string   `json:"PersonalUrl"`
-	PictureURL            string   `json:"PictureUrl"`
-	Title                 string   `json:"Title"`
-	UserURL               string   `json:"UserUrl"`
-	UserProfileProperties []struct {
-		Key       string `json:"Key"`
-		Value     string `json:"Value"`
-		ValueType string `json:"ValueType"`
-	} `json:"UserProfileProperties"`
+	AccountName           string           `json:"AccountName"`
+	DirectReports         []string         `json:"DirectReports"`
+	DisplayName           string           `json:"DisplayName"`
+	Email                 string           `json:"Email"`
+	ExtendedManagers      []string         `json:"ExtendedManagers"`
+	ExtendedReports       []string         `json:"ExtendedReports"`
+	Peers                 []string         `json:"Peers"`
+	IsFollowed            bool             `json:"IsFollowed"`
+	PersonalSiteHostURL   string           `json:"PersonalSiteHostUrl"`
+	PersonalURL           string           `json:"PersonalUrl"`
+	PictureURL            string           `json:"PictureUrl"`
+	Title                 string           `json:"Title"`
+	UserURL               string           `json:"UserUrl"`
+	UserProfileProperties []*TypedKeyValue `json:"UserProfileProperties"`
 	// LatestPost       string `json:"LatestPost"`
 }
 
@@ -79,15 +75,9 @@ func NewProfiles(client *gosip.SPClient, endpoint string, config *RequestConfig)
 	}
 }
 
-// ToURL ...
+// ToURL gets endpoint with modificators raw URL ...
 func (profiles *Profiles) ToURL() string {
-	apiURL, _ := url.Parse(profiles.endpoint)
-	query := apiURL.Query() // url.Values{}
-	for k, v := range profiles.modifiers {
-		query.Set(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
-	return apiURL.String()
+	return toURL(profiles.endpoint, profiles.modifiers)
 }
 
 // Conf ...

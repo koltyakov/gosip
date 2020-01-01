@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 
 	"github.com/koltyakov/gosip"
 )
@@ -28,15 +27,9 @@ func NewFields(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 	}
 }
 
-// ToURL ...
+// ToURL gets endpoint with modificators raw URL ...
 func (fields *Fields) ToURL() string {
-	apiURL, _ := url.Parse(fields.endpoint)
-	query := apiURL.Query() // url.Values{}
-	for k, v := range fields.modifiers {
-		query.Set(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
-	return apiURL.String()
+	return toURL(fields.endpoint, fields.modifiers)
 }
 
 // Conf ...

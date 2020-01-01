@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -19,25 +18,21 @@ type RecycleBin struct {
 
 // RecycledItem ...
 type RecycledItem struct {
-	AuthorEmail               string    `json:"AuthorEmail"`
-	AuthorName                string    `json:"AuthorName"`
-	DeletedByEmail            string    `json:"DeletedByEmail"`
-	DeletedByName             string    `json:"DeletedByName"`
-	DeletedDate               time.Time `json:"DeletedDate"`
-	DeletedDateLocalFormatted string    `json:"DeletedDateLocalFormatted"`
-	DirName                   string    `json:"DirName"`
-	ID                        string    `json:"Id"`
-	ItemState                 int       `json:"ItemState"`
-	ItemType                  int       `json:"ItemType"`
-	LeafName                  string    `json:"LeafName"`
-	Size                      int       `json:"Size"`
-	Title                     string    `json:"Title"`
-	LeafNamePath              struct {
-		DecodedURL string `json:"DecodedUrl"`
-	} `json:"LeafNamePath"`
-	DirNamePath struct {
-		DecodedURL string `json:"DecodedUrl"`
-	} `json:"DirNamePath"`
+	AuthorEmail               string      `json:"AuthorEmail"`
+	AuthorName                string      `json:"AuthorName"`
+	DeletedByEmail            string      `json:"DeletedByEmail"`
+	DeletedByName             string      `json:"DeletedByName"`
+	DeletedDate               time.Time   `json:"DeletedDate"`
+	DeletedDateLocalFormatted string      `json:"DeletedDateLocalFormatted"`
+	DirName                   string      `json:"DirName"`
+	ID                        string      `json:"Id"`
+	ItemState                 int         `json:"ItemState"`
+	ItemType                  int         `json:"ItemType"`
+	LeafName                  string      `json:"LeafName"`
+	Size                      int         `json:"Size"`
+	Title                     string      `json:"Title"`
+	LeafNamePath              *DecodedURL `json:"LeafNamePath"`
+	DirNamePath               *DecodedURL `json:"DirNamePath"`
 }
 
 // RecycleBinResp - recycle bin response type with helper processor methods
@@ -52,15 +47,9 @@ func NewRecycleBin(client *gosip.SPClient, endpoint string, config *RequestConfi
 	}
 }
 
-// ToURL ...
+// ToURL gets endpoint with modificators raw URL ...
 func (recycleBin *RecycleBin) ToURL() string {
-	apiURL, _ := url.Parse(recycleBin.endpoint)
-	query := apiURL.Query() // url.Values{}
-	for k, v := range recycleBin.modifiers {
-		query.Set(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
-	return apiURL.String()
+	return toURL(recycleBin.endpoint, recycleBin.modifiers)
 }
 
 // Conf ...

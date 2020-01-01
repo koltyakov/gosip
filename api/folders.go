@@ -28,9 +28,10 @@ func NewFolders(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 	}
 }
 
-// ToURL ...
+// ToURL gets endpoint with modificators raw URL ...
 func (folders *Folders) ToURL() string {
-	return folders.endpoint
+	// return folders.endpoint
+	return toURL(folders.endpoint, folders.modifiers)
 }
 
 // Conf ...

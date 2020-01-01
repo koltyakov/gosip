@@ -100,15 +100,9 @@ func NewList(client *gosip.SPClient, endpoint string, config *RequestConfig) *Li
 	}
 }
 
-// ToURL ...
+// ToURL gets endpoint with modificators raw URL ...
 func (list *List) ToURL() string {
-	apiURL, _ := url.Parse(list.endpoint)
-	query := apiURL.Query() // url.Values{}
-	for k, v := range list.modifiers {
-		query.Set(k, trimMultiline(v))
-	}
-	apiURL.RawQuery = query.Encode()
-	return apiURL.String()
+	return toURL(list.endpoint, list.modifiers)
 }
 
 // Conf ...
