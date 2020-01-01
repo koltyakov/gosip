@@ -71,20 +71,20 @@ func (folders *Folders) OrderBy(oDataOrderBy string, ascending bool) *Folders {
 	return folders
 }
 
-// Get ...
+// Get gets this folder data object
 func (folders *Folders) Get() (FoldersResp, error) {
 	sp := NewHTTPClient(folders.client)
 	return sp.Get(folders.ToURL(), getConfHeaders(folders.config))
 }
 
-// Add ...
+// Add created a folder with specified name in this folder
 func (folders *Folders) Add(folderName string) (FolderResp, error) {
 	sp := NewHTTPClient(folders.client)
 	endpoint := fmt.Sprintf("%s/Add('%s')", folders.endpoint, folderName)
 	return sp.Post(endpoint, nil, getConfHeaders(folders.config))
 }
 
-// GetByName ...
+// GetByName gets a folder by its name in this folder
 func (folders *Folders) GetByName(folderName string) *Folder {
 	return NewFolder(
 		folders.client,
