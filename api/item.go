@@ -65,19 +65,26 @@ func (item *Item) Expand(oDataExpand string) *Item {
 	return item
 }
 
-// Get ...
+// Get gets this Item info
 func (item *Item) Get() (ItemResp, error) {
 	sp := NewHTTPClient(item.client)
 	return sp.Get(item.ToURL(), getConfHeaders(item.config))
 }
 
-// Delete ...
+// Delete deletes this Item (can't be restored from a recycle bin)
 func (item *Item) Delete() ([]byte, error) {
 	sp := NewHTTPClient(item.client)
 	return sp.Delete(item.endpoint, getConfHeaders(item.config))
 }
 
-// Update ...
+// Recycle moves this item to the recycle bin
+func (item *Item) Recycle() ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/Recycle", item.endpoint)
+	sp := NewHTTPClient(item.client)
+	return sp.Post(endpoint, nil, getConfHeaders(item.config))
+}
+
+// Update updates item's metadata. `body` parameter is byte array representation of JSON string payload relevalt to item metadata object.
 func (item *Item) Update(body []byte) ([]byte, error) {
 	body = patchMetadataTypeCB(body, func() string {
 		endpoint := getPriorEndpoint(item.endpoint, "/Items")
@@ -89,19 +96,12 @@ func (item *Item) Update(body []byte) ([]byte, error) {
 	return sp.Update(item.endpoint, body, getConfHeaders(item.config))
 }
 
-// Recycle ...
-func (item *Item) Recycle() ([]byte, error) {
-	endpoint := fmt.Sprintf("%s/Recycle", item.endpoint)
-	sp := NewHTTPClient(item.client)
-	return sp.Post(endpoint, nil, getConfHeaders(item.config))
-}
-
-// Roles ...
+// Roles gets Roles API instance queryable collection for this Item
 func (item *Item) Roles() *Roles {
 	return NewRoles(item.client, item.endpoint, item.config)
 }
 
-// Attachments ...
+// Attachments gets attachments collection for this Item
 func (item *Item) Attachments() *Attachments {
 	return NewAttachments(
 		item.client,
@@ -110,7 +110,7 @@ func (item *Item) Attachments() *Attachments {
 	)
 }
 
-// ParentList ...
+// ParentList gets this Item's Lists API object
 func (item *Item) ParentList() *List {
 	return NewList(
 		item.client,
@@ -119,12 +119,12 @@ func (item *Item) ParentList() *List {
 	)
 }
 
-// Records ...
+// Records gets Records API instance object for this Item (inplace records manipulation)
 func (item *Item) Records() *Records {
 	return NewRecords(item)
 }
 
-// ContextInfo ...
+// ContextInfo gets current context information
 func (item *Item) ContextInfo() (*ContextInfo, error) {
 	return NewContext(item.client, item.ToURL(), item.config).Get()
 }
