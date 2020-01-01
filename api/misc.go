@@ -1,16 +1,16 @@
 package api
 
-// StringValue ...
+// StringValue single value prop type
 type StringValue struct {
 	StringValue string `json:"StringValue"`
 }
 
-// DecodedURL ...
+// DecodedURL decode URL prop type
 type DecodedURL struct {
 	DecodedURL string `json:"DecodedUrl"`
 }
 
-// TypedKeyValue - typed key value prop
+// TypedKeyValue typed key value prop type
 type TypedKeyValue struct {
 	Key       string `json:"Key"`
 	Value     string `json:"Value"`

@@ -70,13 +70,13 @@ func (lists *Lists) OrderBy(oDataOrderBy string, ascending bool) *Lists {
 	return lists
 }
 
-// Get ...
+// Get gets Lists API queryable collection
 func (lists *Lists) Get() (ListsResp, error) {
 	sp := NewHTTPClient(lists.client)
 	return sp.Get(lists.ToURL(), getConfHeaders(lists.config))
 }
 
-// GetByTitle ...
+// GetByTitle gets a list by its Display Name (Title)
 func (lists *Lists) GetByTitle(listTitle string) *List {
 	list := NewList(
 		lists.client,
@@ -86,7 +86,7 @@ func (lists *Lists) GetByTitle(listTitle string) *List {
 	return list
 }
 
-// GetByID ...
+// GetByID gets a list by its ID (GUID)
 func (lists *Lists) GetByID(listGUID string) *List {
 	list := NewList(
 		lists.client,
@@ -96,7 +96,9 @@ func (lists *Lists) GetByID(listGUID string) *List {
 	return list
 }
 
-// Add ...
+// Add creates new list on this web with a provided `title`.
+// Along with title additional metadata can be provided in optional `metadata` string map object.
+// `metadata` props should correspond to `SP.List` API type. Some props have defaults as BaseTemplate (100), AllowContentTypes (false), etc.
 func (lists *Lists) Add(title string, metadata map[string]interface{}) (ListResp, error) {
 	if metadata == nil {
 		metadata = make(map[string]interface{})
@@ -129,30 +131,22 @@ func (lists *Lists) Add(title string, metadata map[string]interface{}) (ListResp
 	return sp.Post(lists.endpoint, []byte(body), headers)
 }
 
-// AddWithURI ...
+// AddWithURI creates new list on this web with a provided `title` and `uri`.
+// `url` stands for a system friendly URI (e.g. `custom-list`) while `title` is a human friendly name (e.g. `Custom List`).
+// Along with uri and title additional metadata can be provided in optional `metadata` string map object.
+// `metadata` props should correspond to `SP.List` API type. Some props have defaults as BaseTemplate (100), AllowContentTypes (false), etc.
 func (lists *Lists) AddWithURI(title string, uri string, metadata map[string]interface{}) ([]byte, error) {
 	data, err := lists.Conf(HeadersPresets.Verbose).Add(uri, metadata)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &struct {
-		D struct {
-			ID string `json:"Id"`
-		} `json:"d"`
-	}{}
-
-	if err := json.Unmarshal(data, &res); err != nil {
-		return nil, err
-	}
-
 	metadata = make(map[string]interface{})
 	metadata["__metadata"] = map[string]string{"type": "SP.List"}
 	metadata["Title"] = title
-
 	body, _ := json.Marshal(metadata)
 
-	return lists.GetByID(res.D.ID).Update(body)
+	return lists.GetByID(data.Data().ID).Update(body)
 }
 
 /* Response helpers */
