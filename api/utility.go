@@ -15,14 +15,14 @@ type Utility struct {
 	endpoint string
 }
 
-// EmailProps ...
+// EmailProps struct for SendEmail method parametes
 type EmailProps struct {
-	Subject string
-	Body    string
-	To      []string
-	CC      []string
-	BCC     []string
-	From    string
+	Subject string   // Email subject
+	Body    string   // Email text or HTML body
+	To      []string // Slice of To email addresses to whom Email is intended to be sent
+	CC      []string // Slice of CC email addresses (optional)
+	BCC     []string // Slice of BCC email addresses (optional)
+	From    string   // Sender email addresses (optional)
 }
 
 // NewUtility - Utility struct constructor function
@@ -34,7 +34,7 @@ func NewUtility(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 	}
 }
 
-// SendEmail ...
+// SendEmail sends an email via REST API due to the provided EmailProps options
 func (utility *Utility) SendEmail(options *EmailProps) ([]byte, error) {
 	endpoint := fmt.Sprintf(
 		"%s/_api/SP.Utilities.Utility.SendEmail",
