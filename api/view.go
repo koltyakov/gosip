@@ -82,19 +82,19 @@ func (view *View) Expand(oDataExpand string) *View {
 	return view
 }
 
-// Get ...
+// Get gets this View data response
 func (view *View) Get() (ViewResp, error) {
 	sp := NewHTTPClient(view.client)
 	return sp.Get(view.ToURL(), getConfHeaders(view.config))
 }
 
-// Delete ...
+// Delete deletes this View (can't be restored from a recycle bin)
 func (view *View) Delete() ([]byte, error) {
 	sp := NewHTTPClient(view.client)
 	return sp.Delete(view.endpoint, getConfHeaders(view.config))
 }
 
-// Recycle ...
+// Recycle moves this View to the recycle bin
 func (view *View) Recycle() ([]byte, error) {
 	sp := NewHTTPClient(view.client)
 	endpoint := fmt.Sprintf("%s/Recycle", view.endpoint)
