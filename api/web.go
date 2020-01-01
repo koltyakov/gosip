@@ -102,25 +102,26 @@ func (web *Web) Expand(oDataExpand string) *Web {
 	return web
 }
 
-// Get ...
+// Get gets this Web info
 func (web *Web) Get() (WebResp, error) {
 	sp := NewHTTPClient(web.client)
 	return sp.Get(web.ToURL(), getConfHeaders(web.config))
 }
 
-// Delete ...
+// Delete deletes this Web
 func (web *Web) Delete() ([]byte, error) {
 	sp := NewHTTPClient(web.client)
 	return sp.Delete(web.endpoint, getConfHeaders(web.config))
 }
 
-// Update ...
+// Update updates Web's metadata with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.Web object
 func (web *Web) Update(body []byte) ([]byte, error) {
 	sp := NewHTTPClient(web.client)
 	return sp.Update(web.endpoint, body, getConfHeaders(web.config))
 }
 
-// Lists ...
+// Lists gets Lists API instance object
 func (web *Web) Lists() *Lists {
 	return NewLists(
 		web.client,
@@ -129,7 +130,7 @@ func (web *Web) Lists() *Lists {
 	)
 }
 
-// GetChangeToken ...
+// GetChangeToken gets current change token for this Web
 func (web *Web) GetChangeToken() (string, error) {
 	scoped := NewWeb(web.client, web.endpoint, web.config)
 	data, err := scoped.Select("CurrentChangeToken").Get()
@@ -139,7 +140,7 @@ func (web *Web) GetChangeToken() (string, error) {
 	return data.Data().CurrentChangeToken.StringValue, nil
 }
 
-// GetChanges ...
+// GetChanges gets changes on this Web due to the configuration provided as `changeQuery` parameter
 func (web *Web) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
 	return NewChanges(
 		web.client,
@@ -148,7 +149,7 @@ func (web *Web) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
 	).GetChanges(changeQuery)
 }
 
-// Webs ...
+// Webs gets Webs API instance queryable collection for this Web (Subwebs)
 func (web *Web) Webs() *Webs {
 	return NewWebs(
 		web.client,
@@ -157,7 +158,7 @@ func (web *Web) Webs() *Webs {
 	)
 }
 
-// Props ...
+// Props gets WebProps API instance queryable collection for this Web
 func (web *Web) Props() *WebProps {
 	return NewWebProps(
 		web.client,
@@ -166,7 +167,7 @@ func (web *Web) Props() *WebProps {
 	)
 }
 
-// ContentTypes ...
+// ContentTypes gets ContentTypes API instance queryable collection for this Web
 func (web *Web) ContentTypes() *ContentTypes {
 	return NewContentTypes(
 		web.client,
@@ -175,7 +176,7 @@ func (web *Web) ContentTypes() *ContentTypes {
 	)
 }
 
-// Fields ...
+// Fields gets Fields API instance queryable collection for this Web (Site Columns)
 func (web *Web) Fields() *Fields {
 	return NewFields(
 		web.client,
@@ -184,7 +185,7 @@ func (web *Web) Fields() *Fields {
 	)
 }
 
-// GetList ...
+// GetList gets Lists API instance queryable collection for this Web (Web's Lists)
 func (web *Web) GetList(listURI string) *List {
 	return NewList(
 		web.client,
@@ -193,7 +194,7 @@ func (web *Web) GetList(listURI string) *List {
 	)
 }
 
-// EnsureUser ...
+// EnsureUser ensures a user by a `loginName` parameter and returns UserInfo
 func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
 	sp := NewHTTPClient(web.client)
 	endpoint := fmt.Sprintf("%s/EnsureUser", web.endpoint)
@@ -219,7 +220,7 @@ func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
 	return res.User, nil
 }
 
-// SiteGroups ...
+// SiteGroups gets Groups API instance queryable collection for this Web (Site Groups)
 func (web *Web) SiteGroups() *Groups {
 	return NewGroups(
 		web.client,
@@ -228,7 +229,7 @@ func (web *Web) SiteGroups() *Groups {
 	)
 }
 
-// SiteUsers ...
+// SiteUsers gets Users API instance queryable collection for this Web (Site Users)
 func (web *Web) SiteUsers() *Users {
 	return NewUsers(
 		web.client,
@@ -237,7 +238,7 @@ func (web *Web) SiteUsers() *Users {
 	)
 }
 
-// CurrentUser ...
+// CurrentUser gets current User API instance object
 func (web *Web) CurrentUser() *User {
 	return NewUser(
 		web.client,
@@ -246,7 +247,8 @@ func (web *Web) CurrentUser() *User {
 	)
 }
 
-// GetFolder ...
+// GetFolder gets a folder by its relevant URI, URI can be host relevant (e.g. `/sites/site/lib/folder`)
+// or web relavant (e.g. `lib/folder`, with web relevant URI there should be no slash at the begining)
 func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 	return NewFolder(
 		web.client,
@@ -259,12 +261,14 @@ func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 	)
 }
 
-// EnsureFolder ...
+// EnsureFolder is a helper to ensure a folder by its relevalt URI, when there was no folder it's created
 func (web *Web) EnsureFolder(serverRelativeURL string) ([]byte, error) {
 	return ensureFolder(web, serverRelativeURL, serverRelativeURL)
 }
 
-// GetFile ...
+// GetFile gets File API instance object by its relevant URI
+// File URI can be host relevant (e.g. `/sites/site/lib/folder/file.txt`)
+// or web relavant (e.g. `lib/folder/file.txt`, with web relevant URI there should be no slash at the begining)
 func (web *Web) GetFile(serverRelativeURL string) *File {
 	return NewFile(
 		web.client,
@@ -277,12 +281,12 @@ func (web *Web) GetFile(serverRelativeURL string) *File {
 	)
 }
 
-// Roles ...
+// Roles gets Roles API instance queryable collection for this Web
 func (web *Web) Roles() *Roles {
 	return NewRoles(web.client, web.endpoint, web.config)
 }
 
-// RoleDefinitions ...
+// RoleDefinitions gets RoleDefinitions API instance queryable collection for this Web
 func (web *Web) RoleDefinitions() *RoleDefinitions {
 	return NewRoleDefinitions(
 		web.client,
@@ -291,19 +295,19 @@ func (web *Web) RoleDefinitions() *RoleDefinitions {
 	)
 }
 
-// Features ...
+// Features gets Features API instance queryable collection for this Web
 func (web *Web) Features() *Features {
 	endpoint := fmt.Sprintf("%s/Features", web.endpoint)
 	return NewFeatures(web.client, endpoint, web.config)
 }
 
-// RecycleBin ...
+// RecycleBin gets RecycleBin API instance object for this Web
 func (web *Web) RecycleBin() *RecycleBin {
 	endpoint := fmt.Sprintf("%s/RecycleBin", web.endpoint)
 	return NewRecycleBin(web.client, endpoint, web.config)
 }
 
-// ContextInfo ...
+// ContextInfo gets Context info object for this Web
 func (web *Web) ContextInfo() (*ContextInfo, error) {
 	return NewContext(web.client, web.ToURL(), web.config).Get()
 }
