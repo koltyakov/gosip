@@ -70,13 +70,13 @@ func (files *Files) OrderBy(oDataOrderBy string, ascending bool) *Files {
 	return files
 }
 
-// Get ...
+// Get gets Files collection response
 func (files *Files) Get() (FilesResp, error) {
 	sp := NewHTTPClient(files.client)
 	return sp.Get(files.ToURL(), getConfHeaders(files.config))
 }
 
-// GetByName ...
+// GetByName gets a file by its name
 func (files *Files) GetByName(fileName string) *File {
 	return NewFile(
 		files.client,
@@ -85,7 +85,7 @@ func (files *Files) GetByName(fileName string) *File {
 	)
 }
 
-// Add ...
+// Add uploads file into the folder
 func (files *Files) Add(name string, content []byte, overwrite bool) (FileResp, error) {
 	sp := NewHTTPClient(files.client)
 	endpoint := fmt.Sprintf("%s/Add(overwrite=%t,url='%s')", files.endpoint, overwrite, name)

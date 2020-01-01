@@ -11,9 +11,9 @@ import (
 
 // AddChunkedOptions ...
 type AddChunkedOptions struct {
-	Owerwrite bool
-	Progress  func(data *FileUploadProgressData)
-	ChunkSize int
+	Owerwrite bool                               // should overwrite existing file
+	Progress  func(data *FileUploadProgressData) // on progress callback, execute custom logic on each chunk
+	ChunkSize int                                // chunk size in bytes
 }
 
 // FileUploadProgressData ...
@@ -25,7 +25,7 @@ type FileUploadProgressData struct {
 	FileOffset  int
 }
 
-// AddChunked ...
+// AddChunked uploads a file in chunks (streaming), is a good fit for large files. Supported sinse SharePoint 2016.
 func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunkedOptions) (FileResp, error) {
 	web := NewSP(files.client).Web().Conf(files.config)
 	var file *File
