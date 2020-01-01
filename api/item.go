@@ -32,6 +32,9 @@ type GenericItemInfo struct {
 // ItemResp - item response type with helper processor methods
 type ItemResp []byte
 
+// ListItemAllFieldsResp - item fields response type with helper processor methods
+type ListItemAllFieldsResp []byte
+
 // NewItem - Item struct constructor function
 func NewItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *Item {
 	return &Item{

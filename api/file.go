@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -98,7 +97,7 @@ func (file *File) Expand(oDataExpand string) *File {
 	return file
 }
 
-// Get ...
+// Get gets file data object
 func (file *File) Get() (FileResp, error) {
 	sp := NewHTTPClient(file.client)
 	return sp.Get(file.ToURL(), getConfHeaders(file.config))
@@ -112,25 +111,29 @@ func (file *File) Update(body []byte) ([]byte, error) {
 	return sp.Update(file.endpoint, body, getConfHeaders(file.config))
 }
 
-// Delete ...
+// Delete deletes this file skipping recycle bin
 func (file *File) Delete() ([]byte, error) {
 	sp := NewHTTPClient(file.client)
 	return sp.Delete(file.endpoint, getConfHeaders(file.config))
 }
 
-// Recycle ...
+// Recycle moves this file to the recycle bin
 func (file *File) Recycle() ([]byte, error) {
 	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/Recycle", file.endpoint)
 	return sp.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
-// GetItem ...
-func (file *File) GetItem() (*Item, error) {
+// ListItemAllFields gets this file Item data object metadata
+func (file *File) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	endpoint := fmt.Sprintf("%s/ListItemAllFields", file.endpoint)
 	apiURL, _ := url.Parse(endpoint)
-	query := url.Values{}
-	query.Add("$select", "Id")
+
+	query := apiURL.Query()
+	for k, v := range file.modifiers.Get() {
+		query.Set(k, trimMultiline(v))
+	}
+
 	apiURL.RawQuery = query.Encode()
 	sp := NewHTTPClient(file.client)
 
@@ -138,14 +141,23 @@ func (file *File) GetItem() (*Item, error) {
 	if err != nil {
 		return nil, err
 	}
+	data = parseODataItem(data)
+	return data, nil
+}
+
+// GetItem gets this folder Item API object metadata
+func (file *File) GetItem() (*Item, error) {
+	scoped := NewFile(file.client, file.endpoint, file.config)
+	data, err := scoped.Conf(HeadersPresets.Verbose).Select("Id").ListItemAllFields()
+
+	if err != nil {
+		return nil, err
+	}
 
 	res := &struct {
-		D struct {
-			Metadata struct {
-				ID  string `json:"id"`
-				URI string `json:"uri"`
-			} `json:"__metadata"`
-		} `json:"d"`
+		Metadata struct {
+			URI string `json:"id"`
+		} `json:"__metadata"`
 	}{}
 
 	err = json.Unmarshal(data, &res)
@@ -158,14 +170,14 @@ func (file *File) GetItem() (*Item, error) {
 		fmt.Sprintf(
 			"%s/_api/%s",
 			file.client.AuthCnfg.GetSiteURL(),
-			strings.Split(res.D.Metadata.URI, "/_api")[1],
+			res.Metadata.URI,
 		),
 		file.config,
 	)
 	return item, nil
 }
 
-// CheckIn file, checkInType: 0 - Minor, 1 - Major, 2 - Overwrite
+// CheckIn checks file in, checkInType: 0 - Minor, 1 - Major, 2 - Overwrite
 func (file *File) CheckIn(comment string, checkInType int) ([]byte, error) {
 	endpoint := fmt.Sprintf(
 		"%s/CheckIn(comment='%s',checkintype=%d)",
@@ -177,14 +189,14 @@ func (file *File) CheckIn(comment string, checkInType int) ([]byte, error) {
 	return sp.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
-// CheckOut file
+// CheckOut checks file out
 func (file *File) CheckOut() ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/CheckOut", file.endpoint)
 	sp := NewHTTPClient(file.client)
 	return sp.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
-// UndoCheckOut file
+// UndoCheckOut undoes file check out
 func (file *File) UndoCheckOut() ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/UndoCheckOut", file.endpoint)
 	sp := NewHTTPClient(file.client)

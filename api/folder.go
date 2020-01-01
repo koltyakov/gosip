@@ -114,7 +114,7 @@ func (folder *Folder) Files() *Files {
 }
 
 // ListItemAllFields gets this folder Item data object metadata
-func (folder *Folder) ListItemAllFields() ([]byte, error) {
+func (folder *Folder) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	endpoint := fmt.Sprintf("%s/ListItemAllFields", folder.endpoint)
 	apiURL, _ := url.Parse(endpoint)
 
