@@ -90,13 +90,13 @@ func (recycleBin *RecycleBin) OrderBy(oDataOrderBy string, ascending bool) *Recy
 	return recycleBin
 }
 
-// Get ...
+// Get gets recycled items queryable collection
 func (recycleBin *RecycleBin) Get() (RecycleBinResp, error) {
 	sp := NewHTTPClient(recycleBin.client)
 	return sp.Get(recycleBin.ToURL(), getConfHeaders(recycleBin.config))
 }
 
-// GetByID ...
+// GetByID gets a recycled item by its ID
 func (recycleBin *RecycleBin) GetByID(itemID string) *RecycleBinItem {
 	return NewRecycleBinItem(
 		recycleBin.client,
@@ -147,13 +147,13 @@ func NewRecycleBinItem(client *gosip.SPClient, endpoint string, config *RequestC
 	}
 }
 
-// Get ...
+// Get gets this recycle item data object
 func (recycleBinItem *RecycleBinItem) Get() (RecycleBinItemResp, error) {
 	sp := NewHTTPClient(recycleBinItem.client)
 	return sp.Get(recycleBinItem.endpoint, getConfHeaders(recycleBinItem.config))
 }
 
-// Restore ...
+// Restore restores this recycled item
 func (recycleBinItem *RecycleBinItem) Restore() ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/Restore()", recycleBinItem.endpoint)
 	sp := NewHTTPClient(recycleBinItem.client)
