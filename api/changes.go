@@ -34,36 +34,36 @@ type ChangeInfo struct {
 
 // ChangeQuery ...
 type ChangeQuery struct {
-	ChangeTokenStart      string
-	ChangeTokenEnd        string
-	Add                   bool
-	Alert                 bool
-	ContentType           bool
-	DeleteObject          bool
-	Field                 bool
-	File                  bool
-	Folder                bool
-	Group                 bool
-	GroupMembershipAdd    bool
-	GroupMembershipDelete bool
-	Item                  bool
-	List                  bool
-	Move                  bool
-	Navigation            bool
-	Rename                bool
-	Restore               bool
-	RoleAssignmentAdd     bool
-	RoleAssignmentDelete  bool
-	RoleDefinitionAdd     bool
-	RoleDefinitionDelete  bool
-	RoleDefinitionUpdate  bool
-	SecurityPolicy        bool
-	Site                  bool
-	SystemUpdate          bool
-	Update                bool
-	User                  bool
-	View                  bool
-	Web                   bool
+	ChangeTokenStart      string // Gets or sets a value that specifies the start date and start time for changes that are returned through the query
+	ChangeTokenEnd        string // Gets or sets a value that specifies the end date and end time for changes that are returned through the query
+	Add                   bool   // Gets or sets a value that specifies whether add changes are included in the query
+	Alert                 bool   // Gets or sets a value that specifies whether changes to alerts are included in the query
+	ContentType           bool   // Gets or sets a value that specifies whether changes to content types are included in the query
+	DeleteObject          bool   // Gets or sets a value that specifies whether deleted objects are included in the query
+	Field                 bool   // Gets or sets a value that specifies whether changes to fields are included in the query
+	File                  bool   // Gets or sets a value that specifies whether changes to files are included in the query
+	Folder                bool   // Gets or sets value that specifies whether changes to folders are included in the query
+	Group                 bool   // Gets or sets a value that specifies whether changes to groups are included in the query
+	GroupMembershipAdd    bool   // Gets or sets a value that specifies whether adding users to groups is included in the query
+	GroupMembershipDelete bool   // Gets or sets a value that specifies whether deleting users from the groups is included in the query
+	Item                  bool   // Gets or sets a value that specifies whether general changes to list items are included in the query
+	List                  bool   // Gets or sets a value that specifies whether changes to lists are included in the query
+	Move                  bool   // Gets or sets a value that specifies whether move changes are included in the query
+	Navigation            bool   // Gets or sets a value that specifies whether changes to the navigation structure of a site collection are included in the query
+	Rename                bool   // Gets or sets a value that specifies whether renaming changes are included in the query
+	Restore               bool   // Gets or sets a value that specifies whether restoring items from the recycle bin or from backups is included in the query
+	RoleAssignmentAdd     bool   // Gets or sets a value that specifies whether adding role assignments is included in the query
+	RoleAssignmentDelete  bool   // Gets or sets a value that specifies whether adding role assignments is included in the query
+	RoleDefinitionAdd     bool   // Gets or sets a value that specifies whether adding role assignments is included in the query
+	RoleDefinitionDelete  bool   // Gets or sets a value that specifies whether adding role assignments is included in the query
+	RoleDefinitionUpdate  bool   // Gets or sets a value that specifies whether adding role assignments is included in the query
+	SecurityPolicy        bool   // Gets or sets a value that specifies whether modifications to security policies are included in the query
+	Site                  bool   // Gets or sets a value that specifies whether changes to site collections are included in the query
+	SystemUpdate          bool   // Gets or sets a value that specifies whether updates made using the item SystemUpdate method are included in the query
+	Update                bool   // Gets or sets a value that specifies whether update changes are included in the query
+	User                  bool   // Gets or sets a value that specifies whether changes to users are included in the query
+	View                  bool   // Gets or sets a value that specifies whether changes to views are included in the query
+	Web                   bool   // Gets or sets a value that specifies whether changes to Web sites are included in the query
 }
 
 // NewChanges - Changes struct constructor function
@@ -86,7 +86,7 @@ func (changes *Changes) Conf(config *RequestConfig) *Changes {
 	return changes
 }
 
-// GetChanges ...
+// GetChanges gets changes in scope of the parent container using provided change query
 func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
 	sp := NewHTTPClient(changes.client)
 	metadata := map[string]interface{}{}
