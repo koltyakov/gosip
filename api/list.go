@@ -125,25 +125,27 @@ func (list *List) Expand(oDataExpand string) *List {
 	return list
 }
 
-// Get ...
+// Get gets list's data object
 func (list *List) Get() (ListResp, error) {
 	sp := NewHTTPClient(list.client)
 	return sp.Get(list.ToURL(), getConfHeaders(list.config))
 }
 
-// Delete ...
+// Delete deletes a list (can't be restored from a recycle bin)
 func (list *List) Delete() ([]byte, error) {
 	sp := NewHTTPClient(list.client)
 	return sp.Delete(list.endpoint, getConfHeaders(list.config))
 }
 
-// Update ...
+// Update updates Lists's metadata with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.List object
 func (list *List) Update(body []byte) ([]byte, error) {
+	body = patchMetadataType(body, "SP.List")
 	sp := NewHTTPClient(list.client)
 	return sp.Update(list.endpoint, body, getConfHeaders(list.config))
 }
 
-// Items ...
+// Items gets Items API instance queryable collection
 func (list *List) Items() *Items {
 	return NewItems(
 		list.client,
@@ -152,7 +154,7 @@ func (list *List) Items() *Items {
 	)
 }
 
-// ContentTypes ...
+// ContentTypes gets list's Content Types API instance queryable collection
 func (list *List) ContentTypes() *ContentTypes {
 	return NewContentTypes(
 		list.client,
@@ -161,7 +163,7 @@ func (list *List) ContentTypes() *ContentTypes {
 	)
 }
 
-// GetChangeToken ...
+// GetChangeToken gets current change token for this List
 func (list *List) GetChangeToken() (string, error) {
 	scoped := NewList(list.client, list.endpoint, list.config)
 	data, err := scoped.Select("CurrentChangeToken").Get()
@@ -171,7 +173,7 @@ func (list *List) GetChangeToken() (string, error) {
 	return data.Data().CurrentChangeToken.StringValue, nil
 }
 
-// GetChanges ...
+// GetChanges gets changes on this List due to the configuration provided as `changeQuery` parameter
 func (list *List) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
 	return NewChanges(
 		list.client,
@@ -180,7 +182,7 @@ func (list *List) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
 	).GetChanges(changeQuery)
 }
 
-// Fields ...
+// Fields gets list's Fields API instance queryable collection
 func (list *List) Fields() *Fields {
 	return NewFields(
 		list.client,
@@ -189,7 +191,7 @@ func (list *List) Fields() *Fields {
 	)
 }
 
-// Views ...
+// Views gets list's Views API instance queryable collection
 func (list *List) Views() *Views {
 	return NewViews(
 		list.client,
@@ -198,7 +200,7 @@ func (list *List) Views() *Views {
 	)
 }
 
-// ParentWeb ...
+// ParentWeb gets list's Parent Web API instance object
 func (list *List) ParentWeb() *Web {
 	return NewWeb(
 		list.client,
@@ -207,7 +209,7 @@ func (list *List) ParentWeb() *Web {
 	)
 }
 
-// GetEntityType ...
+// GetEntityType gets list's ListItemEntityTypeFullName
 func (list *List) GetEntityType() (string, error) {
 	scoped := NewList(list.client, list.endpoint, list.config)
 	data, err := scoped.Select("ListItemEntityTypeFullName").Get()
@@ -217,7 +219,7 @@ func (list *List) GetEntityType() (string, error) {
 	return data.Data().ListItemEntityTypeFullName, nil
 }
 
-// ReserveListItemID ...
+// ReserveListItemID reserves item's ID in this list
 func (list *List) ReserveListItemID() (int, error) {
 	sp := NewHTTPClient(list.client)
 	endpoint := fmt.Sprintf("%s/ReserveListItemId", list.endpoint)
@@ -238,7 +240,7 @@ func (list *List) ReserveListItemID() (int, error) {
 	return res.ReserveListItemID, nil
 }
 
-// RenderListData ...
+// RenderListData renders lists content using CAML
 func (list *List) RenderListData(viewXML string) (RenderListDataResp, error) {
 	sp := NewHTTPClient(list.client)
 	apiURL, _ := url.Parse(fmt.Sprintf("%s/RenderListData(@viewXml)", list.endpoint))
@@ -269,12 +271,12 @@ func (list *List) RenderListData(viewXML string) (RenderListDataResp, error) {
 // RenderListDataAsStream ...
 // ToDo
 
-// Roles ...
+// Roles gets list's Roles API instance queryable collection
 func (list *List) Roles() *Roles {
 	return NewRoles(list.client, list.endpoint, list.config)
 }
 
-// ContextInfo ...
+// ContextInfo gets context info for a web of current list
 func (list *List) ContextInfo() (*ContextInfo, error) {
 	return NewContext(list.client, list.ToURL(), list.config).Get()
 }
