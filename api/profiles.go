@@ -88,13 +88,13 @@ func (profiles *Profiles) Conf(config *RequestConfig) *Profiles {
 	return profiles
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (profiles *Profiles) Select(oDataSelect string) *Profiles {
 	profiles.modifiers.AddSelect(oDataSelect)
 	return profiles
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (profiles *Profiles) Expand(oDataExpand string) *Profiles {
 	profiles.modifiers.AddExpand(oDataExpand)
 	return profiles

@@ -70,13 +70,13 @@ func (view *View) Conf(config *RequestConfig) *View {
 	return view
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (view *View) Select(oDataSelect string) *View {
 	view.modifiers.AddSelect(oDataSelect)
 	return view
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (view *View) Expand(oDataExpand string) *View {
 	view.modifiers.AddExpand(oDataExpand)
 	return view

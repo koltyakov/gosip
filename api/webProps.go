@@ -36,13 +36,13 @@ func (webProps *WebProps) Conf(config *RequestConfig) *WebProps {
 	return webProps
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (webProps *WebProps) Select(oDataSelect string) *WebProps {
 	webProps.modifiers.AddSelect(oDataSelect)
 	return webProps
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (webProps *WebProps) Expand(oDataExpand string) *WebProps {
 	webProps.modifiers.AddExpand(oDataExpand)
 	return webProps

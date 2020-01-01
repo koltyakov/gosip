@@ -72,13 +72,13 @@ func (field *Field) Conf(config *RequestConfig) *Field {
 	return field
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (field *Field) Select(oDataSelect string) *Field {
 	field.modifiers.AddSelect(oDataSelect)
 	return field
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (field *Field) Expand(oDataExpand string) *Field {
 	field.modifiers.AddExpand(oDataExpand)
 	return field

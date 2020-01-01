@@ -40,31 +40,31 @@ func (webs *Webs) Conf(config *RequestConfig) *Webs {
 	return webs
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (webs *Webs) Select(oDataSelect string) *Webs {
 	webs.modifiers.AddSelect(oDataSelect)
 	return webs
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (webs *Webs) Expand(oDataExpand string) *Webs {
 	webs.modifiers.AddExpand(oDataExpand)
 	return webs
 }
 
-// Filter ...
+// Filter adds $filter OData modifier
 func (webs *Webs) Filter(oDataFilter string) *Webs {
 	webs.modifiers.AddFilter(oDataFilter)
 	return webs
 }
 
-// Top ...
+// Top adds $top OData modifier
 func (webs *Webs) Top(oDataTop int) *Webs {
 	webs.modifiers.AddTop(oDataTop)
 	return webs
 }
 
-// OrderBy ...
+// OrderBy adds $orderby OData modifier
 func (webs *Webs) OrderBy(oDataOrderBy string, ascending bool) *Webs {
 	webs.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return webs

@@ -56,13 +56,13 @@ func (group *Group) Conf(config *RequestConfig) *Group {
 	return group
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (group *Group) Select(oDataSelect string) *Group {
 	group.modifiers.AddSelect(oDataSelect)
 	return group
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (group *Group) Expand(oDataExpand string) *Group {
 	group.modifiers.AddExpand(oDataExpand)
 	return group

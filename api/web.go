@@ -90,13 +90,13 @@ func (web *Web) Conf(config *RequestConfig) *Web {
 	return web
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (web *Web) Select(oDataSelect string) *Web {
 	web.modifiers.AddSelect(oDataSelect)
 	return web
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (web *Web) Expand(oDataExpand string) *Web {
 	web.modifiers.AddExpand(oDataExpand)
 	return web

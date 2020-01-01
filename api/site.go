@@ -84,13 +84,13 @@ func (site *Site) Conf(config *RequestConfig) *Site {
 	return site
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (site *Site) Select(oDataSelect string) *Site {
 	site.modifiers.AddSelect(oDataSelect)
 	return site
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (site *Site) Expand(oDataExpand string) *Site {
 	site.modifiers.AddExpand(oDataExpand)
 	return site

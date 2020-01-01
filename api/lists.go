@@ -40,31 +40,31 @@ func (lists *Lists) Conf(config *RequestConfig) *Lists {
 	return lists
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (lists *Lists) Select(oDataSelect string) *Lists {
 	lists.modifiers.AddSelect(oDataSelect)
 	return lists
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (lists *Lists) Expand(oDataExpand string) *Lists {
 	lists.modifiers.AddExpand(oDataExpand)
 	return lists
 }
 
-// Filter ...
+// Filter adds $filter OData modifier
 func (lists *Lists) Filter(oDataFilter string) *Lists {
 	lists.modifiers.AddFilter(oDataFilter)
 	return lists
 }
 
-// Top ...
+// Top adds $top OData modifier
 func (lists *Lists) Top(oDataTop int) *Lists {
 	lists.modifiers.AddTop(oDataTop)
 	return lists
 }
 
-// OrderBy ...
+// OrderBy adds $orderby OData modifier
 func (lists *Lists) OrderBy(oDataOrderBy string, ascending bool) *Lists {
 	lists.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return lists

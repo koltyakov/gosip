@@ -54,13 +54,13 @@ func (ct *ContentType) Conf(config *RequestConfig) *ContentType {
 	return ct
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (ct *ContentType) Select(oDataSelect string) *ContentType {
 	ct.modifiers.AddSelect(oDataSelect)
 	return ct
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (ct *ContentType) Expand(oDataExpand string) *ContentType {
 	ct.modifiers.AddExpand(oDataExpand)
 	return ct

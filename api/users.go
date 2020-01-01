@@ -41,31 +41,31 @@ func (users *Users) Conf(config *RequestConfig) *Users {
 	return users
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (users *Users) Select(oDataSelect string) *Users {
 	users.modifiers.AddSelect(oDataSelect)
 	return users
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (users *Users) Expand(oDataExpand string) *Users {
 	users.modifiers.AddExpand(oDataExpand)
 	return users
 }
 
-// Filter ...
+// Filter adds $filter OData modifier
 func (users *Users) Filter(oDataFilter string) *Users {
 	users.modifiers.AddFilter(oDataFilter)
 	return users
 }
 
-// Top ...
+// Top adds $top OData modifier
 func (users *Users) Top(oDataTop int) *Users {
 	users.modifiers.AddTop(oDataTop)
 	return users
 }
 
-// OrderBy ...
+// OrderBy adds $orderby OData modifier
 func (users *Users) OrderBy(oDataOrderBy string, ascending bool) *Users {
 	users.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return users

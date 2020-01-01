@@ -40,31 +40,31 @@ func (views *Views) Conf(config *RequestConfig) *Views {
 	return views
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (views *Views) Select(oDataSelect string) *Views {
 	views.modifiers.AddSelect(oDataSelect)
 	return views
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (views *Views) Expand(oDataExpand string) *Views {
 	views.modifiers.AddExpand(oDataExpand)
 	return views
 }
 
-// Filter ...
+// Filter adds $filter OData modifier
 func (views *Views) Filter(oDataFilter string) *Views {
 	views.modifiers.AddFilter(oDataFilter)
 	return views
 }
 
-// Top ...
+// Top adds $top OData modifier
 func (views *Views) Top(oDataTop int) *Views {
 	views.modifiers.AddTop(oDataTop)
 	return views
 }
 
-// OrderBy ...
+// OrderBy adds $orderby OData modifier
 func (views *Views) OrderBy(oDataOrderBy string, ascending bool) *Views {
 	views.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return views

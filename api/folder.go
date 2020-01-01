@@ -56,13 +56,13 @@ func (folder *Folder) Conf(config *RequestConfig) *Folder {
 	return folder
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (folder *Folder) Select(oDataSelect string) *Folder {
 	folder.modifiers.AddSelect(oDataSelect)
 	return folder
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (folder *Folder) Expand(oDataExpand string) *Folder {
 	folder.modifiers.AddExpand(oDataExpand)
 	return folder

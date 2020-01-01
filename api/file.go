@@ -86,13 +86,13 @@ func (file *File) Conf(config *RequestConfig) *File {
 	return file
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (file *File) Select(oDataSelect string) *File {
 	file.modifiers.AddSelect(oDataSelect)
 	return file
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (file *File) Expand(oDataExpand string) *File {
 	file.modifiers.AddExpand(oDataExpand)
 	return file

@@ -113,13 +113,13 @@ func (list *List) Conf(config *RequestConfig) *List {
 	return list
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (list *List) Select(oDataSelect string) *List {
 	list.modifiers.AddSelect(oDataSelect)
 	return list
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (list *List) Expand(oDataExpand string) *List {
 	list.modifiers.AddExpand(oDataExpand)
 	return list

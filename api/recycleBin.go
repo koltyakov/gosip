@@ -60,31 +60,31 @@ func (recycleBin *RecycleBin) Conf(config *RequestConfig) *RecycleBin {
 	return recycleBin
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (recycleBin *RecycleBin) Select(oDataSelect string) *RecycleBin {
 	recycleBin.modifiers.AddSelect(oDataSelect)
 	return recycleBin
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (recycleBin *RecycleBin) Expand(oDataExpand string) *RecycleBin {
 	recycleBin.modifiers.AddExpand(oDataExpand)
 	return recycleBin
 }
 
-// Filter ...
+// Filter adds $filter OData modifier
 func (recycleBin *RecycleBin) Filter(oDataFilter string) *RecycleBin {
 	recycleBin.modifiers.AddFilter(oDataFilter)
 	return recycleBin
 }
 
-// Top ...
+// Top adds $top OData modifier
 func (recycleBin *RecycleBin) Top(oDataTop int) *RecycleBin {
 	recycleBin.modifiers.AddTop(oDataTop)
 	return recycleBin
 }
 
-// OrderBy ...
+// OrderBy adds $orderby OData modifier
 func (recycleBin *RecycleBin) OrderBy(oDataOrderBy string, ascending bool) *RecycleBin {
 	recycleBin.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return recycleBin

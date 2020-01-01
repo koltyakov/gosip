@@ -40,31 +40,31 @@ func (files *Files) Conf(config *RequestConfig) *Files {
 	return files
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (files *Files) Select(oDataSelect string) *Files {
 	files.modifiers.AddSelect(oDataSelect)
 	return files
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (files *Files) Expand(oDataExpand string) *Files {
 	files.modifiers.AddExpand(oDataExpand)
 	return files
 }
 
-// Filter ...
+// Filter adds $filter OData modifier
 func (files *Files) Filter(oDataFilter string) *Files {
 	files.modifiers.AddFilter(oDataFilter)
 	return files
 }
 
-// Top ...
+// Top adds $top OData modifier
 func (files *Files) Top(oDataTop int) *Files {
 	files.modifiers.AddTop(oDataTop)
 	return files
 }
 
-// OrderBy ...
+// OrderBy adds $orderby OData modifier
 func (files *Files) OrderBy(oDataOrderBy string, ascending bool) *Files {
 	files.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return files

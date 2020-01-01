@@ -53,13 +53,13 @@ func (item *Item) Conf(config *RequestConfig) *Item {
 	return item
 }
 
-// Select ...
+// Select adds $select OData modifier
 func (item *Item) Select(oDataSelect string) *Item {
 	item.modifiers.AddSelect(oDataSelect)
 	return item
 }
 
-// Expand ...
+// Expand adds $expand OData modifier
 func (item *Item) Expand(oDataExpand string) *Item {
 	item.modifiers.AddExpand(oDataExpand)
 	return item
