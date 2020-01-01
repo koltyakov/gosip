@@ -14,11 +14,13 @@ func TestProfiles(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Run("Get", func(t *testing.T) {
-		if _, err := profiles.Get(); err != nil {
-			t.Error(err)
-		}
-	})
+	// t.Run("Get", func(t *testing.T) {
+	// 	data, err := profiles.Get()
+	// 	if err != nil {
+	// 		t.Error(err)
+	// 	}
+	// 	fmt.Printf("%s\n", data)
+	// })
 
 	t.Run("GetMyProperties", func(t *testing.T) {
 		profile, err := profiles.GetMyProperties()

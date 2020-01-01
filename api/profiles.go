@@ -100,13 +100,13 @@ func (profiles *Profiles) Expand(oDataExpand string) *Profiles {
 	return profiles
 }
 
-// Get ...
-func (profiles *Profiles) Get() ([]byte, error) {
-	sp := NewHTTPClient(profiles.client)
-	return sp.Get(profiles.ToURL(), getConfHeaders(profiles.config))
-}
+// // Get ...
+// func (profiles *Profiles) Get() ([]byte, error) {
+// 	sp := NewHTTPClient(profiles.client)
+// 	return sp.Get(profiles.ToURL(), getConfHeaders(profiles.config))
+// }
 
-// GetMyProperties ...
+// GetMyProperties gets current context user profile properties
 func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(profiles.endpoint + "/GetMyProperties")
@@ -118,7 +118,7 @@ func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {
 	return sp.Post(apiURL.String(), nil, getConfHeaders(profiles.config))
 }
 
-// GetPropertiesFor ...
+// GetPropertiesFor gets properties of a specified user profile (by user login name)
 func (profiles *Profiles) GetPropertiesFor(loginName string) (ProfilePropsResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
@@ -133,7 +133,7 @@ func (profiles *Profiles) GetPropertiesFor(loginName string) (ProfilePropsResp, 
 	return sp.Get(apiURL.String(), getConfHeaders(profiles.config))
 }
 
-// GetUserProfilePropertyFor ...
+// GetUserProfilePropertyFor gets specific properte of a specified user profile (by user login name)
 func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property string) ([]byte, error) {
 	sp := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint +
@@ -143,7 +143,7 @@ func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property s
 	return sp.Get(endpoint, getConfHeaders(profiles.config))
 }
 
-// GetOwnerUserProfile ...
+// GetOwnerUserProfile gets owner's user profile
 func (profiles *Profiles) GetOwnerUserProfile() (ProfileResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
@@ -158,7 +158,7 @@ func (profiles *Profiles) GetOwnerUserProfile() (ProfileResp, error) {
 	return sp.Post(apiURL.String(), nil, getConfHeaders(profiles.config))
 }
 
-// UserProfile ...
+// UserProfile gets current context user profile object
 func (profiles *Profiles) UserProfile() (ProfileResp, error) {
 	sp := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
@@ -173,7 +173,7 @@ func (profiles *Profiles) UserProfile() (ProfileResp, error) {
 	return sp.Post(apiURL.String(), nil, getConfHeaders(profiles.config))
 }
 
-// SetSingleValueProfileProperty ...
+// SetSingleValueProfileProperty sets a single value property for the profile by its email
 func (profiles *Profiles) SetSingleValueProfileProperty(loginName string, property string, value string) ([]byte, error) {
 	sp := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint + "/SetSingleValueProfileProperty"
@@ -185,7 +185,7 @@ func (profiles *Profiles) SetSingleValueProfileProperty(loginName string, proper
 	return sp.Post(endpoint, body, getConfHeaders(profiles.config))
 }
 
-// SetMultiValuedProfileProperty ...
+// SetMultiValuedProfileProperty sets a multi value property for the profile by its email
 func (profiles *Profiles) SetMultiValuedProfileProperty(loginName string, property string, values []string) ([]byte, error) {
 	sp := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint + "/SetMultiValuedProfileProperty"
@@ -197,7 +197,7 @@ func (profiles *Profiles) SetMultiValuedProfileProperty(loginName string, proper
 	return sp.Post(endpoint, body, getConfHeaders(profiles.config))
 }
 
-// HideSuggestion ...
+// HideSuggestion removes the specified user from the user's list of suggested people to follow
 func (profiles *Profiles) HideSuggestion(loginName string) ([]byte, error) {
 	sp := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint + "/HideSuggestion('" + url.QueryEscape(loginName) + "')"
