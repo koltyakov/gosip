@@ -22,47 +22,47 @@ type SearchResp []byte
 
 // SearchQuery - strongly typed struct for search method parameters
 type SearchQuery struct {
-	QueryText                             string                  `json:"Querytext"`
-	QueryTemplate                         string                  `json:"QueryTemplate"`
-	EnableInterleaving                    bool                    `json:"EnableInterleaving"`
-	EnableStemming                        bool                    `json:"EnableStemming"`
-	TrimDuplicates                        bool                    `json:"TrimDuplicates"`
-	EnableNicknames                       bool                    `json:"EnableNicknames"`
-	EnableFQL                             bool                    `json:"EnableFQL"`
-	EnablePhonetic                        bool                    `json:"EnablePhonetic"`
-	BypassResultTypes                     bool                    `json:"BypassResultTypes"`
-	ProcessBestBets                       bool                    `json:"ProcessBestBets"`
-	EnableQueryRules                      bool                    `json:"EnableQueryRules"`
-	EnableSorting                         bool                    `json:"EnableSorting"`
-	GenerateBlockRankLog                  bool                    `json:"GenerateBlockRankLog"`
-	SourceID                              string                  `json:"SourceId"`
-	RankingModelID                        string                  `json:"RankingModelId"`
-	StartRow                              int                     `json:"StartRow"`
-	RowLimit                              int                     `json:"RowLimit"`
-	RowsPerPage                           int                     `json:"RowsPerPage"`
-	SelectProperties                      []string                `json:"SelectProperties"`
-	Culture                               int                     `json:"Culture"`
-	RefinementFilters                     []string                `json:"RefinementFilters"`
-	Refiners                              string                  `json:"Refiners"`
-	HiddenConstraints                     string                  `json:"HiddenConstraints"`
-	Timeout                               int                     `json:"Timeout"`
-	HitHighlightedProperties              []string                `json:"HitHighlightedProperties"`
-	ClientType                            string                  `json:"ClientType"`
-	PersonalizationData                   string                  `json:"PersonalizationData"`
-	ResultsURL                            string                  `json:"ResultsUrl"`
-	QueryTag                              string                  `json:"QueryTag"`
-	ProcessPersonalFavorites              bool                    `json:"ProcessPersonalFavorites"`
-	QueryTemplatePropertiesURL            string                  `json:"QueryTemplatePropertiesUrl"`
-	HitHighlightedMultivaluePropertyLimit int                     `json:"HitHighlightedMultivaluePropertyLimit"`
-	EnableOrderingHitHighlightedProperty  bool                    `json:"EnableOrderingHitHighlightedProperty"`
-	CollapseSpecification                 string                  `json:"CollapseSpecification"`
-	UIlanguage                            int                     `json:"UIlanguage"`
-	DesiredSnippetLength                  int                     `json:"DesiredSnippetLength"`
-	MaxSnippetLength                      int                     `json:"MaxSnippetLength"`
-	SummaryLength                         int                     `json:"SummaryLength"`
-	SortList                              []*SearchSort           `json:"SortList"`
-	Properties                            []*SearchProperty       `json:"Properties"`
-	ReorderingRules                       []*SearchReorderingRule `json:"ReorderingRules"`
+	QueryText                             string                  `json:"Querytext"`                             // A string that contains the text for the search query
+	QueryTemplate                         string                  `json:"QueryTemplate"`                         // A string that contains the text that replaces the query text, as part of a query transform
+	EnableInterleaving                    bool                    `json:"EnableInterleaving"`                    // A Boolean value that specifies whether the result tables that are returned for the result block are mixed with the result tables that are returned for the original query
+	EnableStemming                        bool                    `json:"EnableStemming"`                        // A Boolean value that specifies whether stemming is enabled
+	TrimDuplicates                        bool                    `json:"TrimDuplicates"`                        // A Boolean value that specifies whether duplicate items are removed from the results
+	EnableNicknames                       bool                    `json:"EnableNicknames"`                       // A Boolean value that specifies whether the exact terms in the search query are used to find matches, or if nicknames are used also
+	EnableFQL                             bool                    `json:"EnableFQL"`                             // A Boolean value that specifies whether the query uses the FAST Query Language (FQL)
+	EnablePhonetic                        bool                    `json:"EnablePhonetic"`                        // A Boolean value that specifies whether the phonetic forms of the query terms are used to find matches
+	BypassResultTypes                     bool                    `json:"BypassResultTypes"`                     // A Boolean value that specifies whether to perform result type processing for the query
+	ProcessBestBets                       bool                    `json:"ProcessBestBets"`                       // A Boolean value that specifies whether to return best bet results for the query. This parameter is used only when EnableQueryRules is set to true, otherwise it is ignored.
+	EnableQueryRules                      bool                    `json:"EnableQueryRules"`                      // A Boolean value that specifies whether to enable query rules for the query
+	EnableSorting                         bool                    `json:"EnableSorting"`                         // A Boolean value that specifies whether to sort search results
+	GenerateBlockRankLog                  bool                    `json:"GenerateBlockRankLog"`                  // Specifies whether to return block rank log information in the BlockRankLog property of the interleaved result table. A block rank log contains the textual information on the block score and the documents that were de-duplicated.
+	SourceID                              string                  `json:"SourceId"`                              // The result source ID to use for executing the search query
+	RankingModelID                        string                  `json:"RankingModelId"`                        // The ID of the ranking model to use for the query
+	StartRow                              int                     `json:"StartRow"`                              // The first row that is included in the search results that are returned. You use this parameter when you want to implement paging for search results.
+	RowLimit                              int                     `json:"RowLimit"`                              // The maximum number of rows overall that are returned in the search results. Compared to RowsPerPage, RowLimit is the maximum number of rows returned overall.
+	RowsPerPage                           int                     `json:"RowsPerPage"`                           // The maximum number of rows to return per page. Compared to RowLimit, RowsPerPage refers to the maximum number of rows to return per page, and is used primarily when you want to implement paging for search results.
+	SelectProperties                      []string                `json:"SelectProperties"`                      // The managed properties to return in the search results
+	Culture                               int                     `json:"Culture"`                               // The locale ID (LCID) for the query
+	RefinementFilters                     []string                `json:"RefinementFilters"`                     // The set of refinement filters used when issuing a refinement query (FQL)
+	Refiners                              string                  `json:"Refiners"`                              // The set of refiners to return in a search result
+	HiddenConstraints                     string                  `json:"HiddenConstraints"`                     // The additional query terms to append to the query
+	Timeout                               int                     `json:"Timeout"`                               // The amount of time in milliseconds before the query request times out
+	HitHighlightedProperties              []string                `json:"HitHighlightedProperties"`              // The properties to highlight in the search result summary when the property value matches the search terms entered by the user
+	ClientType                            string                  `json:"ClientType"`                            // The type of the client that issued the query
+	PersonalizationData                   string                  `json:"PersonalizationData"`                   // The GUID for the user who submitted the search query
+	ResultsURL                            string                  `json:"ResultsUrl"`                            // The URL for the search results page
+	QueryTag                              string                  `json:"QueryTag"`                              // Custom tags that identify the query. You can specify multiple query tags
+	ProcessPersonalFavorites              bool                    `json:"ProcessPersonalFavorites"`              // A Boolean value that specifies whether to return personal favorites with the search results
+	QueryTemplatePropertiesURL            string                  `json:"QueryTemplatePropertiesUrl"`            // The location of the queryparametertemplate.xml file. This file is used to enable anonymous users to make Search REST queries
+	HitHighlightedMultivaluePropertyLimit int                     `json:"HitHighlightedMultivaluePropertyLimit"` // The number of properties to show hit highlighting for in the search results
+	EnableOrderingHitHighlightedProperty  bool                    `json:"EnableOrderingHitHighlightedProperty"`  // A Boolean value that specifies whether the hit highlighted properties can be ordered
+	CollapseSpecification                 string                  `json:"CollapseSpecification"`                 // The managed properties that are used to determine how to collapse individual search results. Results are collapsed into one or a specified number of results if they match any of the individual collapse specifications. In a collapse specification, results are collapsed if their properties match all individual properties in the collapse specification.
+	UIlanguage                            int                     `json:"UIlanguage"`                            // The locale identifier (LCID) of the user interface
+	DesiredSnippetLength                  int                     `json:"DesiredSnippetLength"`                  // The preferred number of characters to display in the hit-highlighted summary generated for a search result
+	MaxSnippetLength                      int                     `json:"MaxSnippetLength"`                      // The maximum number of characters to display in the hit-highlighted summary generated for a search result
+	SummaryLength                         int                     `json:"SummaryLength"`                         // The number of characters to display in the result summary for a search result
+	SortList                              []*SearchSort           `json:"SortList"`                              // The list of properties by which the search results are ordered
+	Properties                            []*SearchProperty       `json:"Properties"`                            // Properties to be used to configure the search query
+	ReorderingRules                       []*SearchReorderingRule `json:"ReorderingRules"`                       // Special rules for reordering search results. These rules can specify that documents matching certain conditions are ranked higher or lower in the results. This property applies only when search results are sorted based on rank.
 }
 
 // SearchSort - search sort property type
@@ -151,7 +151,7 @@ func NewSearch(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 	}
 }
 
-// PostQuery ...
+// PostQuery gets search results based on a `query`
 func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 	endpoint := fmt.Sprintf("%s/PostQuery", search.endpoint)
 	sp := NewHTTPClient(search.client)
