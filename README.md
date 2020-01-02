@@ -249,7 +249,7 @@ JSON and struct representations are different in terms of language notations. So
 
 ### SAML Auth (SharePoint Online user credentials authentication)
 
-This authentication option uses Microsoft Online Security Token Service `https://login.microsoftonline.com/extSTS.srf` and SAML tokens in order to obtain authentication cookie. As soon as cookie obtained, you need to attach it to your HTTP request in order to run authenticated queries against SharePoint Online.
+This authentication option uses Microsoft Online Security Token Service `https://login.microsoftonline.com/extSTS.srf` and SAML tokens in order to obtain authentication cookie.
 
 ```golang
 // AuthCnfg - SAML auth config structure
@@ -312,11 +312,11 @@ type AuthCnfg struct {
 
 See more details [ADFS user credentials authentication](https://github.com/s-kainet/node-sp-auth/wiki/ADFS-user-credentials-authentication).
 
-Gosip's ADFS also support a scenario of ADFS or NTML behind WAP (Web Application Proxy) which adds additional auth flow and `EdgeAccessCookie` involved into play.
+Gosip's ADFS also supports a scenario of ADFS or NTML behind WAP (Web Application Proxy) which adds additional auth flow and `EdgeAccessCookie` involved into play.
 
 ### FBA/TMG Auth (Form-based authentication)
 
-Form-based authentication for SharePoint On-Premises.
+FBA - Form-based authentication for SharePoint On-Premises.
 
 TMG - Microsoft Forefront Threat Management Gateway, currently legacy but was a popular way of exposing SharePoint into external world back in the days.
 
