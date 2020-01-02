@@ -1,3 +1,11 @@
+/*
+Package addin implements AddIn Only Auth
+
+This type of authentication uses AddIn Only policy and OAuth bearer tokens for authenticating HTTP requests.
+
+Amongst supported platform versions are:
+	- SharePoint Online (SPO)
+*/
 package addin
 
 import (
@@ -11,11 +19,18 @@ import (
 )
 
 // AuthCnfg - AddIn Only auth config structure
+/* SharePoint Online config sample:
+{
+  "siteUrl": "https://contoso.sharepoint.com/sites/test",
+  "clientId": "e2763c6d-7ee6-41d6-b15c-dd1f75f90b8f",
+  "clientSecret": "OqDSAAuBChzI+uOX0OUhXxiOYo1g6X7mjXCVA9mSF/0="
+}
+*/
 type AuthCnfg struct {
-	SiteURL      string `json:"siteUrl"`
-	ClientID     string `json:"clientId"`
-	ClientSecret string `json:"clientSecret"`
-	Realm        string `json:"realm"`
+	SiteURL      string `json:"siteUrl"`      // SPSite or SPWeb URL, which is the context target for the API calls
+	ClientID     string `json:"clientId"`     // Client ID obtained when registering the AddIn
+	ClientSecret string `json:"clientSecret"` // Client Secret obtained when registering the AddIn
+	Realm        string `json:"realm"`        // Your SharePoint Online tenant ID (optional)
 
 	masterKey string
 }

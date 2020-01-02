@@ -1,3 +1,4 @@
+// SharePoint REST API POST requests API Digest helper
 package gosip
 
 import (

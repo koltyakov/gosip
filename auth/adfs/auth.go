@@ -1,3 +1,10 @@
+/*
+Package adfs implements ADFS Auth (user credentials authentication)
+
+Amongst supported platform versions are:
+	- SharePoint Online (SPO)
+	- On-Prem: 2019, 2016, and 2013
+*/
 package adfs
 
 import (
@@ -12,8 +19,35 @@ import (
 )
 
 // AuthCnfg - ADFS auth config structure
+/* On-Premises config sample:
+{
+  "siteUrl": "https://www.contoso.com/sites/test",
+  "username": "john.doe@contoso.com",
+  "password": "this-is-not-a-real-password",
+  "relyingParty": "urn:sharepoint:www",
+  "adfsUrl": "https://login.contoso.com",
+  "adfsCookie": "FedAuth"
+}
+*/
+/* On-Premises behind WAP config sample:
+{
+  "siteUrl": "https://www.contoso.com/sites/test",
+  "username": "john.doe@contoso.com",
+  "password": "this-is-not-a-real-password",
+  "relyingParty": "urn:AppProxy:com",
+  "adfsUrl": "https://login.contoso.com",
+  "adfsCookie": "EdgeAccessCookie"
+}
+*/
+/* SharePoint Online config sample:
+{
+  "siteUrl": "https://www.contoso.com/sites/test",
+  "username": "john.doe@contoso.com",
+  "password": "this-is-not-a-real-password"
+}
+*/
 type AuthCnfg struct {
-	SiteURL      string `json:"siteUrl"`
+	SiteURL      string `json:"siteUrl"` // SPSite or SPWeb URL, which is the context target for the API calls
 	Domain       string `json:"domain"`
 	Username     string `json:"username"`
 	Password     string `json:"password"`

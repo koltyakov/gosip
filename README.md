@@ -68,7 +68,7 @@ auth := &strategy.AuthCnfg{
 
 AuthCnfg's from different strategies contains different options relevant for a specified auth type.
 
-The authentication options can be provided explicitly or can be read from a configuration file.
+The authentication options can be provided explicitly or can be read from a configuration file (see [more](#authentication-strategies-1))).
 
 ```golang
 configPath := "./config/private.json"
@@ -232,7 +232,7 @@ SPClient has `Execute` method which is a wrapper function injecting SharePoint a
 
 ## Authentication strategies
 
-Auth strategy should be selected corresponding your SharePoint environment and its configuration.
+Auth strategy should be selected correspondin to your SharePoint environment and its configuration.
 
 Import path `strategy "github.com/koltyakov/gosip/auth/{strategy}"`. Where `/{strategy}` stands for a strategy auth package.
 
@@ -254,9 +254,12 @@ This authentication option uses Microsoft Online Security Token Service `https:/
 ```golang
 // AuthCnfg - SAML auth config structure
 type AuthCnfg struct {
-	SiteURL  string `json:"siteUrl"`  // SPSite or SPWeb URL, which is the context target for the API calls
-	Username string `json:"username"` // Username for SharePoint Online, for example `[user]@[company].onmicrosoft.com`
-	Password string `json:"password"` // User or App password
+	// SPSite or SPWeb URL, which is the context target for the API calls
+	SiteURL string `json:"siteUrl"`
+	// Username for SharePoint Online, for example `[user]@[company].onmicrosoft.com`
+	Username string `json:"username"`
+	// User or App password
+	Password string `json:"password"`
 }
 ```
 
@@ -267,10 +270,14 @@ This type of authentication uses AddIn Only policy and OAuth bearer tokens for a
 ```golang
 // AuthCnfg - AddIn Only auth config structure
 type AuthCnfg struct {
-	SiteURL      string `json:"siteUrl"`      // SPSite or SPWeb URL, which is the context target for the API calls
-	ClientID     string `json:"clientId"`     // Client ID obtained when registering the AddIn
-	ClientSecret string `json:"clientSecret"` // Client Secret obtained when registering the AddIn
-	Realm        string `json:"realm"`        // Your SharePoint Online tenant ID (optional)
+	// SPSite or SPWeb URL, which is the context target for the API calls
+	SiteURL string `json:"siteUrl"`
+	// Client ID obtained when registering the AddIn
+	ClientID string `json:"clientId"`
+	// Client Secret obtained when registering the AddIn
+	ClientSecret string `json:"clientSecret"`
+	// Your SharePoint Online tenant ID (optional)
+	Realm string `json:"realm"`
 }
 ```
 
@@ -285,7 +292,8 @@ This type of authentication uses HTTP NTLM handshake in order to obtain authenti
 ```golang
 // AuthCnfg - NTML auth config structure
 type AuthCnfg struct {
-	SiteURL  string `json:"siteUrl"`  // SPSite or SPWeb URL, which is the context target for the API calls
+	// SPSite or SPWeb URL, which is the context target for the API calls
+	SiteURL  string `json:"siteUrl"`
 	Domain   string `json:"domain"`   // AD domain name
 	Username string `json:"username"` // AD user name
 	Password string `json:"password"` // AD user password
@@ -294,12 +302,13 @@ type AuthCnfg struct {
 
 Gosip uses `github.com/Azure/go-ntlmssp` NTLM negotiator, however a custom one also can be [provided](https://github.com/koltyakov/gosip/issues/14) in case of demand.
 
-### ADFS Auth (user credentials authentication))
+### ADFS Auth (user credentials authentication)
 
 ```golang
 // AuthCnfg - ADFS auth config structure
 type AuthCnfg struct {
-	SiteURL      string `json:"siteUrl"`      // SPSite or SPWeb URL, which is the context target for the API calls
+	// SPSite or SPWeb URL, which is the context target for the API calls
+	SiteURL      string `json:"siteUrl"`
 	Username     string `json:"username"`
 	Password     string `json:"password"`
 	// Following are not required for SPO
@@ -318,7 +327,7 @@ Gosip's ADFS also supports a scenario of ADFS or NTML behind WAP (Web Applicatio
 
 FBA - Form-based authentication for SharePoint On-Premises.
 
-TMG - Microsoft Forefront Threat Management Gateway, currently legacy but was a popular way of exposing SharePoint into external world back in the days.
+TMG - Microsoft Forefront Threat Management Gateway, currently is legacy but was a popular way of exposing SharePoint into external world back in the days.
 
 ```golang
 // AuthCnfg - FBA/TMG auth config structure

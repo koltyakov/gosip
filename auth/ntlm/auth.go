@@ -1,3 +1,11 @@
+/*
+Package ntlm implements NTLM Auth (NTLM handshake)
+
+This type of authentication uses HTTP NTLM handshake in order to obtain authentication header.
+
+Amongst supported platform versions are:
+	- On-Prem: 2019, 2016, and 2013
+*/
 package ntlm
 
 import (
@@ -13,11 +21,25 @@ import (
 )
 
 // AuthCnfg - NTML auth config structure
+/* On-Premises config sample:
+{
+  "siteUrl": "https://www.contoso.com/sites/test",
+  "username": "contoso\\john.doe",
+  "password": "this-is-not-a-real-password"
+}
+or
+{
+  "siteUrl": "https://www.contoso.com/sites/test",
+	"username": "john.doe",
+	"domain": "contoso",
+  "password": "this-is-not-a-real-password"
+}
+*/
 type AuthCnfg struct {
-	SiteURL  string `json:"siteUrl"`
-	Domain   string `json:"domain"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	SiteURL  string `json:"siteUrl"`  // SPSite or SPWeb URL, which is the context target for the API calls
+	Domain   string `json:"domain"`   // AD domain name (optional)
+	Username string `json:"username"` // AD user name
+	Password string `json:"password"` // AD user password
 
 	masterKey string
 }

@@ -1,3 +1,11 @@
+/*
+Package saml implements SAML Auth (SharePoint Online user credentials authentication)
+
+This authentication option uses Microsoft Online Security Token Service `https://login.microsoftonline.com/extSTS.srf` and SAML tokens in order to obtain authentication cookie.
+
+Amongst supported platform versions are:
+	- SharePoint Online (SPO)
+*/
 package saml
 
 import (
@@ -11,10 +19,17 @@ import (
 )
 
 // AuthCnfg - SAML auth config structure
+/* SharePoint Online config sample:
+{
+  "siteUrl": "https://contoso.sharepoint.com/sites/test",
+  "username": "john.doe@contoso.onmicrosoft.com",
+  "password": "this-is-not-a-real-password"
+}
+*/
 type AuthCnfg struct {
-	SiteURL  string `json:"siteUrl"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	SiteURL  string `json:"siteUrl"`  // SPSite or SPWeb URL, which is the context target for the API calls
+	Username string `json:"username"` // Username for SharePoint Online, for example `[user]@[company].onmicrosoft.com`
+	Password string `json:"password"` // User or App password
 
 	masterKey string
 }

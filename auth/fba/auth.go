@@ -1,3 +1,9 @@
+/*
+Package fba implements FBA (Form-based authentication)
+
+Amongst supported platform versions are:
+	- On-Prem: 2019, 2016, and 2013
+*/
 package fba
 
 import (
@@ -11,8 +17,15 @@ import (
 )
 
 // AuthCnfg - FBA auth config structure
+/* On-Premises config sample:
+{
+  "siteUrl": "https://www.contoso.com/sites/test",
+  "username": "john.doe",
+  "password": "this-is-not-a-real-password"
+}
+*/
 type AuthCnfg struct {
-	SiteURL  string `json:"siteUrl"`
+	SiteURL  string `json:"siteUrl"` // SPSite or SPWeb URL, which is the context target for the API calls
 	Username string `json:"username"`
 	Password string `json:"password"`
 
