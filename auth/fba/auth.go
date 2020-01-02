@@ -10,7 +10,7 @@ import (
 	"github.com/koltyakov/gosip/cpass"
 )
 
-// AuthCnfg : auth config structure
+// AuthCnfg - FBA auth config structure
 type AuthCnfg struct {
 	SiteURL  string `json:"siteUrl"`
 	Username string `json:"username"`

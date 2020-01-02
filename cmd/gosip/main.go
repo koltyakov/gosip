@@ -34,6 +34,6 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Printf("%s\n", res)
+	fmt.Printf("%s\n", res.Data().Title)
 
 }

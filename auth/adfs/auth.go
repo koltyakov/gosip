@@ -11,7 +11,7 @@ import (
 	"github.com/koltyakov/gosip/cpass"
 )
 
-// AuthCnfg : auth config structure
+// AuthCnfg - ADFS auth config structure
 type AuthCnfg struct {
 	SiteURL      string `json:"siteUrl"`
 	Domain       string `json:"domain"`

@@ -10,7 +10,7 @@ import (
 	"github.com/koltyakov/gosip/cpass"
 )
 
-// AuthCnfg : auth config structure
+// AuthCnfg - AddIn Only auth config structure
 type AuthCnfg struct {
 	SiteURL      string `json:"siteUrl"`
 	ClientID     string `json:"clientId"`

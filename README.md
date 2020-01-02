@@ -1,4 +1,4 @@
-# Gosip - SharePoint Auth, HTTP client & fluent API wrapper for Go (Golang)
+# Gosip - SharePoint authentication, HTTP client & fluent API wrapper for Go (Golang)
 
 ![Build Status](https://koltyakov.visualstudio.com/SPNode/_apis/build/status/gosip?branchName=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/koltyakov/gosip)](https://goreportcard.com/report/github.com/koltyakov/gosip)
@@ -7,16 +7,15 @@
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkoltyakov%2Fgosip.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkoltyakov%2Fgosip?ref=badge_shield)
 
 <p align="center">
-  <img src="./assets/gosip2.png" />
+  <img src="./assets/gosip.png" />
 </p>
 
 ## Main features
 
-`gosip` allows you to perform SharePoint unattended (without user interaction) http authentication with Go (Golang) using different authentication strategies.
-
-Simplifies SharePoint API consumption such as REST API, CSOM (client.svc/ProcessQuery), etc.
-
-Provides Fluent syntax to construct and consume SharePoint APIs.
+- Unattended authentication using different strategies.
+- Fluent API syntax for SharePoint object model.
+- Simplified API consumption (REST, CSOM, SOAP).
+- SharePoint-aware embedded features (retries, header presets, error handling).
 
 ### Supported SharePoint versions:
 
@@ -26,7 +25,7 @@ Provides Fluent syntax to construct and consume SharePoint APIs.
 ### Authentication strategies:
 
 - SharePoint On-Premises 2019/2016/2013:
-  - User credentianls (NTLM)
+  - User credentials (NTLM)
   - ADFS user credentials (ADFS, WAP -> Basic/NTLM, WAP -> ADFS)
   - Behind a reverse proxy (Forefront TMG, WAP -> Basic/NTLM, WAP -> ADFS)
   - Form-based authentication (FBA)
@@ -45,13 +44,14 @@ go get github.com/koltyakov/gosip
 
 1\. Understand SharePoint environment type and authentication strategy.
 
-Let's assume it's, SharePoint Online and Add-In Only permissions. Then `strategy "github.com/koltyakov/gosip/auth/addin"` subpackage should be used.
+Let's assume it's, SharePoint Online and Add-In Only permissions. Then `strategy "github.com/koltyakov/gosip/auth/addin"` sub package should be used.
 
 ```golang
 package main
 
 import (
 	"github.com/koltyakov/gosip"
+	"github.com/koltyakov/gosip/api"
 	strategy "github.com/koltyakov/gosip/auth/addin"
 )
 ```
@@ -66,12 +66,12 @@ auth := &strategy.AuthCnfg{
 }
 ```
 
-AuthCnfg's from different strategies contains different options.
+AuthCnfg's from different strategies contains different options relevant for a specified auth type.
 
 The authentication options can be provided explicitly or can be read from a configuration file.
 
 ```golang
-configPath := "./config/private.adfs.json"
+configPath := "./config/private.json"
 auth := &strategy.AuthCnfg{}
 
 err := auth.ReadConfig(configPath)
@@ -81,228 +81,28 @@ if err != nil {
 }
 ```
 
-3\. Use SP awared HTTP client from `github.com/koltyakov/gosip` package.
+3\. Bind auth client with Fluent API.
 
 ```golang
-client := &gosip.SPClient{
-	AuthCnfg: auth,
-}
+client := &gosip.SPClient{AuthCnfg: auth}
 
-var req *http.Request
-// Initiate API request
-// ...
+sp := api.NewSP(client)
 
-resp, err := client.Execute(req)
+res, err := sp.Web().Select("Title").Get()
 if err != nil {
-	fmt.Printf("Unable to request api: %v", err)
-	return
+	fmt.Println(err)
 }
-```
 
-SPClient has `Execute` method which is a wrapper function injecting SharePoint authentication and ending up calling http.Client's `Do` method.
+fmt.Printf("%s\n", res.Data().Title)
+```
 
 ## Usage samples
 
-### Addin Only Permissions
-
-```golang
-package main
-
-import (
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"os"
-
-	"github.com/koltyakov/gosip"
-	strategy "github.com/koltyakov/gosip/auth/addin"
-)
-
-func main() {
-	auth := &strategy.AuthCnfg{
-		SiteURL:      os.Getenv("SPAUTH_SITEURL"),
-		ClientID:     os.Getenv("SPAUTH_CLIENTID"),
-		ClientSecret: os.Getenv("SPAUTH_CLIENTSECRET"),
-	}
-
-	client := &gosip.SPClient{
-		AuthCnfg: auth,
-	}
-
-	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		log.Fatalf("unable to create a request: %v\n", err)
-	}
-
-	req.Header.Set("Accept", "application/json;odata=minimalmetadata")
-
-	resp, err := client.Execute(req)
-	if err != nil {
-		log.Fatalf("unable to request api: %v\n", err)
-	}
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("unable to read a response: %v\n", err)
-	}
-
-	// No JSON unmarshalling for simplicity
-	fmt.Printf("response: %s\n", data)
-}
-```
-
-### ADFS with config reader
-
-```golang
-package main
-
-import (
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-
-	"github.com/koltyakov/gosip"
-	strategy "github.com/koltyakov/gosip/auth/adfs"
-)
-
-func main() {
-	configPath := "./config/private.adfs.json"
-	auth := &strategy.AuthCnfg{}
-
-	err := auth.ReadConfig(configPath)
-	if err != nil {
-		log.Fatalf("unable to get config: %v\n", err)
-	}
-
-	client := &gosip.SPClient{
-		AuthCnfg: auth,
-	}
-
-	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		log.Fatalf("unable to create a request: %v\n", err)
-	}
-
-	req.Header.Set("Accept", "application/json;odata=verbose")
-
-	resp, err := client.Execute(req)
-	if err != nil {
-		log.Fatalf("unable to request api: %v\n", err)
-	}
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("unable to read a response: %v\n", err)
-	}
-
-	fmt.Printf("response: %s\n", data)
-}
-```
-
-### Basic/NTLM auth
-
-```golang
-package main
-
-import (
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-
-	"github.com/koltyakov/gosip"
-	strategy "github.com/koltyakov/gosip/auth/ntlm"
-)
-
-func main() {
-	configPath := "./config/private.ntlm.json"
-	auth := &strategy.AuthCnfg{}
-
-	if err := auth.ReadConfig(configPath); err != nil {
-		log.Fatalf("unable to get config: %v\n", err)
-	}
-
-	client := &gosip.SPClient{
-		AuthCnfg: auth,
-	}
-
-	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		log.Fatalf("unable to create a request: %v", err)
-	}
-
-	req.Header.Set("Accept", "application/json;odata=verbose")
-
-	resp, err := client.Execute(req)
-	if err != nil {
-		log.Fatalf("unable to request api: %v\n", err)
-	}
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("unable to read a response: %v\n", err)
-	}
-
-	fmt.Printf("response: %s\n", data)
-}
-```
-
-### SPRest HTTP helper
-
-Provides generic GET/POST helpers for REST operations, reducing amount of `http.NewRequest` scaffolded code.
-
-```golang
-package main
-
-import (
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-
-	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/api"
-	strategy "github.com/koltyakov/gosip/auth/ntlm"
-)
-
-func main() {
-	configPath := "./config/private.ntlm.json"
-	auth := &strategy.AuthCnfg{}
-
-	if err := auth.ReadConfig(configPath); err != nil {
-		log.Fatalf("unable to get config: %v\n", err)
-	}
-
-	sp := api.NewHTTPClient(&gosip.SPClient{AuthCnfg: auth})
-
-	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
-
-	data, err := sp.Get(endpoint, nil)
-	if err != nil {
-		log.Fatalf("%v\n", err)
-	}
-
-	// sp.Post(endpoint, []byte(body), nil) // generic POST
-	// sp.Delete(endpoint, nil) // generic DELETE helper crafts "X-Http-Method"="DELETE" header
-	// sp.Update(endpoint, nil) // generic UPDATE helper crafts "X-Http-Method"="MERGE" header
-
-	fmt.Printf("response: %s\n", data)
-}
-```
-
-### Fluent API (beta)
+### Fluent API client
 
 Provides a simple way of constructing API endpoint calls with IntelliSense and chainable syntax.
 
-![Fluent Sample](./assets/fluent-gosip-sample.gif)
+![Fluent Sample](./assets/fluent.gif)
 
 ```golang
 package main
@@ -330,6 +130,7 @@ func main() {
 	// Custom headers
 	headers := map[string]string{
 		"Accept": "application/json;odata=minimalmetadata",
+		"Accept-Language": "de-DE,de;q=0.9",
 	}
 	config := &api.RequestConfig{Headers: headers}
 
@@ -339,6 +140,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	// Response object unmarshalling (struct depends on OData mode and API method)
 	res := &struct {
 		Value []struct {
 			ID    string `json:"Id"`
@@ -366,55 +168,176 @@ func getAuthClient() (*gosip.SPClient, error) {
 }
 ```
 
-## Tests
+### Generic HTTP-client helper
 
-### Run automated tests
+Provides generic GET/POST helpers for REST operations, reducing amount of `http.NewRequest` scaffolded code, can be used for custom or not covered with a Fluent API endpoints.
 
-Create auth credentials store files in `./config` folder for corresponding strategies:
+```golang
+package main
 
-- private.onprem-adfs.json
-- private.onprem-fba.json
-- private.onprem-ntlm.json
-- private.onprem-tmg.json
-- private.onprem-wap-adfs.json
-- private.onprem-wap.json
-- private.spo-addin.json
-- private.spo-user.json
-- private.spo-adfs.json
+import (
+	"fmt"
+	"log"
 
-Auth configs should have the same structure as [node-sp-auth's](https://github.com/s-kainet/node-sp-auth) configs. See [samples](./config/samples).
+	"github.com/koltyakov/gosip"
+	"github.com/koltyakov/gosip/api"
+	strategy "github.com/koltyakov/gosip/auth/ntlm"
+)
 
-```bash
-go test ./... -v -race -count=1
+func main() {
+	configPath := "./config/private.ntlm.json"
+	auth := &strategy.AuthCnfg{}
+
+	if err := auth.ReadConfig(configPath); err != nil {
+		log.Fatalf("unable to get config: %v\n", err)
+	}
+
+	sp := api.NewHTTPClient(&gosip.SPClient{AuthCnfg: auth})
+
+	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
+
+	data, err := sp.Get(endpoint, nil)
+	if err != nil {
+		log.Fatalf("%v\n", err)
+	}
+
+	// sp.Post(endpoint, []byte(body), nil) // generic POST
+	// sp.Delete(endpoint, nil) // generic DELETE helper crafts "X-Http-Method"="DELETE" header
+	// sp.Update(endpoint, nil) // generic UPDATE helper crafts "X-Http-Method"="MERGE" header
+	// sp.ProcessQuery(endpoint, []byte(body)) // CSOM helper (client.svc/ProcessQuery)
+
+	fmt.Printf("response: %s\n", data)
+}
 ```
 
-Not provided auth configs are ignored and not skipped in tests.
+### Low-level HTTP-client usage
 
-### Run manual test
+Low-lever SharePoint-aware HTTP client from `github.com/koltyakov/gosip` package for custom or not covered with a Fluent API client endpoints with granular control for HTTP request, response, and http.Client parameters. Used internally but almost never required in a consumer code.
 
-Modify `cmd/gosip/main.go` to include required scenarios and run:
+```golang
+client := &gosip.SPClient{AuthCnfg: auth}
 
-```bash
-go run cmd/gosip/main.go
+var req *http.Request
+// Initiate API request
+// ...
+
+resp, err := client.Execute(req)
+if err != nil {
+	fmt.Printf("Unable to request api: %v", err)
+	return
+}
 ```
 
-### Run CI tests
+SPClient has `Execute` method which is a wrapper function injecting SharePoint authentication and ending up calling http.Client's `Do` method.
 
-Configure environment variables:
+## Authentication strategies
 
-- SPAUTH_SITEURL
-- SPAUTH_CLIENTID
-- SPAUTH_CLIENTSECRET
-- SPAUTH_USERNAME
-- SPAUTH_PASSWORD
+Auth strategy should be selected corresponding your SharePoint environment and its configuration.
 
-```bash
-go test ./... -race -timeout 30s
+Import path `strategy "github.com/koltyakov/gosip/auth/{strategy}"`. Where `/{strategy}` stands for a strategy auth package.
+
+`/{strategy}` | SPO     | On-Prem | Credentials sample(s)
+--------------|---------|---------|-------------------
+`/saml`       | ✅      | ❌     | [sample](./config/samples/private.spo-user.json)
+`/addin`      | ✅      | ❌     | [sample](./config/samples/private.spo-addin.json)
+`/ntlm`       | ❌      | ✅     | [sample](./config/samples/private.onprem-ntlm.json)
+`/adfs`       | ✅      | ✅     | [spo](./config/samples/private.spo-adfs.json), [on-prem](./config/samples/private.onprem-adfs.json), [on-prem (wap)](./config/samples/private.onprem-wap.json)
+`/fba`        | ❌      | ✅     | [sample](./config/samples/private.onprem-fba.json)
+`/tmg`        | ❌      | ✅     | [sample](./config/samples/private.onprem-tmg.json)
+
+JSON and struct representations are different in terms of language notations. So credentials parameters names in `private.json` files and declared as structs initiators vary.
+
+### SAML Auth (SharePoint Online user credentials authentication)
+
+This authentication option uses Microsoft Online Security Token Service `https://login.microsoftonline.com/extSTS.srf` and SAML tokens in order to obtain authentication cookie. As soon as cookie obtained, you need to attach it to your HTTP request in order to run authenticated queries against SharePoint Online.
+
+```golang
+// AuthCnfg - SAML auth config structure
+type AuthCnfg struct {
+	SiteURL  string `json:"siteUrl"`  // SPSite or SPWeb URL, which is the context target for the API calls
+	Username string `json:"username"` // Username for SharePoint Online, for example `[user]@[company].onmicrosoft.com`
+	Password string `json:"password"` // User or App password
+}
 ```
+
+### AddIn Only Auth
+
+This type of authentication uses AddIn Only policy and OAuth bearer tokens for authenticating HTTP requests.
+
+```golang
+// AuthCnfg - AddIn Only auth config structure
+type AuthCnfg struct {
+	SiteURL      string `json:"siteUrl"`      // SPSite or SPWeb URL, which is the context target for the API calls
+	ClientID     string `json:"clientId"`     // Client ID obtained when registering the AddIn
+	ClientSecret string `json:"clientSecret"` // Client Secret obtained when registering the AddIn
+	Realm        string `json:"realm"`        // Your SharePoint Online tenant ID (optional)
+}
+```
+
+Realm can be left empty or filled in, that will add small performance improvement. The easiest way to find tenant is to open SharePoint Online site collection, click `Site Settings` -> `Site App Permissions`. Taking any random app, the tenant ID (realm) is the GUID part after the `@`.
+
+See more details of [AddIn Configuration and Permissions](https://github.com/s-kainet/node-sp-auth/wiki/SharePoint-Online-addin-only-authentication).
+
+### NTLM Auth (NTLM handshake)
+
+This type of authentication uses HTTP NTLM handshake in order to obtain authentication header.
+
+```golang
+// AuthCnfg - NTML auth config structure
+type AuthCnfg struct {
+	SiteURL  string `json:"siteUrl"`  // SPSite or SPWeb URL, which is the context target for the API calls
+	Domain   string `json:"domain"`   // AD domain name
+	Username string `json:"username"` // AD user name
+	Password string `json:"password"` // AD user password
+}
+```
+
+Gosip uses `github.com/Azure/go-ntlmssp` NTLM negotiator, however a custom one also can be [provided](https://github.com/koltyakov/gosip/issues/14) in case of demand.
+
+### ADFS Auth (user credentials authentication))
+
+```golang
+// AuthCnfg - ADFS auth config structure
+type AuthCnfg struct {
+	SiteURL      string `json:"siteUrl"`      // SPSite or SPWeb URL, which is the context target for the API calls
+	Username     string `json:"username"`
+	Password     string `json:"password"`
+	// Following are not required for SPO
+	Domain       string `json:"domain"`
+	RelyingParty string `json:"relyingParty"`
+	AdfsURL      string `json:"adfsUrl"`
+	AdfsCookie   string `json:"adfsCookie"`
+}
+```
+
+See more details [ADFS user credentials authentication](https://github.com/s-kainet/node-sp-auth/wiki/ADFS-user-credentials-authentication).
+
+Gosip's ADFS also support a scenario of ADFS or NTML behind WAP (Web Application Proxy) which adds additional auth flow and `EdgeAccessCookie` involved into play.
+
+### FBA/TMG Auth (Form-based authentication)
+
+Form-based authentication for SharePoint On-Premises.
+
+TMG - Microsoft Forefront Threat Management Gateway, currently legacy but was a popular way of exposing SharePoint into external world back in the days.
+
+```golang
+// AuthCnfg - FBA/TMG auth config structure
+type AuthCnfg struct {
+	SiteURL  string `json:"siteUrl"`  // SPSite or SPWeb URL, which is the context target for the API calls
+	Username string `json:"username"` // Username for SharePoint On-Prem, format depends in FBA/TMG settings, can include domain or doesn't
+	Password string `json:"password"` // User password
+}
+```
+
+## Secrets encoding
+
+When storing credential in local `private.json` files, which can be handy in local development scenarios, we strongly recommend to encode secrets such as `password` or `clientSecret` using [cpass](./cmd/cpass/README.md). Cpass converts a secret to an encrypted representation which can only be decrypted on the same machine where it was generated. This minimize incidental leaks, i.e. with git commits.
 
 ## Reference
 
-A lot of stuff for auth flows have been "copied" from [node-sp-auth](https://github.com/s-kainet/node-sp-auth) library (used as blueprint), which we intensively use in Node.js ecosystem for years.
+Many auth flows have been "copied" from [node-sp-auth](https://github.com/s-kainet/node-sp-auth) library (used as a blueprint), which we intensively use in Node.js ecosystem for years.
+
+Fluent API and wrapper syntax are inspired by [PnPjs](https://github.com/pnp/pnpjs) which is also the first-class citizen on almost all our Node.js and front-end projects with SharePoint involved.
 
 ## License
 
