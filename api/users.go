@@ -107,11 +107,11 @@ func (users *Users) GetByEmail(email string) *User {
 /* Response helpers */
 
 // Data : to get typed data
-func (usersResp *UsersResp) Data() []UsersResp {
+func (usersResp *UsersResp) Data() []UserResp {
 	collection, _ := parseODataCollection(*usersResp)
-	users := []UsersResp{}
+	users := []UserResp{}
 	for _, user := range collection {
-		users = append(users, UsersResp(user))
+		users = append(users, UserResp(user))
 	}
 	return users
 }
