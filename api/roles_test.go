@@ -33,6 +33,17 @@ func TestRoles(t *testing.T) {
 		}
 	})
 
+	t.Run("HasUniqueAssignments", func(t *testing.T) {
+		list.Roles().BreakInheritance(false, true)
+		hassUniqueAssigments, err := list.Roles().HasUniqueAssignments()
+		if err != nil {
+			t.Error(err)
+		}
+		if !hassUniqueAssigments {
+			t.Error("should have had unique role assigments")
+		}
+	})
+
 	t.Run("AddAssigment", func(t *testing.T) {
 		if err := list.Roles().AddAssigment(userID, roleDef.ID); err != nil {
 			t.Error(err)

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -42,6 +43,25 @@ func NewRoles(client *gosip.SPClient, endpoint string, config *RequestConfig) *R
 		endpoint: endpoint,
 		config:   config,
 	}
+}
+
+// HasUniqueAssignments checks is a securable object has unique permissions
+func (permissions *Roles) HasUniqueAssignments() (bool, error) {
+	sp := NewHTTPClient(permissions.client)
+	endpoint := fmt.Sprintf("%s/HasUniqueRoleAssignments", permissions.endpoint)
+	data, err := sp.Post(endpoint, nil, getConfHeaders(permissions.config))
+	if err != nil {
+		return false, err
+	}
+	data = parseODataItem(data)
+	res := &struct {
+		Value                    bool `json:"value"`
+		HasUniqueRoleAssignments bool `json:"HasUniqueRoleAssignments"`
+	}{}
+	if err := json.Unmarshal(data, &res); err != nil {
+		return false, err
+	}
+	return res.HasUniqueRoleAssignments || res.Value, nil
 }
 
 // ResetInheritance resets permissions inheritance for this securable object
