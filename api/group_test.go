@@ -43,20 +43,41 @@ func TestGroup(t *testing.T) {
 	})
 
 	t.Run("AddUser", func(t *testing.T) {
-		data, err := web.CurrentUser().Select("LoginName").Conf(headers.verbose).Get()
+		user, err := web.CurrentUser().Select("LoginName").Get()
 		if err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			User *UserInfo `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
+		if err := web.SiteGroups().GetByID(group.ID).AddUser(user.Data().LoginName); err != nil {
 			t.Error(err)
 		}
+	})
 
-		if _, err := web.SiteGroups().GetByID(group.ID).AddUser(res.User.LoginName); err != nil {
+	t.Run("RemoveUser", func(t *testing.T) {
+		user, err := web.CurrentUser().Select("LoginName").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if err := web.SiteGroups().GetByID(group.ID).RemoveUser(user.Data().LoginName); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("AddUserByID", func(t *testing.T) {
+		user, err := web.CurrentUser().Select("Id").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if err := web.SiteGroups().GetByID(group.ID).AddUserByID(user.Data().ID); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("RemoveUserByID", func(t *testing.T) {
+		user, err := web.CurrentUser().Select("Id").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if err := web.SiteGroups().GetByID(group.ID).RemoveUserByID(user.Data().ID); err != nil {
 			t.Error(err)
 		}
 	})

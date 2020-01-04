@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 
 	"github.com/koltyakov/gosip"
 )
@@ -91,18 +92,56 @@ func (group *Group) Users() *Users {
 	)
 }
 
-// AddUser adds a user by his/her login name to this group
-func (group *Group) AddUser(loginName string) ([]byte, error) {
+// AddUser adds a user by login name to this group
+func (group *Group) AddUser(loginName string) error {
 	endpoint := fmt.Sprintf("%s/Users", group.ToURL())
 	sp := NewHTTPClient(group.client)
-
 	metadata := make(map[string]interface{})
 	metadata["__metadata"] = map[string]string{
 		"type": "SP.User",
 	}
 	metadata["LoginName"] = loginName
 	body, _ := json.Marshal(metadata)
-	return sp.Post(endpoint, body, getConfHeaders(group.config))
+	_, err := sp.Post(endpoint, body, getConfHeaders(group.config))
+	return err
+}
+
+// AddUserByID adds a user by ID to this group
+func (group *Group) AddUserByID(userID int) error {
+	sp := NewSP(group.client)
+	user, err := sp.Web().SiteUsers().Select("LoginName").GetByID(userID).Get()
+	if err != nil {
+		return err
+	}
+	return group.AddUser(user.Data().LoginName)
+}
+
+// SetAsOwner sets a user as owner
+func (group *Group) SetAsOwner(userID int) error {
+	endpoint := fmt.Sprintf("%s/SetUserAsOwner(%d)", group.ToURL(), userID)
+	sp := NewHTTPClient(group.client)
+	_, err := sp.Post(endpoint, nil, getConfHeaders(group.config))
+	return err
+}
+
+// RemoveUser removes a user from group
+func (group *Group) RemoveUser(loginName string) error {
+	endpoint := fmt.Sprintf(
+		"%s/Users/RemoveByLoginName(@v)?@v='%s'",
+		group.ToURL(),
+		url.QueryEscape(loginName),
+	)
+	sp := NewHTTPClient(group.client)
+	_, err := sp.Post(endpoint, nil, getConfHeaders(group.config))
+	return err
+}
+
+// RemoveUserByID removes a user from group
+func (group *Group) RemoveUserByID(userID int) error {
+	endpoint := fmt.Sprintf("%s/Users/RemoveById(%d)", group.ToURL(), userID)
+	sp := NewHTTPClient(group.client)
+	_, err := sp.Post(endpoint, nil, getConfHeaders(group.config))
+	return err
 }
 
 /* Response helpers */
