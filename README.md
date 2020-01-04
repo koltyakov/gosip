@@ -17,12 +17,12 @@
 - Simplified API consumption (REST, CSOM, SOAP).
 - SharePoint-aware embedded features (retries, header presets, error handling).
 
-### Supported SharePoint versions:
+### Supported SharePoint versions
 
 - SharePoint Online (SPO)
 - On-Premises (2019/2016/2013)
 
-### Authentication strategies:
+### Supported auth strategies
 
 - SharePoint On-Premises 2019/2016/2013:
   - User credentials (NTLM)
@@ -68,7 +68,7 @@ auth := &strategy.AuthCnfg{
 
 AuthCnfg's from different strategies contains different options relevant for a specified auth type.
 
-The authentication options can be provided explicitly or can be read from a configuration file (see [more](#authentication-strategies-1))).
+The authentication options can be provided explicitly or can be read from a configuration file (see [more](#authentication-strategies-1)).
 
 ```golang
 configPath := "./config/private.json"
