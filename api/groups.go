@@ -79,7 +79,7 @@ func (groups *Groups) Get() (GroupsResp, error) {
 
 // Add creates new group with a specified name. Additional metadata can optionally be provided as string map object.
 // `metadata` should correspond to SP.Group type.
-func (groups *Groups) Add(title string, metadata map[string]interface{}) (GroupsResp, error) {
+func (groups *Groups) Add(title string, metadata map[string]interface{}) (GroupResp, error) {
 	if metadata == nil {
 		metadata = make(map[string]interface{})
 	}
