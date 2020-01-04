@@ -35,7 +35,7 @@ func NewUtility(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 }
 
 // SendEmail sends an email via REST API due to the provided EmailProps options
-func (utility *Utility) SendEmail(options *EmailProps) ([]byte, error) {
+func (utility *Utility) SendEmail(options *EmailProps) error {
 	endpoint := fmt.Sprintf(
 		"%s/_api/SP.Utilities.Utility.SendEmail",
 		getPriorEndpoint(utility.endpoint, "/_api"),
@@ -62,5 +62,6 @@ func (utility *Utility) SendEmail(options *EmailProps) ([]byte, error) {
 	JSONProps := fmt.Sprintf("%s", props)
 	body := []byte(trimMultiline(`{ "properties": ` + JSONProps + `}`))
 
-	return sp.Post(endpoint, body, getConfHeaders(utility.config))
+	_, err := sp.Post(endpoint, body, getConfHeaders(utility.config))
+	return err
 }

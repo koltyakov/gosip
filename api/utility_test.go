@@ -18,7 +18,7 @@ func TestUtility(t *testing.T) {
 			t.Error(err)
 		}
 		if user.Data().Email != "" {
-			if _, err := sp.Utility().SendEmail(&EmailProps{
+			if err := sp.Utility().SendEmail(&EmailProps{
 				Subject: "Gosip SendEmail utility test",
 				Body:    "Feel free to delete the email",
 				To:      []string{user.Data().Email},
