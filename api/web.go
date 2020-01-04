@@ -239,6 +239,15 @@ func (web *Web) SiteUsers() *Users {
 	)
 }
 
+// AssociatedGroups gets associated groups scoped constructor
+func (web *Web) AssociatedGroups() *AssociatedGroups {
+	return NewAssociatedGroups(
+		web.client,
+		web.endpoint,
+		web.config,
+	)
+}
+
 // CurrentUser gets current User API instance object
 func (web *Web) CurrentUser() *User {
 	return NewUser(
