@@ -168,7 +168,7 @@ func getAuthClient() (*gosip.SPClient, error) {
 }
 ```
 
-### Generic HTTP-client helper
+### Generic HTTP client helper
 
 Provides generic GET/POST helpers for REST operations, reducing amount of `http.NewRequest` scaffolded code, can be used for custom or not covered with a Fluent API endpoints.
 
@@ -210,7 +210,7 @@ func main() {
 }
 ```
 
-### Low-level HTTP-client usage
+### Low-level HTTP client usage
 
 Low-lever SharePoint-aware HTTP client from `github.com/koltyakov/gosip` package for custom or not covered with a Fluent API client endpoints with granular control for HTTP request, response, and http.Client parameters. Used internally but almost never required in a consumer code.
 
