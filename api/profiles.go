@@ -100,12 +100,6 @@ func (profiles *Profiles) Expand(oDataExpand string) *Profiles {
 	return profiles
 }
 
-// // Get ...
-// func (profiles *Profiles) Get() ([]byte, error) {
-// 	sp := NewHTTPClient(profiles.client)
-// 	return sp.Get(profiles.ToURL(), getConfHeaders(profiles.config))
-// }
-
 // GetMyProperties gets current context user profile properties
 func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {
 	sp := NewHTTPClient(profiles.client)
@@ -134,13 +128,29 @@ func (profiles *Profiles) GetPropertiesFor(loginName string) (ProfilePropsResp, 
 }
 
 // GetUserProfilePropertyFor gets specific properte of a specified user profile (by user login name)
-func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property string) ([]byte, error) {
+func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property string) (string, error) {
 	sp := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint +
 		"/GetUserProfilePropertyFor(" +
 		"accountname='" + url.QueryEscape(loginName) + "'," +
 		"propertyname='" + url.QueryEscape(property) + "')"
-	return sp.Get(endpoint, getConfHeaders(profiles.config))
+	data, err := sp.Get(endpoint, getConfHeaders(profiles.config))
+	if err != nil {
+		return "", err
+	}
+	data = parseODataItem(data)
+	res := &struct {
+		Value                     string `json:"value"`
+		GetUserProfilePropertyFor string `json:"GetUserProfilePropertyFor"`
+	}{}
+	if err := json.Unmarshal(data, &res); err != nil {
+		return "", err
+	}
+	propertyValue := res.GetUserProfilePropertyFor
+	if res.Value != "" {
+		propertyValue = res.Value
+	}
+	return propertyValue, nil
 }
 
 // GetOwnerUserProfile gets owner's user profile

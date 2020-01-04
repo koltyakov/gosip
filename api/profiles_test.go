@@ -14,14 +14,6 @@ func TestProfiles(t *testing.T) {
 		t.Error(err)
 	}
 
-	// t.Run("Get", func(t *testing.T) {
-	// 	data, err := profiles.Get()
-	// 	if err != nil {
-	// 		t.Error(err)
-	// 	}
-	// 	fmt.Printf("%s\n", data)
-	// })
-
 	t.Run("GetMyProperties", func(t *testing.T) {
 		profile, err := profiles.GetMyProperties()
 		if err != nil {
@@ -43,8 +35,31 @@ func TestProfiles(t *testing.T) {
 	})
 
 	t.Run("GetUserProfilePropertyFor", func(t *testing.T) {
-		if _, err := profiles.GetUserProfilePropertyFor(user.Data().LoginName, "LastName"); err != nil {
+		accountName, err := sp.Profiles().Conf(headers.verbose).
+			GetUserProfilePropertyFor(user.Data().LoginName, "AccountName")
+		if err != nil {
 			t.Error(err)
+		}
+		if accountName == "" {
+			t.Error("wrong property value")
+		}
+		if envCode != "2013" {
+			accountName, err = sp.Profiles().Conf(headers.minimalmetadata).
+				GetUserProfilePropertyFor(user.Data().LoginName, "AccountName")
+			if err != nil {
+				t.Error(err)
+			}
+			if accountName == "" {
+				t.Error("wrong property value")
+			}
+			accountName, err = sp.Profiles().Conf(headers.nometadata).
+				GetUserProfilePropertyFor(user.Data().LoginName, "AccountName")
+			if err != nil {
+				t.Error(err)
+			}
+			if accountName == "" {
+				t.Error("wrong property value")
+			}
 		}
 	})
 
