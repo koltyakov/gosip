@@ -83,7 +83,7 @@ func TestGroup(t *testing.T) {
 	})
 
 	t.Run("RemoveByID", func(t *testing.T) {
-		if _, err := web.SiteGroups().RemoveByID(group.ID); err != nil {
+		if err := web.SiteGroups().RemoveByID(group.ID); err != nil {
 			t.Error(err)
 		}
 	})

@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 
 	"github.com/koltyakov/gosip"
 )
@@ -111,21 +110,23 @@ func (groups *Groups) GetByName(groupName string) *Group {
 }
 
 // RemoveByID deletes a group object by its ID
-func (groups *Groups) RemoveByID(groupID int) ([]byte, error) {
+func (groups *Groups) RemoveByID(groupID int) error {
 	endpoint := fmt.Sprintf("%s/RemoveById(%d)", groups.ToURL(), groupID)
 	sp := NewHTTPClient(groups.client)
-	return sp.Post(endpoint, nil, getConfHeaders(groups.config))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(groups.config))
+	return err
 }
 
 // RemoveByLoginName deletes a group object by its login name
-func (groups *Groups) RemoveByLoginName(loginName string) ([]byte, error) {
+func (groups *Groups) RemoveByLoginName(loginName string) error {
 	endpoint := fmt.Sprintf(
 		"%s/RemoveByLoginName('%s')",
 		groups.endpoint,
-		url.QueryEscape(loginName),
+		loginName, // url.QueryEscape(loginName),
 	)
 	sp := NewHTTPClient(groups.client)
-	return sp.Post(endpoint, nil, getConfHeaders(groups.config))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(groups.config))
+	return err
 }
 
 /* Response helpers */

@@ -114,12 +114,12 @@ func TestGroups(t *testing.T) {
 		if _, err := groups.Conf(headers.verbose).Add(newGroupNameRemove, nil); err != nil {
 			t.Error(err)
 		}
-		if _, err := groups.RemoveByLoginName(newGroupNameRemove); err != nil {
+		if err := groups.RemoveByLoginName(newGroupNameRemove); err != nil {
 			t.Error(err)
 		}
 	})
 
-	if _, err := groups.RemoveByLoginName(newGroupName); err != nil {
+	if err := groups.RemoveByLoginName(newGroupName); err != nil {
 		t.Error(err)
 	}
 
