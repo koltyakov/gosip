@@ -84,14 +84,14 @@ func TestProfiles(t *testing.T) {
 	})
 
 	t.Run("SetSingleValueProfileProperty", func(t *testing.T) {
-		if _, err := profiles.SetSingleValueProfileProperty(user.Data().LoginName, "AboutMe", "Updated from Gosip"); err != nil {
+		if err := profiles.SetSingleValueProfileProperty(user.Data().LoginName, "AboutMe", "Updated from Gosip"); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("SetMultiValuedProfileProperty", func(t *testing.T) {
 		tags := []string{"#ci", "#demo", "#test"}
-		if _, err := profiles.SetMultiValuedProfileProperty(user.Data().LoginName, "SPS-HashTags", tags); err != nil {
+		if err := profiles.SetMultiValuedProfileProperty(user.Data().LoginName, "SPS-HashTags", tags); err != nil {
 			t.Error(err)
 		}
 	})

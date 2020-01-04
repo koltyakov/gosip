@@ -184,7 +184,7 @@ func (profiles *Profiles) UserProfile() (ProfileResp, error) {
 }
 
 // SetSingleValueProfileProperty sets a single value property for the profile by its email
-func (profiles *Profiles) SetSingleValueProfileProperty(loginName string, property string, value string) ([]byte, error) {
+func (profiles *Profiles) SetSingleValueProfileProperty(loginName string, property string, value string) error {
 	sp := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint + "/SetSingleValueProfileProperty"
 	prop := map[string]string{}
@@ -192,11 +192,12 @@ func (profiles *Profiles) SetSingleValueProfileProperty(loginName string, proper
 	prop["propertyName"] = property
 	prop["propertyValue"] = value
 	body, _ := json.Marshal(prop)
-	return sp.Post(endpoint, body, getConfHeaders(profiles.config))
+	_, err := sp.Post(endpoint, body, getConfHeaders(profiles.config))
+	return err
 }
 
 // SetMultiValuedProfileProperty sets a multi value property for the profile by its email
-func (profiles *Profiles) SetMultiValuedProfileProperty(loginName string, property string, values []string) ([]byte, error) {
+func (profiles *Profiles) SetMultiValuedProfileProperty(loginName string, property string, values []string) error {
 	sp := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint + "/SetMultiValuedProfileProperty"
 	prop := map[string]interface{}{}
@@ -204,7 +205,8 @@ func (profiles *Profiles) SetMultiValuedProfileProperty(loginName string, proper
 	prop["propertyName"] = property
 	prop["propertyValues"] = values
 	body, _ := json.Marshal(prop)
-	return sp.Post(endpoint, body, getConfHeaders(profiles.config))
+	_, err := sp.Post(endpoint, body, getConfHeaders(profiles.config))
+	return err
 }
 
 // HideSuggestion removes the specified user from the user's list of suggested people to follow
