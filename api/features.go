@@ -45,17 +45,19 @@ func (features *Features) Get() ([]*FeatureInfo, error) {
 }
 
 // Add activates a feature by its ID (GUID) in the parent container (Site or Web)
-func (features *Features) Add(featureID string, force bool) ([]byte, error) {
+func (features *Features) Add(featureID string, force bool) error {
 	endpoint := fmt.Sprintf("%s/Add", features.endpoint)
 	sp := NewHTTPClient(features.client)
 	body := []byte(fmt.Sprintf(`{"featdefScope":0,"featureId":"%s","force":%t}`, featureID, force))
-	return sp.Post(endpoint, body, getConfHeaders(features.config))
+	_, err := sp.Post(endpoint, body, getConfHeaders(features.config))
+	return err
 }
 
 // Remove deactivates a feature by its ID (GUID) in the parent container (Site or Web)
-func (features *Features) Remove(featureID string, force bool) ([]byte, error) {
+func (features *Features) Remove(featureID string, force bool) error {
 	endpoint := fmt.Sprintf("%s/Remove", features.endpoint)
 	sp := NewHTTPClient(features.client)
 	body := []byte(fmt.Sprintf(`{"featureId":"%s","force":%t}`, featureID, force))
-	return sp.Post(endpoint, body, getConfHeaders(features.config))
+	_, err := sp.Post(endpoint, body, getConfHeaders(features.config))
+	return err
 }

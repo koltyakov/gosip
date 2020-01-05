@@ -25,13 +25,13 @@ func TestFeatures(t *testing.T) {
 	})
 
 	t.Run("Add", func(t *testing.T) {
-		if _, err := sp.Web().Features().Add(mdsFeatureID, true); err != nil {
+		if err := sp.Web().Features().Add(mdsFeatureID, true); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Remove", func(t *testing.T) {
-		if _, err := sp.Web().Features().Remove(mdsFeatureID, true); err != nil {
+		if err := sp.Web().Features().Remove(mdsFeatureID, true); err != nil {
 			t.Error(err)
 		}
 	})
