@@ -61,6 +61,36 @@ func (properties *Properties) Get() (PropsResp, error) {
 	return sp.Get(properties.ToURL(), getConfHeaders(properties.config))
 }
 
+// GetProps gets specific props values
+func (properties *Properties) GetProps(props []string) (map[string]string, error) {
+	scoped := NewProperties(properties.client, properties.endpoint, properties.config)
+	selectProps := ""
+	for _, prop := range props {
+		if len(selectProps) > 0 {
+			selectProps += ","
+		}
+		selectProps += prop
+	}
+	res, err := scoped.Select(selectProps).Get()
+	if err != nil {
+		scoped.modifiers = &ODataMods{}
+		res, err := scoped.Get()
+		if err != nil {
+			return nil, err
+		}
+		resProps := map[string]string{}
+		for key, val := range res.Data() {
+			for _, p := range props {
+				if p == key {
+					resProps[key] = val
+				}
+			}
+		}
+		return resProps, nil
+	}
+	return res.Data(), nil
+}
+
 // Set sets a single property (CSOM helper)
 func (properties *Properties) Set(prop string, value string) ([]byte, error) {
 	return properties.SetProps(map[string]string{prop: value})
