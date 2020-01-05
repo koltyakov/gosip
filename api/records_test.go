@@ -78,6 +78,10 @@ func TestRecords(t *testing.T) {
 	})
 
 	t.Run("Records/DeclareWithDate", func(t *testing.T) {
+		if envCode != "spo" {
+			t.Skip("is not supported with old SharePoint versions")
+		}
+
 		item, err := folder.Folders().GetByName(folderName).Files().GetByName(docs[1]).GetItem()
 		if err != nil {
 			t.Error(err)
