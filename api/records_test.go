@@ -18,7 +18,7 @@ func TestRecords(t *testing.T) {
 	sp := NewSP(spClient)
 
 	// Activate in place record management feature
-	if _, err := sp.Site().Features().Add("da2e115b-07e4-49d9-bb2c-35e93bb9fca9", true); err != nil {
+	if err := sp.Site().Features().Add("da2e115b-07e4-49d9-bb2c-35e93bb9fca9", true); err != nil {
 		t.Error(err)
 	}
 
