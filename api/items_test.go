@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -22,7 +21,7 @@ func TestItems(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	startedOn := time.Now()
+	// startedOn := time.Now()
 
 	t.Run("AddWithoutMetadataType", func(t *testing.T) {
 		body := []byte(`{"Title":"Item"}`)
@@ -88,12 +87,12 @@ func TestItems(t *testing.T) {
 		if item.Data().Title == "" {
 			t.Error("can't get item Title property properly")
 		}
-		if item.Data().Created.Day() != startedOn.Day() {
-			t.Error("can't get item Created property properly")
-		}
-		if item.Data().Modified.Day() != startedOn.Day() {
-			t.Error("can't get item Modified property properly")
-		}
+		// if item.Data().Created.Day() != startedOn.Day() {
+		// 	t.Error("can't get item Created property properly")
+		// }
+		// if item.Data().Modified.Day() != startedOn.Day() {
+		// 	t.Error("can't get item Modified property properly")
+		// }
 	})
 
 	t.Run("Get/CustomUnmarshal", func(t *testing.T) {
@@ -113,28 +112,13 @@ func TestItems(t *testing.T) {
 		}
 	})
 
-	t.Run("GetByCAML", func(t *testing.T) {
-		caml := `
-			<View>
-				<Query>
-					<Where>
-						<Eq>
-							<FieldRef Name='ID' />
-							<Value Type='Number'>3</Value>
-						</Eq>
-					</Where>
-				</Query>
-			</View>
-		`
-		data, err := list.Items().GetByCAML(caml)
+	t.Run("GetByCAMLAdvanced", func(t *testing.T) {
+		viewResp, err := list.Views().DefaultView().Select("ListViewXml").Get()
 		if err != nil {
 			t.Error(err)
 		}
-		if len(data.Data()) != 1 {
-			t.Error("incorrect number of items")
-		}
-		if data.Data()[0].Data().ID != 3 {
-			t.Error("incorrect response")
+		if _, err := list.Items().GetByCAML(viewResp.Data().ListViewXML); err != nil {
+			t.Error(err)
 		}
 	})
 

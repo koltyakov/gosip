@@ -173,12 +173,26 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 	}
 	apiURL.RawQuery = query.Encode()
 
-	body := trimMultiline(`{
-		"query": {
-			"__metadata": { "type": "SP.CamlQuery" },
-			"ViewXml": "` + trimMultiline(caml) + `"
-		}
-	}`)
+	request := &struct {
+		Query struct {
+			Metadata struct {
+				Type string `json:"type"`
+			} `json:"__metadata"`
+			ViewXML string `json:"ViewXml"`
+		} `json:"query"`
+	}{}
+
+	request.Query.Metadata.Type = "SP.CamlQuery"
+	request.Query.ViewXML = trimMultiline(caml)
+
+	body, _ := json.Marshal(request)
+	// body := trimMultiline(`{
+	// 	"query": {
+	// 		"__metadata": { "type": "SP.CamlQuery" },
+	// 		"ViewXml": "` + trimMultiline(caml) + `"
+	// 	}
+	// }`)
+
 	sp := NewHTTPClient(items.client)
 	return sp.Post(apiURL.String(), []byte(body), getConfHeaders(items.config))
 }
