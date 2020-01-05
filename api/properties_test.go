@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"strings"
 	"testing"
 	"time"
@@ -44,22 +43,23 @@ func TestProperties(t *testing.T) {
 			t.Skip("is not supported with SP 2013")
 		}
 
-		data, err := webProps.Select("vti_x005f_defaultlanguage").Conf(headers.verbose).Get()
+		data, err := webProps.Select("vti_x005f_defaultlanguage").Get()
 		if err != nil {
 			t.Error(err)
 		}
 
-		res := &struct {
-			D struct {
-				Lang string `json:"vti_x005f_defaultlanguage"`
-			} `json:"d"`
-		}{}
+		if data.Data()["vti_defaultlanguage"] == "" {
+			t.Error("can't get web prop")
+		}
+	})
 
-		if err := json.Unmarshal(data, &res); err != nil {
+	t.Run("GetProps", func(t *testing.T) {
+		data, err := webProps.GetProps([]string{"vti_defaultlanguage"})
+		if err != nil {
 			t.Error(err)
 		}
 
-		if res.D.Lang == "" {
+		if data["vti_defaultlanguage"] == "" {
 			t.Error("can't get web prop")
 		}
 	})

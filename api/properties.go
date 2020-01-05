@@ -63,6 +63,10 @@ func (properties *Properties) Get() (PropsResp, error) {
 
 // GetProps gets specific props values
 func (properties *Properties) GetProps(props []string) (map[string]string, error) {
+	for indx, prop := range props {
+		key := strings.Replace(strings.Replace(prop, "_x005f_", "_", -1), "_", "_x005f_", -1)
+		props[indx] = key
+	}
 	scoped := NewProperties(properties.client, properties.endpoint, properties.config)
 	selectProps := ""
 	for _, prop := range props {
@@ -81,6 +85,10 @@ func (properties *Properties) GetProps(props []string) (map[string]string, error
 		resProps := map[string]string{}
 		for key, val := range res.Data() {
 			for _, p := range props {
+				if p == key {
+					resProps[key] = val
+				}
+				p = strings.Replace(p, "_x005f_", "_", -1)
 				if p == key {
 					resProps[key] = val
 				}
