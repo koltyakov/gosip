@@ -7,14 +7,15 @@ import (
 	"time"
 )
 
-func TestWebProps(t *testing.T) {
+func TestProperties(t *testing.T) {
 	checkClient(t)
 
-	webProps := NewSP(spClient).Web().Props()
+	web := NewSP(spClient).Web()
+	webProps := web.AllProps()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web/AllProperties"
 
 	t.Run("Constructor", func(t *testing.T) {
-		webProps := NewWebProps(spClient, endpoint, nil)
+		webProps := NewProperties(spClient, endpoint, nil)
 		if _, err := webProps.Select("vti_x005f_defaultlanguage").Get(); err != nil {
 			t.Error(err)
 		}
@@ -65,6 +66,12 @@ func TestWebProps(t *testing.T) {
 
 	t.Run("Set", func(t *testing.T) {
 		if _, err := webProps.Set("test_gosip", time.Now().String()); err != nil {
+			// By default is denied on Modern SPO sites, so ignore in tests
+			if strings.Index(err.Error(), "System.UnauthorizedAccessException") == -1 {
+				t.Error(err)
+			}
+		}
+		if _, err := web.RootFolder().Props().Set("test_gosip", time.Now().String()); err != nil {
 			// By default is denied on Modern SPO sites, so ignore in tests
 			if strings.Index(err.Error(), "System.UnauthorizedAccessException") == -1 {
 				t.Error(err)
