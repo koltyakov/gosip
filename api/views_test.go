@@ -27,6 +27,12 @@ func TestViews(t *testing.T) {
 		}
 	})
 
+	t.Run("DefaultView", func(t *testing.T) {
+		if _, err := web.GetList(listURI).Views().DefaultView().Get(); err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("GetByTitle", func(t *testing.T) {
 		if _, err := web.GetList(listURI).Views().GetByTitle(view.Title).Get(); err != nil {
 			t.Error(err)

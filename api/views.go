@@ -94,6 +94,15 @@ func (views *Views) GetByTitle(title string) *View {
 	)
 }
 
+// DefaultView gets list's default view
+func (views *Views) DefaultView() *View {
+	return NewView(
+		views.client,
+		fmt.Sprintf("%s/DefaultView", getPriorEndpoint(views.endpoint, "/Views")),
+		views.config,
+	)
+}
+
 // ToDo:
 // Add
 
