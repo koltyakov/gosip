@@ -131,23 +131,13 @@ func (web *Web) Lists() *Lists {
 	)
 }
 
-// GetChangeToken gets current change token for this Web
-func (web *Web) GetChangeToken() (string, error) {
-	scoped := NewWeb(web.client, web.endpoint, web.config)
-	data, err := scoped.Select("CurrentChangeToken").Get()
-	if err != nil {
-		return "", err
-	}
-	return data.Data().CurrentChangeToken.StringValue, nil
-}
-
-// GetChanges gets changes on this Web due to the configuration provided as `changeQuery` parameter
-func (web *Web) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
+// Changes gets changes API scoped object
+func (web *Web) Changes() *Changes {
 	return NewChanges(
 		web.client,
-		fmt.Sprintf("%s/GetChanges", web.endpoint),
+		web.endpoint,
 		web.config,
-	).GetChanges(changeQuery)
+	)
 }
 
 // Webs gets Webs API instance queryable collection for this Web (Subwebs)

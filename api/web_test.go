@@ -92,16 +92,6 @@ func TestWeb(t *testing.T) {
 		}
 	})
 
-	t.Run("CurrentChangeToken", func(t *testing.T) {
-		token, err := web.GetChangeToken()
-		if err != nil {
-			t.Error(err)
-		}
-		if token == "" {
-			t.Error("can't get current change token")
-		}
-	})
-
 	t.Run("EnsureFolder", func(t *testing.T) {
 		data, err := web.GetFolder("Shared Documents").Folders().Select("Name").Get()
 		if err != nil {

@@ -141,23 +141,13 @@ func (site *Site) RecycleBin() *RecycleBin {
 	return NewRecycleBin(site.client, endpoint, site.config)
 }
 
-// GetChangeToken gets current change token for this Site
-func (site *Site) GetChangeToken() (string, error) {
-	scoped := NewSite(site.client, site.endpoint, site.config)
-	data, err := scoped.Select("CurrentChangeToken").Get()
-	if err != nil {
-		return "", err
-	}
-	return data.Data().CurrentChangeToken.StringValue, nil
-}
-
-// GetChanges gets changes on this Site due to the configuration provided as `changeQuery` parameter
-func (site *Site) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
+// Changes gets changes API scoped object
+func (site *Site) Changes() *Changes {
 	return NewChanges(
 		site.client,
-		fmt.Sprintf("%s/GetChanges", site.endpoint),
+		site.endpoint,
 		site.config,
-	).GetChanges(changeQuery)
+	)
 }
 
 // ToDo:

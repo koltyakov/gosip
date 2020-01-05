@@ -46,16 +46,6 @@ func TestList(t *testing.T) {
 		}
 	})
 
-	t.Run("CurrentChangeToken", func(t *testing.T) {
-		token, err := list.GetChangeToken()
-		if err != nil {
-			t.Error(err)
-		}
-		if token == "" {
-			t.Error("can't get current change token")
-		}
-	})
-
 	t.Run("ReserveListItemID", func(t *testing.T) {
 		nextID, err := list.ReserveListItemID()
 		if err != nil {

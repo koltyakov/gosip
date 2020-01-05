@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -75,10 +76,10 @@ func NewChanges(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL gets endpoint with modificators raw URL
-func (changes *Changes) ToURL() string {
-	return changes.endpoint
-}
+// // ToURL gets endpoint with modificators raw URL gets endpoint with modificators raw URL
+// func (changes *Changes) ToURL() string {
+// 	return changes.endpoint
+// }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (changes *Changes) Conf(config *RequestConfig) *Changes {
@@ -86,8 +87,27 @@ func (changes *Changes) Conf(config *RequestConfig) *Changes {
 	return changes
 }
 
+// GetChangeToken gets current change token for this parent entity
+func (changes *Changes) GetCurrentToken() (string, error) {
+	endpoint := fmt.Sprintf("%s?$select=CurrentChangeToken", changes.endpoint)
+	sp := NewHTTPClient(changes.client)
+	data, err := sp.Get(endpoint, getConfHeaders(changes.config))
+	if err != nil {
+		return "", err
+	}
+	data = parseODataItem(data)
+	res := &struct {
+		CurrentChangeToken StringValue `json:"CurrentChangeToken"`
+	}{}
+	if err := json.Unmarshal(data, &res); err != nil {
+		return "", err
+	}
+	return res.CurrentChangeToken.StringValue, nil
+}
+
 // GetChanges gets changes in scope of the parent container using provided change query
 func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
+	endpoint := fmt.Sprintf("%s/GetChanges", changes.endpoint)
 	sp := NewHTTPClient(changes.client)
 	metadata := map[string]interface{}{}
 	if changeQuery != nil {
@@ -111,7 +131,7 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, err
 	if err != nil {
 		return nil, err
 	}
-	data, err := sp.Post(changes.ToURL(), body, getConfHeaders(changes.config))
+	data, err := sp.Post(endpoint, body, getConfHeaders(changes.config))
 	if err != nil {
 		return nil, err
 	}

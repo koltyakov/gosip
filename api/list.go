@@ -163,23 +163,13 @@ func (list *List) ContentTypes() *ContentTypes {
 	)
 }
 
-// GetChangeToken gets current change token for this List
-func (list *List) GetChangeToken() (string, error) {
-	scoped := NewList(list.client, list.endpoint, list.config)
-	data, err := scoped.Select("CurrentChangeToken").Get()
-	if err != nil {
-		return "", err
-	}
-	return data.Data().CurrentChangeToken.StringValue, nil
-}
-
-// GetChanges gets changes on this List due to the configuration provided as `changeQuery` parameter
-func (list *List) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
+// Changes gets changes API scoped object
+func (list *List) Changes() *Changes {
 	return NewChanges(
 		list.client,
-		fmt.Sprintf("%s/GetChanges", list.endpoint),
+		list.endpoint,
 		list.config,
-	).GetChanges(changeQuery)
+	)
 }
 
 // Fields gets list's Fields API instance queryable collection
