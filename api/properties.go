@@ -171,6 +171,21 @@ func (properties *Properties) SetProps(props map[string]string) error {
 		</Request>
 	`))
 	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), body)
+
+	if err != nil && strings.Contains(err.Error(), "System.UnauthorizedAccessException") {
+		siteURL := getPriorEndpoint(properties.endpoint, "/_api")
+		if strings.Contains(strings.ToLower(siteURL), ".sharepoint.com") {
+			noScriptSiteDisable := fmt.Sprintf("spo site classic set --url %s --noScriptSite false", siteURL)
+			err = fmt.Errorf(
+				"%s. You probably have \"noScriptSite\" enabled on your site. "+
+					"You can enable it using PnP Office 365 CLI by running \"%s\". "+
+					"See more: https://pnp.github.io/office365-cli",
+				err,
+				noScriptSiteDisable,
+			)
+		}
+	}
+
 	return err
 }
 
