@@ -104,6 +104,24 @@ func (folder *Folder) Folders() *Folders {
 	)
 }
 
+// ParentFolder gets parent folder of this folder
+func (folder *Folder) ParentFolder() *Folder {
+	return NewFolder(
+		folder.client,
+		fmt.Sprintf("%s/ParentFolder", folder.endpoint),
+		folder.config,
+	)
+}
+
+// Props gets Properties API instance queryable collection for this Folder
+func (folder *Folder) Props() *Properties {
+	return NewProperties(
+		folder.client,
+		fmt.Sprintf("%s/Properties", folder.endpoint),
+		folder.config,
+	)
+}
+
 // Files gets files queryable collection in this folder
 func (folder *Folder) Files() *Files {
 	return NewFiles(
@@ -165,6 +183,9 @@ func (folder *Folder) GetItem() (*Item, error) {
 func (folder *Folder) ContextInfo() (*ContextInfo, error) {
 	return NewContext(folder.client, folder.ToURL(), folder.config).Get()
 }
+
+// ToDo:
+// StorageMetrics
 
 /* Response helpers */
 

@@ -25,6 +25,16 @@ func TestFolder(t *testing.T) {
 		}
 	})
 
+	t.Run("Props", func(t *testing.T) {
+		props, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Props().Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if len(props.Data()) == 0 {
+			t.Error("can't get property bags")
+		}
+	})
+
 	t.Run("GetItem", func(t *testing.T) {
 		item, err := web.GetFolder(rootFolderURI + "/" + newFolderName).GetItem()
 		if err != nil {
