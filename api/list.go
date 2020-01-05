@@ -199,6 +199,15 @@ func (list *List) ParentWeb() *Web {
 	)
 }
 
+// RootFolder gets lists's root folder object
+func (list *List) RootFolder() *Folder {
+	return NewFolder(
+		list.client,
+		fmt.Sprintf("%s/RootFolder", list.endpoint),
+		list.config,
+	)
+}
+
 // GetEntityType gets list's ListItemEntityTypeFullName
 func (list *List) GetEntityType() (string, error) {
 	scoped := NewList(list.client, list.endpoint, list.config)

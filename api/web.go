@@ -149,9 +149,9 @@ func (web *Web) Webs() *Webs {
 	)
 }
 
-// Props gets WebProps API instance queryable collection for this Web
-func (web *Web) Props() *WebProps {
-	return NewWebProps(
+// AllProps gets Properties API instance queryable collection for this Web
+func (web *Web) AllProps() *Properties {
+	return NewProperties(
 		web.client,
 		fmt.Sprintf("%s/AllProperties", web.endpoint),
 		web.config,
@@ -172,6 +172,15 @@ func (web *Web) Fields() *Fields {
 	return NewFields(
 		web.client,
 		fmt.Sprintf("%s/Fields", web.endpoint),
+		web.config,
+	)
+}
+
+// RootFolder gets web's root folder object
+func (web *Web) RootFolder() *Folder {
+	return NewFolder(
+		web.client,
+		fmt.Sprintf("%s/RootFolder", web.endpoint),
 		web.config,
 	)
 }
