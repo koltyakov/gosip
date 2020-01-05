@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"path"
 	"runtime"
 )
@@ -9,6 +8,6 @@ import (
 // ResolveCnfgPath : resolves config path (for auth startegy tests only)
 func ResolveCnfgPath(relativePath string) string {
 	_, filename, _, _ := runtime.Caller(1)
-	fmt.Println(filename)
+	// fmt.Println(filename)
 	return path.Join(path.Dir(filename), "../..", relativePath)
 }
