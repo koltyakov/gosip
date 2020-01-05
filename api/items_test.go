@@ -112,6 +112,31 @@ func TestItems(t *testing.T) {
 		}
 	})
 
+	t.Run("GetByCAML", func(t *testing.T) {
+		caml := `
+			<View>
+				<Query>
+					<Where>
+						<Eq>
+							<FieldRef Name='ID' />
+							<Value Type='Number'>3</Value>
+						</Eq>
+					</Where>
+				</Query>
+			</View>
+		`
+		data, err := list.Items().GetByCAML(caml)
+		if err != nil {
+			t.Error(err)
+		}
+		if len(data.Data()) != 1 {
+			t.Error("incorrect number of items")
+		}
+		if data.Data()[0].Data().ID != 3 {
+			t.Error("incorrect response")
+		}
+	})
+
 	t.Run("GetByCAMLAdvanced", func(t *testing.T) {
 		viewResp, err := list.Views().DefaultView().Select("ListViewXml").Get()
 		if err != nil {
