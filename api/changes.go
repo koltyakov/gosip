@@ -19,7 +19,7 @@ type Changes struct {
 // ChangeInfo - changes API response payload structure
 type ChangeInfo struct {
 	ChangeToken       *StringValue `json:"ChangeToken"`
-	ChangeType        int          `json:"ChangeType"`
+	ChangeType        int          `json:"ChangeType"` // see more https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-csom/ee543793(v%3Doffice.15)
 	Editor            string       `json:"Editor"`
 	EditorEmailHint   string       `json:"EditorEmailHint"`
 	ItemID            int          `json:"ItemId"`
@@ -35,36 +35,36 @@ type ChangeInfo struct {
 
 // ChangeQuery ...
 type ChangeQuery struct {
-	ChangeTokenStart      string // Gets or sets a value that specifies the start date and start time for changes that are returned through the query
-	ChangeTokenEnd        string // Gets or sets a value that specifies the end date and end time for changes that are returned through the query
-	Add                   bool   // Gets or sets a value that specifies whether add changes are included in the query
-	Alert                 bool   // Gets or sets a value that specifies whether changes to alerts are included in the query
-	ContentType           bool   // Gets or sets a value that specifies whether changes to content types are included in the query
-	DeleteObject          bool   // Gets or sets a value that specifies whether deleted objects are included in the query
-	Field                 bool   // Gets or sets a value that specifies whether changes to fields are included in the query
-	File                  bool   // Gets or sets a value that specifies whether changes to files are included in the query
-	Folder                bool   // Gets or sets value that specifies whether changes to folders are included in the query
-	Group                 bool   // Gets or sets a value that specifies whether changes to groups are included in the query
-	GroupMembershipAdd    bool   // Gets or sets a value that specifies whether adding users to groups is included in the query
-	GroupMembershipDelete bool   // Gets or sets a value that specifies whether deleting users from the groups is included in the query
-	Item                  bool   // Gets or sets a value that specifies whether general changes to list items are included in the query
-	List                  bool   // Gets or sets a value that specifies whether changes to lists are included in the query
-	Move                  bool   // Gets or sets a value that specifies whether move changes are included in the query
-	Navigation            bool   // Gets or sets a value that specifies whether changes to the navigation structure of a site collection are included in the query
-	Rename                bool   // Gets or sets a value that specifies whether renaming changes are included in the query
-	Restore               bool   // Gets or sets a value that specifies whether restoring items from the recycle bin or from backups is included in the query
-	RoleAssignmentAdd     bool   // Gets or sets a value that specifies whether adding role assignments is included in the query
-	RoleAssignmentDelete  bool   // Gets or sets a value that specifies whether adding role assignments is included in the query
-	RoleDefinitionAdd     bool   // Gets or sets a value that specifies whether adding role assignments is included in the query
-	RoleDefinitionDelete  bool   // Gets or sets a value that specifies whether adding role assignments is included in the query
-	RoleDefinitionUpdate  bool   // Gets or sets a value that specifies whether adding role assignments is included in the query
-	SecurityPolicy        bool   // Gets or sets a value that specifies whether modifications to security policies are included in the query
-	Site                  bool   // Gets or sets a value that specifies whether changes to site collections are included in the query
-	SystemUpdate          bool   // Gets or sets a value that specifies whether updates made using the item SystemUpdate method are included in the query
-	Update                bool   // Gets or sets a value that specifies whether update changes are included in the query
-	User                  bool   // Gets or sets a value that specifies whether changes to users are included in the query
-	View                  bool   // Gets or sets a value that specifies whether changes to views are included in the query
-	Web                   bool   // Gets or sets a value that specifies whether changes to Web sites are included in the query
+	ChangeTokenStart      string // Specifies the start date and start time for changes that are returned through the query
+	ChangeTokenEnd        string // Specifies the end date and end time for changes that are returned through the query
+	Add                   bool   // Specifies whether add changes are included in the query
+	Alert                 bool   // Specifies whether changes to alerts are included in the query
+	ContentType           bool   // Specifies whether changes to content types are included in the query
+	DeleteObject          bool   // Specifies whether deleted objects are included in the query
+	Field                 bool   // Specifies whether changes to fields are included in the query
+	File                  bool   // Specifies whether changes to files are included in the query
+	Folder                bool   // Specifies whether changes to folders are included in the query
+	Group                 bool   // Specifies whether changes to groups are included in the query
+	GroupMembershipAdd    bool   // Specifies whether adding users to groups is included in the query
+	GroupMembershipDelete bool   // Specifies whether deleting users from the groups is included in the query
+	Item                  bool   // Specifies whether general changes to list items are included in the query
+	List                  bool   // Specifies whether changes to lists are included in the query
+	Move                  bool   // Specifies whether move changes are included in the query
+	Navigation            bool   // Specifies whether changes to the navigation structure of a site collection are included in the query
+	Rename                bool   // Specifies whether renaming changes are included in the query
+	Restore               bool   // Specifies whether restoring items from the recycle bin or from backups is included in the query
+	RoleAssignmentAdd     bool   // Specifies whether adding role assignments is included in the query
+	RoleAssignmentDelete  bool   // Specifies whether adding role assignments is included in the query
+	RoleDefinitionAdd     bool   // Specifies whether adding role assignments is included in the query
+	RoleDefinitionDelete  bool   // Specifies whether adding role assignments is included in the query
+	RoleDefinitionUpdate  bool   // Specifies whether adding role assignments is included in the query
+	SecurityPolicy        bool   // Specifies whether modifications to security policies are included in the query
+	Site                  bool   // Specifies whether changes to site collections are included in the query
+	SystemUpdate          bool   // Specifies whether updates made using the item SystemUpdate method are included in the query
+	Update                bool   // Specifies whether update changes are included in the query
+	User                  bool   // Specifies whether changes to users are included in the query
+	View                  bool   // Specifies whether changes to views are included in the query
+	Web                   bool   // Specifies whether changes to Web sites are included in the query
 }
 
 // NewChanges - Changes struct constructor function
@@ -75,11 +75,6 @@ func NewChanges(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 		config:   config,
 	}
 }
-
-// // ToURL gets endpoint with modificators raw URL gets endpoint with modificators raw URL
-// func (changes *Changes) ToURL() string {
-// 	return changes.endpoint
-// }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (changes *Changes) Conf(config *RequestConfig) *Changes {
