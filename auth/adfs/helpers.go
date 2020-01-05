@@ -190,6 +190,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
+	defer resp.Body.Close()
 
 	// Response location with WAP login endpoint is used to send form auth request
 	redirect, err := resp.Location()
@@ -208,6 +209,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
+	defer resp.Body.Close()
 
 	// Request to redirect URL using MSISAuth
 	req, err := http.NewRequest("GET", redirectURL, nil)
@@ -228,6 +230,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
+	defer resp.Body.Close()
 
 	// Yet another redirect using JWT at this point (spUrl?authToken=JWT&client-request-id=)
 	redirect, err = resp.Location()
@@ -247,6 +250,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
+	defer resp.Body.Close()
 
 	// TODO: get expirity somehow
 	authCookie := resp.Header.Get("Set-Cookie") // EdgeAccessCookie
@@ -271,6 +275,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 			if err != nil {
 				return "", "", err
 			}
+			defer resp.Body.Close()
 
 			cc := *c
 			cc.RelyingParty = resp.Request.URL.Query().Get("wtrealm")

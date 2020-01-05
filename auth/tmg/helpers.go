@@ -93,6 +93,7 @@ func detectCookieAuthURL(siteURL string) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	redirect, err := resp.Location()
 	if err != nil {
