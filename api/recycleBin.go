@@ -154,10 +154,11 @@ func (recycleBinItem *RecycleBinItem) Get() (RecycleBinItemResp, error) {
 }
 
 // Restore restores this recycled item
-func (recycleBinItem *RecycleBinItem) Restore() ([]byte, error) {
+func (recycleBinItem *RecycleBinItem) Restore() error {
 	endpoint := fmt.Sprintf("%s/Restore()", recycleBinItem.endpoint)
 	sp := NewHTTPClient(recycleBinItem.client)
-	return sp.Post(endpoint, nil, getConfHeaders(recycleBinItem.config))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(recycleBinItem.config))
+	return err
 }
 
 /* Response helpers */

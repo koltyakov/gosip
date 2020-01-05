@@ -41,7 +41,7 @@ func TestRecycleBin(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := sp.Web().RecycleBin().GetByID(items.Data()[0].Data().ID).Restore(); err != nil {
+		if err := sp.Web().RecycleBin().GetByID(items.Data()[0].Data().ID).Restore(); err != nil {
 			t.Error(err)
 		}
 		data2, err := list.Items().Select("Id").Get()
