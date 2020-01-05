@@ -100,12 +100,12 @@ func (properties *Properties) GetProps(props []string) (map[string]string, error
 }
 
 // Set sets a single property (CSOM helper)
-func (properties *Properties) Set(prop string, value string) ([]byte, error) {
+func (properties *Properties) Set(prop string, value string) error {
 	return properties.SetProps(map[string]string{prop: value})
 }
 
 // SetProps sets multiple properties defined in string map object (CSOM helper)
-func (properties *Properties) SetProps(props map[string]string) ([]byte, error) {
+func (properties *Properties) SetProps(props map[string]string) error {
 	var web *Web
 	var folder *Folder
 
@@ -126,20 +126,20 @@ func (properties *Properties) SetProps(props map[string]string) ([]byte, error) 
 	site := NewSP(properties.client).Site()
 	siteR, err := site.Select("Id").Get()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	identity = fmt.Sprintf("740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:%s", siteR.Data().ID)
 
 	webR, err := web.Select("Id").Get()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	identity = fmt.Sprintf("%s:web:%s", identity, webR.Data().ID)
 
 	if folder != nil {
 		folderR, err := folder.Select("UniqueId").Get()
 		if err != nil {
-			return nil, err
+			return err
 		}
 		identity = fmt.Sprintf("7394289f-308a-9000-9495-3d03f105ec57|%s:folder:%s", identity, folderR.Data().UniqueID)
 	}
@@ -170,7 +170,8 @@ func (properties *Properties) SetProps(props map[string]string) ([]byte, error) 
 			</ObjectPaths>
 		</Request>
 	`))
-	return sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), body)
+	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), body)
+	return err
 }
 
 /* Response helpers */
