@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -139,11 +140,14 @@ func (properties *Properties) SetProps(props map[string]string) ([]byte, error) 
 // Data : to get typed data
 func (propsResp *PropsResp) Data() map[string]string {
 	data := parseODataItem(*propsResp)
-	res0 := map[string]interface{}{}
-	json.Unmarshal(data, &res0)
-	delete(res0, "__metadata")
-	data1, _ := json.Marshal(res0)
+	resAll := map[string]interface{}{}
+	json.Unmarshal(data, &resAll)
 	res := map[string]string{}
-	json.Unmarshal(data1, &res)
+	for key, val := range resAll {
+		if reflect.TypeOf(val).String() == "string" {
+			key = strings.Replace(key, "_x005f_", "_", -1)
+			res[key] = val.(string)
+		}
+	}
 	return res
 }
