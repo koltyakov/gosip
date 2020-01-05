@@ -48,10 +48,10 @@ func (records *Records) IsRecord() (bool, error) {
 // RecordDate checks record declaration date of this item
 func (records *Records) RecordDate() (time.Time, error) {
 	data, err := records.item.Select("OData__vti_ItemDeclaredRecord").Get()
-	if strings.Index(err.Error(), "OData__vti_ItemDeclaredRecord") != -1 {
-		return time.Time{}, nil // in place records is not configured in a list
-	}
 	if err != nil {
+		if strings.Index(err.Error(), "OData__vti_ItemDeclaredRecord") != -1 {
+			return time.Time{}, nil // in place records is not configured in a list
+		}
 		return time.Time{}, err
 	}
 	res := &struct {
