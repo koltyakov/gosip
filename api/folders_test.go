@@ -36,7 +36,7 @@ func TestFolders(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		if _, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Delete(); err != nil {
+		if err := web.GetFolder(rootFolderURI + "/" + newFolderName).Delete(); err != nil {
 			t.Error(err)
 		}
 	})

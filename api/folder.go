@@ -76,23 +76,25 @@ func (folder *Folder) Get() (FolderResp, error) {
 
 // Update updates Folder's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Folder object
-func (folder *Folder) Update(body []byte) ([]byte, error) {
+func (folder *Folder) Update(body []byte) (FolderResp, error) {
 	body = patchMetadataType(body, "SP.Folder")
 	sp := NewHTTPClient(folder.client)
 	return sp.Update(folder.endpoint, body, getConfHeaders(folder.config))
 }
 
 // Delete deletes this folder (can't be restored from a recycle bin)
-func (folder *Folder) Delete() ([]byte, error) {
+func (folder *Folder) Delete() error {
 	sp := NewHTTPClient(folder.client)
-	return sp.Delete(folder.endpoint, getConfHeaders(folder.config))
+	_, err := sp.Delete(folder.endpoint, getConfHeaders(folder.config))
+	return err
 }
 
 // Recycle moves this folder to the recycle bin
-func (folder *Folder) Recycle() ([]byte, error) {
+func (folder *Folder) Recycle() error {
 	sp := NewHTTPClient(folder.client)
 	endpoint := fmt.Sprintf("%s/Recycle", folder.endpoint)
-	return sp.Post(endpoint, nil, getConfHeaders(folder.config))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(folder.config))
+	return err
 }
 
 // Folders gets subfolders queryable collection

@@ -58,7 +58,7 @@ func TestFiles(t *testing.T) {
 		}
 	})
 
-	if _, err := web.GetFolder(newFolderURI).Delete(); err != nil {
+	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
 		t.Error(err)
 	}
 }

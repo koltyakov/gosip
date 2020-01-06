@@ -119,7 +119,7 @@ func TestChanges(t *testing.T) {
 		}
 	})
 
-	if _, err := list.Delete(); err != nil {
+	if err := list.Delete(); err != nil {
 		t.Error(err)
 	}
 

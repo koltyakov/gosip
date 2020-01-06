@@ -105,23 +105,25 @@ func (file *File) Get() (FileResp, error) {
 
 // Update updates Field's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.File object
-func (file *File) Update(body []byte) ([]byte, error) {
+func (file *File) Update(body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.File")
 	sp := NewHTTPClient(file.client)
 	return sp.Update(file.endpoint, body, getConfHeaders(file.config))
 }
 
 // Delete deletes this file skipping recycle bin
-func (file *File) Delete() ([]byte, error) {
+func (file *File) Delete() error {
 	sp := NewHTTPClient(file.client)
-	return sp.Delete(file.endpoint, getConfHeaders(file.config))
+	_, err := sp.Delete(file.endpoint, getConfHeaders(file.config))
+	return err
 }
 
 // Recycle moves this file to the recycle bin
-func (file *File) Recycle() ([]byte, error) {
+func (file *File) Recycle() error {
 	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/Recycle", file.endpoint)
-	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(file.config))
+	return err
 }
 
 // ListItemAllFields gets this file Item data object metadata

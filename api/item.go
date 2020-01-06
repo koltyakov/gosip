@@ -75,20 +75,22 @@ func (item *Item) Get() (ItemResp, error) {
 }
 
 // Delete deletes this Item (can't be restored from a recycle bin)
-func (item *Item) Delete() ([]byte, error) {
+func (item *Item) Delete() error {
 	sp := NewHTTPClient(item.client)
-	return sp.Delete(item.endpoint, getConfHeaders(item.config))
+	_, err := sp.Delete(item.endpoint, getConfHeaders(item.config))
+	return err
 }
 
 // Recycle moves this item to the recycle bin
-func (item *Item) Recycle() ([]byte, error) {
+func (item *Item) Recycle() error {
 	endpoint := fmt.Sprintf("%s/Recycle", item.endpoint)
 	sp := NewHTTPClient(item.client)
-	return sp.Post(endpoint, nil, getConfHeaders(item.config))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(item.config))
+	return err
 }
 
 // Update updates item's metadata. `body` parameter is byte array representation of JSON string payload relevalt to item metadata object.
-func (item *Item) Update(body []byte) ([]byte, error) {
+func (item *Item) Update(body []byte) (ItemResp, error) {
 	body = patchMetadataTypeCB(body, func() string {
 		endpoint := getPriorEndpoint(item.endpoint, "/Items")
 		list := NewList(item.client, endpoint, nil)

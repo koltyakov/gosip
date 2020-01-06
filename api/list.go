@@ -132,14 +132,23 @@ func (list *List) Get() (ListResp, error) {
 }
 
 // Delete deletes a list (can't be restored from a recycle bin)
-func (list *List) Delete() ([]byte, error) {
+func (list *List) Delete() error {
 	sp := NewHTTPClient(list.client)
-	return sp.Delete(list.endpoint, getConfHeaders(list.config))
+	_, err := sp.Delete(list.endpoint, getConfHeaders(list.config))
+	return err
+}
+
+// Recycle moves this list to the recycle bin
+func (list *List) Recycle() error {
+	endpoint := fmt.Sprintf("%s/Recycle", list.endpoint)
+	sp := NewHTTPClient(list.client)
+	_, err := sp.Post(endpoint, nil, getConfHeaders(list.config))
+	return err
 }
 
 // Update updates Lists's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.List object
-func (list *List) Update(body []byte) ([]byte, error) {
+func (list *List) Update(body []byte) (ListResp, error) {
 	body = patchMetadataType(body, "SP.List")
 	sp := NewHTTPClient(list.client)
 	return sp.Update(list.endpoint, body, getConfHeaders(list.config))

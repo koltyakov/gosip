@@ -74,7 +74,7 @@ func TestWebs(t *testing.T) {
 		}
 		createdWebURL := spClient.AuthCnfg.GetSiteURL() + "/ci_" + newWebGUID
 		subWeb := NewWeb(spClient, createdWebURL, nil)
-		if _, err := subWeb.Delete(); err != nil {
+		if err := subWeb.Delete(); err != nil {
 			t.Error(err)
 		}
 	})

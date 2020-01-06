@@ -96,23 +96,25 @@ func (field *Field) Get() (FieldResp, error) {
 
 // Update updates Field's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Field object
-func (field *Field) Update(body []byte) ([]byte, error) {
+func (field *Field) Update(body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.Field")
 	sp := NewHTTPClient(field.client)
 	return sp.Update(field.endpoint, body, getConfHeaders(field.config))
 }
 
 // Delete deletes a field skipping recycle bin
-func (field *Field) Delete() ([]byte, error) {
+func (field *Field) Delete() error {
 	sp := NewHTTPClient(field.client)
-	return sp.Delete(field.endpoint, getConfHeaders(field.config))
+	_, err := sp.Delete(field.endpoint, getConfHeaders(field.config))
+	return err
 }
 
 // Recycle moves a field to the recycle bin
-func (field *Field) Recycle() ([]byte, error) {
+func (field *Field) Recycle() error {
 	sp := NewHTTPClient(field.client)
 	endpoint := fmt.Sprintf("%s/Recycle", field.endpoint)
-	return sp.Post(endpoint, nil, getConfHeaders(field.config))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(field.config))
+	return err
 }
 
 /* Response helpers */

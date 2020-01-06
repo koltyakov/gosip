@@ -109,14 +109,23 @@ func (web *Web) Get() (WebResp, error) {
 }
 
 // Delete deletes this Web
-func (web *Web) Delete() ([]byte, error) {
+func (web *Web) Delete() error {
 	sp := NewHTTPClient(web.client)
-	return sp.Delete(web.endpoint, getConfHeaders(web.config))
+	_, err := sp.Delete(web.endpoint, getConfHeaders(web.config))
+	return err
+}
+
+// Recycle moves this web to the recycle bin
+func (web *Web) Recycle() error {
+	endpoint := fmt.Sprintf("%s/Recycle", web.endpoint)
+	sp := NewHTTPClient(web.client)
+	_, err := sp.Post(endpoint, nil, getConfHeaders(web.config))
+	return err
 }
 
 // Update updates Web's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Web object
-func (web *Web) Update(body []byte) ([]byte, error) {
+func (web *Web) Update(body []byte) (WebResp, error) {
 	body = patchMetadataType(body, "SP.Web")
 	sp := NewHTTPClient(web.client)
 	return sp.Update(web.endpoint, body, getConfHeaders(web.config))

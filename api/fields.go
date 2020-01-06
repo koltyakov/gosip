@@ -76,6 +76,14 @@ func (fields *Fields) Get() (FieldsResp, error) {
 	return sp.Get(fields.ToURL(), getConfHeaders(fields.config))
 }
 
+// Add adds field with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.Field object
+func (fields *Fields) Add(body []byte) (FieldResp, error) {
+	body = patchMetadataType(body, "SP.Field")
+	sp := NewHTTPClient(fields.client)
+	return sp.Post(fields.endpoint, body, getConfHeaders(fields.config))
+}
+
 // GetByID gets a field by its ID (GUID)
 func (fields *Fields) GetByID(fieldID string) *Field {
 	return NewField(
@@ -104,7 +112,6 @@ func (fields *Fields) GetByInternalNameOrTitle(internalName string) *Field {
 }
 
 // ToDo:
-// Add
 // CreateFieldAsXml
 
 /* Response helpers */

@@ -81,13 +81,13 @@ func TestItem(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		if _, err := list.Items().GetByID(1).Delete(); err != nil {
+		if err := list.Items().GetByID(1).Delete(); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Recycle", func(t *testing.T) {
-		if _, err := list.Items().GetByID(2).Recycle(); err != nil {
+		if err := list.Items().GetByID(2).Recycle(); err != nil {
 			t.Error(err)
 		}
 	})
@@ -98,7 +98,7 @@ func TestItem(t *testing.T) {
 		}
 	})
 
-	if _, err := list.Delete(); err != nil {
+	if err := list.Delete(); err != nil {
 		t.Error(err)
 	}
 }

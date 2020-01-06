@@ -85,8 +85,13 @@ func (contentTypes *ContentTypes) GetByID(contentTypeID string) *ContentType {
 	)
 }
 
-// ToDo:
-// Add
+// Add adds Content Types with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.ContentType object
+func (contentTypes *ContentTypes) Add(body []byte) (ContentTypeResp, error) {
+	body = patchMetadataType(body, "SP.ContentType")
+	sp := NewHTTPClient(contentTypes.client)
+	return sp.Post(contentTypes.endpoint, body, getConfHeaders(contentTypes.config))
+}
 
 /* Response helpers */
 

@@ -104,16 +104,17 @@ func (site *Site) Get() (SiteResp, error) {
 
 // Update updates Site's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Site object
-func (site *Site) Update(body []byte) ([]byte, error) {
+func (site *Site) Update(body []byte) (SiteResp, error) {
 	body = patchMetadataType(body, "SP.Site")
 	sp := NewHTTPClient(site.client)
 	return sp.Update(site.endpoint, body, getConfHeaders(site.config))
 }
 
 // Delete deletes current site (can't be restored from a recycle bin)
-func (site *Site) Delete() ([]byte, error) {
+func (site *Site) Delete() error {
 	sp := NewHTTPClient(site.client)
-	return sp.Delete(site.endpoint, getConfHeaders(site.config))
+	_, err := sp.Delete(site.endpoint, getConfHeaders(site.config))
+	return err
 }
 
 // RootWeb gets Site's root web queryable API object

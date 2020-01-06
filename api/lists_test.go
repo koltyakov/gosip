@@ -64,13 +64,13 @@ func TestLists(t *testing.T) {
 		if _, err := web.Lists().AddWithURI(listTitle, listURI, nil); err != nil {
 			t.Error(err)
 		}
-		if _, err := web.Lists().GetByTitle(listTitle).Delete(); err != nil {
+		if err := web.Lists().GetByTitle(listTitle).Delete(); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		if _, err := web.Lists().GetByTitle(newListTitle).Delete(); err != nil {
+		if err := web.Lists().GetByTitle(newListTitle).Delete(); err != nil {
 			t.Error(err)
 		}
 	})

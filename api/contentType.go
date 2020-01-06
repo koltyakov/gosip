@@ -74,23 +74,25 @@ func (ct *ContentType) Get() (ContentTypeResp, error) {
 
 // Update updates Content Types's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.ContentType object
-func (ct *ContentType) Update(body []byte) ([]byte, error) {
+func (ct *ContentType) Update(body []byte) (ContentTypeResp, error) {
 	body = patchMetadataType(body, "SP.ContentType")
 	sp := NewHTTPClient(ct.client)
 	return sp.Update(ct.endpoint, body, getConfHeaders(ct.config))
 }
 
 // Delete deletes a content type skipping recycle bin
-func (ct *ContentType) Delete() ([]byte, error) {
+func (ct *ContentType) Delete() error {
 	sp := NewHTTPClient(ct.client)
-	return sp.Delete(ct.endpoint, getConfHeaders(ct.config))
+	_, err := sp.Delete(ct.endpoint, getConfHeaders(ct.config))
+	return err
 }
 
 // Recycle moves a content type to the recycle bin
-func (ct *ContentType) Recycle() ([]byte, error) {
+func (ct *ContentType) Recycle() error {
 	sp := NewHTTPClient(ct.client)
 	endpoint := fmt.Sprintf("%s/Recycle", ct.endpoint)
-	return sp.Post(endpoint, nil, getConfHeaders(ct.config))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(ct.config))
+	return err
 }
 
 // Fields gets Fields API instance queryable collection

@@ -90,23 +90,25 @@ func (view *View) Get() (ViewResp, error) {
 
 // Update updates View's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.View object
-func (view *View) Update(body []byte) ([]byte, error) {
+func (view *View) Update(body []byte) (ViewResp, error) {
 	body = patchMetadataType(body, "SP.View")
 	sp := NewHTTPClient(view.client)
 	return sp.Update(view.endpoint, body, getConfHeaders(view.config))
 }
 
 // Delete deletes this View (can't be restored from a recycle bin)
-func (view *View) Delete() ([]byte, error) {
+func (view *View) Delete() error {
 	sp := NewHTTPClient(view.client)
-	return sp.Delete(view.endpoint, getConfHeaders(view.config))
+	_, err := sp.Delete(view.endpoint, getConfHeaders(view.config))
+	return err
 }
 
 // Recycle moves this View to the recycle bin
-func (view *View) Recycle() ([]byte, error) {
+func (view *View) Recycle() error {
 	sp := NewHTTPClient(view.client)
 	endpoint := fmt.Sprintf("%s/Recycle", view.endpoint)
-	return sp.Post(endpoint, nil, getConfHeaders(view.config))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(view.config))
+	return err
 }
 
 /* Response helpers */

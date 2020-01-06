@@ -76,6 +76,14 @@ func (views *Views) Get() (ViewsResp, error) {
 	return sp.Get(views.ToURL(), getConfHeaders(views.config))
 }
 
+// Add adds view with properties provided in `body` parameter
+// where `body` is byte array representation of JSON string payload relevalt to SP.View object
+func (views *Views) Add(body []byte) (ViewResp, error) {
+	body = patchMetadataType(body, "SP.View")
+	sp := NewHTTPClient(views.client)
+	return sp.Post(views.endpoint, body, getConfHeaders(views.config))
+}
+
 // GetByID gets a view by its ID (GUID)
 func (views *Views) GetByID(viewID string) *View {
 	return NewView(
@@ -102,9 +110,6 @@ func (views *Views) DefaultView() *View {
 		views.config,
 	)
 }
-
-// ToDo:
-// Add
 
 /* Response helpers */
 

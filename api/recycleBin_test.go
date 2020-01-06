@@ -34,7 +34,7 @@ func TestRecycleBin(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := list.Items().GetByID(data.Data().ID).Recycle(); err != nil {
+		if err := list.Items().GetByID(data.Data().ID).Recycle(); err != nil {
 			t.Error(err)
 		}
 		items, err := sp.Web().RecycleBin().OrderBy("DeletedDate", false).Filter("LeafName eq '1_.000'").Top(1).Get()
@@ -53,7 +53,7 @@ func TestRecycleBin(t *testing.T) {
 		}
 	})
 
-	if _, err := list.Delete(); err != nil {
+	if err := list.Delete(); err != nil {
 		t.Error(err)
 	}
 

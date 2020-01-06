@@ -63,7 +63,7 @@ func TestRoles(t *testing.T) {
 	})
 
 	// Postconfigurations
-	if _, err := list.Delete(); err != nil {
+	if err := list.Delete(); err != nil {
 		t.Errorf("can't delete a list: %s", err)
 	}
 

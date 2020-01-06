@@ -104,7 +104,7 @@ func TestRecords(t *testing.T) {
 		}
 	})
 
-	if _, err := folder.Folders().GetByName(folderName).Delete(); err != nil {
+	if err := folder.Folders().GetByName(folderName).Delete(); err != nil {
 		t.Error(err)
 	}
 

@@ -85,16 +85,18 @@ func (attachment *Attachment) Get() (AttachmentResp, error) {
 }
 
 // Delete delete an attachment skipping recycle bin
-func (attachment *Attachment) Delete() ([]byte, error) {
+func (attachment *Attachment) Delete() error {
 	sp := NewHTTPClient(attachment.client)
-	return sp.Delete(attachment.endpoint, getConfHeaders(attachment.config))
+	_, err := sp.Delete(attachment.endpoint, getConfHeaders(attachment.config))
+	return err
 }
 
 // Recycle moves an attachment to the recycle bin
-func (attachment *Attachment) Recycle() ([]byte, error) {
+func (attachment *Attachment) Recycle() error {
 	sp := NewHTTPClient(attachment.client)
 	endpoint := fmt.Sprintf("%s/RecycleObject", attachment.endpoint)
-	return sp.Post(endpoint, nil, getConfHeaders(attachment.config))
+	_, err := sp.Post(endpoint, nil, getConfHeaders(attachment.config))
+	return err
 }
 
 // GetReader gets attachment body data reader

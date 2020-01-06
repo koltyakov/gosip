@@ -50,7 +50,7 @@ func TestFolder(t *testing.T) {
 	})
 
 	t.Run("Recycle", func(t *testing.T) {
-		if _, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Delete(); err != nil {
+		if err := web.GetFolder(rootFolderURI + "/" + newFolderName).Delete(); err != nil {
 			t.Error(err)
 		}
 		// ToDo: Restore and delete

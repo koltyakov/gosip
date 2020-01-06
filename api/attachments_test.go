@@ -57,15 +57,13 @@ func TestAttachments(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		_, err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_02.txt").Delete()
-		if err != nil {
+		if err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_02.txt").Delete(); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Recycle", func(t *testing.T) {
-		_, err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_03.txt").Recycle()
-		if err != nil {
+		if err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_03.txt").Recycle(); err != nil {
 			t.Error(err)
 		}
 	})
@@ -81,7 +79,7 @@ func TestAttachments(t *testing.T) {
 		}
 	})
 
-	if _, err := list.Delete(); err != nil {
+	if err := list.Delete(); err != nil {
 		t.Error(err)
 	}
 

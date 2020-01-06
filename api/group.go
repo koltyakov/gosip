@@ -77,7 +77,7 @@ func (group *Group) Get() (GroupResp, error) {
 
 // Update updates Group's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Group object
-func (group *Group) Update(body []byte) ([]byte, error) {
+func (group *Group) Update(body []byte) (GroupResp, error) {
 	body = patchMetadataType(body, "SP.Group")
 	sp := NewHTTPClient(group.client)
 	return sp.Update(group.endpoint, body, getConfHeaders(group.config))

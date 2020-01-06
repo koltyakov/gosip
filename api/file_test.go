@@ -51,13 +51,13 @@ func TestFile(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Delete(); err != nil {
+		if err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Delete(); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Recycle", func(t *testing.T) {
-		if _, err := web.GetFile(newFolderURI + "/File_2.txt").Recycle(); err != nil {
+		if err := web.GetFile(newFolderURI + "/File_2.txt").Recycle(); err != nil {
 			t.Error(err)
 		}
 	})
@@ -116,7 +116,7 @@ func TestFile(t *testing.T) {
 		}
 	})
 
-	if _, err := web.GetFolder(newFolderURI).Delete(); err != nil {
+	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
 		t.Error(err)
 	}
 }
