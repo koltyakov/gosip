@@ -22,6 +22,13 @@ type Items struct {
 // ItemsResp - items response type with helper processor methods
 type ItemsResp []byte
 
+// ItemsPage - paged items
+type ItemsPage struct {
+	Items       ItemsResp
+	HasNextPage func() bool
+	GetNextPage func() (*ItemsPage, error)
+}
+
 // NewItems - Items struct constructor function
 func NewItems(client *gosip.SPClient, endpoint string, config *RequestConfig) *Items {
 	return &Items{
@@ -82,25 +89,33 @@ func (items *Items) OrderBy(oDataOrderBy string, ascending bool) *Items {
 // Get gets Items API queryable collection
 func (items *Items) Get() (ItemsResp, error) {
 	sp := NewHTTPClient(items.client)
-	return sp.Get(items.ToURL(), getConfHeaders(items.config))
+	data, err := sp.Get(items.ToURL(), getConfHeaders(items.config))
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
-// GetPaged gets Items API queryable paged collection. Returns paged result and next page collection callback.
-// `getNextPage` callback returns the same for the next page or `unable to get next page` error if there is no more data.
-func (items *Items) GetPaged() (ItemsResp, func() (ItemsResp, error), error) {
-	sp := NewHTTPClient(items.client)
-	itemsResp, err := sp.Get(items.ToURL(), getConfHeaders(items.config))
+// GetPaged gets Paged Items collection
+func (items *Items) GetPaged() (*ItemsPage, error) {
+	data, err := items.Get()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	getNextPage := func() (ItemsResp, error) {
-		nextURL := getODataCollectionNextPageURL(itemsResp)
-		if nextURL == "" {
-			return nil, fmt.Errorf("unable to get next page")
-		}
-		return NewItems(items.client, nextURL, items.config).Get()
+	res := &ItemsPage{
+		Items: data,
+		HasNextPage: func() bool {
+			return data.HasNextPage()
+		},
+		GetNextPage: func() (*ItemsPage, error) {
+			nextURL := data.NextPageURL()
+			if nextURL == "" {
+				return nil, fmt.Errorf("unable to get next page")
+			}
+			return NewItems(items.client, nextURL, items.config).GetPaged()
+		},
 	}
-	return itemsResp, getNextPage, nil
+	return res, nil
 }
 
 // GetAll gets all items in a list using internal page helper. The use case of the method is getting all the content from large lists.
@@ -186,12 +201,6 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 	request.Query.ViewXML = trimMultiline(caml)
 
 	body, _ := json.Marshal(request)
-	// body := trimMultiline(`{
-	// 	"query": {
-	// 		"__metadata": { "type": "SP.CamlQuery" },
-	// 		"ViewXml": "` + trimMultiline(caml) + `"
-	// 	}
-	// }`)
 
 	sp := NewHTTPClient(items.client)
 	return sp.Post(apiURL.String(), []byte(body), getConfHeaders(items.config))
@@ -216,6 +225,20 @@ func (itemsResp *ItemsResp) Data() []ItemResp {
 func (itemsResp *ItemsResp) NextPageURL() string {
 	return getODataCollectionNextPageURL(*itemsResp)
 }
+
+// HasNextPage : returns is true if next page exists
+func (itemsResp *ItemsResp) HasNextPage() bool {
+	return itemsResp.NextPageURL() != ""
+}
+
+// // GetNext : gets next page OData collection
+// func (itemsResp *ItemsResp) GetNext(items *Items) (ItemsResp, error) {
+// 	nextURL := getODataCollectionNextPageURL(*itemsResp)
+// 	if nextURL == "" {
+// 		return nil, fmt.Errorf("unable to get next page")
+// 	}
+// 	return NewItems(items.client, nextURL, items.config).Get()
+// }
 
 // Unmarshal : to unmarshal to custom object
 func (itemsResp *ItemsResp) Unmarshal(obj interface{}) error {
