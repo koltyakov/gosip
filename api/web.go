@@ -310,6 +310,15 @@ func (web *Web) Features() *Features {
 	return NewFeatures(web.client, endpoint, web.config)
 }
 
+// EventReceivers gets EventReceivers API scoped object
+func (web *Web) EventReceivers() *EventReceivers {
+	return NewEventReceivers(
+		web.client,
+		fmt.Sprintf("%s/EventReceivers", web.endpoint),
+		web.config,
+	)
+}
+
 // RecycleBin gets RecycleBin API instance object for this Web
 func (web *Web) RecycleBin() *RecycleBin {
 	endpoint := fmt.Sprintf("%s/RecycleBin", web.endpoint)

@@ -150,8 +150,26 @@ func (site *Site) Changes() *Changes {
 	)
 }
 
+// EventReceivers gets EventReceivers API scoped object
+func (site *Site) EventReceivers() *EventReceivers {
+	return NewEventReceivers(
+		site.client,
+		fmt.Sprintf("%s/EventReceivers", site.endpoint),
+		site.config,
+	)
+}
+
+// Owner gets site's owner user
+func (site *Site) Owner() *User {
+	return NewUser(
+		site.client,
+		fmt.Sprintf("%s/Owner", site.endpoint),
+		site.config,
+	)
+}
+
 // ToDo:
-// Custom actions
+// UserCustomActions
 
 /* Response helpers */
 

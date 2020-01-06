@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-// Features represent SharePoint Webs & SIte Features API queryable collection struct
+// Features represent SharePoint Webs & Site Features API queryable collection struct
 // Always use NewFeatures constructor instead of &Features{}
 type Features struct {
 	client   *gosip.SPClient
