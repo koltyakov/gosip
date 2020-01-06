@@ -15,7 +15,7 @@ type EventReceivers struct {
 	modifiers *ODataMods
 }
 
-// EventReceiverInfo - features API response payload structure
+// EventReceiverInfo - event receivers API response payload structure
 type EventReceiverInfo struct {
 	EventType        int    `json:"EventType"`
 	ReceiverAssembly string `json:"ReceiverAssembly"`

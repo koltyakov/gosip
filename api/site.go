@@ -159,6 +159,15 @@ func (site *Site) EventReceivers() *EventReceivers {
 	)
 }
 
+// CustomActions gets CustomActions API scoped object
+func (site *Site) CustomActions() *CustomActions {
+	return NewCustomActions(
+		site.client,
+		fmt.Sprintf("%s/UserCustomActions", site.endpoint),
+		site.config,
+	)
+}
+
 // Owner gets site's owner user
 func (site *Site) Owner() *User {
 	return NewUser(
@@ -167,9 +176,6 @@ func (site *Site) Owner() *User {
 		site.config,
 	)
 }
-
-// ToDo:
-// UserCustomActions
 
 /* Response helpers */
 

@@ -319,6 +319,15 @@ func (web *Web) EventReceivers() *EventReceivers {
 	)
 }
 
+// CustomActions gets CustomActions API scoped object
+func (web *Web) CustomActions() *CustomActions {
+	return NewCustomActions(
+		web.client,
+		fmt.Sprintf("%s/UserCustomActions", web.endpoint),
+		web.config,
+	)
+}
+
 // RecycleBin gets RecycleBin API instance object for this Web
 func (web *Web) RecycleBin() *RecycleBin {
 	endpoint := fmt.Sprintf("%s/RecycleBin", web.endpoint)
