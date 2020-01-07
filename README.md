@@ -228,7 +228,7 @@ if err != nil {
 }
 ```
 
-SPClient has `Execute` method which is a wrapper function injecting SharePoint authentication and ending up calling http.Client's `Do` method.
+SPClient has `Execute` method which is a wrapper function injecting SharePoint authentication and ending up calling `http.Client`'s `Do` method.
 
 ## Authentication strategies
 
