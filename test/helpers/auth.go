@@ -44,7 +44,7 @@ func CheckAuth(auth gosip.AuthCnfg, cnfgPath string, required []string) error {
 	if err != nil {
 		return err
 	}
-	if time.Since(startAt).Seconds() > 0.0001 {
+	if time.Since(startAt).Seconds() > 0.001 {
 		return fmt.Errorf("possible caching issue, too slow read: %f", time.Since(startAt).Seconds())
 	}
 	if token == "" {
