@@ -6,6 +6,7 @@ pkg/
 tmp/
 debug/
 download/
+coverage.out
 
 # Binaries for programs and plugins
 *.exe

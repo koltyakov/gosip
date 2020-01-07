@@ -9,3 +9,7 @@ test-api:
 
 format:
 	gofmt -s -w .
+
+coverage:
+	SPAUTH_ENVCODE=spo go test ./... -count=1 -coverprofile=coverage.out
+	go tool cover -html=coverage.out
