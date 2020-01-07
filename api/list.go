@@ -312,9 +312,13 @@ func (listResp *ListResp) Data() *ListInfo {
 	return res
 }
 
+// Normalized returns normalized body
+func (listResp *ListResp) Normalized() []byte {
+	return NormalizeODataItem(*listResp)
+}
+
 // Data : to get typed data
 func (listData *RenderListDataResp) Data() *RenderListDataInfo {
-	// data := parseODataItem(*listData)
 	res := &RenderListDataInfo{}
 	json.Unmarshal(*listData, &res)
 	return res

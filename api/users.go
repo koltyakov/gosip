@@ -114,3 +114,9 @@ func (usersResp *UsersResp) Data() []UserResp {
 	}
 	return users
 }
+
+// Normalized returns normalized body
+func (usersResp *UsersResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*usersResp)
+	return normalized
+}

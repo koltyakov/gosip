@@ -133,3 +133,8 @@ func (fieldResp *FieldResp) Data() *GenericFieldInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
+
+// Normalized returns normalized body
+func (fieldResp *FieldResp) Normalized() []byte {
+	return NormalizeODataItem(*fieldResp)
+}

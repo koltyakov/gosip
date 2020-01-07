@@ -102,3 +102,9 @@ func (filesResp *FilesResp) Data() []FileResp {
 	}
 	return files
 }
+
+// Normalized returns normalized body
+func (filesResp *FilesResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*filesResp)
+	return normalized
+}

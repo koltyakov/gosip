@@ -275,3 +275,8 @@ func (fileResp *FileResp) Data() *FileInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
+
+// Normalized returns normalized body
+func (fileResp *FileResp) Normalized() []byte {
+	return NormalizeODataItem(*fileResp)
+}

@@ -103,3 +103,9 @@ func (foldersResp *FoldersResp) Data() []FolderResp {
 	}
 	return folders
 }
+
+// Normalized returns normalized body
+func (foldersResp *FoldersResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*foldersResp)
+	return normalized
+}

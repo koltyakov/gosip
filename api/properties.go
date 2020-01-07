@@ -205,3 +205,8 @@ func (propsResp *PropsResp) Data() map[string]string {
 	}
 	return res
 }
+
+// Normalized returns normalized body
+func (propsResp *PropsResp) Normalized() []byte {
+	return NormalizeODataItem(*propsResp)
+}

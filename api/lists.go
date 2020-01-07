@@ -160,3 +160,9 @@ func (listsResp *ListsResp) Data() []ListResp {
 	}
 	return lists
 }
+
+// Normalized returns normalized body
+func (listsResp *ListsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*listsResp)
+	return normalized
+}

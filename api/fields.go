@@ -124,3 +124,9 @@ func (fieldsResp *FieldsResp) Data() []FieldResp {
 	}
 	return resFields
 }
+
+// Normalized returns normalized body
+func (fieldsResp *FieldsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*fieldsResp)
+	return normalized
+}

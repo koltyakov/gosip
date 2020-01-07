@@ -227,6 +227,11 @@ func (profileResp *ProfileResp) Data() *ProfileInfo {
 	return res
 }
 
+// Normalized returns normalized body
+func (profileResp *ProfileResp) Normalized() []byte {
+	return NormalizeODataItem(*profileResp)
+}
+
 // Data : to get typed data
 func (profilePropsResp *ProfilePropsResp) Data() *ProfilePropsInto {
 	data := NormalizeODataItem(*profilePropsResp)
@@ -234,4 +239,10 @@ func (profilePropsResp *ProfilePropsResp) Data() *ProfilePropsInto {
 	res := &ProfilePropsInto{}
 	json.Unmarshal(data, &res)
 	return res
+}
+
+// Normalized returns normalized body
+func (profilePropsResp *ProfilePropsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*profilePropsResp)
+	return normalized
 }

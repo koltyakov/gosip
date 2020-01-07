@@ -160,3 +160,8 @@ func (groupResp *GroupResp) Data() *GroupInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
+
+// Normalized returns normalized body
+func (groupResp *GroupResp) Normalized() []byte {
+	return NormalizeODataItem(*groupResp)
+}

@@ -102,3 +102,8 @@ func (userResp *UserResp) Data() *UserInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
+
+// Normalized returns normalized body
+func (userResp *UserResp) Normalized() []byte {
+	return NormalizeODataItem(*userResp)
+}

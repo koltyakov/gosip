@@ -221,6 +221,12 @@ func (itemsResp *ItemsResp) Data() []ItemResp {
 	return items
 }
 
+// Normalized returns normalized body
+func (itemsResp *ItemsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*itemsResp)
+	return normalized
+}
+
 // NextPageURL : gets next page OData collection
 func (itemsResp *ItemsResp) NextPageURL() string {
 	return getODataCollectionNextPageURL(*itemsResp)

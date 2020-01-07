@@ -127,3 +127,8 @@ func (viewResp *ViewResp) Data() *ViewInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
+
+// Normalized returns normalized body
+func (viewResp *ViewResp) Normalized() []byte {
+	return NormalizeODataItem(*viewResp)
+}

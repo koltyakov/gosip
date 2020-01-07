@@ -140,3 +140,9 @@ func (groupsResp *GroupsResp) Data() []GroupResp {
 	}
 	return cts
 }
+
+// Normalized returns normalized body
+func (groupsResp *GroupsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*groupsResp)
+	return normalized
+}

@@ -364,6 +364,11 @@ func (webResp *WebResp) Data() *WebInfo {
 	return res
 }
 
+// Normalized returns normalized body
+func (webResp *WebResp) Normalized() []byte {
+	return NormalizeODataItem(*webResp)
+}
+
 /* Miscellaneous */
 
 func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string) ([]byte, error) {

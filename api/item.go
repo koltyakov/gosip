@@ -151,3 +151,8 @@ func (itemResp *ItemResp) Data() *GenericItemInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
+
+// Normalized returns normalized body
+func (itemResp *ItemResp) Normalized() []byte {
+	return NormalizeODataItem(*itemResp)
+}

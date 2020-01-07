@@ -120,3 +120,8 @@ func (ctResp *ContentTypeResp) Data() *ContentTypeInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
+
+// Normalized returns normalized body
+func (ctResp *ContentTypeResp) Normalized() []byte {
+	return NormalizeODataItem(*ctResp)
+}

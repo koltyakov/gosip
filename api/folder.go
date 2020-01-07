@@ -205,3 +205,8 @@ func (folderResp *FolderResp) Data() *FolderInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
+
+// Normalized returns normalized body
+func (folderResp *FolderResp) Normalized() []byte {
+	return NormalizeODataItem(*folderResp)
+}

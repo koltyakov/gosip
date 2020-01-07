@@ -194,3 +194,8 @@ func (siteResp *SiteResp) Data() *SiteInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
+
+// Normalized returns normalized body
+func (siteResp *SiteResp) Normalized() []byte {
+	return NormalizeODataItem(*siteResp)
+}

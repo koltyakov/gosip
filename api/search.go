@@ -213,6 +213,11 @@ func (searchResp *SearchResp) Data() *SearchResults {
 	return res
 }
 
+// Normalized returns normalized body
+func (searchResp *SearchResp) Normalized() []byte {
+	return NormalizeODataItem(*searchResp)
+}
+
 // Results : to get typed data
 func (searchResp *SearchResp) Results() []map[string]string {
 	results := []map[string]string{}

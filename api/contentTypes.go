@@ -103,3 +103,9 @@ func (ctsResp *ContentTypesResp) Data() []ContentTypeResp {
 	}
 	return cts
 }
+
+// Normalized returns normalized body
+func (ctsResp *ContentTypesResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*ctsResp)
+	return normalized
+}

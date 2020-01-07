@@ -137,3 +137,9 @@ func (websResp *WebsResp) Data() []WebResp {
 	}
 	return webs
 }
+
+// Normalized returns normalized body
+func (websResp *WebsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*websResp)
+	return normalized
+}

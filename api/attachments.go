@@ -148,10 +148,21 @@ func (attachmentsResp *AttachmentsResp) Data() []AttachmentResp {
 	return attachments
 }
 
+// Normalized returns normalized body
+func (attachmentsResp *AttachmentsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*attachmentsResp)
+	return normalized
+}
+
 // Data : to get typed data
 func (attachmentResp *AttachmentResp) Data() *AttachmentInfo {
 	data := NormalizeODataItem(*attachmentResp)
 	res := &AttachmentInfo{}
 	json.Unmarshal(data, &res)
 	return res
+}
+
+// Normalized returns normalized body
+func (attachmentResp *AttachmentResp) Normalized() []byte {
+	return NormalizeODataItem(*attachmentResp)
 }

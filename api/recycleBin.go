@@ -117,6 +117,12 @@ func (recycleBinResp *RecycleBinResp) Data() []RecycleBinItemResp {
 	return items
 }
 
+// Normalized returns normalized body
+func (recycleBinResp *RecycleBinResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*recycleBinResp)
+	return normalized
+}
+
 /* Recycle bin item */
 
 // RecycleBinItem represent SharePoint Recycle Bin Item API queryable object struct
@@ -163,4 +169,9 @@ func (recycleBinItemResp *RecycleBinItemResp) Data() *RecycledItem {
 	res := &RecycledItem{}
 	json.Unmarshal(data, &res)
 	return res
+}
+
+// Normalized returns normalized body
+func (recycleBinItemResp *RecycleBinItemResp) Normalized() []byte {
+	return NormalizeODataItem(*recycleBinItemResp)
 }

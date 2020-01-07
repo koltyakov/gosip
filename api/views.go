@@ -121,3 +121,9 @@ func (viewsResp *ViewsResp) Data() []ViewResp {
 	}
 	return views
 }
+
+// Normalized returns normalized body
+func (viewsResp *ViewsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*viewsResp)
+	return normalized
+}
