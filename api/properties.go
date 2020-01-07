@@ -147,7 +147,7 @@ func (properties *Properties) SetProps(props map[string]string) error {
 	methods := ""
 	csomIndex := 9
 	for key, val := range props {
-		methods += trimMultiline(`
+		methods += TrimMultiline(`
 			<Method Name="SetFieldValue" Id="` + strconv.Itoa(csomIndex) + `" ObjectPathId="4">
 				<Parameters>
 					<Parameter Type="String">` + key + `</Parameter>
@@ -158,7 +158,7 @@ func (properties *Properties) SetProps(props map[string]string) error {
 		csomIndex++
 	}
 	sp := NewHTTPClient(properties.client)
-	body := []byte(trimMultiline(`
+	body := []byte(TrimMultiline(`
 		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Gosip">
 			<Actions>
 				` + methods + `

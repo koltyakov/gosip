@@ -140,7 +140,7 @@ func (folder *Folder) ListItemAllFields() (ListItemAllFieldsResp, error) {
 
 	query := apiURL.Query()
 	for k, v := range folder.modifiers.Get() {
-		query.Set(k, trimMultiline(v))
+		query.Set(k, TrimMultiline(v))
 	}
 
 	apiURL.RawQuery = query.Encode()

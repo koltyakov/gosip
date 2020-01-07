@@ -253,7 +253,7 @@ func (list *List) RenderListData(viewXML string) (RenderListDataResp, error) {
 	sp := NewHTTPClient(list.client)
 	apiURL, _ := url.Parse(fmt.Sprintf("%s/RenderListData(@viewXml)", list.endpoint))
 	query := apiURL.Query()
-	query.Set("@viewXml", `'`+trimMultiline(viewXML)+`'`)
+	query.Set("@viewXml", `'`+TrimMultiline(viewXML)+`'`)
 	apiURL.RawQuery = query.Encode()
 	data, err := sp.Post(apiURL.String(), nil, getConfHeaders(list.config))
 	if err != nil {

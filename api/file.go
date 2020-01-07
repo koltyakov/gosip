@@ -133,7 +133,7 @@ func (file *File) ListItemAllFields() (ListItemAllFieldsResp, error) {
 
 	query := apiURL.Query()
 	for k, v := range file.modifiers.Get() {
-		query.Set(k, trimMultiline(v))
+		query.Set(k, TrimMultiline(v))
 	}
 
 	apiURL.RawQuery = query.Encode()

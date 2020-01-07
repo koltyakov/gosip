@@ -113,7 +113,7 @@ func (webs *Webs) Add(title string, url string, metadata map[string]interface{})
 
 	parameters, _ := json.Marshal(metadata)
 
-	body := trimMultiline(`{
+	body := TrimMultiline(`{
 		"parameters": ` + fmt.Sprintf("%s", parameters) + `
 	}`)
 

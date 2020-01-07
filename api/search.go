@@ -190,7 +190,7 @@ func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 
 	req, _ := json.Marshal(request)
 	JSONReq := fmt.Sprintf("%s", req)
-	body := []byte(trimMultiline(`{ "request": ` + JSONReq + `}`))
+	body := []byte(TrimMultiline(`{ "request": ` + JSONReq + `}`))
 
 	headers := map[string]string{
 		"Accept":       "application/json",

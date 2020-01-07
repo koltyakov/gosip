@@ -30,7 +30,7 @@ func TestUtils(t *testing.T) {
 			</div>
 		`
 		expected := "<div>Hello SharePoint</div>"
-		resStr := trimMultiline(initial)
+		resStr := TrimMultiline(initial)
 		if resStr != expected {
 			t.Errorf(
 				"incorrect string, expected \"%s\", got \"%s\"",

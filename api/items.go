@@ -184,7 +184,7 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 	apiURL, _ := url.Parse(endpoint)
 	query := url.Values{}
 	for k, v := range items.modifiers.Get() {
-		query.Add(k, trimMultiline(v))
+		query.Add(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 
@@ -198,7 +198,7 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 	}{}
 
 	request.Query.Metadata.Type = "SP.CamlQuery"
-	request.Query.ViewXML = trimMultiline(caml)
+	request.Query.ViewXML = TrimMultiline(caml)
 
 	body, _ := json.Marshal(request)
 

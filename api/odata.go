@@ -112,7 +112,7 @@ func toURL(endpoint string, modifiers *ODataMods) string {
 	apiURL, _ := url.Parse(endpoint)
 	query := apiURL.Query() // url.Values{}
 	for k, v := range modifiers.Get() {
-		query.Set(k, trimMultiline(v))
+		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return apiURL.String()

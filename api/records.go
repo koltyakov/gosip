@@ -211,7 +211,7 @@ func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) 
 	if date != nil && csomStaticMethod == "DeclareItemAsRecordWithDeclarationDate" {
 		timeParameter = fmt.Sprintf(`<Parameter Type="DateTime">%s</Parameter>`, date.Format(time.RFC3339))
 	}
-	body := []byte(trimMultiline(`
+	body := []byte(TrimMultiline(`
 		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Gosip">
 			<Actions>
 				<StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="` + csomStaticMethod + `" Id="6">

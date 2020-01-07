@@ -106,7 +106,7 @@ func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {
 	apiURL, _ := url.Parse(profiles.endpoint + "/GetMyProperties")
 	query := apiURL.Query()
 	for k, v := range profiles.modifiers.Get() {
-		query.Set(k, trimMultiline(v))
+		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return sp.Post(apiURL.String(), nil, getConfHeaders(profiles.config))
@@ -121,7 +121,7 @@ func (profiles *Profiles) GetPropertiesFor(loginName string) (ProfilePropsResp, 
 	)
 	query := apiURL.Query()
 	for k, v := range profiles.modifiers.Get() {
-		query.Set(k, trimMultiline(v))
+		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return sp.Get(apiURL.String(), getConfHeaders(profiles.config))
@@ -162,7 +162,7 @@ func (profiles *Profiles) GetOwnerUserProfile() (ProfileResp, error) {
 	)
 	query := apiURL.Query()
 	for k, v := range profiles.modifiers.Get() {
-		query.Set(k, trimMultiline(v))
+		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return sp.Post(apiURL.String(), nil, getConfHeaders(profiles.config))
@@ -177,7 +177,7 @@ func (profiles *Profiles) UserProfile() (ProfileResp, error) {
 	)
 	query := apiURL.Query()
 	for k, v := range profiles.modifiers.Get() {
-		query.Set(k, trimMultiline(v))
+		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
 	return sp.Post(apiURL.String(), nil, getConfHeaders(profiles.config))

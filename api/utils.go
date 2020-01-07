@@ -17,8 +17,8 @@ func getConfHeaders(config *RequestConfig) map[string]string {
 	return headers
 }
 
-// trimMultiline - trims multiline
-func trimMultiline(multi string) string {
+// TrimMultiline - trims multiline
+func TrimMultiline(multi string) string {
 	res := ""
 	for _, line := range strings.Split(multi, "\n") {
 		res += strings.Trim(line, "\t")
