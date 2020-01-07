@@ -67,8 +67,9 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 	defer jsonFile.Close()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
-	json.Unmarshal(byteValue, &c)
-
+	if err := json.Unmarshal(byteValue, &c); err != nil {
+		return err
+	}
 	crypt := cpass.Cpass(c.masterKey)
 	pass, err := crypt.Decode(c.Password)
 	if err == nil {

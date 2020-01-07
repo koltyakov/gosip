@@ -1,1 +1,0 @@
-go run ./cmd/samples/files/main.go -fileRelativeUrl=/sites/site/Shared%20Documents/gosip2.png
