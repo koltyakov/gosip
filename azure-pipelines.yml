@@ -31,42 +31,24 @@ steps:
   workingDirectory: '$(modulePath)'
   displayName: 'Get dependencies'
 
-# - script: |
-#     go test ./... -race
-#   workingDirectory: '$(modulePath)'
-#   displayName: 'Run tests'
-#   env:
-#     SPAUTH_SITEURL: $(ci.spo.siteurl)
-#     SPAUTH_USERNAME: $(ci.spo.username)
-#     SPAUTH_PASSWORD: $(ci.spo.password)
-#     SPAUTH_CLIENTID: $(ci.spo.clientid)
-#     SPAUTH_CLIENTSECRET: $(ci.spo.clientsecret)
-
-# - script: |
-#     go test ./api/... -v -count=1
-#   workingDirectory: '$(modulePath)'
-#   displayName: 'Run API tests'
-#   env:
-#     SPAUTH_ENVCODE: spo
-#     SPAPI_HEAVY_TESTS: true
-#     ENV_SPO_SITEURL: $(ci.spo.siteurl)
-#     ENV_SPO_USERNAME: $(ci.spo.username)
-#     ENV_SPO_PASSWORD: $(ci.spo.password)
-
 - script: |
-    go test ./... -v -count=1 -coverprofile=coverage.out
+    go test ./... -race
   workingDirectory: '$(modulePath)'
-  displayName: 'Run tests'
+  displayName: 'Run auth tests'
   env:
-    # API tests variables
-    SPAUTH_ENVCODE: spo
-    SPAPI_HEAVY_TESTS: true
-    ENV_SPO_SITEURL: $(ci.spo.siteurl)
-    ENV_SPO_USERNAME: $(ci.spo.username)
-    ENV_SPO_PASSWORD: $(ci.spo.password)
-    # Auth tests variables
     SPAUTH_SITEURL: $(ci.spo.siteurl)
     SPAUTH_USERNAME: $(ci.spo.username)
     SPAUTH_PASSWORD: $(ci.spo.password)
     SPAUTH_CLIENTID: $(ci.spo.clientid)
     SPAUTH_CLIENTSECRET: $(ci.spo.clientsecret)
+
+- script: |
+    go test ./api/... -v -count=1
+  workingDirectory: '$(modulePath)'
+  displayName: 'Run API tests'
+  env:
+    SPAUTH_ENVCODE: spo
+    SPAPI_HEAVY_TESTS: true
+    ENV_SPO_SITEURL: $(ci.spo.siteurl)
+    ENV_SPO_USERNAME: $(ci.spo.username)
+    ENV_SPO_PASSWORD: $(ci.spo.password)
