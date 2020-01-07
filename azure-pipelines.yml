@@ -32,7 +32,7 @@ steps:
   displayName: 'Get dependencies'
 
 - script: |
-    go test ./... -race
+    go test ./... -race -coverprofile=auth_coverage.out -covermode=atomic
   workingDirectory: '$(modulePath)'
   displayName: 'Run auth tests'
   env:
@@ -43,7 +43,7 @@ steps:
     SPAUTH_CLIENTSECRET: $(ci.spo.clientsecret)
 
 - script: |
-    go test ./api/... -v -count=1
+    go test ./api/... -v -count=1 -coverprofile=api_coverage.out -covermode=atomic
   workingDirectory: '$(modulePath)'
   displayName: 'Run API tests'
   env:
@@ -52,3 +52,19 @@ steps:
     ENV_SPO_SITEURL: $(ci.spo.siteurl)
     ENV_SPO_USERNAME: $(ci.spo.username)
     ENV_SPO_PASSWORD: $(ci.spo.password)
+
+- script: |
+    echo "" > coverage.txt
+    if [ -f auth_coverage.out ]; then
+        cat auth_coverage.out >> coverage.txt
+        rm auth_coverage.out
+    fi
+    if [ -f api_coverage.out ]; then
+        cat api_coverage.out >> coverage.txt
+        rm api_coverage.out
+    fi
+    bash <(curl -s https://codecov.io/bash)
+  workingDirectory: '$(modulePath)'
+  displayName: 'Publish code coverage'
+  env:
+    CODECOV_TOKEN: $(ci.codecov.token)
