@@ -56,10 +56,17 @@ steps:
 - script: |
     go test ./... -v -count=1 -coverprofile=coverage.out
   workingDirectory: '$(modulePath)'
-  displayName: 'Run API tests'
+  displayName: 'Run tests'
   env:
+    # API tests variables
     SPAUTH_ENVCODE: spo
     SPAPI_HEAVY_TESTS: true
     ENV_SPO_SITEURL: $(ci.spo.siteurl)
     ENV_SPO_USERNAME: $(ci.spo.username)
     ENV_SPO_PASSWORD: $(ci.spo.password)
+    # Auth tests variables
+    SPAUTH_SITEURL: $(ci.spo.siteurl)
+    SPAUTH_USERNAME: $(ci.spo.username)
+    SPAUTH_PASSWORD: $(ci.spo.password)
+    SPAUTH_CLIENTID: $(ci.spo.clientid)
+    SPAUTH_CLIENTSECRET: $(ci.spo.clientsecret)
