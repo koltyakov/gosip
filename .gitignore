@@ -1,3 +1,4 @@
+# Package specific
 config/private.*
 config/*/private.*
 config/certs/*.*
@@ -6,7 +7,11 @@ pkg/
 tmp/
 debug/
 download/
+
+# Code coverage
+*_coverage.out
 coverage.out
+coverage.txt
 
 # Binaries for programs and plugins
 *.exe
