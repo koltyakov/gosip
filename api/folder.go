@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -48,6 +49,12 @@ func NewFolder(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 // ToURL gets endpoint with modificators raw URL
 func (folder *Folder) ToURL() string {
 	return toURL(folder.endpoint, folder.modifiers)
+}
+
+// FromURL gets Folder object using its API URL
+func (folder *Folder) FromURL(url string) *Folder {
+	url = strings.Split(url, "?")[0]
+	return NewFolder(folder.client, url, folder.config)
 }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod

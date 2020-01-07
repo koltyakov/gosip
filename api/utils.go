@@ -50,6 +50,25 @@ func NormalizeODataCollection(payload []byte) ([]byte, string) {
 	return res, netxtURL
 }
 
+// ExtractEntityURI extracts REST entity URI from payload
+func ExtractEntityURI(payload []byte) string {
+	payload = NormalizeODataItem(payload)
+	r := &struct {
+		Metadata *struct {
+			ID string `json:"id"`
+		} `json:"__metadata"`
+		ID string `json:"odata.id"`
+	}{}
+	entityURI := ""
+	if err := json.Unmarshal(payload, &r); err == nil {
+		entityURI = r.ID
+	}
+	if r.Metadata != nil && r.Metadata.ID != "" {
+		entityURI = r.Metadata.ID
+	}
+	return entityURI
+}
+
 // getConfHeaders resolves headers from config overrides
 func getConfHeaders(config *RequestConfig) map[string]string {
 	headers := map[string]string{}

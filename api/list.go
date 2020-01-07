@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -105,6 +106,12 @@ func NewList(client *gosip.SPClient, endpoint string, config *RequestConfig) *Li
 // ToURL gets endpoint with modificators raw URL
 func (list *List) ToURL() string {
 	return toURL(list.endpoint, list.modifiers)
+}
+
+// FromURL gets List object using its API URL
+func (list *List) FromURL(url string) *List {
+	url = strings.Split(url, "?")[0]
+	return NewList(list.client, url, list.config)
 }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/koltyakov/gosip"
 )
@@ -49,6 +50,12 @@ func NewGroup(client *gosip.SPClient, endpoint string, config *RequestConfig) *G
 // ToURL gets endpoint with modificators raw URL
 func (group *Group) ToURL() string {
 	return toURL(group.endpoint, group.modifiers)
+}
+
+// FromURL gets Group object using its API URL
+func (group *Group) FromURL(url string) *Group {
+	url = strings.Split(url, "?")[0]
+	return NewGroup(group.client, url, group.config)
 }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod

@@ -84,6 +84,12 @@ func (web *Web) ToURL() string {
 	return toURL(web.endpoint, web.modifiers)
 }
 
+// FromURL gets Web object using its API URL
+func (web *Web) FromURL(url string) *Web {
+	url = strings.Split(url, "?")[0]
+	return NewWeb(web.client, url, web.config)
+}
+
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (web *Web) Conf(config *RequestConfig) *Web {
 	web.config = config

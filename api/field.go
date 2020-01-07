@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/koltyakov/gosip"
 )
@@ -64,6 +65,12 @@ func NewField(client *gosip.SPClient, endpoint string, config *RequestConfig) *F
 // ToURL gets endpoint with modificators raw URL
 func (field *Field) ToURL() string {
 	return toURL(field.endpoint, field.modifiers)
+}
+
+// FromURL gets Field object using its API URL
+func (field *Field) FromURL(url string) *Field {
+	url = strings.Split(url, "?")[0]
+	return NewField(field.client, url, field.config)
 }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod
