@@ -90,7 +90,7 @@ func (user *User) Groups() *Groups {
 
 // Data : to get typed data
 func (userResp *UserResp) Data() *UserInfo {
-	data := parseODataItem(*userResp)
+	data := NormalizeODataItem(*userResp)
 	res := &UserInfo{}
 	json.Unmarshal(data, &res)
 	return res
@@ -98,6 +98,6 @@ func (userResp *UserResp) Data() *UserInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (userResp *UserResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*userResp)
+	data := NormalizeODataItem(*userResp)
 	return json.Unmarshal(data, obj)
 }

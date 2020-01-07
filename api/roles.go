@@ -53,7 +53,7 @@ func (permissions *Roles) HasUniqueAssignments() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	res := &struct {
 		Value                    bool `json:"value"`
 		HasUniqueRoleAssignments bool `json:"HasUniqueRoleAssignments"`

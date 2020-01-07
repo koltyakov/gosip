@@ -135,10 +135,10 @@ func TestUtils(t *testing.T) {
 	t.Run("parseODataItem", func(t *testing.T) {
 		minimal := []byte(`{"prop":"val"}`)
 		verbose := []byte(fmt.Sprintf(`{"d":%s}`, minimal))
-		if bytes.Compare(parseODataItem(verbose), minimal) != 0 {
+		if bytes.Compare(NormalizeODataItem(verbose), minimal) != 0 {
 			t.Error("wrong OData transformation")
 		}
-		if bytes.Compare(parseODataItem(minimal), minimal) != 0 {
+		if bytes.Compare(NormalizeODataItem(minimal), minimal) != 0 {
 			t.Error("wrong OData transformation")
 		}
 	})

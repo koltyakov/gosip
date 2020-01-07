@@ -8,15 +8,6 @@ import (
 	"strings"
 )
 
-// getConfHeaders resolves headers from config overrides
-func getConfHeaders(config *RequestConfig) map[string]string {
-	headers := map[string]string{}
-	if config != nil {
-		headers = config.Headers
-	}
-	return headers
-}
-
 // TrimMultiline - trims multiline
 func TrimMultiline(multi string) string {
 	res := ""
@@ -24,6 +15,30 @@ func TrimMultiline(multi string) string {
 		res += strings.Trim(line, "\t")
 	}
 	return res
+}
+
+// NormalizeODataItem parses OData resp taking care of OData mode
+func NormalizeODataItem(payload []byte) []byte {
+	v := &struct {
+		D map[string]interface{} `json:"d"`
+	}{}
+	if err := json.Unmarshal(payload, &v); err != nil {
+		return payload
+	}
+	if len(v.D) == 0 {
+		return payload
+	}
+	res, _ := json.Marshal(v.D)
+	return res
+}
+
+// getConfHeaders resolves headers from config overrides
+func getConfHeaders(config *RequestConfig) map[string]string {
+	headers := map[string]string{}
+	if config != nil {
+		headers = config.Headers
+	}
+	return headers
 }
 
 // getRelativeURL out of an absolute one
@@ -98,21 +113,6 @@ func patchMetadataTypeCB(payload []byte, resolver func() string) []byte {
 		return payload
 	}
 	return patchMetadataType(payload, resolver())
-}
-
-// parseODataItem parses OData resp taking care of OData mode
-func parseODataItem(payload []byte) []byte {
-	v := &struct {
-		D map[string]interface{} `json:"d"`
-	}{}
-	if err := json.Unmarshal(payload, &v); err != nil {
-		return payload
-	}
-	if len(v.D) == 0 {
-		return payload
-	}
-	res, _ := json.Marshal(v.D)
-	return res
 }
 
 // parseODataCollection parses OData resp taking care of OData mode

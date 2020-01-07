@@ -165,7 +165,7 @@ func (recycleBinItem *RecycleBinItem) Restore() error {
 
 // Data : to get typed data
 func (recycleBinItemResp *RecycleBinItemResp) Data() *RecycledItem {
-	data := parseODataItem(*recycleBinItemResp)
+	data := NormalizeODataItem(*recycleBinItemResp)
 	res := &RecycledItem{}
 	json.Unmarshal(data, &res)
 	return res
@@ -173,7 +173,7 @@ func (recycleBinItemResp *RecycleBinItemResp) Data() *RecycledItem {
 
 // Unmarshal : to unmarshal to custom object
 func (recycleBinItemResp *RecycleBinItemResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*recycleBinItemResp)
+	data := NormalizeODataItem(*recycleBinItemResp)
 	data = normalizeMultiLookups(data)
 	return json.Unmarshal(data, obj)
 }

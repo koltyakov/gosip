@@ -108,7 +108,7 @@ func (ct *ContentType) Fields() *Fields {
 
 // Data : to get typed data
 func (ctResp *ContentTypeResp) Data() *ContentTypeInfo {
-	data := parseODataItem(*ctResp)
+	data := NormalizeODataItem(*ctResp)
 	res := &ContentTypeInfo{}
 	json.Unmarshal(data, &res)
 	return res
@@ -116,6 +116,6 @@ func (ctResp *ContentTypeResp) Data() *ContentTypeInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (ctResp *ContentTypeResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*ctResp)
+	data := NormalizeODataItem(*ctResp)
 	return json.Unmarshal(data, obj)
 }

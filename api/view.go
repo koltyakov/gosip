@@ -115,7 +115,7 @@ func (view *View) Recycle() error {
 
 // Data : to get typed data
 func (viewResp *ViewResp) Data() *ViewInfo {
-	data := parseODataItem(*viewResp)
+	data := NormalizeODataItem(*viewResp)
 	res := &ViewInfo{}
 	json.Unmarshal(data, &res)
 	return res
@@ -123,6 +123,6 @@ func (viewResp *ViewResp) Data() *ViewInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (viewResp *ViewResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*viewResp)
+	data := NormalizeODataItem(*viewResp)
 	return json.Unmarshal(data, obj)
 }

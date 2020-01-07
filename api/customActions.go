@@ -108,7 +108,7 @@ func (customActions *CustomActions) Add(payload []byte) (*CustomActionInfo, erro
 	if err != nil {
 		return nil, err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	res := &CustomActionInfo{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return nil, err
@@ -151,7 +151,7 @@ func (customAction *CustomAction) Get() (*CustomActionInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	res := &CustomActionInfo{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return nil, err
@@ -167,7 +167,7 @@ func (customAction *CustomAction) Update(payload []byte) (*CustomActionInfo, err
 	if err != nil {
 		return nil, err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	res := &CustomActionInfo{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return nil, err

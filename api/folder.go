@@ -150,7 +150,7 @@ func (folder *Folder) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	if err != nil {
 		return nil, err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	return data, nil
 }
 
@@ -193,7 +193,7 @@ func (folder *Folder) ContextInfo() (*ContextInfo, error) {
 
 // Data : to get typed data
 func (folderResp *FolderResp) Data() *FolderInfo {
-	data := parseODataItem(*folderResp)
+	data := NormalizeODataItem(*folderResp)
 	res := &FolderInfo{}
 	json.Unmarshal(data, &res)
 	return res
@@ -201,6 +201,6 @@ func (folderResp *FolderResp) Data() *FolderInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (folderResp *FolderResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*folderResp)
+	data := NormalizeODataItem(*folderResp)
 	return json.Unmarshal(data, obj)
 }

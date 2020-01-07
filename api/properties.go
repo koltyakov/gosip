@@ -193,7 +193,7 @@ func (properties *Properties) SetProps(props map[string]string) error {
 
 // Data : to get typed data
 func (propsResp *PropsResp) Data() map[string]string {
-	data := parseODataItem(*propsResp)
+	data := NormalizeODataItem(*propsResp)
 	resAll := map[string]interface{}{}
 	json.Unmarshal(data, &resAll)
 	res := map[string]string{}

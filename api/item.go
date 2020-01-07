@@ -138,7 +138,7 @@ func (item *Item) ContextInfo() (*ContextInfo, error) {
 
 // Data : to get typed data
 func (itemResp *ItemResp) Data() *GenericItemInfo {
-	data := parseODataItem(*itemResp)
+	data := NormalizeODataItem(*itemResp)
 	data = fixDatesInResponse(data, []string{"Created", "Modified"})
 	res := &GenericItemInfo{}
 	json.Unmarshal(data, &res)
@@ -147,7 +147,7 @@ func (itemResp *ItemResp) Data() *GenericItemInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (itemResp *ItemResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*itemResp)
+	data := NormalizeODataItem(*itemResp)
 	data = normalizeMultiLookups(data)
 	return json.Unmarshal(data, obj)
 }

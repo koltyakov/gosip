@@ -182,7 +182,7 @@ func (site *Site) Owner() *User {
 
 // Data : to get typed data
 func (siteResp *SiteResp) Data() *SiteInfo {
-	data := parseODataItem(*siteResp)
+	data := NormalizeODataItem(*siteResp)
 	res := &SiteInfo{}
 	json.Unmarshal(data, &res)
 	return res
@@ -190,6 +190,6 @@ func (siteResp *SiteResp) Data() *SiteInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (siteResp *SiteResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*siteResp)
+	data := NormalizeODataItem(*siteResp)
 	return json.Unmarshal(data, obj)
 }

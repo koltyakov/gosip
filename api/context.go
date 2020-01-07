@@ -41,7 +41,7 @@ func (context *Context) Get() (*ContextInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	data := parseODataItem(resp)
+	data := NormalizeODataItem(resp)
 	ci0 := &struct {
 		GetContextWebInformation map[string]interface{} `json:"GetContextWebInformation"`
 	}{}

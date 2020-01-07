@@ -111,7 +111,7 @@ func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	if res, err := strconv.Atoi(fmt.Sprintf("%s", data)); err == nil {
 		return res, nil
 	}
@@ -131,7 +131,7 @@ func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) 
 	if err != nil {
 		return 0, err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	if res, err := strconv.Atoi(fmt.Sprintf("%s", data)); err == nil {
 		return res, nil
 	}

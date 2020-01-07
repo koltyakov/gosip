@@ -138,7 +138,7 @@ func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property s
 	if err != nil {
 		return "", err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	res := &struct {
 		Value                     string `json:"value"`
 		GetUserProfilePropertyFor string `json:"GetUserProfilePropertyFor"`
@@ -220,7 +220,7 @@ func (profiles *Profiles) HideSuggestion(loginName string) ([]byte, error) {
 
 // Data : to get typed data
 func (profileResp *ProfileResp) Data() *ProfileInfo {
-	data := parseODataItem(*profileResp)
+	data := NormalizeODataItem(*profileResp)
 	data = normalizeMultiLookups(data)
 	res := &ProfileInfo{}
 	json.Unmarshal(data, &res)
@@ -229,13 +229,13 @@ func (profileResp *ProfileResp) Data() *ProfileInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (profileResp *ProfileResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*profileResp)
+	data := NormalizeODataItem(*profileResp)
 	return json.Unmarshal(data, obj)
 }
 
 // Data : to get typed data
 func (profilePropsResp *ProfilePropsResp) Data() *ProfilePropsInto {
-	data := parseODataItem(*profilePropsResp)
+	data := NormalizeODataItem(*profilePropsResp)
 	data = normalizeMultiLookups(data)
 	res := &ProfilePropsInto{}
 	json.Unmarshal(data, &res)
@@ -244,6 +244,6 @@ func (profilePropsResp *ProfilePropsResp) Data() *ProfilePropsInto {
 
 // Unmarshal : to unmarshal to custom object
 func (profilePropsResp *ProfilePropsResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*profilePropsResp)
+	data := NormalizeODataItem(*profilePropsResp)
 	return json.Unmarshal(data, obj)
 }

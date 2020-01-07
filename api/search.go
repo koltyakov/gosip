@@ -207,7 +207,7 @@ func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 
 // Data : to get typed data
 func (searchResp *SearchResp) Data() *SearchResults {
-	data := parseODataItem(*searchResp)
+	data := NormalizeODataItem(*searchResp)
 	res := &SearchResults{}
 	json.Unmarshal(data, &res)
 	return res

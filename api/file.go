@@ -143,7 +143,7 @@ func (file *File) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	if err != nil {
 		return nil, err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	return data, nil
 }
 
@@ -263,7 +263,7 @@ func (file *File) ContextInfo() (*ContextInfo, error) {
 
 // Data : to get typed data
 func (fileResp *FileResp) Data() *FileInfo {
-	data := parseODataItem(*fileResp)
+	data := NormalizeODataItem(*fileResp)
 	res := &FileInfo{}
 	json.Unmarshal(data, &res)
 	return res
@@ -271,6 +271,6 @@ func (fileResp *FileResp) Data() *FileInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (fileResp *FileResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*fileResp)
+	data := NormalizeODataItem(*fileResp)
 	return json.Unmarshal(data, obj)
 }

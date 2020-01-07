@@ -121,7 +121,7 @@ func (field *Field) Recycle() error {
 
 // Data : to get typed data
 func (fieldResp *FieldResp) Data() *GenericFieldInfo {
-	data := parseODataItem(*fieldResp)
+	data := NormalizeODataItem(*fieldResp)
 	res := &GenericFieldInfo{}
 	json.Unmarshal(data, &res)
 	return res
@@ -129,6 +129,6 @@ func (fieldResp *FieldResp) Data() *GenericFieldInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (fieldResp *FieldResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*fieldResp)
+	data := NormalizeODataItem(*fieldResp)
 	return json.Unmarshal(data, obj)
 }

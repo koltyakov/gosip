@@ -158,7 +158,7 @@ func (attachmentsResp *AttachmentsResp) Unmarshal(obj interface{}) error {
 
 // Data : to get typed data
 func (attachmentResp *AttachmentResp) Data() *AttachmentInfo {
-	data := parseODataItem(*attachmentResp)
+	data := NormalizeODataItem(*attachmentResp)
 	res := &AttachmentInfo{}
 	json.Unmarshal(data, &res)
 	return res
@@ -166,6 +166,6 @@ func (attachmentResp *AttachmentResp) Data() *AttachmentInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (attachmentResp *AttachmentResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*attachmentResp)
+	data := NormalizeODataItem(*attachmentResp)
 	return json.Unmarshal(data, obj)
 }

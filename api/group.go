@@ -148,7 +148,7 @@ func (group *Group) RemoveUserByID(userID int) error {
 
 // Data : to get typed data
 func (groupResp *GroupResp) Data() *GroupInfo {
-	data := parseODataItem(*groupResp)
+	data := NormalizeODataItem(*groupResp)
 	res := &GroupInfo{}
 	json.Unmarshal(data, &res)
 	return res
@@ -156,6 +156,6 @@ func (groupResp *GroupResp) Data() *GroupInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (groupResp *GroupResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*groupResp)
+	data := NormalizeODataItem(*groupResp)
 	return json.Unmarshal(data, obj)
 }

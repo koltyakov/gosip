@@ -235,7 +235,7 @@ func (list *List) ReserveListItemID() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	if res, err := strconv.Atoi(fmt.Sprintf("%s", data)); err == nil {
 		return res, nil
 	}
@@ -259,7 +259,7 @@ func (list *List) RenderListData(viewXML string) (RenderListDataResp, error) {
 	if err != nil {
 		return nil, err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	res := &struct {
 		Value          string `json:"value"`
 		RenderListData string `json:"RenderListData"`
@@ -293,7 +293,7 @@ func (list *List) ContextInfo() (*ContextInfo, error) {
 
 // Data : to get typed data
 func (listResp *ListResp) Data() *ListInfo {
-	data := parseODataItem(*listResp)
+	data := NormalizeODataItem(*listResp)
 	data = fixDatesInResponse(data, []string{
 		"Created",
 		"LastItemDeletedDate",
@@ -307,7 +307,7 @@ func (listResp *ListResp) Data() *ListInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (listResp *ListResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*listResp)
+	data := NormalizeODataItem(*listResp)
 	return json.Unmarshal(data, obj)
 }
 

@@ -90,7 +90,7 @@ func (changes *Changes) GetCurrentToken() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	data = parseODataItem(data)
+	data = NormalizeODataItem(data)
 	res := &struct {
 		CurrentChangeToken StringValue `json:"CurrentChangeToken"`
 	}{}

@@ -352,7 +352,7 @@ func (web *Web) ContextInfo() (*ContextInfo, error) {
 
 // Data : to get typed data
 func (webResp *WebResp) Data() *WebInfo {
-	data := parseODataItem(*webResp)
+	data := NormalizeODataItem(*webResp)
 	res := &WebInfo{}
 	json.Unmarshal(data, &res)
 	return res
@@ -360,7 +360,7 @@ func (webResp *WebResp) Data() *WebInfo {
 
 // Unmarshal : to unmarshal to custom object
 func (webResp *WebResp) Unmarshal(obj interface{}) error {
-	data := parseODataItem(*webResp)
+	data := NormalizeODataItem(*webResp)
 	return json.Unmarshal(data, obj)
 }
 
