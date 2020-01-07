@@ -79,7 +79,7 @@ func (receivers *EventReceivers) Get() ([]*EventReceiverInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, _ = parseODataCollectionPlain(data)
+	data, _ = NormalizeODataCollection(data)
 	res := []*EventReceiverInfo{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return nil, err

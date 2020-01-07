@@ -120,6 +120,6 @@ func (usersResp *UsersResp) Data() []UserResp {
 func (usersResp *UsersResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*usersResp)
 	// data, _ := json.Marshal(collection)
-	data, _ := parseODataCollectionPlain(*usersResp)
+	data, _ := NormalizeODataCollection(*usersResp)
 	return json.Unmarshal(data, obj)
 }

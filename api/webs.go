@@ -142,6 +142,6 @@ func (websResp *WebsResp) Data() []WebResp {
 func (websResp *WebsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*websResp)
 	// data, _ := json.Marshal(collection)
-	data, _ := parseODataCollectionPlain(*websResp)
+	data, _ := NormalizeODataCollection(*websResp)
 	return json.Unmarshal(data, obj)
 }

@@ -32,6 +32,23 @@ func NormalizeODataItem(payload []byte) []byte {
 	return res
 }
 
+// NormalizeODataCollection parses OData resp taking care of OData mode
+func NormalizeODataCollection(payload []byte) ([]byte, string) {
+	bb, netxtURL := parseODataCollection(payload)
+	mapRes := []map[string]interface{}{}
+	for _, b := range bb {
+		mapItem := map[string]interface{}{}
+		if err := json.Unmarshal(b, &mapItem); err == nil {
+			mapRes = append(mapRes, normalizeMultiLookupsMap(mapItem))
+		}
+	}
+	res, err := json.Marshal(mapRes)
+	if err != nil {
+		return payload, netxtURL
+	}
+	return res, netxtURL
+}
+
 // getConfHeaders resolves headers from config overrides
 func getConfHeaders(config *RequestConfig) map[string]string {
 	headers := map[string]string{}
@@ -170,23 +187,6 @@ func getODataCollectionNextPageURL(payload []byte) string {
 		return r.D.NextURL
 	}
 	return ""
-}
-
-// parseODataCollection2 parses OData resp taking care of OData mode
-func parseODataCollectionPlain(payload []byte) ([]byte, string) {
-	bb, netxtURL := parseODataCollection(payload)
-	mapRes := []map[string]interface{}{}
-	for _, b := range bb {
-		mapItem := map[string]interface{}{}
-		if err := json.Unmarshal(b, &mapItem); err == nil {
-			mapRes = append(mapRes, normalizeMultiLookupsMap(mapItem))
-		}
-	}
-	res, err := json.Marshal(mapRes)
-	if err != nil {
-		return payload, netxtURL
-	}
-	return res, netxtURL
 }
 
 // normalizeMultiLookups normalizes verbose results for multilookup

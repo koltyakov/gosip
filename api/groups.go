@@ -145,6 +145,6 @@ func (groupsResp *GroupsResp) Data() []GroupResp {
 func (groupsResp *GroupsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*groupsResp)
 	// data, _ := json.Marshal(collection)
-	data, _ := parseODataCollectionPlain(*groupsResp)
+	data, _ := NormalizeODataCollection(*groupsResp)
 	return json.Unmarshal(data, obj)
 }

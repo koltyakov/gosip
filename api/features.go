@@ -36,7 +36,7 @@ func (features *Features) Get() ([]*FeatureInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, _ = parseODataCollectionPlain(data)
+	data, _ = NormalizeODataCollection(data)
 	res := []*FeatureInfo{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return nil, err

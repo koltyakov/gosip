@@ -244,6 +244,6 @@ func (itemsResp *ItemsResp) HasNextPage() bool {
 func (itemsResp *ItemsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*itemsResp)
 	// data, _ := json.Marshal(collection)
-	data, _ := parseODataCollectionPlain(*itemsResp)
+	data, _ := NormalizeODataCollection(*itemsResp)
 	return json.Unmarshal(data, obj)
 }

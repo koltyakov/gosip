@@ -127,6 +127,6 @@ func (viewsResp *ViewsResp) Data() []ViewResp {
 func (viewsResp *ViewsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*viewsResp)
 	// data, _ := json.Marshal(collection)
-	data, _ := parseODataCollectionPlain(*viewsResp)
+	data, _ := NormalizeODataCollection(*viewsResp)
 	return json.Unmarshal(data, obj)
 }

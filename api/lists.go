@@ -165,6 +165,6 @@ func (listsResp *ListsResp) Data() []ListResp {
 func (listsResp *ListsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*listsResp)
 	// data, _ := json.Marshal(collection)
-	data, _ := parseODataCollectionPlain(*listsResp)
+	data, _ := NormalizeODataCollection(*listsResp)
 	return json.Unmarshal(data, obj)
 }

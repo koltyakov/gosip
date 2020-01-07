@@ -106,6 +106,6 @@ func (filesResp *FilesResp) Data() []FileResp {
 
 // Unmarshal : to unmarshal to custom object
 func (filesResp *FilesResp) Unmarshal(obj interface{}) error {
-	data, _ := parseODataCollectionPlain(*filesResp)
+	data, _ := NormalizeODataCollection(*filesResp)
 	return json.Unmarshal(data, obj)
 }

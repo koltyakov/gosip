@@ -107,6 +107,6 @@ func (foldersResp *FoldersResp) Data() []FolderResp {
 
 // Unmarshal : to unmarshal to custom object
 func (foldersResp *FoldersResp) Unmarshal(obj interface{}) error {
-	data, _ := parseODataCollectionPlain(*foldersResp)
+	data, _ := NormalizeODataCollection(*foldersResp)
 	return json.Unmarshal(data, obj)
 }

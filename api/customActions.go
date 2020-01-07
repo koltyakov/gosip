@@ -92,7 +92,7 @@ func (customActions *CustomActions) Get() ([]*CustomActionInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, _ = parseODataCollectionPlain(data)
+	data, _ = NormalizeODataCollection(data)
 	res := []*CustomActionInfo{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return nil, err

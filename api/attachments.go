@@ -152,7 +152,7 @@ func (attachmentsResp *AttachmentsResp) Data() []AttachmentResp {
 func (attachmentsResp *AttachmentsResp) Unmarshal(obj interface{}) error {
 	// collection := parseODataCollection(*ctsResp)
 	// data, _ := json.Marshal(collection)
-	data, _ := parseODataCollectionPlain(*attachmentsResp)
+	data, _ := NormalizeODataCollection(*attachmentsResp)
 	return json.Unmarshal(data, obj)
 }
 

@@ -128,6 +128,6 @@ func (fieldsResp *FieldsResp) Data() []FieldResp {
 
 // Unmarshal : to unmarshal to custom object
 func (fieldsResp *FieldsResp) Unmarshal(obj interface{}) error {
-	data, _ := parseODataCollectionPlain(*fieldsResp)
+	data, _ := NormalizeODataCollection(*fieldsResp)
 	return json.Unmarshal(data, obj)
 }

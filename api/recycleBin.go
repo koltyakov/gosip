@@ -119,7 +119,7 @@ func (recycleBinResp *RecycleBinResp) Data() []RecycleBinItemResp {
 
 // Unmarshal : to unmarshal to custom object
 func (recycleBinResp *RecycleBinResp) Unmarshal(obj interface{}) error {
-	data, _ := parseODataCollectionPlain(*recycleBinResp)
+	data, _ := NormalizeODataCollection(*recycleBinResp)
 	return json.Unmarshal(data, obj)
 }
 
