@@ -133,9 +133,3 @@ func (fieldResp *FieldResp) Data() *GenericFieldInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
-
-// Unmarshal : to unmarshal to custom object
-func (fieldResp *FieldResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*fieldResp)
-	return json.Unmarshal(data, obj)
-}

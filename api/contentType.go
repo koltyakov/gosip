@@ -120,9 +120,3 @@ func (ctResp *ContentTypeResp) Data() *ContentTypeInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
-
-// Unmarshal : to unmarshal to custom object
-func (ctResp *ContentTypeResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*ctResp)
-	return json.Unmarshal(data, obj)
-}

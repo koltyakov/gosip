@@ -117,12 +117,6 @@ func (recycleBinResp *RecycleBinResp) Data() []RecycleBinItemResp {
 	return items
 }
 
-// Unmarshal : to unmarshal to custom object
-func (recycleBinResp *RecycleBinResp) Unmarshal(obj interface{}) error {
-	data, _ := NormalizeODataCollection(*recycleBinResp)
-	return json.Unmarshal(data, obj)
-}
-
 /* Recycle bin item */
 
 // RecycleBinItem represent SharePoint Recycle Bin Item API queryable object struct
@@ -169,11 +163,4 @@ func (recycleBinItemResp *RecycleBinItemResp) Data() *RecycledItem {
 	res := &RecycledItem{}
 	json.Unmarshal(data, &res)
 	return res
-}
-
-// Unmarshal : to unmarshal to custom object
-func (recycleBinItemResp *RecycleBinItemResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*recycleBinItemResp)
-	data = normalizeMultiLookups(data)
-	return json.Unmarshal(data, obj)
 }

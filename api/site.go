@@ -194,9 +194,3 @@ func (siteResp *SiteResp) Data() *SiteInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
-
-// Unmarshal : to unmarshal to custom object
-func (siteResp *SiteResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*siteResp)
-	return json.Unmarshal(data, obj)
-}

@@ -227,12 +227,6 @@ func (profileResp *ProfileResp) Data() *ProfileInfo {
 	return res
 }
 
-// Unmarshal : to unmarshal to custom object
-func (profileResp *ProfileResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*profileResp)
-	return json.Unmarshal(data, obj)
-}
-
 // Data : to get typed data
 func (profilePropsResp *ProfilePropsResp) Data() *ProfilePropsInto {
 	data := NormalizeODataItem(*profilePropsResp)
@@ -240,10 +234,4 @@ func (profilePropsResp *ProfilePropsResp) Data() *ProfilePropsInto {
 	res := &ProfilePropsInto{}
 	json.Unmarshal(data, &res)
 	return res
-}
-
-// Unmarshal : to unmarshal to custom object
-func (profilePropsResp *ProfilePropsResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*profilePropsResp)
-	return json.Unmarshal(data, obj)
 }

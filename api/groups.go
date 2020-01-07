@@ -140,11 +140,3 @@ func (groupsResp *GroupsResp) Data() []GroupResp {
 	}
 	return cts
 }
-
-// Unmarshal : to unmarshal to custom object
-func (groupsResp *GroupsResp) Unmarshal(obj interface{}) error {
-	// collection := parseODataCollection(*groupsResp)
-	// data, _ := json.Marshal(collection)
-	data, _ := NormalizeODataCollection(*groupsResp)
-	return json.Unmarshal(data, obj)
-}

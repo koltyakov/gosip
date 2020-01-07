@@ -148,24 +148,10 @@ func (attachmentsResp *AttachmentsResp) Data() []AttachmentResp {
 	return attachments
 }
 
-// Unmarshal : to unmarshal to custom object
-func (attachmentsResp *AttachmentsResp) Unmarshal(obj interface{}) error {
-	// collection := parseODataCollection(*ctsResp)
-	// data, _ := json.Marshal(collection)
-	data, _ := NormalizeODataCollection(*attachmentsResp)
-	return json.Unmarshal(data, obj)
-}
-
 // Data : to get typed data
 func (attachmentResp *AttachmentResp) Data() *AttachmentInfo {
 	data := NormalizeODataItem(*attachmentResp)
 	res := &AttachmentInfo{}
 	json.Unmarshal(data, &res)
 	return res
-}
-
-// Unmarshal : to unmarshal to custom object
-func (attachmentResp *AttachmentResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*attachmentResp)
-	return json.Unmarshal(data, obj)
 }

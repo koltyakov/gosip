@@ -364,12 +364,6 @@ func (webResp *WebResp) Data() *WebInfo {
 	return res
 }
 
-// Unmarshal : to unmarshal to custom object
-func (webResp *WebResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*webResp)
-	return json.Unmarshal(data, obj)
-}
-
 /* Miscellaneous */
 
 func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string) ([]byte, error) {

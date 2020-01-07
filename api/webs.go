@@ -137,11 +137,3 @@ func (websResp *WebsResp) Data() []WebResp {
 	}
 	return webs
 }
-
-// Unmarshal : to unmarshal to custom object
-func (websResp *WebsResp) Unmarshal(obj interface{}) error {
-	// collection := parseODataCollection(*websResp)
-	// data, _ := json.Marshal(collection)
-	data, _ := NormalizeODataCollection(*websResp)
-	return json.Unmarshal(data, obj)
-}

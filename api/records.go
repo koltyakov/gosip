@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -57,7 +58,8 @@ func (records *Records) RecordDate() (time.Time, error) {
 	res := &struct {
 		RecordDate time.Time `json:"OData__vti_ItemDeclaredRecord"`
 	}{}
-	if err := data.Unmarshal(&res); err != nil {
+	data = NormalizeODataItem(data)
+	if err := json.Unmarshal(data, &res); err != nil {
 		return time.Time{}, err
 	}
 	return res.RecordDate, nil

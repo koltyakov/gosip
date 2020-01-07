@@ -127,9 +127,3 @@ func (viewResp *ViewResp) Data() *ViewInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
-
-// Unmarshal : to unmarshal to custom object
-func (viewResp *ViewResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*viewResp)
-	return json.Unmarshal(data, obj)
-}

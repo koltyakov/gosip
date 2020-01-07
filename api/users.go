@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -114,12 +113,4 @@ func (usersResp *UsersResp) Data() []UserResp {
 		users = append(users, UserResp(user))
 	}
 	return users
-}
-
-// Unmarshal : to unmarshal to custom object
-func (usersResp *UsersResp) Unmarshal(obj interface{}) error {
-	// collection := parseODataCollection(*usersResp)
-	// data, _ := json.Marshal(collection)
-	data, _ := NormalizeODataCollection(*usersResp)
-	return json.Unmarshal(data, obj)
 }

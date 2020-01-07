@@ -44,23 +44,6 @@ func TestItem(t *testing.T) {
 		}
 	})
 
-	t.Run("Get/CustomUnmarshal", func(t *testing.T) {
-		item, err := list.Items().GetByID(1).Select("Id,RoleAssignments").Expand("RoleAssignments").Get()
-		if err != nil {
-			t.Error(err)
-		}
-		obj := &struct {
-			ID              int                      `json:"Id"`
-			RoleAssignments []map[string]interface{} `json:"RoleAssignments"`
-		}{}
-		if err := item.Unmarshal(&obj); err != nil {
-			t.Error(err)
-		}
-		if len(obj.RoleAssignments) == 0 {
-			t.Error("can't parse response object")
-		}
-	})
-
 	t.Run("Update", func(t *testing.T) {
 		metadata := make(map[string]interface{})
 		metadata["__metadata"] = map[string]string{"type": entType}

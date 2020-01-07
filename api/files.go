@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -102,10 +101,4 @@ func (filesResp *FilesResp) Data() []FileResp {
 		files = append(files, FileResp(ct))
 	}
 	return files
-}
-
-// Unmarshal : to unmarshal to custom object
-func (filesResp *FilesResp) Unmarshal(obj interface{}) error {
-	data, _ := NormalizeODataCollection(*filesResp)
-	return json.Unmarshal(data, obj)
 }

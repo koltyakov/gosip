@@ -275,9 +275,3 @@ func (fileResp *FileResp) Data() *FileInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
-
-// Unmarshal : to unmarshal to custom object
-func (fileResp *FileResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*fileResp)
-	return json.Unmarshal(data, obj)
-}

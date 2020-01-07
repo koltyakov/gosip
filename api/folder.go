@@ -205,9 +205,3 @@ func (folderResp *FolderResp) Data() *FolderInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
-
-// Unmarshal : to unmarshal to custom object
-func (folderResp *FolderResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*folderResp)
-	return json.Unmarshal(data, obj)
-}

@@ -160,9 +160,3 @@ func (groupResp *GroupResp) Data() *GroupInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
-
-// Unmarshal : to unmarshal to custom object
-func (groupResp *GroupResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*groupResp)
-	return json.Unmarshal(data, obj)
-}

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -103,10 +102,4 @@ func (foldersResp *FoldersResp) Data() []FolderResp {
 		folders = append(folders, FolderResp(ct))
 	}
 	return folders
-}
-
-// Unmarshal : to unmarshal to custom object
-func (foldersResp *FoldersResp) Unmarshal(obj interface{}) error {
-	data, _ := NormalizeODataCollection(*foldersResp)
-	return json.Unmarshal(data, obj)
 }

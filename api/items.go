@@ -230,20 +230,3 @@ func (itemsResp *ItemsResp) NextPageURL() string {
 func (itemsResp *ItemsResp) HasNextPage() bool {
 	return itemsResp.NextPageURL() != ""
 }
-
-// // GetNext : gets next page OData collection
-// func (itemsResp *ItemsResp) GetNext(items *Items) (ItemsResp, error) {
-// 	nextURL := getODataCollectionNextPageURL(*itemsResp)
-// 	if nextURL == "" {
-// 		return nil, fmt.Errorf("unable to get next page")
-// 	}
-// 	return NewItems(items.client, nextURL, items.config).Get()
-// }
-
-// Unmarshal : to unmarshal to custom object
-func (itemsResp *ItemsResp) Unmarshal(obj interface{}) error {
-	// collection := parseODataCollection(*itemsResp)
-	// data, _ := json.Marshal(collection)
-	data, _ := NormalizeODataCollection(*itemsResp)
-	return json.Unmarshal(data, obj)
-}

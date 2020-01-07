@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -121,12 +120,4 @@ func (viewsResp *ViewsResp) Data() []ViewResp {
 		views = append(views, ViewResp(view))
 	}
 	return views
-}
-
-// Unmarshal : to unmarshal to custom object
-func (viewsResp *ViewsResp) Unmarshal(obj interface{}) error {
-	// collection := parseODataCollection(*viewsResp)
-	// data, _ := json.Marshal(collection)
-	data, _ := NormalizeODataCollection(*viewsResp)
-	return json.Unmarshal(data, obj)
 }

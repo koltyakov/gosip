@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -124,10 +123,4 @@ func (fieldsResp *FieldsResp) Data() []FieldResp {
 		resFields = append(resFields, FieldResp(f))
 	}
 	return resFields
-}
-
-// Unmarshal : to unmarshal to custom object
-func (fieldsResp *FieldsResp) Unmarshal(obj interface{}) error {
-	data, _ := NormalizeODataCollection(*fieldsResp)
-	return json.Unmarshal(data, obj)
 }

@@ -102,9 +102,3 @@ func (userResp *UserResp) Data() *UserInfo {
 	json.Unmarshal(data, &res)
 	return res
 }
-
-// Unmarshal : to unmarshal to custom object
-func (userResp *UserResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*userResp)
-	return json.Unmarshal(data, obj)
-}

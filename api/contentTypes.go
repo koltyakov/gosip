@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -103,12 +102,4 @@ func (ctsResp *ContentTypesResp) Data() []ContentTypeResp {
 		cts = append(cts, ContentTypeResp(ct))
 	}
 	return cts
-}
-
-// Unmarshal : to unmarshal to custom object
-func (ctsResp *ContentTypesResp) Unmarshal(obj interface{}) error {
-	// collection := parseODataCollection(*ctsResp)
-	// data, _ := json.Marshal(collection)
-	data, _ := NormalizeODataCollection(*ctsResp)
-	return json.Unmarshal(data, obj)
 }

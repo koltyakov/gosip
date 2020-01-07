@@ -312,12 +312,6 @@ func (listResp *ListResp) Data() *ListInfo {
 	return res
 }
 
-// Unmarshal : to unmarshal to custom object
-func (listResp *ListResp) Unmarshal(obj interface{}) error {
-	data := NormalizeODataItem(*listResp)
-	return json.Unmarshal(data, obj)
-}
-
 // Data : to get typed data
 func (listData *RenderListDataResp) Data() *RenderListDataInfo {
 	// data := parseODataItem(*listData)
