@@ -1,7 +1,7 @@
 install:
 	go get -u ./... && go mod tidy
 
-test:
+test-auth:
 	go test ./... -v -race -count=1
 
 test-api:
