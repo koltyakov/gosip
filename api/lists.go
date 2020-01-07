@@ -153,7 +153,7 @@ func (lists *Lists) AddWithURI(title string, uri string, metadata map[string]int
 
 // Data : to get typed data
 func (listsResp *ListsResp) Data() []ListResp {
-	collection, _ := parseODataCollection(*listsResp)
+	collection, _ := normalizeODataCollection(*listsResp)
 	lists := []ListResp{}
 	for _, list := range collection {
 		lists = append(lists, ListResp(list))

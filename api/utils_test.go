@@ -147,12 +147,12 @@ func TestUtils(t *testing.T) {
 		resulted := []byte(`[{"prop":"val1"},{"prop":"val2"}]`)
 		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, resulted))
 		fromVerbose := []byte{}
-		coll, _ := parseODataCollection(verbose)
+		coll, _ := normalizeODataCollection(verbose)
 		for _, b := range coll {
 			fromVerbose = append(fromVerbose, b...)
 		}
 		fromMinimal := []byte{}
-		coll, _ = parseODataCollection(resulted)
+		coll, _ = normalizeODataCollection(resulted)
 		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
 		}
@@ -166,12 +166,12 @@ func TestUtils(t *testing.T) {
 		minimal := []byte(fmt.Sprintf(`{"value":%s}`, resulted))
 		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, resulted))
 		fromVerbose := []byte{}
-		coll, _ := parseODataCollection(verbose)
+		coll, _ := normalizeODataCollection(verbose)
 		for _, b := range coll {
 			fromVerbose = append(fromVerbose, b...)
 		}
 		fromMinimal := []byte{}
-		coll, _ = parseODataCollection(minimal)
+		coll, _ = normalizeODataCollection(minimal)
 		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
 		}
@@ -184,12 +184,12 @@ func TestUtils(t *testing.T) {
 		minimal := []byte(`[]`)
 		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, minimal))
 		fromVerbose := []byte{}
-		coll, _ := parseODataCollection(verbose)
+		coll, _ := normalizeODataCollection(verbose)
 		for _, b := range coll {
 			fromVerbose = append(fromVerbose, b...)
 		}
 		fromMinimal := []byte{}
-		coll, _ = parseODataCollection(minimal)
+		coll, _ = normalizeODataCollection(minimal)
 		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
 		}

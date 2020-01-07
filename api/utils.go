@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// TrimMultiline - trims multiline
+// TrimMultiline trims multiline string converting to a single line friendly for payloads
 func TrimMultiline(multi string) string {
 	res := ""
 	for _, line := range strings.Split(multi, "\n") {
@@ -28,13 +28,14 @@ func NormalizeODataItem(payload []byte) []byte {
 	if len(v.D) == 0 {
 		return payload
 	}
+	v.D = normalizeMultiLookupsMap(v.D)
 	res, _ := json.Marshal(v.D)
 	return res
 }
 
 // NormalizeODataCollection parses OData resp taking care of OData mode
 func NormalizeODataCollection(payload []byte) ([]byte, string) {
-	bb, netxtURL := parseODataCollection(payload)
+	bb, netxtURL := normalizeODataCollection(payload)
 	mapRes := []map[string]interface{}{}
 	for _, b := range bb {
 		mapItem := map[string]interface{}{}
@@ -132,8 +133,8 @@ func patchMetadataTypeCB(payload []byte, resolver func() string) []byte {
 	return patchMetadataType(payload, resolver())
 }
 
-// parseODataCollection parses OData resp taking care of OData mode
-func parseODataCollection(payload []byte) ([][]byte, string) {
+// normalizeODataCollection parses OData resp taking care of OData mode
+func normalizeODataCollection(payload []byte) ([][]byte, string) {
 	r := &struct {
 		// Verbose OData structure
 		D struct {

@@ -130,7 +130,7 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, err
 	if err != nil {
 		return nil, err
 	}
-	collection, _ := parseODataCollection(data)
+	collection, _ := normalizeODataCollection(data)
 	results := []*ChangeInfo{}
 	for _, changeItem := range collection {
 		c := &ChangeInfo{}

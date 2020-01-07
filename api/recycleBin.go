@@ -109,7 +109,7 @@ func (recycleBin *RecycleBin) GetByID(itemID string) *RecycleBinItem {
 
 // Data : to get typed data
 func (recycleBinResp *RecycleBinResp) Data() []RecycleBinItemResp {
-	collection, _ := parseODataCollection(*recycleBinResp)
+	collection, _ := normalizeODataCollection(*recycleBinResp)
 	items := []RecycleBinItemResp{}
 	for _, item := range collection {
 		items = append(items, RecycleBinItemResp(item))

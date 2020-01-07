@@ -115,7 +115,7 @@ func (views *Views) DefaultView() *View {
 
 // Data : to get typed data
 func (viewsResp *ViewsResp) Data() []ViewResp {
-	collection, _ := parseODataCollection(*viewsResp)
+	collection, _ := normalizeODataCollection(*viewsResp)
 	views := []ViewResp{}
 	for _, view := range collection {
 		views = append(views, ViewResp(view))

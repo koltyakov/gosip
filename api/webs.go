@@ -130,7 +130,7 @@ func (webs *Webs) Add(title string, url string, metadata map[string]interface{})
 
 // Data : to get typed data
 func (websResp *WebsResp) Data() []WebResp {
-	collection, _ := parseODataCollection(*websResp)
+	collection, _ := normalizeODataCollection(*websResp)
 	webs := []WebResp{}
 	for _, web := range collection {
 		webs = append(webs, WebResp(web))

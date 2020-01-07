@@ -140,7 +140,7 @@ func (attachment *Attachment) Dowload() ([]byte, error) {
 
 // Data : to get typed data
 func (attachmentsResp *AttachmentsResp) Data() []AttachmentResp {
-	collection, _ := parseODataCollection(*attachmentsResp)
+	collection, _ := normalizeODataCollection(*attachmentsResp)
 	attachments := []AttachmentResp{}
 	for _, attachment := range collection {
 		attachments = append(attachments, AttachmentResp(attachment))

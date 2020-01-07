@@ -96,7 +96,7 @@ func (files *Files) Add(name string, content []byte, overwrite bool) (FileResp, 
 
 // Data : to get typed data
 func (filesResp *FilesResp) Data() []FileResp {
-	collection, _ := parseODataCollection(*filesResp)
+	collection, _ := normalizeODataCollection(*filesResp)
 	files := []FileResp{}
 	for _, ct := range collection {
 		files = append(files, FileResp(ct))

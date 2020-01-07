@@ -118,7 +118,7 @@ func (fields *Fields) GetByInternalNameOrTitle(internalName string) *Field {
 
 // Data : to get typed data
 func (fieldsResp *FieldsResp) Data() []FieldResp {
-	collection, _ := parseODataCollection(*fieldsResp)
+	collection, _ := normalizeODataCollection(*fieldsResp)
 	resFields := []FieldResp{}
 	for _, f := range collection {
 		resFields = append(resFields, FieldResp(f))

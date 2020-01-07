@@ -97,7 +97,7 @@ func (contentTypes *ContentTypes) Add(body []byte) (ContentTypeResp, error) {
 
 // Data : to get typed data
 func (ctsResp *ContentTypesResp) Data() []ContentTypeResp {
-	collection, _ := parseODataCollection(*ctsResp)
+	collection, _ := normalizeODataCollection(*ctsResp)
 	cts := []ContentTypeResp{}
 	for _, ct := range collection {
 		cts = append(cts, ContentTypeResp(ct))

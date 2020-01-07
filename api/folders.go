@@ -97,7 +97,7 @@ func (folders *Folders) GetByName(folderName string) *Folder {
 
 // Data : to get typed data
 func (foldersResp *FoldersResp) Data() []FolderResp {
-	collection, _ := parseODataCollection(*foldersResp)
+	collection, _ := normalizeODataCollection(*foldersResp)
 	folders := []FolderResp{}
 	for _, ct := range collection {
 		folders = append(folders, FolderResp(ct))

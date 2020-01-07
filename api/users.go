@@ -108,7 +108,7 @@ func (users *Users) GetByEmail(email string) *User {
 
 // Data : to get typed data
 func (usersResp *UsersResp) Data() []UserResp {
-	collection, _ := parseODataCollection(*usersResp)
+	collection, _ := normalizeODataCollection(*usersResp)
 	users := []UserResp{}
 	for _, user := range collection {
 		users = append(users, UserResp(user))

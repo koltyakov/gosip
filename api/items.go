@@ -213,7 +213,7 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 
 // Data : to get typed data
 func (itemsResp *ItemsResp) Data() []ItemResp {
-	collection, _ := parseODataCollection(*itemsResp)
+	collection, _ := normalizeODataCollection(*itemsResp)
 	items := []ItemResp{}
 	for _, item := range collection {
 		items = append(items, ItemResp(item))

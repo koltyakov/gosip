@@ -133,7 +133,7 @@ func (groups *Groups) RemoveByLoginName(loginName string) error {
 
 // Data : to get typed data
 func (groupsResp *GroupsResp) Data() []GroupResp {
-	collection, _ := parseODataCollection(*groupsResp)
+	collection, _ := normalizeODataCollection(*groupsResp)
 	cts := []GroupResp{}
 	for _, ct := range collection {
 		cts = append(cts, GroupResp(ct))
