@@ -7,7 +7,7 @@
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkoltyakov%2Fgosip.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkoltyakov%2Fgosip?ref=badge_shield)
 
 <p align="center">
-  <img src="./assets/gosip.png" />
+  <img src="https://raw.githubusercontent.com/koltyakov/gosip-docs/master/.gitbook/assets/gosip.png" />
 </p>
 
 ## Main features
@@ -44,7 +44,7 @@ go get github.com/koltyakov/gosip
 
 1\. Understand SharePoint environment type and authentication strategy.
 
-Let's assume it's, SharePoint Online and Add-In Only permissions. Then `strategy "github.com/koltyakov/gosip/auth/addin"` sub package should be used.
+Let's assume it's SharePoint Online and Add-In Only permissions. Then `strategy "github.com/koltyakov/gosip/auth/addin"` subpackage should be used.
 
 ```golang
 package main
@@ -56,7 +56,7 @@ import (
 )
 ```
 
-2\. Initiate authentication object.
+2\. Initiate an authentication object.
 
 ```golang
 auth := &strategy.AuthCnfg{
@@ -66,7 +66,7 @@ auth := &strategy.AuthCnfg{
 }
 ```
 
-AuthCnfg's from different strategies contains different options relevant for a specified auth type.
+AuthCnfg from different strategies contains different options relevant for a specified auth type.
 
 The authentication options can be provided explicitly or can be read from a configuration file (see [more](#authentication-strategies-1)).
 
@@ -100,9 +100,9 @@ fmt.Printf("%s\n", res.Data().Title)
 
 ### Fluent API client
 
-Provides a simple way of constructing API endpoint calls with IntelliSense and chainable syntax.
+Fluent API gives a simple way of constructing API endpoint calls with IntelliSense and chainable syntax.
 
-![Fluent Sample](./assets/fluent.gif)
+![Fluent Sample](https://raw.githubusercontent.com/koltyakov/gosip-docs/master/.gitbook/assets/fluent.gif)
 
 ```golang
 package main
@@ -170,7 +170,7 @@ func getAuthClient() (*gosip.SPClient, error) {
 
 ### Generic HTTP client helper
 
-Provides generic GET/POST helpers for REST operations, reducing amount of `http.NewRequest` scaffolded code, can be used for custom or not covered with a Fluent API endpoints.
+Provides generic GET/POST helpers for REST operations, reducing the amount of `http.NewRequest` scaffolded code, can be used for custom or not covered with Fluent API endpoints.
 
 ```golang
 package main
@@ -212,7 +212,7 @@ func main() {
 
 ### Low-level HTTP client usage
 
-Low-lever SharePoint-aware HTTP client from `github.com/koltyakov/gosip` package for custom or not covered with a Fluent API client endpoints with granular control for HTTP request, response, and http.Client parameters. Used internally but almost never required in a consumer code.
+Low-lever SharePoint-aware HTTP client from `github.com/koltyakov/gosip` package for custom or not covered with a Fluent API client endpoints with granular control for an HTTP request, response, and http.Client parameters. The client is used internally but rarely required in consumer code.
 
 ```golang
 client := &gosip.SPClient{AuthCnfg: auth}
@@ -232,7 +232,7 @@ SPClient has `Execute` method which is a wrapper function injecting SharePoint a
 
 ## Authentication strategies
 
-Auth strategy should be selected correspondin to your SharePoint environment and its configuration.
+Auth strategy should be selected corresponding to your SharePoint environment and its configuration.
 
 Import path `strategy "github.com/koltyakov/gosip/auth/{strategy}"`. Where `/{strategy}` stands for a strategy auth package.
 
@@ -249,7 +249,7 @@ JSON and struct representations are different in terms of language notations. So
 
 ### SAML Auth (SharePoint Online user credentials authentication)
 
-This authentication option uses Microsoft Online Security Token Service `https://login.microsoftonline.com/extSTS.srf` and SAML tokens in order to obtain authentication cookie.
+This authentication option uses Microsoft Online Security Token Service `https://login.microsoftonline.com/extSTS.srf` and SAML tokens in order to obtain an authentication cookie.
 
 ```golang
 // AuthCnfg - SAML auth config structure
@@ -281,13 +281,13 @@ type AuthCnfg struct {
 }
 ```
 
-Realm can be left empty or filled in, that will add small performance improvement. The easiest way to find tenant is to open SharePoint Online site collection, click `Site Settings` -> `Site App Permissions`. Taking any random app, the tenant ID (realm) is the GUID part after the `@`.
+Realm can be left empty or filled in, which will add small performance improvement. The easiest way to find the tenant is to open SharePoint Online site collection, click `Site Settings` -> `Site App Permissions`. Taking any random app, the tenant ID (realm) is the GUID part after the `@`.
 
 See more details of [AddIn Configuration and Permissions](https://github.com/s-kainet/node-sp-auth/wiki/SharePoint-Online-addin-only-authentication).
 
 ### NTLM Auth (NTLM handshake)
 
-This type of authentication uses HTTP NTLM handshake in order to obtain authentication header.
+This type of authentication uses an HTTP NTLM handshake to obtain an authentication header.
 
 ```golang
 // AuthCnfg - NTML auth config structure
@@ -300,7 +300,7 @@ type AuthCnfg struct {
 }
 ```
 
-Gosip uses `github.com/Azure/go-ntlmssp` NTLM negotiator, however a custom one also can be [provided](https://github.com/koltyakov/gosip/issues/14) in case of demand.
+Gosip uses `github.com/Azure/go-ntlmssp` NTLM negotiator, however, a custom one also can be [provided](https://github.com/koltyakov/gosip/issues/14) in case of demand.
 
 ### ADFS Auth (user credentials authentication)
 
@@ -327,7 +327,7 @@ Gosip's ADFS also supports a scenario of ADFS or NTML behind WAP (Web Applicatio
 
 FBA - Form-based authentication for SharePoint On-Premises.
 
-TMG - Microsoft Forefront Threat Management Gateway, currently is legacy but was a popular way of exposing SharePoint into external world back in the days.
+TMG - Microsoft Forefront Threat Management Gateway, currently is legacy but was a popular way of exposing SharePoint into the external world back in the days.
 
 ```golang
 // AuthCnfg - FBA/TMG auth config structure
@@ -343,13 +343,13 @@ type AuthCnfg struct {
 
 ## Secrets encoding
 
-When storing credential in local `private.json` files, which can be handy in local development scenarios, we strongly recommend to encode secrets such as `password` or `clientSecret` using [cpass](./cmd/cpass/README.md). Cpass converts a secret to an encrypted representation which can only be decrypted on the same machine where it was generated. This minimize incidental leaks, i.e. with git commits.
+When storing credential in local `private.json` files, which can be handy in local development scenarios, we strongly recommend to encode secrets such as `password` or `clientSecret` using [cpass](./cmd/cpass/README.md). Class converts a secret to an encrypted representation, which can only be decrypted on the same machine where it was generated. That reduces accidental leaks, e.g. together with git commits.
 
 ## Reference
 
 Many auth flows have been "copied" from [node-sp-auth](https://github.com/s-kainet/node-sp-auth) library (used as a blueprint), which we intensively use in Node.js ecosystem for years.
 
-Fluent API and wrapper syntax are inspired by [PnPjs](https://github.com/pnp/pnpjs) which is also the first-class citizen on almost all our Node.js and front-end projects with SharePoint involved.
+Fluent API and wrapper syntax are inspired by [PnPjs](https://github.com/pnp/pnpjs), which is also the first-class citizen on almost all our Node.js and front-end projects with SharePoint involved.
 
 ## License
 
