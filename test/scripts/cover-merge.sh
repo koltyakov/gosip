@@ -1,9 +1,9 @@
 echo "" > coverage.txt
 
-# if [ -f auth_coverage.out ]; then
-#   cat auth_coverage.out >> coverage.txt
-#   rm auth_coverage.out
-# fi
+if [ -f auth_coverage.out ]; then
+  cat auth_coverage.out >> coverage.txt
+  rm auth_coverage.out
+fi
 
 # Locally precovered strategies
 strategies=( addin adfs fba ntml saml tmg )
