@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -49,12 +48,6 @@ func NewItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *It
 // ToURL gets endpoint with modificators raw URL
 func (item *Item) ToURL() string {
 	return toURL(item.endpoint, item.modifiers)
-}
-
-// FromURL gets Item object using its API URL
-func (item *Item) FromURL(url string) *Item {
-	url = strings.Split(url, "?")[0]
-	return NewItem(item.client, url, item.config)
 }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod

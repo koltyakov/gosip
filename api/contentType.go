@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/koltyakov/gosip"
 )
@@ -47,12 +46,6 @@ func NewContentType(client *gosip.SPClient, endpoint string, config *RequestConf
 // ToURL gets endpoint with modificators raw URL
 func (ct *ContentType) ToURL() string {
 	return toURL(ct.endpoint, ct.modifiers)
-}
-
-// FromURL gets ContentType object using its API URL
-func (ct *ContentType) FromURL(url string) *ContentType {
-	url = strings.Split(url, "?")[0]
-	return NewContentType(ct.client, url, ct.config)
 }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod

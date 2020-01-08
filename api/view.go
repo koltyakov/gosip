@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/koltyakov/gosip"
 )
@@ -63,12 +62,6 @@ func NewView(client *gosip.SPClient, endpoint string, config *RequestConfig) *Vi
 // ToURL gets endpoint with modificators raw URL
 func (view *View) ToURL() string {
 	return toURL(view.endpoint, view.modifiers)
-}
-
-// FromURL gets View object using its API URL
-func (view *View) FromURL(url string) *View {
-	url = strings.Split(url, "?")[0]
-	return NewView(view.client, url, view.config)
 }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod

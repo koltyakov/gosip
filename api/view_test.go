@@ -43,24 +43,6 @@ func TestView(t *testing.T) {
 		}
 	})
 
-	t.Run("FromURL", func(t *testing.T) {
-		viewR, err := web.GetList(listURI).Views().DefaultView().Get()
-		if err != nil {
-			t.Error(err)
-		}
-		entityURL := ExtractEntityURI(viewR)
-		if entityURL == "" {
-			t.Error("can't extract entity URL")
-		}
-		view1, err := web.GetList(listURI).Views().GetByID("").FromURL(entityURL).Get()
-		if err != nil {
-			t.Error(err)
-		}
-		if viewR.Data().ID != view1.Data().ID {
-			t.Error("can't get view from entity URL")
-		}
-	})
-
 	// ToDo:
 	// Update
 	// Delete

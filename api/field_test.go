@@ -52,24 +52,6 @@ func TestField(t *testing.T) {
 		}
 	})
 
-	t.Run("FromURL", func(t *testing.T) {
-		fieldR, err := field.Get()
-		if err != nil {
-			t.Error(err)
-		}
-		entityURL := ExtractEntityURI(fieldR)
-		if entityURL == "" {
-			t.Error("can't extract entity URL")
-		}
-		field1, err := web.Fields().GetByID("").FromURL(entityURL).Get()
-		if err != nil {
-			t.Error(err)
-		}
-		if fieldR.Data().ID != field1.Data().ID {
-			t.Error("can't get CT from entity URL")
-		}
-	})
-
 	// ToDo:
 	// Update
 	// Delete

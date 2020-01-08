@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -78,12 +77,6 @@ func NewFile(client *gosip.SPClient, endpoint string, config *RequestConfig) *Fi
 // ToURL gets endpoint with modificators raw URL
 func (file *File) ToURL() string {
 	return toURL(file.endpoint, file.modifiers)
-}
-
-// FromURL gets File object using its API URL
-func (file *File) FromURL(url string) *File {
-	url = strings.Split(url, "?")[0]
-	return NewFile(file.client, url, file.config)
 }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod

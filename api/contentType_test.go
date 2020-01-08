@@ -54,28 +54,6 @@ func TestContentType(t *testing.T) {
 		}
 	})
 
-	t.Run("FromURL", func(t *testing.T) {
-		ct, err := getRandomCT()
-		if err != nil {
-			t.Error(err)
-		}
-		ctR, err := ct.Get()
-		if err != nil {
-			t.Error(err)
-		}
-		entityURL := ExtractEntityURI(ctR)
-		if entityURL == "" {
-			t.Error("can't extract entity URL")
-		}
-		ct1, err := web.ContentTypes().GetByID("").FromURL(entityURL).Get()
-		if err != nil {
-			t.Error(err)
-		}
-		if ctR.Data().ID != ct1.Data().ID {
-			t.Error("can't get CT from entity URL")
-		}
-	})
-
 	// ToDo:
 	// Update
 	// Delete
