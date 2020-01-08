@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 	"time"
@@ -59,6 +60,10 @@ func TestProperties(t *testing.T) {
 
 		if data.Data()["vti_defaultlanguage"] == "" {
 			t.Error("can't get web prop")
+		}
+
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 

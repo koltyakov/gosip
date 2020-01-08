@@ -77,10 +77,10 @@ func NewProfiles(client *gosip.SPClient, endpoint string, config *RequestConfig)
 	}
 }
 
-// ToURL gets endpoint with modificators raw URL
-func (profiles *Profiles) ToURL() string {
-	return toURL(profiles.endpoint, profiles.modifiers)
-}
+// // ToURL gets endpoint with modificators raw URL
+// func (profiles *Profiles) ToURL() string {
+// 	return toURL(profiles.endpoint, profiles.modifiers)
+// }
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (profiles *Profiles) Conf(config *RequestConfig) *Profiles {
@@ -88,17 +88,17 @@ func (profiles *Profiles) Conf(config *RequestConfig) *Profiles {
 	return profiles
 }
 
-// Select adds $select OData modifier
-func (profiles *Profiles) Select(oDataSelect string) *Profiles {
-	profiles.modifiers.AddSelect(oDataSelect)
-	return profiles
-}
+// // Select adds $select OData modifier
+// func (profiles *Profiles) Select(oDataSelect string) *Profiles {
+// 	profiles.modifiers.AddSelect(oDataSelect)
+// 	return profiles
+// }
 
-// Expand adds $expand OData modifier
-func (profiles *Profiles) Expand(oDataExpand string) *Profiles {
-	profiles.modifiers.AddExpand(oDataExpand)
-	return profiles
-}
+// // Expand adds $expand OData modifier
+// func (profiles *Profiles) Expand(oDataExpand string) *Profiles {
+// 	profiles.modifiers.AddExpand(oDataExpand)
+// 	return profiles
+// }
 
 // GetMyProperties gets current context user profile properties
 func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {

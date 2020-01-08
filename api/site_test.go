@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -51,6 +52,9 @@ func TestSite(t *testing.T) {
 		}
 		if data.Data().URL == "" {
 			t.Error("can't get site Url property")
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 

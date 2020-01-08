@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 
@@ -35,6 +36,9 @@ func TestFiles(t *testing.T) {
 		}
 		if len(data.Data()) == 0 {
 			t.Error("can't get files")
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("response normalization error")
 		}
 	})
 

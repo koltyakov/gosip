@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"testing"
 
@@ -38,19 +39,21 @@ func TestGroup(t *testing.T) {
 	})
 
 	t.Run("Add", func(t *testing.T) {
-		data, err := web.SiteGroups().Conf(headers.verbose).Add(newGroupName, nil)
+		data, err := web.SiteGroups().Add(newGroupName, nil)
 		if err != nil {
 			t.Error(err)
 		}
+		group = data.Data()
+	})
 
-		res := &struct {
-			Group *GroupInfo `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
+	t.Run("Get", func(t *testing.T) {
+		data, err := web.SiteGroups().GetByName(newGroupName).Get()
+		if err != nil {
 			t.Error(err)
 		}
-		group = res.Group
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("response normalization error")
+		}
 	})
 
 	t.Run("Update", func(t *testing.T) {

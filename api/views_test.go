@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -45,6 +46,9 @@ func TestViews(t *testing.T) {
 		}
 		if data.Data()[0].Data().ID == "" {
 			t.Error("can't unmarshal data")
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 

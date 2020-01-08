@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"testing"
@@ -14,6 +15,14 @@ func TestLists(t *testing.T) {
 	web := NewSP(spClient).Web()
 	newListTitle := uuid.New().String()
 
+	t.Run("Modifiers", func(t *testing.T) {
+		lists := web.Lists()
+		mods := lists.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
+		if mods == nil || len(mods.mods) != 5 {
+			t.Error("can't add modifiers")
+		}
+	})
+
 	t.Run("Get", func(t *testing.T) {
 		data, err := web.Lists().Select("Id,Title").Conf(headers.verbose).Get()
 		if err != nil {
@@ -21,6 +30,9 @@ func TestLists(t *testing.T) {
 		}
 		if len(data.Data()) == 0 {
 			t.Error("can't get webs")
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 

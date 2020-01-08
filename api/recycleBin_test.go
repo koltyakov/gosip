@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/google/uuid"
@@ -40,8 +41,12 @@ func TestRecycleBin(t *testing.T) {
 	})
 
 	t.Run("Get/Site", func(t *testing.T) {
-		if _, err := sp.Site().RecycleBin().Top(1).Get(); err != nil {
+		data, err := sp.Site().RecycleBin().Top(1).Get()
+		if err != nil {
 			t.Error(err)
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -14,19 +15,19 @@ func TestProfiles(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Run("ToURL", func(t *testing.T) {
-		if sp.Profiles().ToURL() == "" {
-			t.Error("can't get endpoint's to URL")
-		}
-	})
+	// t.Run("ToURL", func(t *testing.T) {
+	// 	if sp.Profiles().ToURL() == "" {
+	// 		t.Error("can't get endpoint's to URL")
+	// 	}
+	// })
 
-	t.Run("Modifiers", func(t *testing.T) {
-		p := sp.Profiles()
-		mods := p.Select("*").Expand("*").modifiers
-		if mods == nil || len(mods.mods) != 2 {
-			t.Error("can't add modifiers")
-		}
-	})
+	// t.Run("Modifiers", func(t *testing.T) {
+	// 	p := sp.Profiles()
+	// 	mods := p.Select("*").Expand("*").modifiers
+	// 	if mods == nil || len(mods.mods) != 2 {
+	// 		t.Error("can't add modifiers")
+	// 	}
+	// })
 
 	t.Run("GetMyProperties", func(t *testing.T) {
 		profile, err := profiles.GetMyProperties()
@@ -39,12 +40,15 @@ func TestProfiles(t *testing.T) {
 	})
 
 	t.Run("GetPropertiesFor", func(t *testing.T) {
-		profile, err := profiles.GetPropertiesFor(user.Data().LoginName)
+		props, err := profiles.GetPropertiesFor(user.Data().LoginName)
 		if err != nil {
 			t.Error(err)
 		}
-		if len(profile.Data().UserProfileProperties) == 0 {
+		if len(props.Data().UserProfileProperties) == 0 {
 			t.Error("can't get user profile properties")
+		}
+		if bytes.Compare(props, props.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 
@@ -94,6 +98,19 @@ func TestProfiles(t *testing.T) {
 		}
 		if profile.Data().AccountName == "" {
 			t.Error("can't get profile")
+		}
+		if bytes.Compare(profile, profile.Normalized()) == -1 {
+			t.Error("wrong response normalization")
+		}
+	})
+
+	t.Run("UserProfile", func(t *testing.T) {
+		profile, err := profiles.UserProfile()
+		if err != nil {
+			t.Error(err)
+		}
+		if _, err := sp.Profiles().HideSuggestion(profile.Data().AccountName); err != nil {
+			t.Error(err)
 		}
 	})
 

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"net/url"
 	"testing"
 )
@@ -72,6 +73,10 @@ func TestWeb(t *testing.T) {
 		if data.Data().Title == "" {
 			t.Error("can't get web title property")
 		}
+
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("wrong response normalization")
+		}
 	})
 
 	t.Run("NoTitle", func(t *testing.T) {
@@ -111,6 +116,22 @@ func TestWeb(t *testing.T) {
 			}
 		}
 		if _, err := web.EnsureFolder("Shared Documents/doc1/doc2/doc3/doc4"); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("EnsureUser", func(t *testing.T) {
+		user, err := sp.Web().CurrentUser().Select("LoginName").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if _, err := sp.Web().EnsureUser(user.Data().Email); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("Roles", func(t *testing.T) {
+		if _, err := sp.Web().Roles().HasUniqueAssignments(); err != nil {
 			t.Error(err)
 		}
 	})

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -11,15 +12,15 @@ func TestView(t *testing.T) {
 	listURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 
 	t.Run("Conf", func(t *testing.T) {
-		f := web.Fields().GetByID("")
+		v := web.GetList(listURI).Views().DefaultView()
 		hs := map[string]*RequestConfig{
 			"nometadata":      HeadersPresets.Nometadata,
 			"minimalmetadata": HeadersPresets.Minimalmetadata,
 			"verbose":         HeadersPresets.Verbose,
 		}
 		for key, preset := range hs {
-			g := f.Conf(preset)
-			if g.config != preset {
+			lv := v.Conf(preset)
+			if lv.config != preset {
 				t.Errorf("can't %v config", key)
 			}
 		}
@@ -32,6 +33,9 @@ func TestView(t *testing.T) {
 		}
 		if data.Data().ID == "" {
 			t.Error("can't unmarshal data")
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 

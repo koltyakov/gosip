@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"testing"
 )
@@ -16,8 +17,12 @@ func TestContentTypes(t *testing.T) {
 	}
 
 	t.Run("GetFromWeb", func(t *testing.T) {
-		if _, err := web.ContentTypes().Select("StringId").Top(1).Get(); err != nil {
+		data, err := web.ContentTypes().Select("StringId").Top(1).Get()
+		if err != nil {
 			t.Error(err)
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("response normalization error")
 		}
 	})
 

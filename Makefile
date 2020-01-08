@@ -12,4 +12,5 @@ format:
 
 coverage:
 	SPAUTH_ENVCODE=spo SPAPI_HEAVY_TESTS=true go test ./... -count=1 -coverprofile=coverage.out
+	go tool cover -func=coverage.out
 	go tool cover -html=coverage.out

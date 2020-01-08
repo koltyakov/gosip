@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"testing"
@@ -54,6 +55,9 @@ func TestContentType(t *testing.T) {
 		}
 		if _, err := web.ContentTypes().GetByID(cts[0].Data().ID).Get(); err != nil {
 			t.Error(err)
+		}
+		if bytes.Compare(resp, resp.Normalized()) == -1 {
+			t.Error("response normalization error")
 		}
 	})
 

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/google/uuid"
@@ -56,6 +57,9 @@ func TestFolders(t *testing.T) {
 		}
 		if len(data.Data()) == 0 {
 			t.Error("can't get folders")
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("response normalization error")
 		}
 	})
 

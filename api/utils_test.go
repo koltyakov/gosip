@@ -293,4 +293,22 @@ func TestUtils(t *testing.T) {
 		}
 	})
 
+	t.Run("extractEntityURI", func(t *testing.T) {
+		ep1 := []byte(`{
+			"__metadata": {
+				"id": "entity_url"
+			}
+		}`)
+		if ExtractEntityURI(ep1) != "entity_url" {
+			t.Error("can't extract entity URL")
+		}
+
+		ep2 := []byte(`{
+			"odata.id": "entity_url"
+		}`)
+		if ExtractEntityURI(ep2) != "entity_url" {
+			t.Error("can't extract entity URL")
+		}
+	})
+
 }

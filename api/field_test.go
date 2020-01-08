@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 )
@@ -49,6 +50,9 @@ func TestField(t *testing.T) {
 		}
 		if data.Data().ID == "" {
 			t.Error("can't unmarshal data")
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("response normalization error")
 		}
 	})
 

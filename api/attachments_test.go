@@ -44,6 +44,9 @@ func TestAttachments(t *testing.T) {
 		if len(data.Data()) != 4 {
 			t.Error("wrong number of attachments")
 		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("response normalization error")
+		}
 	})
 
 	t.Run("GetByName", func(t *testing.T) {
@@ -53,6 +56,9 @@ func TestAttachments(t *testing.T) {
 		}
 		if data.Data().FileName != "att_01.txt" {
 			t.Error("wrong attachment name")
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("response normalization error")
 		}
 	})
 

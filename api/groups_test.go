@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/google/uuid"
@@ -40,6 +41,14 @@ func TestGroups(t *testing.T) {
 		}
 	})
 
+	t.Run("Modifiers", func(t *testing.T) {
+		g := sp.Web().SiteGroups()
+		mods := g.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
+		if mods == nil || len(mods.mods) != 5 {
+			t.Error("wrong number of modifiers")
+		}
+	})
+
 	t.Run("GetGroups", func(t *testing.T) {
 		data, err := groups.Select("Id").Top(5).Get()
 		if err != nil {
@@ -60,6 +69,9 @@ func TestGroups(t *testing.T) {
 		}
 		if data.Data()[0].Data().Title == "" {
 			t.Error("can't get groups")
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("response normalization error")
 		}
 	})
 

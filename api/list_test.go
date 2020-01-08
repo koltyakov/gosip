@@ -93,4 +93,10 @@ func TestList(t *testing.T) {
 		}
 	})
 
+	t.Run("RootFolder", func(t *testing.T) {
+		if _, err := list.RootFolder().Get(); err != nil {
+			t.Error(err)
+		}
+	})
+
 }

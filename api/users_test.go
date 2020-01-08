@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -60,6 +61,10 @@ func TestUsers(t *testing.T) {
 
 		if len(data.Data()) == 0 {
 			t.Error("can't get users")
+		}
+
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 )
@@ -39,8 +40,12 @@ func TestFields(t *testing.T) {
 	})
 
 	t.Run("GetFromWeb", func(t *testing.T) {
-		if _, err := web.Fields().Top(1).Get(); err != nil {
+		data, err := web.Fields().Top(1).Get()
+		if err != nil {
 			t.Error(err)
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("response normalization error")
 		}
 	})
 

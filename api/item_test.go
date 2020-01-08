@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -34,13 +35,24 @@ func TestItem(t *testing.T) {
 		}
 	})
 
+	t.Run("Modifiers", func(t *testing.T) {
+		g := list.Items()
+		mods := g.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
+		if mods == nil || len(mods.mods) != 5 {
+			t.Error("wrong number of modifiers")
+		}
+	})
+
 	t.Run("Get", func(t *testing.T) {
-		item, err := list.Items().GetByID(1).Get()
+		item, err := list.Items().GetByID(1).Conf(HeadersPresets.Verbose).Get()
 		if err != nil {
 			t.Error(err)
 		}
 		if item.Data().ID == 0 {
 			t.Error("can't get item properly")
+		}
+		if bytes.Compare(item, item.Normalized()) == -1 {
+			t.Error("response normalization error")
 		}
 	})
 
@@ -77,6 +89,18 @@ func TestItem(t *testing.T) {
 
 	t.Run("ParentList", func(t *testing.T) {
 		if _, err := list.Items().GetByID(3).ParentList().Get(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("Roles", func(t *testing.T) {
+		if _, err := list.Items().GetByID(3).Roles().HasUniqueAssignments(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("ContextInfo", func(t *testing.T) {
+		if _, err := list.Items().GetByID(3).ContextInfo(); err != nil {
 			t.Error(err)
 		}
 	})

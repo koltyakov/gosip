@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/google/uuid"
@@ -43,7 +44,17 @@ func TestFolder(t *testing.T) {
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		if _, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get(); err != nil {
+		data, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("response normalization error")
+		}
+	})
+
+	t.Run("ContextInfo", func(t *testing.T) {
+		if _, err := web.GetFolder(rootFolderURI + "/" + newFolderName).ContextInfo(); err != nil {
 			t.Error(err)
 		}
 	})

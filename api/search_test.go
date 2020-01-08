@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -9,12 +10,15 @@ func TestSearch(t *testing.T) {
 
 	t.Run("Basic", func(t *testing.T) {
 		sp := NewSP(spClient)
-		_, err := sp.Search().PostQuery(&SearchQuery{
+		data, err := sp.Search().PostQuery(&SearchQuery{
 			QueryText: "*",
 			RowLimit:  10,
 		})
 		if err != nil {
 			t.Error(err)
+		}
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 

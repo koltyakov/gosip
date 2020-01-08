@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/google/uuid"
@@ -65,14 +66,19 @@ func TestWebs(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if len(data) == 0 {
+		if len(data.Data()) == 0 {
 			t.Error("wrong webs number")
 		}
 	})
 
 	t.Run("GetWebs", func(t *testing.T) {
-		if _, err := webs.Select("Id,Title").Get(); err != nil {
+		data, err := webs.Select("Id,Title").Get()
+		if err != nil {
 			t.Error(err)
+		}
+
+		if bytes.Compare(data, data.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 
