@@ -1,6 +1,7 @@
 package cpass
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -32,5 +33,13 @@ func TestHashingSameValues(t *testing.T) {
 
 	if string(b1) != string(b2) {
 		t.Error("hashing failure, different hashes for the same values")
+	}
+}
+
+func TestGetHmac(t *testing.T) {
+	hmac := getHmac([]byte("text"), []byte("key"))
+	hmac1 := getHmac([]byte("text"), []byte("key1"))
+	if bytes.Compare(hmac, hmac1) != -1 {
+		t.Error("wrong hmacs")
 	}
 }

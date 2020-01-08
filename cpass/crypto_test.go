@@ -1,6 +1,7 @@
 package cpass
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -75,4 +76,52 @@ func TestDecryptWithIncorrectKey(t *testing.T) {
 	if encrypted != decrypted {
 		t.Error("decrypted by incorrect key is not equal to secret")
 	}
+}
+
+func TestEdgeCases(t *testing.T) {
+
+	t.Run("encrypt/EmptyKey", func(t *testing.T) {
+		if _, err := encrypt("secret", []byte("")); err == nil {
+			if !strings.Contains(err.Error(), "invalid key size") {
+				t.Error("empty key should not pass")
+			}
+		}
+	})
+
+	t.Run("encrypt/WrongSizeKey", func(t *testing.T) {
+		if _, err := encrypt("secret", []byte("wrong_size")); err == nil {
+			if !strings.Contains(err.Error(), "invalid key size") {
+				t.Error("short key should not pass")
+			}
+		}
+	})
+
+	t.Run("decrypt/EmptyKey", func(t *testing.T) {
+		secured, err := encrypt("secret", hashCipherKey("key"))
+		if err != nil {
+			t.Error(err)
+		}
+		if _, err := decrypt(secured, []byte("")); err == nil {
+			if !strings.Contains(err.Error(), "invalid key size") {
+				t.Error("empty key should not pass")
+			}
+		}
+	})
+
+	t.Run("decrypt/IllegaBase64", func(t *testing.T) {
+		if _, err := decrypt("incorrect", []byte("key")); err == nil {
+			if !strings.Contains(err.Error(), "illegal base64 data") {
+				t.Error("illegal base64 data should not pass")
+			}
+		}
+	})
+
+	t.Run("decrypt/SmallBlockSize", func(t *testing.T) {
+		if _, err := decrypt("YQ==", hashCipherKey("key")); err == nil {
+			if !strings.Contains(err.Error(), "ciphertext block size is too short") {
+				t.Error("too short ciphertext block size should not pass")
+			}
+		}
+	})
+
 }
