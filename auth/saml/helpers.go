@@ -35,7 +35,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 
 	authCookie, notAfter, err := getSecurityToken(c)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	notAfterTime, _ := time.Parse(time.RFC3339, notAfter)

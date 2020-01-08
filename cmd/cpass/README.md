@@ -4,4 +4,4 @@
 go run ./cmd/cpass/main.go -secret "MyP@s$word"
 ```
 
-User encrypted output in `private.json` files.
+Use the encrypted output in `private.json` files.
