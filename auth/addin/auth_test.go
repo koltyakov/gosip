@@ -50,3 +50,40 @@ func TestGettingDigest(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestAuthEdgeCases(t *testing.T) {
+
+	t.Run("ReadConfig/MissedConfig", func(t *testing.T) {
+		cnfg := &AuthCnfg{}
+		if err := cnfg.ReadConfig("wrong_path.json"); err == nil {
+			t.Error("wrong_path config should not pass")
+		}
+	})
+
+	t.Run("ReadConfig/MissedConfig", func(t *testing.T) {
+		cnfg := &AuthCnfg{}
+		if err := cnfg.ReadConfig(u.ResolveCnfgPath("./test/config/malformed.json")); err == nil {
+			t.Error("malformed config should not pass")
+		}
+	})
+
+	t.Run("WriteConfig", func(t *testing.T) {
+		folderPath := u.ResolveCnfgPath("./test/tmp")
+		filePath := u.ResolveCnfgPath("./test/tmp/addin.json")
+		cnfg := &AuthCnfg{SiteURL: "test"}
+		os.MkdirAll(folderPath, os.ModePerm)
+		if err := cnfg.WriteConfig(filePath); err != nil {
+			t.Error(err)
+		}
+		os.RemoveAll(filePath)
+	})
+
+	t.Run("SetMasterkey", func(t *testing.T) {
+		cnfg := &AuthCnfg{}
+		cnfg.SetMasterkey("key")
+		if cnfg.masterKey != "key" {
+			t.Error("unable to set master key")
+		}
+	})
+
+}
