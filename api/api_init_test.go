@@ -15,6 +15,7 @@ import (
 
 var (
 	ci         bool
+	skip       bool
 	heavyTests bool
 	envCode    string
 	spClient   *gosip.SPClient
@@ -27,10 +28,11 @@ var (
 
 func init() {
 	ci = os.Getenv("SPAUTH_CI") == "true"
+	skip = os.Getenv("SPAPI_SKIP_TESTS") == "true"
 	heavyTests = os.Getenv("SPAPI_HEAVY_TESTS") == "true"
 	envCode = os.Getenv("SPAUTH_ENVCODE")
 
-	if envCode == "" && !ci {
+	if envCode == "" && !ci && !skip {
 		envCode = "spo"
 	}
 

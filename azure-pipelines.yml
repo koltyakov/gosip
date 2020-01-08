@@ -54,15 +54,7 @@ steps:
     ENV_SPO_PASSWORD: $(ci.spo.password)
 
 - script: |
-    echo "" > coverage.txt
-    if [ -f auth_coverage.out ]; then
-        cat auth_coverage.out >> coverage.txt
-        rm auth_coverage.out
-    fi
-    if [ -f api_coverage.out ]; then
-        cat api_coverage.out >> coverage.txt
-        rm api_coverage.out
-    fi
+    bash ./test/scripts/cover-merge.sh
     bash <(curl -s https://codecov.io/bash)
   workingDirectory: '$(modulePath)'
   displayName: 'Publish code coverage'
