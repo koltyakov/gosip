@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -22,6 +23,29 @@ func TestItems(t *testing.T) {
 		t.Error(err)
 	}
 	// startedOn := time.Now()
+
+	t.Run("Conf", func(t *testing.T) {
+		items := list.Items()
+		hs := map[string]*RequestConfig{
+			"nometadata":      HeadersPresets.Nometadata,
+			"minimalmetadata": HeadersPresets.Minimalmetadata,
+			"verbose":         HeadersPresets.Verbose,
+		}
+		for key, preset := range hs {
+			i := items.Conf(preset)
+			if i.config != preset {
+				t.Errorf("can't %v config", key)
+			}
+		}
+	})
+
+	t.Run("Modifiers", func(t *testing.T) {
+		items := list.Items()
+		mods := items.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).Skip("*").modifiers
+		if mods == nil || len(mods.mods) != 6 {
+			t.Error("can't add modifiers")
+		}
+	})
 
 	t.Run("AddWithoutMetadataType", func(t *testing.T) {
 		body := []byte(`{"Title":"Item"}`)
@@ -63,6 +87,26 @@ func TestItems(t *testing.T) {
 		}
 		if items.Data()[0].Data().ID == 0 {
 			t.Error("can't get items properly")
+		}
+		if bytes.Compare(items, items.Normalized()) == -1 {
+			t.Error("wrong response normalization")
+		}
+	})
+
+	t.Run("GetPaged", func(t *testing.T) {
+		paged, err := list.Items().Top(5).GetPaged()
+		if err != nil {
+			t.Error(err)
+		}
+		if len(paged.Items.Data()) == 0 {
+			t.Error("can't get items")
+		}
+		if !paged.HasNextPage() {
+			t.Error("can't get next page")
+		} else {
+			if _, err := paged.GetNextPage(); err != nil {
+				t.Error(err)
+			}
 		}
 	})
 
@@ -108,7 +152,7 @@ func TestItems(t *testing.T) {
 				</Query>
 			</View>
 		`
-		data, err := list.Items().GetByCAML(caml)
+		data, err := list.Items().Select("Id").GetByCAML(caml)
 		if err != nil {
 			t.Error(err)
 		}

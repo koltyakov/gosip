@@ -1,14 +1,14 @@
 package api
 
 import (
-	"encoding/json"
 	"testing"
 )
 
 func TestUser(t *testing.T) {
 	checkClient(t)
 
-	user := NewSP(spClient).Web().CurrentUser()
+	sp := NewSP(spClient)
+	user := sp.Web().CurrentUser()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web/CurrentUser"
 
 	t.Run("Constructor", func(t *testing.T) {
@@ -36,42 +36,32 @@ func TestUser(t *testing.T) {
 		}
 	})
 
-	t.Run("GetUserInfo", func(t *testing.T) {
-		data, err := user.Conf(headers.verbose).Get()
+	t.Run("Modifiers", func(t *testing.T) {
+		user := sp.Web().CurrentUser()
+		mods := user.Select("*").Expand("*").modifiers
+		if mods == nil || len(mods.mods) != 2 {
+			t.Error("can't add modifiers")
+		}
+	})
 
+	t.Run("GetUserInfo", func(t *testing.T) {
+		data, err := user.Get()
 		if err != nil {
 			t.Error(err)
 		}
 
-		res := &struct {
-			User *UserInfo `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if res.User.ID == 0 {
+		if data.Data().ID == 0 {
 			t.Error("can't get user info")
 		}
 	})
 
 	t.Run("GetGroups", func(t *testing.T) {
-		data, err := user.Groups().Select("Id").Conf(headers.verbose).Get()
-
-		if err != nil {
-			t.Error(err)
-		}
-
-		res := &struct {
-			D struct {
-				Results []*GroupInfo `json:"results"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
+		if _, err := user.Groups().Select("Id").Get(); err != nil {
 			t.Error(err)
 		}
 	})
+
+	// ToDo:
+	// Update
 
 }

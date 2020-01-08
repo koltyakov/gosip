@@ -1,14 +1,14 @@
 package api
 
 import (
-	"encoding/json"
 	"testing"
 )
 
 func TestUsers(t *testing.T) {
 	checkClient(t)
 
-	users := NewSP(spClient).Web().SiteUsers()
+	sp := NewSP(spClient)
+	users := sp.Web().SiteUsers()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web/SiteUsers"
 	user := &UserInfo{}
 
@@ -30,10 +30,25 @@ func TestUsers(t *testing.T) {
 	})
 
 	t.Run("Conf", func(t *testing.T) {
-		users.config = nil
-		users.Conf(headers.verbose)
-		if users.config != headers.verbose {
-			t.Errorf("failed to apply config")
+		us := sp.Web().SiteUsers()
+		hs := map[string]*RequestConfig{
+			"nometadata":      HeadersPresets.Nometadata,
+			"minimalmetadata": HeadersPresets.Minimalmetadata,
+			"verbose":         HeadersPresets.Verbose,
+		}
+		for key, preset := range hs {
+			u := us.Conf(preset)
+			if u.config != preset {
+				t.Errorf("can't %v config", key)
+			}
+		}
+	})
+
+	t.Run("Modifiers", func(t *testing.T) {
+		us := sp.Web().SiteUsers()
+		mods := us.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
+		if mods == nil || len(mods.mods) != 5 {
+			t.Error("wrong number of modifiers")
 		}
 	})
 
@@ -43,37 +58,17 @@ func TestUsers(t *testing.T) {
 			t.Error(err)
 		}
 
-		res := &struct {
-			D struct {
-				Results []UserInfo `json:"results"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if len(res.D.Results) == 0 {
+		if len(data.Data()) == 0 {
 			t.Error("can't get users")
 		}
 	})
 
 	t.Run("GetUser", func(t *testing.T) {
-		data, err := NewSP(spClient).Web().CurrentUser().Conf(headers.verbose).Get()
-
+		data, err := NewSP(spClient).Web().CurrentUser().Get()
 		if err != nil {
 			t.Error(err)
 		}
-
-		res := &struct {
-			User *UserInfo `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		user = res.User
+		user = data.Data()
 	})
 
 	t.Run("GetByID", func(t *testing.T) {
@@ -86,19 +81,11 @@ func TestUsers(t *testing.T) {
 			t.Error(err)
 		}
 
-		res := &struct {
-			User *UserInfo `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if res.User.ID != user.ID {
+		if data.Data().ID != user.ID {
 			t.Errorf(
 				"incorrect user ID, expected \"%d\", received \"%d\"",
 				user.ID,
-				res.User.ID,
+				data.Data().ID,
 			)
 		}
 	})
@@ -116,19 +103,11 @@ func TestUsers(t *testing.T) {
 			t.Error(err)
 		}
 
-		res := &struct {
-			User *UserInfo `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if res.User.LoginName != user.LoginName {
+		if data.Data().LoginName != user.LoginName {
 			t.Errorf(
 				"incorrect user LoginName, expected \"%s\", received \"%s\"",
 				user.LoginName,
-				res.User.LoginName,
+				data.Data().LoginName,
 			)
 		}
 	})
@@ -143,19 +122,11 @@ func TestUsers(t *testing.T) {
 			t.Error(err)
 		}
 
-		res := &struct {
-			User *UserInfo `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
-			t.Error(err)
-		}
-
-		if res.User.Email != user.Email {
+		if data.Data().Email != user.Email {
 			t.Errorf(
 				"incorrect user Email, expected \"%s\", received \"%s\"",
 				user.Email,
-				res.User.Email,
+				data.Data().Email,
 			)
 		}
 	})

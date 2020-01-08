@@ -9,7 +9,8 @@ import (
 func TestProperties(t *testing.T) {
 	checkClient(t)
 
-	web := NewSP(spClient).Web()
+	sp := NewSP(spClient)
+	web := sp.Web()
 	webProps := web.AllProps()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web/AllProperties"
 
@@ -35,6 +36,14 @@ func TestProperties(t *testing.T) {
 		webProps.Conf(headers.verbose)
 		if webProps.config != headers.verbose {
 			t.Errorf("failed to apply config")
+		}
+	})
+
+	t.Run("Modifiers", func(t *testing.T) {
+		props := sp.Web().AllProps()
+		mods := props.Select("*").Expand("*").modifiers
+		if mods == nil || len(mods.mods) != 2 {
+			t.Error("can't add modifiers")
 		}
 	})
 

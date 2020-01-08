@@ -8,7 +8,8 @@ import (
 func TestWeb(t *testing.T) {
 	checkClient(t)
 
-	web := NewSP(spClient).Web()
+	sp := NewSP(spClient)
+	web := sp.Web()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web"
 
 	t.Run("Constructor", func(t *testing.T) {
@@ -52,6 +53,13 @@ func TestWeb(t *testing.T) {
 		web.Conf(headers.verbose)
 		if web.config != headers.verbose {
 			t.Errorf("failed to apply config")
+		}
+	})
+
+	t.Run("FromURL", func(t *testing.T) {
+		w := web.FromURL("site_url")
+		if w.endpoint != "site_url" {
+			t.Error("can't get site from url")
 		}
 	})
 

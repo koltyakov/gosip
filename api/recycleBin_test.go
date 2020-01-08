@@ -16,6 +16,29 @@ func TestRecycleBin(t *testing.T) {
 	}
 	list := sp.Web().Lists().GetByTitle(newListTitle)
 
+	t.Run("Conf", func(t *testing.T) {
+		rb := sp.Web().RecycleBin()
+		hs := map[string]*RequestConfig{
+			"nometadata":      HeadersPresets.Nometadata,
+			"minimalmetadata": HeadersPresets.Minimalmetadata,
+			"verbose":         HeadersPresets.Verbose,
+		}
+		for key, preset := range hs {
+			i := rb.Conf(preset)
+			if i.config != preset {
+				t.Errorf("can't %v config", key)
+			}
+		}
+	})
+
+	t.Run("Modifiers", func(t *testing.T) {
+		rb := sp.Web().RecycleBin()
+		mods := rb.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
+		if mods == nil || len(mods.mods) != 5 {
+			t.Error("can't add modifiers")
+		}
+	})
+
 	t.Run("Get/Site", func(t *testing.T) {
 		if _, err := sp.Site().RecycleBin().Top(1).Get(); err != nil {
 			t.Error(err)
@@ -41,7 +64,11 @@ func TestRecycleBin(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if err := sp.Web().RecycleBin().GetByID(items.Data()[0].Data().ID).Restore(); err != nil {
+		itemID := items.Data()[0].Data().ID
+		if _, err := sp.Web().RecycleBin().GetByID(itemID).Get(); err != nil {
+			t.Error(err)
+		}
+		if err := sp.Web().RecycleBin().GetByID(itemID).Restore(); err != nil {
 			t.Error(err)
 		}
 		data2, err := list.Items().Select("Id").Get()

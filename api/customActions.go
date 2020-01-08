@@ -159,21 +159,21 @@ func (customAction *CustomAction) Get() (*CustomActionInfo, error) {
 	return res, nil
 }
 
-// Update updates this custom action
-func (customAction *CustomAction) Update(payload []byte) (*CustomActionInfo, error) {
-	body := patchMetadataType(payload, "SP.UserCustomAction")
-	sp := NewHTTPClient(customAction.client)
-	data, err := sp.Post(customAction.endpoint, body, getConfHeaders(customAction.config))
-	if err != nil {
-		return nil, err
-	}
-	data = NormalizeODataItem(data)
-	res := &CustomActionInfo{}
-	if err := json.Unmarshal(data, &res); err != nil {
-		return nil, err
-	}
-	return res, nil
-}
+// // Update updates this custom action
+// func (customAction *CustomAction) Update(payload []byte) (*CustomActionInfo, error) {
+// 	body := patchMetadataType(payload, "SP.UserCustomAction")
+// 	sp := NewHTTPClient(customAction.client)
+// 	data, err := sp.Post(customAction.endpoint, body, getConfHeaders(customAction.config))
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	data = NormalizeODataItem(data)
+// 	res := &CustomActionInfo{}
+// 	if err := json.Unmarshal(data, &res); err != nil {
+// 		return nil, err
+// 	}
+// 	return res, nil
+// }
 
 // Delete deletes this custom action
 func (customAction *CustomAction) Delete() error {

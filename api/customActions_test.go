@@ -40,11 +40,13 @@ func TestCustomActions(t *testing.T) {
 			"Sequence":    100,
 			"ScriptBlock": "if (console) { console.log(1); }",
 		}
+		// Add
 		payload, _ := json.Marshal(info)
 		action, err := sp.Web().CustomActions().Add(payload)
 		if err != nil {
 			t.Error(err)
 		}
+		// Get
 		action1, err := sp.Web().CustomActions().GetByID(action.ID).Get()
 		if err != nil {
 			t.Error(err)
@@ -52,8 +54,32 @@ func TestCustomActions(t *testing.T) {
 		if action.ID != action1.ID {
 			t.Error("can't get action by ID")
 		}
+		// Delete
 		if err := sp.Web().CustomActions().GetByID(action.ID).Delete(); err != nil {
 			t.Error(err)
+		}
+	})
+
+	t.Run("Conf", func(t *testing.T) {
+		ca := sp.Web().CustomActions()
+		hs := map[string]*RequestConfig{
+			"nometadata":      HeadersPresets.Nometadata,
+			"minimalmetadata": HeadersPresets.Minimalmetadata,
+			"verbose":         HeadersPresets.Verbose,
+		}
+		for key, preset := range hs {
+			a := ca.Conf(preset)
+			if a.config != preset {
+				t.Errorf("can't %v config", key)
+			}
+		}
+	})
+
+	t.Run("Modifiers", func(t *testing.T) {
+		ca := sp.Web().CustomActions()
+		mods := ca.Select("*").Filter("*").Top(1).OrderBy("*", true).modifiers
+		if mods == nil || len(mods.mods) != 4 {
+			t.Error("wrong number of modifiers")
 		}
 	})
 

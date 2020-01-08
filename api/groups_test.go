@@ -9,7 +9,8 @@ import (
 func TestGroups(t *testing.T) {
 	checkClient(t)
 
-	groups := NewSP(spClient).Web().SiteGroups()
+	sp := NewSP(spClient)
+	groups := sp.Web().SiteGroups()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web/SiteGroups"
 	newGroupName := uuid.New().String()
 	newGroupNameRemove := uuid.New().String()
@@ -106,6 +107,14 @@ func TestGroups(t *testing.T) {
 
 	t.Run("Add", func(t *testing.T) {
 		if _, err := groups.Conf(headers.verbose).Add(newGroupName, nil); err != nil {
+			t.Error(err)
+		}
+
+		u, err := sp.Web().CurrentUser().Select("Id").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if err := groups.GetByName(newGroupName).SetAsOwner(u.Data().ID); err != nil {
 			t.Error(err)
 		}
 	})

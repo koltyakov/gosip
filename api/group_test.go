@@ -14,6 +14,29 @@ func TestGroup(t *testing.T) {
 	newGroupName := uuid.New().String()
 	group := &GroupInfo{}
 
+	t.Run("Conf", func(t *testing.T) {
+		g := web.AssociatedGroups().Visitors()
+		hs := map[string]*RequestConfig{
+			"nometadata":      HeadersPresets.Nometadata,
+			"minimalmetadata": HeadersPresets.Minimalmetadata,
+			"verbose":         HeadersPresets.Verbose,
+		}
+		for key, preset := range hs {
+			u := g.Conf(preset)
+			if u.config != preset {
+				t.Errorf("can't %v config", key)
+			}
+		}
+	})
+
+	t.Run("Modifiers", func(t *testing.T) {
+		g := web.AssociatedGroups().Visitors()
+		mods := g.Select("*").Expand("*").modifiers
+		if mods == nil || len(mods.mods) != 2 {
+			t.Error("wrong number of modifiers")
+		}
+	})
+
 	t.Run("Add", func(t *testing.T) {
 		data, err := web.SiteGroups().Conf(headers.verbose).Add(newGroupName, nil)
 		if err != nil {
@@ -84,6 +107,12 @@ func TestGroup(t *testing.T) {
 
 	t.Run("RemoveByID", func(t *testing.T) {
 		if err := web.SiteGroups().RemoveByID(group.ID); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("Modifiers", func(t *testing.T) {
+		if _, err := web.AssociatedGroups().Visitors().Users().Get(); err != nil {
 			t.Error(err)
 		}
 	})

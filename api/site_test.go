@@ -7,7 +7,8 @@ import (
 func TestSite(t *testing.T) {
 	checkClient(t)
 
-	site := NewSP(spClient).Site()
+	sp := NewSP(spClient)
+	site := sp.Site()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Site"
 
 	t.Run("Constructor", func(t *testing.T) {
@@ -35,13 +36,28 @@ func TestSite(t *testing.T) {
 		}
 	})
 
-	t.Run("GetUrl", func(t *testing.T) {
+	t.Run("Modifiers", func(t *testing.T) {
+		s := sp.Site()
+		mods := s.Select("*").Expand("*").modifiers
+		if mods == nil || len(mods.mods) != 2 {
+			t.Error("wrong number of modifiers")
+		}
+	})
+
+	t.Run("GetURL", func(t *testing.T) {
 		data, err := site.Select("Url").Conf(headers.verbose).Get()
 		if err != nil {
 			t.Error(err)
 		}
 		if data.Data().URL == "" {
 			t.Error("can't get site Url property")
+		}
+	})
+
+	t.Run("FromURL", func(t *testing.T) {
+		s := site.FromURL("site_url")
+		if s.endpoint != "site_url" {
+			t.Error("can't get site from url")
 		}
 	})
 
@@ -70,6 +86,12 @@ func TestSite(t *testing.T) {
 		}
 		if data.Data().ID == "" {
 			t.Error("can't open web by id property")
+		}
+	})
+
+	t.Run("Owner", func(t *testing.T) {
+		if _, err := site.Owner().Get(); err != nil {
+			t.Error(err)
 		}
 	})
 

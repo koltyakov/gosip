@@ -13,6 +13,29 @@ func TestFolder(t *testing.T) {
 	newFolderName := uuid.New().String()
 	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 
+	t.Run("Conf", func(t *testing.T) {
+		folder := web.GetFolder(rootFolderURI)
+		hs := map[string]*RequestConfig{
+			"nometadata":      HeadersPresets.Nometadata,
+			"minimalmetadata": HeadersPresets.Minimalmetadata,
+			"verbose":         HeadersPresets.Verbose,
+		}
+		for key, preset := range hs {
+			f := folder.Conf(preset)
+			if f.config != preset {
+				t.Errorf("can't %v config", key)
+			}
+		}
+	})
+
+	t.Run("Modifiers", func(t *testing.T) {
+		folder := web.GetFolder(rootFolderURI)
+		mods := folder.Select("*").Expand("*").modifiers
+		if mods == nil || len(mods.mods) != 2 {
+			t.Error("can't add modifiers")
+		}
+	})
+
 	t.Run("Add", func(t *testing.T) {
 		if _, err := web.GetFolder(rootFolderURI).Folders().Add(newFolderName); err != nil {
 			t.Error(err)
@@ -22,6 +45,17 @@ func TestFolder(t *testing.T) {
 	t.Run("Get", func(t *testing.T) {
 		if _, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get(); err != nil {
 			t.Error(err)
+		}
+	})
+
+	t.Run("ParentFolder", func(t *testing.T) {
+		pf, err := web.GetFolder(rootFolderURI + "/" + newFolderName).ParentFolder().Get()
+		if err != nil {
+			t.Error(err)
+		}
+
+		if pf.Data().Name == "" {
+			t.Error("wrong parent folder name")
 		}
 	})
 

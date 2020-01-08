@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -13,6 +14,29 @@ func TestList(t *testing.T) {
 		t.Error(err)
 	}
 	list := web.Lists().GetByID(listInfo.ID)
+
+	t.Run("Conf", func(t *testing.T) {
+		list := web.Lists().GetByID(listInfo.ID)
+		hs := map[string]*RequestConfig{
+			"nometadata":      HeadersPresets.Nometadata,
+			"minimalmetadata": HeadersPresets.Minimalmetadata,
+			"verbose":         HeadersPresets.Verbose,
+		}
+		for key, preset := range hs {
+			l := list.Conf(preset)
+			if l.config != preset {
+				t.Errorf("can't %v config", key)
+			}
+		}
+	})
+
+	t.Run("Modifiers", func(t *testing.T) {
+		list := web.Lists().GetByID(listInfo.ID)
+		mods := list.Select("*").Expand("*").modifiers
+		if mods == nil || len(mods.mods) != 2 {
+			t.Error("can't add modifiers")
+		}
+	})
 
 	t.Run("GetEntityType", func(t *testing.T) {
 		entType, err := list.GetEntityType()
@@ -31,6 +55,9 @@ func TestList(t *testing.T) {
 		}
 		if l.Data().Title == "" {
 			t.Error("can't unmarshal list info")
+		}
+		if bytes.Compare(l, l.Normalized()) == -1 {
+			t.Error("wrong response normalization")
 		}
 	})
 

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/google/uuid"
@@ -10,7 +9,8 @@ import (
 func TestWebs(t *testing.T) {
 	checkClient(t)
 
-	webs := NewSP(spClient).Web().Webs()
+	sp := NewSP(spClient)
+	webs := sp.Web().Webs()
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web/Webs"
 	newWebGUID := uuid.New().String()
 
@@ -32,10 +32,25 @@ func TestWebs(t *testing.T) {
 	})
 
 	t.Run("Conf", func(t *testing.T) {
-		webs.config = nil
-		webs.Conf(headers.verbose)
-		if webs.config != headers.verbose {
-			t.Errorf("failed to apply config")
+		ws := sp.Web().Webs()
+		hs := map[string]*RequestConfig{
+			"nometadata":      HeadersPresets.Nometadata,
+			"minimalmetadata": HeadersPresets.Minimalmetadata,
+			"verbose":         HeadersPresets.Verbose,
+		}
+		for key, preset := range hs {
+			w := ws.Conf(preset)
+			if w.config != preset {
+				t.Errorf("can't %v config", key)
+			}
+		}
+	})
+
+	t.Run("Modifiers", func(t *testing.T) {
+		ws := sp.Web().Webs()
+		mods := ws.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
+		if mods == nil || len(mods.mods) != 5 {
+			t.Error("wrong number of modifiers")
 		}
 	})
 
@@ -46,24 +61,17 @@ func TestWebs(t *testing.T) {
 		if _, err := webs.Add("CI: "+newWebGUID, "ci_"+newWebGUID, nil); err != nil {
 			t.Error(err)
 		}
-	})
-
-	t.Run("GetWebs", func(t *testing.T) {
-		data, err := webs.Select("Id,Title").Conf(headers.verbose).Get()
+		data, err := webs.Select("Id,Title").Get()
 		if err != nil {
 			t.Error(err)
 		}
+		if len(data) == 0 {
+			t.Error("wrong webs number")
+		}
+	})
 
-		res := &struct {
-			D struct {
-				Results []struct {
-					ID    string `json:"Id"`
-					Title string `json:"Title"`
-				} `json:"results"`
-			} `json:"d"`
-		}{}
-
-		if err := json.Unmarshal(data, &res); err != nil {
+	t.Run("GetWebs", func(t *testing.T) {
+		if _, err := webs.Select("Id,Title").Get(); err != nil {
 			t.Error(err)
 		}
 	})

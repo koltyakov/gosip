@@ -31,16 +31,6 @@ func TestField(t *testing.T) {
 		}
 	})
 
-	t.Run("Get", func(t *testing.T) {
-		data, err := field.Select("Id").Get()
-		if err != nil {
-			t.Error(err)
-		}
-		if data.Data().ID == "" {
-			t.Error("can't unmarshal data")
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		f, err := getRandomField()
 		if err != nil {
@@ -52,9 +42,31 @@ func TestField(t *testing.T) {
 		}
 	})
 
+	t.Run("Get", func(t *testing.T) {
+		data, err := field.Select("Id").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if data.Data().ID == "" {
+			t.Error("can't unmarshal data")
+		}
+	})
+
+	t.Run("UpdateDelete", func(t *testing.T) {
+		fm := []byte(`{"__metadata":{"type":"SP.FieldText"},"Title":"test-temp-field","FieldTypeKind":2,"MaxLength":255}`)
+		d, err := web.Fields().Add(fm)
+		if err != nil {
+			t.Error(err)
+		}
+		if _, err := web.Fields().GetByID(d.Data().ID).Update([]byte(`{"Description":"Test"}`)); err != nil {
+			t.Error(err)
+		}
+		if err := web.Fields().GetByID(d.Data().ID).Delete(); err != nil {
+			t.Error(err)
+		}
+	})
+
 	// ToDo:
-	// Update
-	// Delete
 	// Recycle
 
 }
