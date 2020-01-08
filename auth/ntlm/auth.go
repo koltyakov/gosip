@@ -94,7 +94,7 @@ func (c *AuthCnfg) SetMasterkey(masterKey string) {
 
 // GetAuth : authenticates, receives access token
 func (c *AuthCnfg) GetAuth() (string, error) {
-	return GetAuth(c)
+	return "", nil
 }
 
 // GetSiteURL : gets siteURL
