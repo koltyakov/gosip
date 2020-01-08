@@ -53,10 +53,11 @@ func TestContentType(t *testing.T) {
 		if cts[0].Data().ID == "" {
 			t.Error("can't get content type info")
 		}
-		if _, err := web.ContentTypes().GetByID(cts[0].Data().ID).Get(); err != nil {
+		data, err := web.ContentTypes().GetByID(cts[0].Data().ID).Get()
+		if err != nil {
 			t.Error(err)
 		}
-		if bytes.Compare(resp, resp.Normalized()) == -1 {
+		if bytes.Compare(data, data.Normalized()) == -1 {
 			t.Error("response normalization error")
 		}
 	})

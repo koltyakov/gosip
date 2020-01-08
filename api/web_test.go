@@ -121,7 +121,7 @@ func TestWeb(t *testing.T) {
 	})
 
 	t.Run("EnsureUser", func(t *testing.T) {
-		user, err := sp.Web().CurrentUser().Select("LoginName").Get()
+		user, err := sp.Web().CurrentUser().Get()
 		if err != nil {
 			t.Error(err)
 		}
