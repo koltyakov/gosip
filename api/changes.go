@@ -82,7 +82,7 @@ func (changes *Changes) Conf(config *RequestConfig) *Changes {
 	return changes
 }
 
-// GetChangeToken gets current change token for this parent entity
+// GetCurrentToken gets current change token for this parent entity
 func (changes *Changes) GetCurrentToken() (string, error) {
 	endpoint := fmt.Sprintf("%s?$select=CurrentChangeToken", changes.endpoint)
 	sp := NewHTTPClient(changes.client)
