@@ -87,7 +87,7 @@ func (permissions *Roles) BreakInheritance(copyRoleAssigments bool, clearSubScop
 	return err
 }
 
-// AddAssigment adds role assigment for this securable object. Relevant only for the objects after breaking inheritence.
+// AddAssigment adds role assigment for this securable object. Relevant only for the objects after breaking inheritance.
 // `principalID` - Principal ID - numeric ID from User information list - user or group ID
 // `roleDefID` - Role definition ID, use RoleDefinitions API for getting roleDefID
 func (permissions *Roles) AddAssigment(principalID int, roleDefID int) error {

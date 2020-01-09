@@ -103,7 +103,7 @@ type SearchResults struct {
 	TriggeredRules        []interface{}            `json:"TriggeredRules"`
 }
 
-// ResultTableCollection - search results table collecton type
+// ResultTableCollection - search results table collection type
 type ResultTableCollection struct {
 	QueryErrors        map[string]interface{} `json:"QueryErrors"`
 	QueryID            string                 `json:"QueryId"`

@@ -272,7 +272,7 @@ func (web *Web) CurrentUser() *User {
 }
 
 // GetFolder gets a folder by its relevant URI, URI can be host relevant (e.g. `/sites/site/lib/folder`)
-// or web relavant (e.g. `lib/folder`, with web relevant URI there should be no slash at the begining)
+// or web relavant (e.g. `lib/folder`, with web relevant URI there should be no slash at the beginning)
 func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 	return NewFolder(
 		web.client,
@@ -292,7 +292,7 @@ func (web *Web) EnsureFolder(serverRelativeURL string) ([]byte, error) {
 
 // GetFile gets File API instance object by its relevant URI
 // File URI can be host relevant (e.g. `/sites/site/lib/folder/file.txt`)
-// or web relavant (e.g. `lib/folder/file.txt`, with web relevant URI there should be no slash at the begining)
+// or web relavant (e.g. `lib/folder/file.txt`, with web relevant URI there should be no slash at the beginning)
 func (web *Web) GetFile(serverRelativeURL string) *File {
 	return NewFile(
 		web.client,

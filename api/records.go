@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Records represents SharePoint Item Records throught REST+CSOM API object struct
+// Records represents SharePoint Item Records via REST+CSOM API object struct
 // Always use NewRecords constructor instead of &Records{}
 type Records struct {
 	item *Item

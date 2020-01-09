@@ -25,7 +25,7 @@ type FileUploadProgressData struct {
 	FileOffset  int
 }
 
-// AddChunked uploads a file in chunks (streaming), is a good fit for large files. Supported sinse SharePoint 2016.
+// AddChunked uploads a file in chunks (streaming), is a good fit for large files. Supported starting from SharePoint 2016.
 func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunkedOptions) (FileResp, error) {
 	web := NewSP(files.client).Web().Conf(files.config)
 	var file *File
