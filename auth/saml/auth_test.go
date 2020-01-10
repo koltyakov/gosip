@@ -87,7 +87,7 @@ func TestAuthEdgeCases(t *testing.T) {
 
 	t.Run("WriteConfig", func(t *testing.T) {
 		folderPath := u.ResolveCnfgPath("./test/tmp")
-		filePath := u.ResolveCnfgPath("./test/tmp/addin.json")
+		filePath := u.ResolveCnfgPath("./test/tmp/saml.json")
 		cnfg := &AuthCnfg{SiteURL: "test"}
 		os.MkdirAll(folderPath, os.ModePerm)
 		if err := cnfg.WriteConfig(filePath); err != nil {

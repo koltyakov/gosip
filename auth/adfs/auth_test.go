@@ -44,6 +44,18 @@ func TestGettingDigest(t *testing.T) {
 	}
 }
 
+func TestCheckRequest(t *testing.T) {
+	for _, cnfgPath := range cnfgPaths {
+		if !h.ConfigExists(cnfgPath) {
+			continue
+		}
+		err := h.CheckRequest(&AuthCnfg{}, cnfgPath)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+}
+
 func TestAuthEdgeCases(t *testing.T) {
 
 	t.Run("ReadConfig/MissedConfig", func(t *testing.T) {
@@ -62,7 +74,7 @@ func TestAuthEdgeCases(t *testing.T) {
 
 	t.Run("WriteConfig", func(t *testing.T) {
 		folderPath := u.ResolveCnfgPath("./test/tmp")
-		filePath := u.ResolveCnfgPath("./test/tmp/addin.json")
+		filePath := u.ResolveCnfgPath("./test/tmp/adfs.json")
 		cnfg := &AuthCnfg{SiteURL: "test"}
 		os.MkdirAll(folderPath, os.ModePerm)
 		if err := cnfg.WriteConfig(filePath); err != nil {
