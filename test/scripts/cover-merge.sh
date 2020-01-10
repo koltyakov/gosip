@@ -1,7 +1,7 @@
 echo "mode: atomic" > coverage.txt
 
 # Locally precovered strategies
-strategies=( addin adfs fba ntml saml tmg )
+strategies=( addin adfs anon fba ntml saml tmg )
 for strategy in "${strategies[@]}"
 do
   auth_coverage_file="auth/${strategy}/coverage.data"
