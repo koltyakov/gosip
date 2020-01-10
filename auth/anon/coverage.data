@@ -1,0 +1,11 @@
+mode: atomic
+github.com/koltyakov/gosip/auth/anon/anon.go:25.57,27.16 2 3
+github.com/koltyakov/gosip/auth/anon/anon.go:30.2,33.54 3 2
+github.com/koltyakov/gosip/auth/anon/anon.go:37.2,37.12 1 1
+github.com/koltyakov/gosip/auth/anon/anon.go:27.16,29.3 1 1
+github.com/koltyakov/gosip/auth/anon/anon.go:33.54,35.3 1 1
+github.com/koltyakov/gosip/auth/anon/anon.go:41.58,47.2 3 1
+github.com/koltyakov/gosip/auth/anon/anon.go:50.46,52.2 1 1
+github.com/koltyakov/gosip/auth/anon/anon.go:55.40,57.2 1 1
+github.com/koltyakov/gosip/auth/anon/anon.go:60.41,62.2 1 4
+github.com/koltyakov/gosip/auth/anon/anon.go:65.81,67.2 1 1
