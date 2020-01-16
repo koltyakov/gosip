@@ -29,6 +29,14 @@ func TestFiles(t *testing.T) {
 		}
 	})
 
+	t.Run("Upload", func(t *testing.T) {
+		fileName := "File_6.txt"
+		fileReader := bytes.NewBuffer([]byte("File 6 data"))
+		if _, err := web.GetFolder(newFolderURI).Files().Upload(fileName, fileReader, true); err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("Get", func(t *testing.T) {
 		data, err := web.GetFolder(newFolderURI).Files().Get()
 		if err != nil {
