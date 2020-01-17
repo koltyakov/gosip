@@ -11,7 +11,7 @@ import (
 
 // AddChunkedOptions provides optional settings for AddChunked method
 type AddChunkedOptions struct {
-	Owerwrite bool                                    // should overwrite existing file
+	Overwrite bool                                    // should overwrite existing file
 	Progress  func(data *FileUploadProgressData) bool // on progress callback, execute custom logic on each chunk, if the Progress is used it should return "true" to continue upload otherwise upload is canceled
 	ChunkSize int                                     // chunk size in bytes
 }
@@ -41,7 +41,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 	// Default props
 	if options == nil {
 		options = &AddChunkedOptions{
-			Owerwrite: true,
+			Overwrite: true,
 			ChunkSize: 10485760,
 		}
 	}
@@ -72,7 +72,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 
 		// Upload in a call if file size is less than chunk size
 		if size < options.ChunkSize && progress.BlockNumber == 0 {
-			return files.Add(name, chunk, options.Owerwrite)
+			return files.Add(name, chunk, options.Overwrite)
 		}
 
 		// Finishing uploading chunked file
@@ -90,7 +90,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 			if goon := options.Progress(progress); !goon {
 				return nil, cancelUpload(file, uploadID)
 			}
-			fileResp, err := files.Add(name, nil, options.Owerwrite)
+			fileResp, err := files.Add(name, nil, options.Overwrite)
 			if err != nil {
 				return nil, err
 			}

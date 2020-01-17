@@ -37,7 +37,7 @@ func TestFilesChunked(t *testing.T) {
 		content := "Greater than a chunk content..."
 		stream := strings.NewReader(content)
 		options := &AddChunkedOptions{
-			Owerwrite: true,
+			Overwrite: true,
 			ChunkSize: 5,
 		}
 		fileResp, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options)
@@ -58,7 +58,7 @@ func TestFilesChunked(t *testing.T) {
 		content := "Greater than a chunk content..."
 		stream := strings.NewReader(content)
 		options := &AddChunkedOptions{
-			Owerwrite: true,
+			Overwrite: true,
 			ChunkSize: 5,
 			Progress: func(data *FileUploadProgressData) bool {
 				if data.BlockNumber > 0 {
