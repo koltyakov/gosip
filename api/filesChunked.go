@@ -11,9 +11,9 @@ import (
 
 // AddChunkedOptions ...
 type AddChunkedOptions struct {
-	Owerwrite bool                               // should overwrite existing file
-	Progress  func(data *FileUploadProgressData) // on progress callback, execute custom logic on each chunk
-	ChunkSize int                                // chunk size in bytes
+	Owerwrite bool                                    // should overwrite existing file
+	Progress  func(data *FileUploadProgressData) bool // on progress callback, execute custom logic on each chunk, if the Progress is used it should return "true" to continue upload otherwise upload is canceled
+	ChunkSize int                                     // chunk size in bytes
 }
 
 // FileUploadProgressData ...
@@ -31,6 +31,13 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 	var file *File
 	uploadID := uuid.New().String()
 
+	cancelUpload := func(file *File, uploadID string) error {
+		if err := file.cancelUpload(uploadID); err != nil {
+			return err
+		}
+		return fmt.Errorf("file upload was canceled")
+	}
+
 	// Default props
 	if options == nil {
 		options = &AddChunkedOptions{
@@ -39,7 +46,9 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 		}
 	}
 	if options.Progress == nil {
-		options.Progress = func(data *FileUploadProgressData) {}
+		options.Progress = func(data *FileUploadProgressData) bool {
+			return true
+		}
 	}
 	if options.ChunkSize == 0 {
 		options.ChunkSize = 10485760
@@ -69,13 +78,18 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 		// Finishing uploading chunked file
 		if size < options.ChunkSize && progress.BlockNumber > 0 {
 			progress.Stage = "finishing"
-			options.Progress(progress)
+			if goon := options.Progress(progress); !goon {
+				return nil, cancelUpload(file, uploadID)
+			}
 			return file.finishUpload(uploadID, progress.FileOffset, chunk)
 		}
 
 		// Initial chunked upload
 		if progress.BlockNumber == 0 {
-			options.Progress(progress)
+			progress.Stage = "starting"
+			if goon := options.Progress(progress); !goon {
+				return nil, cancelUpload(file, uploadID)
+			}
 			fileResp, err := files.Add(name, nil, options.Owerwrite)
 			if err != nil {
 				return nil, err
@@ -88,7 +102,9 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 			progress.FileOffset = offset
 		} else { // or continue chunk upload
 			progress.Stage = "continue"
-			options.Progress(progress)
+			if goon := options.Progress(progress); !goon {
+				return nil, cancelUpload(file, uploadID)
+			}
 			offset, err := file.continueUpload(uploadID, progress.FileOffset, chunk)
 			if err != nil {
 				return nil, err
@@ -100,10 +116,13 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 	}
 
 	progress.Stage = "finishing"
-	options.Progress(progress)
+	if goon := options.Progress(progress); !goon {
+		return nil, cancelUpload(file, uploadID)
+	}
 	return file.finishUpload(uploadID, progress.FileOffset, nil)
 }
 
+// startUpload starts uploading a document using chunk API
 func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/StartUpload(uploadId=guid'%s')", file.endpoint, uploadID)
@@ -124,6 +143,7 @@ func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 	return res.StartUpload, nil
 }
 
+// continueUpload continues uploading a document using chunk API
 func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) (int, error) {
 	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/ContinueUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)
@@ -144,6 +164,15 @@ func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) 
 	return res.ContinueUpload, nil
 }
 
+// cancelUpload canceles document upload using chunk API
+func (file *File) cancelUpload(uploadID string) error {
+	sp := NewHTTPClient(file.client)
+	endpoint := fmt.Sprintf("%s/CancelUpload(uploadId=guid'%s')", file.endpoint, uploadID)
+	_, err := sp.Post(endpoint, nil, getConfHeaders(file.config))
+	return err
+}
+
+// finishUpload finiches uploading a document using chunk API
 func (file *File) finishUpload(uploadID string, fileOffset int, chunk []byte) (FileResp, error) {
 	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/FinishUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)

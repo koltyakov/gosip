@@ -53,6 +53,29 @@ func TestFilesChunked(t *testing.T) {
 		}
 	})
 
+	t.Run("AddChunkedCancel", func(t *testing.T) {
+		fileName := fmt.Sprintf("ChunkedFile.txt")
+		content := "Greater than a chunk content..."
+		stream := strings.NewReader(content)
+		options := &AddChunkedOptions{
+			Owerwrite: true,
+			ChunkSize: 5,
+			Progress: func(data *FileUploadProgressData) bool {
+				if data.BlockNumber > 0 {
+					return false // cancel upload
+				}
+				return true
+			},
+		}
+		_, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options)
+		if err == nil {
+			t.Error("cancel upload was not handled")
+		}
+		if err.Error() != "file upload was canceled" {
+			t.Error(err)
+		}
+	})
+
 	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
 		t.Error(err)
 	}

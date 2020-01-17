@@ -91,31 +91,6 @@ func (files *Files) Add(name string, content []byte, overwrite bool) (FileResp, 
 	return sp.Post(endpoint, content, getConfHeaders(files.config))
 }
 
-// // Upload uploads file into the folder using Reader interface and file streaming
-// func (files *Files) Upload(name string, file io.Reader, overwrite bool) (FileResp, error) {
-// 	endpoint := fmt.Sprintf("%s/Add(overwrite=%t,url='%s')", files.endpoint, overwrite, name)
-
-// 	req, err := http.NewRequest("POST", endpoint, file)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("unable to create a request: %v", err)
-// 	}
-
-// 	req.Header.Set("Accept", "application/json;odata=verbose")
-// 	req.Header.Set("Content-Type", "application/json;odata=verbose;charset=utf-8")
-
-// 	for key, value := range getConfHeaders(files.config) {
-// 		req.Header.Set(key, value)
-// 	}
-
-// 	resp, err := files.client.Execute(req)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("unable to request api: %v", err)
-// 	}
-// 	defer resp.Body.Close()
-
-// 	return ioutil.ReadAll(resp.Body)
-// }
-
 /* Response helpers */
 
 // Data : to get typed data
