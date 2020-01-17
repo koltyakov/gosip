@@ -9,14 +9,14 @@ import (
 	"github.com/google/uuid"
 )
 
-// AddChunkedOptions ...
+// AddChunkedOptions provides optional settings for AddChunked method
 type AddChunkedOptions struct {
 	Owerwrite bool                                    // should overwrite existing file
 	Progress  func(data *FileUploadProgressData) bool // on progress callback, execute custom logic on each chunk, if the Progress is used it should return "true" to continue upload otherwise upload is canceled
 	ChunkSize int                                     // chunk size in bytes
 }
 
-// FileUploadProgressData ...
+// FileUploadProgressData describes Progress callback options
 type FileUploadProgressData struct {
 	UploadID    string
 	Stage       string
