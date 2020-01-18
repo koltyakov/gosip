@@ -7,8 +7,8 @@ require (
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/google/uuid v1.1.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	golang.org/x/crypto v0.0.0-20191227163750-53104e6ec876 // indirect
-	golang.org/x/sys v0.0.0-20200106162015-b016eb3dc98e // indirect
+	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad // indirect
+	golang.org/x/sys v0.0.0-20200117145432-59e60aa80a0c // indirect
 )
 
 replace github.com/koltyakov/gosip => ./
