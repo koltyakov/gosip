@@ -24,7 +24,7 @@ func main() {
 	sp := api.NewSP(client)
 	res, err := sp.Web().Select("Title").Get()
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	fmt.Printf("%s\n", res.Data().Title)
