@@ -3,6 +3,8 @@ package api
 import (
 	"bytes"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestList(t *testing.T) {
@@ -97,6 +99,18 @@ func TestList(t *testing.T) {
 		if _, err := list.RootFolder().Get(); err != nil {
 			t.Error(err)
 		}
+	})
+
+	t.Run("Recycle", func(t *testing.T) {
+		guid := uuid.New().String()
+		lr, err := web.Lists().Add(guid, nil)
+		if err != nil {
+			t.Error(err)
+		}
+		if err := web.Lists().GetByID(lr.Data().ID).Recycle(); err != nil {
+			t.Error(err)
+		}
+		// ToDo: Empty Recycle Bin
 	})
 
 }

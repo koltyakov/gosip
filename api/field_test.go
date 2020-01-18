@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 var fieldID = ""
@@ -57,7 +59,8 @@ func TestField(t *testing.T) {
 	})
 
 	t.Run("UpdateDelete", func(t *testing.T) {
-		fm := []byte(`{"__metadata":{"type":"SP.FieldText"},"Title":"test-temp-field","FieldTypeKind":2,"MaxLength":255}`)
+		guid := uuid.New().String()
+		fm := []byte(`{"__metadata":{"type":"SP.FieldText"},"Title":"test-temp-` + guid + `","FieldTypeKind":2,"MaxLength":255}`)
 		d, err := web.Fields().Add(fm)
 		if err != nil {
 			t.Error(err)
@@ -70,8 +73,18 @@ func TestField(t *testing.T) {
 		}
 	})
 
-	// ToDo:
-	// Recycle
+	t.Run("Recycle", func(t *testing.T) {
+		guid := uuid.New().String()
+		fm := []byte(`{"__metadata":{"type":"SP.FieldText"},"Title":"test-temp-` + guid + `","FieldTypeKind":2,"MaxLength":255}`)
+		d, err := web.Fields().Add(fm)
+		if err != nil {
+			t.Error(err)
+		}
+		if err := web.Fields().GetByID(d.Data().ID).Recycle(); err != nil {
+			t.Error(err)
+		}
+		// ToDo: Empty Recycle Bin
+	})
 
 }
 

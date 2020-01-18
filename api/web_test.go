@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"net/url"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestWeb(t *testing.T) {
@@ -132,6 +134,21 @@ func TestWeb(t *testing.T) {
 
 	t.Run("Roles", func(t *testing.T) {
 		if _, err := sp.Web().Roles().HasUniqueAssignments(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("Recycle", func(t *testing.T) {
+		if !heavyTests {
+			t.Skip("setup SPAPI_HEAVY_TESTS env var to \"true\" to run this test")
+		}
+		newWebGUID := uuid.New().String()
+		if _, err := sp.Web().Webs().Add("CI: "+newWebGUID, "ci_"+newWebGUID, nil); err != nil {
+			t.Error(err)
+		}
+		createdWebURL := spClient.AuthCnfg.GetSiteURL() + "/ci_" + newWebGUID
+		subWeb := NewWeb(spClient, createdWebURL, nil)
+		if err := subWeb.Recycle(); err != nil {
 			t.Error(err)
 		}
 	})

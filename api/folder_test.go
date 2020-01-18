@@ -94,11 +94,23 @@ func TestFolder(t *testing.T) {
 		}
 	})
 
-	t.Run("Recycle", func(t *testing.T) {
+	t.Run("Delete", func(t *testing.T) {
 		if err := web.GetFolder(rootFolderURI + "/" + newFolderName).Delete(); err != nil {
 			t.Error(err)
 		}
-		// ToDo: Restore and delete
+		// ToDo: Empty Recycle Bin
+	})
+
+	t.Run("Recycle", func(t *testing.T) {
+		guid := uuid.New().String()
+		fr, err := web.GetFolder(rootFolderURI).Folders().Add(guid)
+		if err != nil {
+			t.Error(err)
+		}
+		if err := web.GetFolder(fr.Data().ServerRelativeURL).Recycle(); err != nil {
+			t.Error(err)
+		}
+		// ToDo: Empty Recycle Bin
 	})
 
 }

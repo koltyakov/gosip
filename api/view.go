@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/koltyakov/gosip"
 )
@@ -100,14 +99,6 @@ func (view *View) Update(body []byte) (ViewResp, error) {
 func (view *View) Delete() error {
 	sp := NewHTTPClient(view.client)
 	_, err := sp.Delete(view.endpoint, getConfHeaders(view.config))
-	return err
-}
-
-// Recycle moves this View to the recycle bin
-func (view *View) Recycle() error {
-	sp := NewHTTPClient(view.client)
-	endpoint := fmt.Sprintf("%s/Recycle", view.endpoint)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(view.config))
 	return err
 }
 
