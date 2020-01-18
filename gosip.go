@@ -111,54 +111,30 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 
 	resp, err := c.Do(req)
 	if err != nil {
+		if c.retry(req, resp, 5) {
+			return c.Execute(req)
+		}
 		return resp, err
 	}
 
 	// Wait and retry after a delay on 429 :: Too many requests throttling error response
-	if resp.StatusCode == 429 {
-		if retryAfter, err := strconv.Atoi(resp.Header.Get("Retry-After")); err == nil {
-			retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
-			if retry < 5 { // only retry 5 times
-				req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
-				time.Sleep(time.Duration(retryAfter) * time.Second)
-				return c.Execute(req)
-			}
-		}
+	if resp.StatusCode == 429 && c.retry(req, resp, 5) {
+		return c.Execute(req)
 	}
 
 	// Wait and retry on 503 :: Service Unavailable
-	if resp.StatusCode == 503 {
-		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
-		if retry < 5 { // only retry 5 times
-			retryAfter, _ := strconv.Atoi(resp.Header.Get("Retry-After"))
-			req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
-			if retryAfter == 0 {
-				time.Sleep(time.Duration(retryAfter) * time.Second) // wait for Retry-After header info value
-			} else {
-				time.Sleep(time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond) // no Retry-After header
-			}
-			return c.Execute(req)
-		}
+	if resp.StatusCode == 503 && c.retry(req, resp, 5) {
+		return c.Execute(req)
 	}
 
 	// Wait and retry on 500 :: Internal Server Error
-	if resp.StatusCode == 500 {
-		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
-		if retry < 1 { // only retry 1 time
-			req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
-			time.Sleep(time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond)
-			return c.Execute(req)
-		}
+	if resp.StatusCode == 500 && c.retry(req, resp, 1) {
+		return c.Execute(req)
 	} // temporary workaround to fix unstable SPO service (https://github.com/SharePoint/sp-dev-docs/issues/4952)
 
 	// Wait and retry on 401 :: Unauthorized
-	if resp.StatusCode == 401 {
-		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
-		if retry < 5 {
-			req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
-			time.Sleep(time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond)
-			return c.Execute(req)
-		}
+	if resp.StatusCode == 401 && c.retry(req, resp, 5) {
+		return c.Execute(req)
 	}
 
 	// Return meaningful error message
@@ -173,4 +149,22 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	}
 
 	return resp, err
+}
+
+func (c *SPClient) retry(req *http.Request, resp *http.Response, retries int) bool {
+	retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
+	if retry < retries {
+		retryAfter := 0
+		if resp != nil {
+			retryAfter, _ = strconv.Atoi(resp.Header.Get("Retry-After"))
+		}
+		req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
+		if retryAfter != 0 {
+			time.Sleep(time.Duration(retryAfter) * time.Second) // wait for Retry-After header info value
+		} else {
+			time.Sleep(time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond) // no Retry-After header
+		}
+		return true
+	}
+	return false
 }
