@@ -110,6 +110,9 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	}
 
 	resp, err := c.Do(req)
+	if err != nil {
+		return resp, err
+	}
 
 	// Wait and retry after a delay on 429 :: Too many requests throttling error response
 	if resp.StatusCode == 429 {
