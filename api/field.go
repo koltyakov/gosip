@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/koltyakov/gosip"
 )
@@ -109,13 +108,13 @@ func (field *Field) Delete() error {
 	return err
 }
 
-// Recycle moves a field to the recycle bin
-func (field *Field) Recycle() error {
-	sp := NewHTTPClient(field.client)
-	endpoint := fmt.Sprintf("%s/Recycle", field.endpoint)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(field.config))
-	return err
-}
+// // Recycle moves a field to the recycle bin
+// func (field *Field) Recycle() error {
+// 	sp := NewHTTPClient(field.client)
+// 	endpoint := fmt.Sprintf("%s/Recycle", field.endpoint)
+// 	_, err := sp.Post(endpoint, nil, getConfHeaders(field.config))
+// 	return err
+// }
 
 /* Response helpers */
 

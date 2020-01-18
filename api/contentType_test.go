@@ -82,23 +82,23 @@ func TestContentType(t *testing.T) {
 		}
 	})
 
-	t.Run("Recycle", func(t *testing.T) {
-		guid := uuid.New().String()
-		ctID := "0x0100" + strings.ToUpper(strings.Replace(guid, "-", "", -1))
-		ct := []byte(`{
-			"Description":"",
-			"Group":"Custom Content Types",
-			"Id":{"StringValue":"` + ctID + `"},
-			"Name":"test-temp-ct ` + guid + `"
-		}`)
-		if _, err := web.ContentTypes().Add(ct); err != nil {
-			t.Error(err)
-		}
-		if err := web.ContentTypes().GetByID(ctID).Recycle(); err != nil {
-			t.Error(err)
-		}
-		// ToDo: Empty Recycle Bin
-	})
+	// t.Run("Recycle", func(t *testing.T) {
+	// 	guid := uuid.New().String()
+	// 	ctID := "0x0100" + strings.ToUpper(strings.Replace(guid, "-", "", -1))
+	// 	ct := []byte(`{
+	// 		"Description":"",
+	// 		"Group":"Custom Content Types",
+	// 		"Id":{"StringValue":"` + ctID + `"},
+	// 		"Name":"test-temp-ct ` + guid + `"
+	// 	}`)
+	// 	if _, err := web.ContentTypes().Add(ct); err != nil {
+	// 		t.Error(err)
+	// 	}
+	// 	if err := web.ContentTypes().GetByID(ctID).Recycle(); err != nil {
+	// 		t.Error(err)
+	// 	}
+	// 	// ToDo: Empty Recycle Bin
+	// })
 
 }
 
