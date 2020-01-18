@@ -154,7 +154,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	// Wait and retry on 401 :: Unauthorized
 	if resp.StatusCode == 401 {
 		retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
-		if retry < 10 {
+		if retry < 5 {
 			req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
 			time.Sleep(time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond)
 			return c.Execute(req)

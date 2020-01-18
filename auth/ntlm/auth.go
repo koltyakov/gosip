@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 
 	ntlmssp "github.com/Azure/go-ntlmssp"
 	"github.com/koltyakov/gosip"
@@ -42,6 +43,8 @@ type AuthCnfg struct {
 	Password string `json:"password"` // AD user password
 
 	masterKey string
+	transport ntlmssp.Negotiator
+	mux       sync.Mutex
 }
 
 // ReadConfig : reads private config with auth options
@@ -110,15 +113,20 @@ func (c *AuthCnfg) GetStrategy() string {
 // SetAuth : authenticate request
 func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
 	// NTML + Negotiation
-	if httpClient.Transport != nil {
-		httpClient.Transport = ntlmssp.Negotiator{
-			RoundTripper: httpClient.Transport, // custom transport
-		}
-	} else {
-		httpClient.Transport = ntlmssp.Negotiator{
+
+	c.mux.Lock()
+	if c.transport.RoundTripper == nil {
+		c.transport = ntlmssp.Negotiator{
 			RoundTripper: &http.Transport{},
 		}
 	}
+	c.mux.Unlock()
+
+	if httpClient.Transport != nil && httpClient.Transport != c.transport {
+		c.transport.RoundTripper = httpClient.Transport // custom transport
+	}
+	httpClient.Transport = c.transport
+
 	req.SetBasicAuth(c.Username, c.Password)
 	return nil
 }
