@@ -29,19 +29,29 @@ const version = "1.0.0"
 // AuthCnfg is an abstract auth config interface,
 // allows different authentications strategies' dependency injection
 type AuthCnfg interface {
-	ReadConfig(configPath string) error
-	WriteConfig(configPath string) error
-	GetAuth() (string, error)
-	GetSiteURL() string
-	GetStrategy() string
-	SetAuth(req *http.Request, client *SPClient) error
+	SetAuth(req *http.Request, client *SPClient) error // Authentication middleware fabric
+	GetSiteURL() string                                // SiteURL getter method
+	GetStrategy() string                               // Strategy code getter (triggered on demand)
+	ReadConfig(configPath string) error                // Reads credentials from storage (triggered on demand)
+	WriteConfig(configPath string) error               // Writes credential to storage (triggered on demand)
+	GetAuth() (string, error)                          // Authentication initializer
 }
 
 // SPClient : SharePoint HTTP client struct
 type SPClient struct {
 	http.Client
-	AuthCnfg   AuthCnfg
-	ConfigPath string
+	AuthCnfg   AuthCnfg // authentication configuration interface
+	ConfigPath string   // private.json location path, optional when AuthCnfg is provided with creds explicitely
+
+	RetryPolicies map[int]int
+}
+
+// RetryPolicies : error state requests default retry policies
+var retryPolicies = map[int]int{
+	401: 5, // on 401 :: Unauthorized
+	429: 5, // on 429 :: Too many requests throttling error response
+	500: 1, // on 500 :: Internal Server Error
+	503: 5, // on 503 :: Service Unavailable
 }
 
 // Execute : SharePoint HTTP client
@@ -68,30 +78,18 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	// Sending actual request to SharePoint API/resource
 	resp, err := c.Do(req)
 	if err != nil {
-		if c.shouldRetry(req, resp, 5) {
+		// Retry only for NTML
+		if c.AuthCnfg.GetStrategy() == "ntlm" && c.shouldRetry(req, resp, 5) {
 			return c.Execute(req)
 		}
 		return resp, err
 	}
 
-	// Wait and retry after a delay on 429 :: Too many requests throttling error response
-	if resp.StatusCode == 429 && c.shouldRetry(req, resp, 5) {
-		return c.Execute(req)
-	}
-
-	// Wait and retry on 503 :: Service Unavailable
-	if resp.StatusCode == 503 && c.shouldRetry(req, resp, 5) {
-		return c.Execute(req)
-	}
-
-	// Wait and retry on 500 :: Internal Server Error
-	if resp.StatusCode == 500 && c.shouldRetry(req, resp, 1) {
-		return c.Execute(req)
-	} // temporary workaround to fix unstable SPO service (https://github.com/SharePoint/sp-dev-docs/issues/4952)
-
-	// Wait and retry on 401 :: Unauthorized
-	if resp.StatusCode == 401 && c.shouldRetry(req, resp, 5) {
-		return c.Execute(req)
+	// Wait and retry after a delay for error state responses, due to retry policies
+	if retries := c.getRetryPolicy(resp.StatusCode); retries > 0 {
+		if c.shouldRetry(req, resp, retries) {
+			return c.Execute(req)
+		}
 	}
 
 	// Return meaningful error message
@@ -149,12 +147,6 @@ func (c *SPClient) applyHeaders(req *http.Request) error {
 	if digestIsRequired {
 		digest, err := GetDigest(c)
 		if err != nil {
-			// res := &http.Response{
-			// 	Status:     "400 Bad Request",
-			// 	StatusCode: 400,
-			// 	Request:    req,
-			// }
-			// return res, err
 			return err
 		}
 		req.Header.Set("X-RequestDigest", digest)
@@ -177,6 +169,22 @@ func (c *SPClient) applyHeaders(req *http.Request) error {
 	}
 
 	return nil
+}
+
+// getRetryPolicy receives retries policy retry number
+func (c *SPClient) getRetryPolicy(statusCode int) int {
+	// Apply default policies
+	if c.RetryPolicies == nil {
+		c.RetryPolicies = retryPolicies
+	} else {
+		// Append defaults to custom
+		for status, retries := range retryPolicies {
+			if _, ok := c.RetryPolicies[status]; !ok {
+				c.RetryPolicies[status] = retries
+			}
+		}
+	}
+	return c.RetryPolicies[statusCode]
 }
 
 // shouldRetry checks should the request be retried, used with specific resp.StatusCode's
