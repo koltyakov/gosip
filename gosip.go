@@ -245,7 +245,7 @@ func (c *SPClient) onRetry(req *http.Request, startAt time.Time, statusCode int,
 
 // onResponse on response hook handler
 func (c *SPClient) onResponse(req *http.Request, startAt time.Time, statusCode int, err error) {
-	if c.Hooks != nil && c.Hooks.OnRetry != nil {
+	if c.Hooks != nil && c.Hooks.OnResponse != nil {
 		c.Hooks.OnResponse(&HookEvent{
 			Request:    req,
 			StartedAt:  startAt,
