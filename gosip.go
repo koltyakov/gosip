@@ -43,7 +43,7 @@ type SPClient struct {
 	AuthCnfg   AuthCnfg // authentication configuration interface
 	ConfigPath string   // private.json location path, optional when AuthCnfg is provided with creds explicitely
 
-	RetryPolicies map[int]int
+	RetryPolicies map[int]int // allow redefine error state requests retry policies
 }
 
 // RetryPolicies : error state requests default retry policies
