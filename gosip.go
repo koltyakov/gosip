@@ -43,7 +43,8 @@ type SPClient struct {
 	AuthCnfg   AuthCnfg // authentication configuration interface
 	ConfigPath string   // private.json location path, optional when AuthCnfg is provided with creds explicitly
 
-	RetryPolicies map[int]int // allows redefine error state requests retry policies
+	RetryPolicies map[int]int   // allows redefine error state requests retry policies
+	Hooks         *HookHandlers // hook handlers definition
 }
 
 // RetryPolicies : error state requests default retry policies
@@ -58,9 +59,11 @@ var retryPolicies = map[int]int{
 // is a wrapper for standard http.Client' `Do` method,
 // injects authorization tokens, etc.
 func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
+	reqTime := time.Now()
 
 	// Apply authentication flow
 	if res, err := c.applyAuth(req); err != nil {
+		c.onError(req, reqTime, 0, err)
 		return res, err
 	}
 
@@ -72,16 +75,22 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 			StatusCode: 400,
 			Request:    req,
 		}
+		c.onError(req, reqTime, 0, err)
 		return res, err
 	}
+
+	c.onRequest(req, reqTime, 0, nil)
+	reqTime = time.Now() // update request time to exclude auth-releted timings
 
 	// Sending actual request to SharePoint API/resource
 	resp, err := c.Do(req)
 	if err != nil {
 		// Retry only for NTML
 		if c.AuthCnfg.GetStrategy() == "ntlm" && c.shouldRetry(req, resp, 5) {
+			c.onRetry(req, reqTime, resp.StatusCode, nil)
 			return c.Execute(req)
 		}
+		c.onError(req, reqTime, 0, err)
 		return resp, err
 	}
 
@@ -89,6 +98,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	if retries := c.getRetryPolicy(resp.StatusCode); retries > 0 {
 		// When it should, shouldRetry not only checks but waits before a retry
 		if c.shouldRetry(req, resp, retries) {
+			c.onRetry(req, reqTime, resp.StatusCode, nil)
 			return c.Execute(req)
 		}
 	}
@@ -102,8 +112,10 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		if unescaped, e := strconv.Unquote(`"` + strings.Replace(fmt.Sprintf("%s", details), `"`, `\"`, -1) + `"`); e == nil {
 			err = fmt.Errorf("%s :: %s", resp.Status, unescaped)
 		}
+		c.onError(req, reqTime, resp.StatusCode, err)
 	}
 
+	c.onResponse(req, reqTime, resp.StatusCode, err)
 	return resp, err
 }
 
@@ -205,4 +217,52 @@ func (c *SPClient) shouldRetry(req *http.Request, resp *http.Response, retries i
 		return true
 	}
 	return false
+}
+
+// onError on error hook handler
+func (c *SPClient) onError(req *http.Request, startAt time.Time, statusCode int, err error) {
+	if c.Hooks != nil && c.Hooks.OnError != nil {
+		c.Hooks.OnError(&HookEvent{
+			Request:    req,
+			StartedAt:  startAt,
+			StatusCode: statusCode,
+			Error:      err,
+		})
+	}
+}
+
+// onRetry on retry hook handler
+func (c *SPClient) onRetry(req *http.Request, startAt time.Time, statusCode int, err error) {
+	if c.Hooks != nil && c.Hooks.OnRetry != nil {
+		c.Hooks.OnRetry(&HookEvent{
+			Request:    req,
+			StartedAt:  startAt,
+			StatusCode: statusCode,
+			Error:      err,
+		})
+	}
+}
+
+// onResponse on response hook handler
+func (c *SPClient) onResponse(req *http.Request, startAt time.Time, statusCode int, err error) {
+	if c.Hooks != nil && c.Hooks.OnRetry != nil {
+		c.Hooks.OnResponse(&HookEvent{
+			Request:    req,
+			StartedAt:  startAt,
+			StatusCode: statusCode,
+			Error:      err,
+		})
+	}
+}
+
+// onRequest on response hook handler
+func (c *SPClient) onRequest(req *http.Request, startAt time.Time, statusCode int, err error) {
+	if c.Hooks != nil && c.Hooks.OnRequest != nil {
+		c.Hooks.OnRequest(&HookEvent{
+			Request:    req,
+			StartedAt:  startAt,
+			StatusCode: statusCode,
+			Error:      err,
+		})
+	}
 }
