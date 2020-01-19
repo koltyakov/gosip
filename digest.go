@@ -11,9 +11,7 @@ import (
 	cache "github.com/patrickmn/go-cache"
 )
 
-var (
-	storage = cache.New(5*time.Minute, 10*time.Minute)
-)
+var storage = cache.New(5*time.Minute, 10*time.Minute)
 
 type contextInfoResponse struct {
 	D struct {
