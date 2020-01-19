@@ -339,7 +339,8 @@ TMG - Microsoft Forefront Threat Management Gateway, currently is legacy but was
 type AuthCnfg struct {
 	// SPSite or SPWeb URL, which is the context target for the API calls
 	SiteURL string `json:"siteUrl"`
-	// Username for SharePoint On-Prem, format depends in FBA/TMG settings, can include domain or doesn't
+	// Username for SharePoint On-Prem, format depends in FBA/TMG settings,
+	// can include domain or doesn't
 	Username string `json:"username"`
 	// User password
 	Password string `json:"password"`
