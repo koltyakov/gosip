@@ -78,7 +78,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 		// Finishing uploading chunked file
 		if size < options.ChunkSize && progress.BlockNumber > 0 {
 			progress.Stage = "finishing"
-			if goon := options.Progress(progress); !goon {
+			if !options.Progress(progress) {
 				return nil, cancelUpload(file, uploadID)
 			}
 			return file.finishUpload(uploadID, progress.FileOffset, chunk)
@@ -87,7 +87,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 		// Initial chunked upload
 		if progress.BlockNumber == 0 {
 			progress.Stage = "starting"
-			if goon := options.Progress(progress); !goon {
+			if !options.Progress(progress) {
 				return nil, cancelUpload(file, uploadID)
 			}
 			fileResp, err := files.Add(name, nil, options.Overwrite)
@@ -102,7 +102,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 			progress.FileOffset = offset
 		} else { // or continue chunk upload
 			progress.Stage = "continue"
-			if goon := options.Progress(progress); !goon {
+			if !options.Progress(progress) {
 				return nil, cancelUpload(file, uploadID)
 			}
 			offset, err := file.continueUpload(uploadID, progress.FileOffset, chunk)
@@ -116,7 +116,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 	}
 
 	progress.Stage = "finishing"
-	if goon := options.Progress(progress); !goon {
+	if !options.Progress(progress) {
 		return nil, cancelUpload(file, uploadID)
 	}
 	return file.finishUpload(uploadID, progress.FileOffset, nil)
