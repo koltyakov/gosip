@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"sync/atomic"
 	"testing"
 
 	"github.com/koltyakov/gosip"
@@ -25,6 +26,19 @@ var (
 		nometadata      *RequestConfig
 	}
 )
+
+// Request counters
+var requestCntrs = struct {
+	Errors    int32
+	Responses int32
+	Retries   int32
+	Requests  int32
+}{
+	Errors:    0,
+	Responses: 0,
+	Retries:   0,
+	Requests:  0,
+}
 
 func init() {
 	ci = os.Getenv("SPAUTH_CI") == "true"
@@ -81,8 +95,24 @@ func init() {
 		},
 	}
 
+	handlers := &gosip.HookHandlers{
+		OnError: func(e *gosip.HookEvent) {
+			atomic.AddInt32(&requestCntrs.Errors, 1)
+		},
+		OnResponse: func(e *gosip.HookEvent) {
+			atomic.AddInt32(&requestCntrs.Responses, 1)
+		},
+		OnRetry: func(e *gosip.HookEvent) {
+			atomic.AddInt32(&requestCntrs.Retries, 1)
+		},
+		OnRequest: func(e *gosip.HookEvent) {
+			atomic.AddInt32(&requestCntrs.Requests, 1)
+		},
+	}
+
 	if envCode != "" && envResolver[envCode] != nil {
 		spClient = envResolver[envCode]()
+		spClient.Hooks = handlers
 	}
 
 	setHeadersPresets()
