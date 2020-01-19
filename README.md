@@ -10,11 +10,7 @@
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/koltyakov/gosip-docs/master/.gitbook/assets/gosip.png" />
-  <h3>
-    📚 <a href="https://go.spflow.com" target="_blank">Documentation</a> 📦 <a href="https://github.com/koltyakov/gosip-sandbox/tree/master/samples" target="_blank">Samples</a>
-  </h3>
 </div>
-
 
 ## Main features
 
@@ -359,6 +355,10 @@ When storing credential in local `private.json` files, which can be handy in loc
 Many auth flows have been "copied" from [node-sp-auth](https://github.com/s-kainet/node-sp-auth) library (used as a blueprint), which we intensively use in Node.js ecosystem for years.
 
 Fluent API and wrapper syntax are inspired by [PnPjs](https://github.com/pnp/pnpjs), which is also the first-class citizen on almost all our Node.js and front-end projects with SharePoint involved.
+
+## 📚 [Documentation](https://go.spflow.com)
+
+## 📦 [Samples](https://github.com/koltyakov/gosip-sandbox/tree/master/samples)
 
 ## License
 
