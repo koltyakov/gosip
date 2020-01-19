@@ -8,9 +8,13 @@
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkoltyakov%2Fgosip.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkoltyakov%2Fgosip?ref=badge_shield)
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
-<p align="center">
+<div align="center">
   <img src="https://raw.githubusercontent.com/koltyakov/gosip-docs/master/.gitbook/assets/gosip.png" />
-</p>
+  <h3>
+    📚 <a href="https://go.spflow.com" target="_blank">Documentation</a> 📦 <a href="https://github.com/koltyakov/gosip-sandbox/tree/master/samples" target="_blank">Samples</a>
+  </h3>
+</div>
+
 
 ## Main features
 
@@ -31,10 +35,13 @@
   - ADFS user credentials (ADFS, WAP -> Basic/NTLM, WAP -> ADFS)
   - Behind a reverse proxy (Forefront TMG, WAP -> Basic/NTLM, WAP -> ADFS)
   - Form-based authentication (FBA)
+  - On-Demand auth [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/ondemand)
 - SharePoint Online:
   - SAML based with user credentials
   - Add-In only permissions
   - ADFS user credentials (automatically detects in SAML strategy)
+  - On-Demand auth [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/ondemand)
+  - Azure AD Device flow [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/device)
 
 ## Installation
 
