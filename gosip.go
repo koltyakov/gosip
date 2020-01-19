@@ -43,7 +43,7 @@ type SPClient struct {
 	AuthCnfg   AuthCnfg // authentication configuration interface
 	ConfigPath string   // private.json location path, optional when AuthCnfg is provided with creds explicitely
 
-	RetryPolicies map[int]int // allow redefine error state requests retry policies
+	RetryPolicies map[int]int // allows redefine error state requests retry policies
 }
 
 // RetryPolicies : error state requests default retry policies
@@ -87,6 +87,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 
 	// Wait and retry after a delay for error state responses, due to retry policies
 	if retries := c.getRetryPolicy(resp.StatusCode); retries > 0 {
+		// When it should, shouldRetry not only checks but waits before the retry
 		if c.shouldRetry(req, resp, retries) {
 			return c.Execute(req)
 		}
