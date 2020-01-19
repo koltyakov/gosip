@@ -49,6 +49,67 @@ type SPClient struct {
 // injects authorization tokens, etc.
 func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 
+	// Apply authentication flow
+	if res, err := c.applyAuth(req); err != nil {
+		return res, err
+	}
+
+	// Setup request default headers
+	if err := c.applyHeaders(req); err != nil {
+		// An error might occur only when calling for the digest
+		res := &http.Response{
+			Status:     "400 Bad Request",
+			StatusCode: 400,
+			Request:    req,
+		}
+		return res, err
+	}
+
+	// Sending actual request to SharePoint API/resource
+	resp, err := c.Do(req)
+	if err != nil {
+		if c.shouldRetry(req, resp, 5) {
+			return c.Execute(req)
+		}
+		return resp, err
+	}
+
+	// Wait and retry after a delay on 429 :: Too many requests throttling error response
+	if resp.StatusCode == 429 && c.shouldRetry(req, resp, 5) {
+		return c.Execute(req)
+	}
+
+	// Wait and retry on 503 :: Service Unavailable
+	if resp.StatusCode == 503 && c.shouldRetry(req, resp, 5) {
+		return c.Execute(req)
+	}
+
+	// Wait and retry on 500 :: Internal Server Error
+	if resp.StatusCode == 500 && c.shouldRetry(req, resp, 1) {
+		return c.Execute(req)
+	} // temporary workaround to fix unstable SPO service (https://github.com/SharePoint/sp-dev-docs/issues/4952)
+
+	// Wait and retry on 401 :: Unauthorized
+	if resp.StatusCode == 401 && c.shouldRetry(req, resp, 5) {
+		return c.Execute(req)
+	}
+
+	// Return meaningful error message
+	if err == nil && !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
+		defer resp.Body.Close()
+		details, _ := ioutil.ReadAll(resp.Body)
+		err = fmt.Errorf("%s :: %s", resp.Status, details)
+		// Unescape unicode-escaped error messages for non Latin languages
+		if unescaped, e := strconv.Unquote(`"` + strings.Replace(fmt.Sprintf("%s", details), `"`, `\"`, -1) + `"`); e == nil {
+			err = fmt.Errorf("%s :: %s", resp.Status, unescaped)
+		}
+	}
+
+	return resp, err
+}
+
+// applyAuth applyes authentication flow
+func (c *SPClient) applyAuth(req *http.Request) (*http.Response, error) {
 	// Read stored creds and config
 	if c.ConfigPath != "" && c.AuthCnfg.GetSiteURL() == "" {
 		c.AuthCnfg.ReadConfig(c.ConfigPath)
@@ -75,6 +136,11 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		return res, err
 	}
 
+	return nil, nil
+}
+
+// applyHeaders patches request readers for SP API defaults
+func (c *SPClient) applyHeaders(req *http.Request) error {
 	// Inject X-RequestDigest header when needed
 	digestIsRequired := req.Method == "POST" &&
 		!strings.Contains(strings.ToLower(req.URL.Path), "/_api/contextinfo") &&
@@ -83,12 +149,13 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	if digestIsRequired {
 		digest, err := GetDigest(c)
 		if err != nil {
-			res := &http.Response{
-				Status:     "400 Bad Request",
-				StatusCode: 400,
-				Request:    req,
-			}
-			return res, err
+			// res := &http.Response{
+			// 	Status:     "400 Bad Request",
+			// 	StatusCode: 400,
+			// 	Request:    req,
+			// }
+			// return res, err
+			return err
 		}
 		req.Header.Set("X-RequestDigest", digest)
 	}
@@ -109,49 +176,11 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		req.Header.Set("User-Agent", fmt.Sprintf("NONISV|Go|Gosip/@%s", version))
 	}
 
-	resp, err := c.Do(req)
-	if err != nil {
-		if c.retry(req, resp, 5) {
-			return c.Execute(req)
-		}
-		return resp, err
-	}
-
-	// Wait and retry after a delay on 429 :: Too many requests throttling error response
-	if resp.StatusCode == 429 && c.retry(req, resp, 5) {
-		return c.Execute(req)
-	}
-
-	// Wait and retry on 503 :: Service Unavailable
-	if resp.StatusCode == 503 && c.retry(req, resp, 5) {
-		return c.Execute(req)
-	}
-
-	// Wait and retry on 500 :: Internal Server Error
-	if resp.StatusCode == 500 && c.retry(req, resp, 1) {
-		return c.Execute(req)
-	} // temporary workaround to fix unstable SPO service (https://github.com/SharePoint/sp-dev-docs/issues/4952)
-
-	// Wait and retry on 401 :: Unauthorized
-	if resp.StatusCode == 401 && c.retry(req, resp, 5) {
-		return c.Execute(req)
-	}
-
-	// Return meaningful error message
-	if err == nil && !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
-		defer resp.Body.Close()
-		details, _ := ioutil.ReadAll(resp.Body)
-		err = fmt.Errorf("%s :: %s", resp.Status, details)
-		// Unescape unicode-escaped error messages for non Latin languages
-		if unescaped, e := strconv.Unquote(`"` + strings.Replace(fmt.Sprintf("%s", details), `"`, `\"`, -1) + `"`); e == nil {
-			err = fmt.Errorf("%s :: %s", resp.Status, unescaped)
-		}
-	}
-
-	return resp, err
+	return nil
 }
 
-func (c *SPClient) retry(req *http.Request, resp *http.Response, retries int) bool {
+// shouldRetry checks should the request be retried, used with specific resp.StatusCode's
+func (c *SPClient) shouldRetry(req *http.Request, resp *http.Response, retries int) bool {
 	retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
 	if retry < retries {
 		retryAfter := 0
