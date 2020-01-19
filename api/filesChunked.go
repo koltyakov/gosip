@@ -164,7 +164,7 @@ func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) 
 	return res.ContinueUpload, nil
 }
 
-// cancelUpload canceles document upload using chunk API
+// cancelUpload cancels document upload using chunk API
 func (file *File) cancelUpload(uploadID string) error {
 	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/CancelUpload(uploadId=guid'%s')", file.endpoint, uploadID)
