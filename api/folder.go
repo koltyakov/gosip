@@ -121,6 +121,7 @@ func (folder *Folder) Props() *Properties {
 		folder.client,
 		fmt.Sprintf("%s/Properties", folder.endpoint),
 		folder.config,
+		"folder",
 	)
 }
 

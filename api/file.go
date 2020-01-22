@@ -259,6 +259,16 @@ func (file *File) ContextInfo() (*ContextInfo, error) {
 	return NewContext(file.client, file.ToURL(), file.config).Get()
 }
 
+// Props gets Properties API instance queryable collection for this File
+func (file *File) Props() *Properties {
+	return NewProperties(
+		file.client,
+		fmt.Sprintf("%s/Properties", file.endpoint),
+		file.config,
+		"file",
+	)
+}
+
 /* Response helpers */
 
 // Data : to get typed data

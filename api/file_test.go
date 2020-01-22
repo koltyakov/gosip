@@ -58,6 +58,20 @@ func TestFile(t *testing.T) {
 		}
 	})
 
+	t.Run("Properties", func(t *testing.T) {
+		file := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt")
+		props, err := file.Props().Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if len(props.Data()) == 0 {
+			t.Error("can't get file properties")
+		}
+		if err := file.Props().Set("MyProp", "MyValue"); err != nil {
+			t.Error("can't set file property")
+		}
+	})
+
 	// t.Run("Update", func(t *testing.T) {
 	// 	fm := []byte(`{"Name":"Test"}`)
 	// 	if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Update(fm); err != nil {

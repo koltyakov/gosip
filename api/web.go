@@ -170,6 +170,7 @@ func (web *Web) AllProps() *Properties {
 		web.client,
 		fmt.Sprintf("%s/AllProperties", web.endpoint),
 		web.config,
+		"web",
 	)
 }
 

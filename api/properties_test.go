@@ -16,7 +16,7 @@ func TestProperties(t *testing.T) {
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web/AllProperties"
 
 	t.Run("Constructor", func(t *testing.T) {
-		webProps := NewProperties(spClient, endpoint, nil)
+		webProps := NewProperties(spClient, endpoint, nil, "web")
 		if _, err := webProps.Select("vti_x005f_defaultlanguage").Get(); err != nil {
 			t.Error(err)
 		}
