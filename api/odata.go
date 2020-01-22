@@ -19,9 +19,6 @@ func NewODataMods() *ODataMods {
 
 // Get retrieves OData modifiers map
 func (oData *ODataMods) Get() map[string]string {
-	if oData == nil {
-		oData = &ODataMods{mods: map[string]string{}}
-	}
 	if oData.mods == nil {
 		oData.mods = map[string]string{}
 	}
@@ -30,9 +27,6 @@ func (oData *ODataMods) Get() map[string]string {
 
 // AddSelect adds $select OData modifier
 func (oData *ODataMods) AddSelect(values string) *ODataMods {
-	if oData == nil {
-		oData = &ODataMods{mods: map[string]string{}}
-	}
 	if oData.mods == nil {
 		oData.mods = map[string]string{}
 	}
@@ -42,9 +36,9 @@ func (oData *ODataMods) AddSelect(values string) *ODataMods {
 
 // AddExpand adds $expand OData modifier
 func (oData *ODataMods) AddExpand(values string) *ODataMods {
-	if oData == nil {
-		oData = &ODataMods{mods: map[string]string{}}
-	}
+	// if oData == nil {
+	// 	oData = &ODataMods{mods: map[string]string{}}
+	// }
 	if oData.mods == nil {
 		oData.mods = map[string]string{}
 	}
@@ -54,9 +48,9 @@ func (oData *ODataMods) AddExpand(values string) *ODataMods {
 
 // AddFilter adds $filter OData modifier
 func (oData *ODataMods) AddFilter(values string) *ODataMods {
-	if oData == nil {
-		oData = &ODataMods{mods: map[string]string{}}
-	}
+	// if oData == nil {
+	// 	oData = &ODataMods{mods: map[string]string{}}
+	// }
 	if oData.mods == nil {
 		oData.mods = map[string]string{}
 	}
@@ -78,9 +72,6 @@ func (oData *ODataMods) AddSkip(value string) *ODataMods {
 
 // AddTop adds $top OData modifier
 func (oData *ODataMods) AddTop(value int) *ODataMods {
-	if oData == nil {
-		oData = &ODataMods{mods: map[string]string{}}
-	}
 	if oData.mods == nil {
 		oData.mods = map[string]string{}
 	}
@@ -90,9 +81,6 @@ func (oData *ODataMods) AddTop(value int) *ODataMods {
 
 // AddOrderBy adds $orderby OData modifier
 func (oData *ODataMods) AddOrderBy(orderBy string, ascending bool) *ODataMods {
-	if oData == nil {
-		oData = &ODataMods{mods: map[string]string{}}
-	}
 	if oData.mods == nil {
 		oData.mods = map[string]string{}
 	}

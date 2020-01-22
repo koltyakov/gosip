@@ -53,6 +53,19 @@ func TestFilesChunked(t *testing.T) {
 		}
 	})
 
+	t.Run("AddChunked", func(t *testing.T) {
+		fileName := fmt.Sprintf("ChunkedFile.txt")
+		content := "1234512345" // with combination of ChunkSize finishUpload package is nil
+		stream := strings.NewReader(content)
+		options := &AddChunkedOptions{
+			Overwrite: true,
+			ChunkSize: 5,
+		}
+		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options); err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("AddChunkedCancel", func(t *testing.T) {
 		fileName := fmt.Sprintf("ChunkedFile.txt")
 		content := "Greater than a chunk content..."

@@ -69,6 +69,14 @@ func TestOData(t *testing.T) {
 		}
 	})
 
+	t.Run("addMultyiOrderBy", func(t *testing.T) {
+		modifiers := &ODataMods{}
+		modifiers.AddOrderBy("OneField", true).AddOrderBy("AnotherField", false)
+		if fmt.Sprintf("%+v", modifiers.Get()) != "map[$orderby:OneField asc,AnotherField desc]" {
+			t.Error("incorrect add order by result")
+		}
+	})
+
 	t.Run("addMixed", func(t *testing.T) {
 		modifiers := &ODataMods{}
 		modifiers.AddSelect("Select").AddExpand("Expand").AddTop(5)
