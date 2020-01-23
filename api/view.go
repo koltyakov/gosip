@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/koltyakov/gosip"
 )
@@ -100,6 +101,21 @@ func (view *View) Delete() error {
 	sp := NewHTTPClient(view.client)
 	_, err := sp.Delete(view.endpoint, getConfHeaders(view.config))
 	return err
+}
+
+// SetViewXML updates view XML
+func (view *View) SetViewXML(viewXML string) (ViewResp, error) {
+	endpoint := fmt.Sprintf("%s/SetViewXml()", view.endpoint)
+	payload, err := json.Marshal(&struct {
+		ViewXML string `json:"viewXml"`
+	}{
+		ViewXML: viewXML,
+	})
+	if err != nil {
+		return nil, err
+	}
+	sp := NewHTTPClient(view.client)
+	return sp.Post(endpoint, payload, getConfHeaders(view.config))
 }
 
 /* Response helpers */
