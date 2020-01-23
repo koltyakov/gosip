@@ -87,8 +87,8 @@ func (ct *ContentType) Delete() error {
 	return err
 }
 
-// Fields gets FieldLinks API instance queryable collection
-func (ct *ContentType) Fields() *FieldLinks {
+// FieldLinks gets FieldLinks API instance queryable collection
+func (ct *ContentType) FieldLinks() *FieldLinks {
 	return NewFieldLinks(
 		ct.client,
 		fmt.Sprintf("%s/FieldLinks", ct.endpoint),

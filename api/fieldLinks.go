@@ -51,6 +51,12 @@ func (fieldLinks *FieldLinks) Conf(config *RequestConfig) *FieldLinks {
 	return fieldLinks
 }
 
+// Select adds $select OData modifier
+func (fieldLinks *FieldLinks) Select(oDataSelect string) *FieldLinks {
+	fieldLinks.modifiers.AddSelect(oDataSelect)
+	return fieldLinks
+}
+
 // Filter adds $filter OData modifier
 func (fieldLinks *FieldLinks) Filter(oDataFilter string) *FieldLinks {
 	fieldLinks.modifiers.AddFilter(oDataFilter)
@@ -67,6 +73,19 @@ func (fieldLinks *FieldLinks) Top(oDataTop int) *FieldLinks {
 func (fieldLinks *FieldLinks) Get() (FieldLinksResp, error) {
 	sp := NewHTTPClient(fieldLinks.client)
 	return sp.Get(fieldLinks.ToURL(), getConfHeaders(fieldLinks.config))
+}
+
+// Get gets fieds response collection
+func (fieldLinks *FieldLinks) GetFields() (FieldsResp, error) {
+	endpoint := getPriorEndpoint(fieldLinks.endpoint, "/FieldLinks")
+	fields := NewFields(
+		fieldLinks.client,
+		endpoint,
+		fieldLinks.config,
+		"contentType",
+	)
+	fields.modifiers = fieldLinks.modifiers
+	return fields.Get()
 }
 
 // // Add adds field link

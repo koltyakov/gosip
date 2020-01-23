@@ -26,7 +26,7 @@ func TestFieldLinks(t *testing.T) {
 	ctID = ctResp.Data().ID // content type ID can't be set in REST API https://github.com/pnp/pnpjs/issues/457
 
 	t.Run("Conf", func(t *testing.T) {
-		fl := web.ContentTypes().GetByID(ctID).Fields()
+		fl := web.ContentTypes().GetByID(ctID).FieldLinks()
 		hs := map[string]*RequestConfig{
 			"nometadata":      HeadersPresets.Nometadata,
 			"minimalmetadata": HeadersPresets.Minimalmetadata,
@@ -41,15 +41,15 @@ func TestFieldLinks(t *testing.T) {
 	})
 
 	t.Run("Modifiers", func(t *testing.T) {
-		fl := web.ContentTypes().GetByID(ctID).Fields()
-		mods := fl.Filter("*").Top(1).modifiers
-		if mods == nil || len(mods.mods) != 2 {
+		fl := web.ContentTypes().GetByID(ctID).FieldLinks()
+		mods := fl.Select("*").Filter("*").Top(1).modifiers
+		if mods == nil || len(mods.mods) != 3 {
 			t.Error("wrong number of modifiers")
 		}
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		resp, err := web.ContentTypes().GetByID(ctID).Fields().Get()
+		resp, err := web.ContentTypes().GetByID(ctID).FieldLinks().Get()
 		if err != nil {
 			t.Error(err)
 		}
@@ -64,8 +64,24 @@ func TestFieldLinks(t *testing.T) {
 		}
 	})
 
+	t.Run("GetFields", func(t *testing.T) {
+		resp, err := web.ContentTypes().GetByID(ctID).FieldLinks().GetFields()
+		if err != nil {
+			t.Error(err)
+		}
+		if len(resp.Data()) == 0 {
+			t.Error("can't get fields")
+		}
+		if bytes.Compare(resp, resp.Normalized()) == -1 {
+			t.Error("response normalization error")
+		}
+		if resp.Data()[0].Data().ID == "" {
+			t.Error("can't unmarshal field info")
+		}
+	})
+
 	// t.Run("Add", func(t *testing.T) {
-	// 	resp, err := web.ContentTypes().GetByID(ctID).Fields().Add("Language", false, false)
+	// 	resp, err := web.ContentTypes().GetByID(ctID).FieldLinks().Add("Language", false, false)
 	// 	if err != nil {
 	// 		t.Error(err)
 	// 	}
