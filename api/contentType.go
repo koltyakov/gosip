@@ -87,19 +87,11 @@ func (ct *ContentType) Delete() error {
 	return err
 }
 
-// // Recycle moves a content type to the recycle bin
-// func (ct *ContentType) Recycle() error {
-// 	sp := NewHTTPClient(ct.client)
-// 	endpoint := fmt.Sprintf("%s/Recycle", ct.endpoint)
-// 	_, err := sp.Post(endpoint, nil, getConfHeaders(ct.config))
-// 	return err
-// }
-
-// Fields gets Fields API instance queryable collection
-func (ct *ContentType) Fields() *Fields {
-	return NewFields(
+// Fields gets FieldLinks API instance queryable collection
+func (ct *ContentType) Fields() *FieldLinks {
+	return NewFieldLinks(
 		ct.client,
-		fmt.Sprintf("%s/Fields", ct.endpoint),
+		fmt.Sprintf("%s/FieldLinks", ct.endpoint),
 		ct.config,
 	)
 }

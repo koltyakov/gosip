@@ -65,15 +65,16 @@ func TestContentType(t *testing.T) {
 	t.Run("UpdateDelete", func(t *testing.T) {
 		guid := uuid.New().String()
 		ctID := "0x0100" + strings.ToUpper(strings.Replace(guid, "-", "", -1))
-		ct := []byte(`{
-			"Description":"",
+		ct := []byte(TrimMultiline(`{
 			"Group":"Custom Content Types",
 			"Id":{"StringValue":"` + ctID + `"},
 			"Name":"test-temp-ct ` + guid + `"
-		}`)
-		if _, err := web.ContentTypes().Add(ct); err != nil {
+		}`))
+		ctResp, err := web.ContentTypes().Add(ct)
+		if err != nil {
 			t.Error(err)
 		}
+		ctID = ctResp.Data().ID // content type ID can't be set in REST API https://github.com/pnp/pnpjs/issues/457
 		if _, err := web.ContentTypes().GetByID(ctID).Update([]byte(`{"Description":"Test"}`)); err != nil {
 			t.Error(err)
 		}
@@ -81,24 +82,6 @@ func TestContentType(t *testing.T) {
 			t.Error(err)
 		}
 	})
-
-	// t.Run("Recycle", func(t *testing.T) {
-	// 	guid := uuid.New().String()
-	// 	ctID := "0x0100" + strings.ToUpper(strings.Replace(guid, "-", "", -1))
-	// 	ct := []byte(`{
-	// 		"Description":"",
-	// 		"Group":"Custom Content Types",
-	// 		"Id":{"StringValue":"` + ctID + `"},
-	// 		"Name":"test-temp-ct ` + guid + `"
-	// 	}`)
-	// 	if _, err := web.ContentTypes().Add(ct); err != nil {
-	// 		t.Error(err)
-	// 	}
-	// 	if err := web.ContentTypes().GetByID(ctID).Recycle(); err != nil {
-	// 		t.Error(err)
-	// 	}
-	// 	// ToDo: Empty Recycle Bin
-	// })
 
 }
 
