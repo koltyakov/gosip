@@ -3,7 +3,10 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestContentTypes(t *testing.T) {
@@ -58,6 +61,42 @@ func TestContentTypes(t *testing.T) {
 		mods := cts.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
 		if mods == nil || len(mods.mods) != 5 {
 			t.Error("wrong number of modifiers")
+		}
+	})
+
+	t.Run("CreateUsingParentID", func(t *testing.T) {
+		guid := uuid.New().String()
+		newCTID, err := web.ContentTypes().Create(&ContentTypeCreationInfo{
+			Name:                guid,
+			Group:               "Test",
+			ParentContentTypeID: "0x01",
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		if newCTID == "" {
+			t.Error("can't parse CT creation response")
+		}
+		if err := web.ContentTypes().GetByID(newCTID).Delete(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("CreateUsingID", func(t *testing.T) {
+		guid := uuid.New().String()
+		newCTID, err := web.ContentTypes().Create(&ContentTypeCreationInfo{
+			ID:    "0x0100" + strings.ToUpper(strings.Replace(guid, "-", "", -1)),
+			Name:  guid,
+			Group: "Test",
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		if newCTID == "" {
+			t.Error("can't parse CT creation response")
+		}
+		if err := web.ContentTypes().GetByID(newCTID).Delete(); err != nil {
+			t.Error(err)
 		}
 	})
 
