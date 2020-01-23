@@ -80,13 +80,22 @@ func TestFieldLinks(t *testing.T) {
 		}
 	})
 
-	// t.Run("Add", func(t *testing.T) {
-	// 	resp, err := web.ContentTypes().GetByID(ctID).FieldLinks().Add("Language", false, false)
-	// 	if err != nil {
-	// 		t.Error(err)
-	// 	}
-	// 	fmt.Println(resp)
-	// })
+	t.Run("Add", func(t *testing.T) {
+		fl, err := web.ContentTypes().GetByID(ctID).FieldLinks().Add("Language")
+		if err != nil {
+			t.Error(err)
+		}
+		if fl == "" {
+			t.Error("can't parse field link add response")
+		}
+		fls, _ := web.ContentTypes().GetByID(ctID).FieldLinks().Get()
+		if len(fls.Data()) < 3 {
+			t.Error("failed adding field link")
+		}
+		if err := web.ContentTypes().GetByID(ctID).FieldLinks().GetByID(fl).Delete(); err != nil {
+			t.Error(err)
+		}
+	})
 
 	if err := web.ContentTypes().GetByID(ctID).Delete(); err != nil {
 		t.Error(err)
