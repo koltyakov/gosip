@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -89,6 +90,17 @@ func TestWebs(t *testing.T) {
 		createdWebURL := spClient.AuthCnfg.GetSiteURL() + "/ci_" + newWebGUID
 		subWeb := NewWeb(spClient, createdWebURL, nil)
 		if err := subWeb.Delete(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("CreateFieldAsXML", func(t *testing.T) {
+		title := strings.Replace(uuid.New().String(), "-", "", -1)
+		schemaXML := `<Field Type="Text" DisplayName="` + title + `" MaxLength="255" Name="` + title + `" Title="` + title + `"></Field>`
+		if _, err := sp.Web().Fields().CreateFieldAsXML(schemaXML, 0); err != nil {
+			t.Error(err)
+		}
+		if err := sp.Web().Fields().GetByInternalNameOrTitle(title).Delete(); err != nil {
 			t.Error(err)
 		}
 	})

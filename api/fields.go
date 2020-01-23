@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -13,18 +14,20 @@ type Fields struct {
 	config    *RequestConfig
 	endpoint  string
 	modifiers *ODataMods
+	entity    string
 }
 
 // FieldsResp - fields response type with helper processor methods
 type FieldsResp []byte
 
 // NewFields - Fields struct constructor function
-func NewFields(client *gosip.SPClient, endpoint string, config *RequestConfig) *Fields {
+func NewFields(client *gosip.SPClient, endpoint string, config *RequestConfig, entity string) *Fields {
 	return &Fields{
 		client:    client,
 		endpoint:  endpoint,
 		config:    config,
 		modifiers: NewODataMods(),
+		entity:    entity,
 	}
 }
 
@@ -83,6 +86,28 @@ func (fields *Fields) Add(body []byte) (FieldResp, error) {
 	return sp.Post(fields.endpoint, body, getConfHeaders(fields.config))
 }
 
+// CreateFieldAsXML creates a field using XML schema definition
+// `options` parameter (https://github.com/pnp/pnpjs/blob/version-2/packages/sp/fields/types.ts#L553)
+// is only relevant for adding fields in list instances
+func (fields *Fields) CreateFieldAsXML(schemaXML string, options int) (FieldResp, error) {
+	endpoint := fmt.Sprintf("%s/CreateFieldAsXml", fields.endpoint)
+	info := map[string]interface{}{
+		"__metadata": &map[string]string{
+			"type": "SP.XmlSchemaFieldCreationInformation",
+		},
+		"SchemaXml": schemaXML,
+	}
+	if fields.entity == "list" {
+		info["Options"] = options
+	}
+	payload, err := json.Marshal(info)
+	if err != nil {
+		return nil, err
+	}
+	sp := NewHTTPClient(fields.client)
+	return sp.Post(endpoint, payload, getConfHeaders(fields.config))
+}
+
 // GetByID gets a field by its ID (GUID)
 func (fields *Fields) GetByID(fieldID string) *Field {
 	return NewField(
@@ -109,9 +134,6 @@ func (fields *Fields) GetByInternalNameOrTitle(internalName string) *Field {
 		fields.config,
 	)
 }
-
-// ToDo:
-// CreateFieldAsXml
 
 /* Response helpers */
 

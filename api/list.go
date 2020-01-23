@@ -187,6 +187,7 @@ func (list *List) Fields() *Fields {
 		list.client,
 		fmt.Sprintf("%s/Fields", list.endpoint),
 		list.config,
+		"list",
 	)
 }
 

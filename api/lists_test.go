@@ -81,6 +81,17 @@ func TestLists(t *testing.T) {
 		}
 	})
 
+	t.Run("CreateFieldAsXML", func(t *testing.T) {
+		title := strings.Replace(uuid.New().String(), "-", "", -1)
+		schemaXML := `<Field Type="Text" DisplayName="` + title + `" MaxLength="255" Name="` + title + `" Title="` + title + `"></Field>`
+		if _, err := web.Lists().GetByTitle(newListTitle).Fields().CreateFieldAsXML(schemaXML, 12); err != nil {
+			t.Error(err)
+		}
+		if err := web.Lists().GetByTitle(newListTitle).Fields().GetByInternalNameOrTitle(title).Delete(); err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("Delete", func(t *testing.T) {
 		if err := web.Lists().GetByTitle(newListTitle).Delete(); err != nil {
 			t.Error(err)

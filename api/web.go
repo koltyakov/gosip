@@ -189,6 +189,7 @@ func (web *Web) Fields() *Fields {
 		web.client,
 		fmt.Sprintf("%s/Fields", web.endpoint),
 		web.config,
+		"web",
 	)
 }
 

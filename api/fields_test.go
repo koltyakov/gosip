@@ -3,7 +3,10 @@ package api
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestFields(t *testing.T) {
@@ -55,15 +58,15 @@ func TestFields(t *testing.T) {
 		}
 	})
 
-	t.Run("GetFromContentType", func(t *testing.T) {
-		contentType, err := getAnyContentType()
-		if err != nil {
-			t.Error(err)
-		}
-		if _, err := web.ContentTypes().GetByID(contentType.ID).Fields().Get(); err != nil {
-			t.Error(err)
-		}
-	})
+	// t.Run("GetFromContentType", func(t *testing.T) {
+	// 	contentType, err := getAnyContentType()
+	// 	if err != nil {
+	// 		t.Error(err)
+	// 	}
+	// 	if _, err := web.ContentTypes().GetByID(contentType.ID).Fields().Get(); err != nil {
+	// 		t.Error(err)
+	// 	}
+	// })
 
 	t.Run("GetByID", func(t *testing.T) {
 		if _, err := web.Fields().GetByID(field.ID).Get(); err != nil {
@@ -85,6 +88,20 @@ func TestFields(t *testing.T) {
 			t.Error(err)
 		}
 	})
+
+	t.Run("Add", func(t *testing.T) {
+		title := strings.Replace(uuid.New().String(), "-", "", -1)
+		fm := []byte(`{"__metadata":{"type":"SP.FieldText"},"Title":"` + title + `","FieldTypeKind":2,"MaxLength":255}`)
+		if _, err := web.Fields().Add(fm); err != nil {
+			t.Error(err)
+		}
+		if err := web.Fields().GetByInternalNameOrTitle(title).Delete(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	// CreateFieldAsXML/Web - in web_test.go
+	// CreateFieldAsXML/List - in lists_test.go
 
 }
 
