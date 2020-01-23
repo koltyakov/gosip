@@ -91,14 +91,16 @@ func (fields *Fields) Add(body []byte) (FieldResp, error) {
 // is only relevant for adding fields in list instances
 func (fields *Fields) CreateFieldAsXML(schemaXML string, options int) (FieldResp, error) {
 	endpoint := fmt.Sprintf("%s/CreateFieldAsXml", fields.endpoint)
-	info := map[string]interface{}{
-		"__metadata": &map[string]string{
-			"type": "SP.XmlSchemaFieldCreationInformation",
+	info := map[string]map[string]interface{}{
+		"parameters": {
+			"__metadata": &map[string]string{
+				"type": "SP.XmlSchemaFieldCreationInformation",
+			},
+			"SchemaXml": schemaXML,
 		},
-		"SchemaXml": schemaXML,
 	}
 	if fields.entity == "list" {
-		info["Options"] = options
+		info["parameters"]["Options"] = options
 	}
 	payload, err := json.Marshal(info)
 	if err != nil {
