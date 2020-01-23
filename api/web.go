@@ -183,6 +183,15 @@ func (web *Web) ContentTypes() *ContentTypes {
 	)
 }
 
+// AvailableContentTypes gets ContentTypes API instance queryable collection for this Web
+func (web *Web) AvailableContentTypes() *ContentTypes {
+	return NewContentTypes(
+		web.client,
+		fmt.Sprintf("%s/AvailableContentTypes", web.endpoint),
+		web.config,
+	)
+}
+
 // Fields gets Fields API instance queryable collection for this Web (Site Columns)
 func (web *Web) Fields() *Fields {
 	return NewFields(

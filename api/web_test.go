@@ -151,4 +151,14 @@ func TestWeb(t *testing.T) {
 	// 	}
 	// })
 
+	t.Run("AvailableContentTypes", func(t *testing.T) {
+		resp, err := sp.Web().AvailableContentTypes().Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if len(resp.Data()) == 0 {
+			t.Error("can't get available content types")
+		}
+	})
+
 }
