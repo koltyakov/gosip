@@ -54,7 +54,7 @@ func NewFieldLinks(client *gosip.SPClient, endpoint string, config *RequestConfi
 	}
 }
 
-// NewFieldLins - FieldLink struct constructor function
+// NewFieldLink - FieldLink struct constructor function
 func NewFieldLink(client *gosip.SPClient, endpoint string, config *RequestConfig) *FieldLink {
 	return &FieldLink{
 		client:    client,
