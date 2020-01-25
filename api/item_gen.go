@@ -18,3 +18,10 @@ func (item *Item) Expand(oDataExpand string) *Item {
 	item.modifiers.AddExpand(oDataExpand)
 	return item
 }
+
+/* Response helpers */
+
+// Normalized returns normalized body
+func (itemResp *ItemResp) Normalized() []byte {
+	return NormalizeODataItem(*itemResp)
+}

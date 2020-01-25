@@ -1,13 +1,12 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent ContentType -conf -mods Select,Expand
+//go:generate ggen -ent ContentType -conf -mods Select,Expand -helpers Data,Normalized
 
 // ContentType represents SharePoint Content Types API queryable object struct
 // Always use NewContentType constructor instead of &ContentType{}
@@ -78,19 +77,4 @@ func (ct *ContentType) FieldLinks() *FieldLinks {
 		fmt.Sprintf("%s/FieldLinks", ct.endpoint),
 		ct.config,
 	)
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (ctResp *ContentTypeResp) Data() *ContentTypeInfo {
-	data := NormalizeODataItem(*ctResp)
-	res := &ContentTypeInfo{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (ctResp *ContentTypeResp) Normalized() []byte {
-	return NormalizeODataItem(*ctResp)
 }

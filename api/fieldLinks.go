@@ -1,14 +1,14 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
 
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent FieldLinks -conf -mods Select,Filter,Top
+//go:generate ggen -ent FieldLinks -item FieldLink -conf -coll -mods Select,Filter,Top -helpers Data,Normalized
+//go:generate ggen -ent FieldLink -helpers Data,Normalized
 
 // FieldLinks represent SharePoint content type FieldLinks API queryable collection struct
 // Always use NewFieldLinks constructor instead of &FieldLinks{}
@@ -196,35 +196,16 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 	return fieldLinkID, nil
 }
 
-/* Response helpers */
+// /* Response helpers */
 
-// Data : to get typed data
-func (fieldLinksResp *FieldLinksResp) Data() []*FieldLinkInfo {
-	collection, _ := normalizeODataCollection(*fieldLinksResp)
-	resFieldLinks := []*FieldLinkInfo{}
-	for _, f := range collection {
-		linkInfo := &FieldLinkInfo{}
-		json.Unmarshal(f, &linkInfo)
-		resFieldLinks = append(resFieldLinks, linkInfo)
-	}
-	return resFieldLinks
-}
-
-// Normalized returns normalized body
-func (fieldLinksResp *FieldLinksResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*fieldLinksResp)
-	return normalized
-}
-
-// Data : to get typed data
-func (fieldLinkResp *FieldLinkResp) Data() *FieldLinkInfo {
-	data := NormalizeODataItem(*fieldLinkResp)
-	res := &FieldLinkInfo{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (fieldLinkResp *FieldLinkResp) Normalized() []byte {
-	return NormalizeODataItem(*fieldLinkResp)
-}
+// // Data : to get typed data
+// func (fieldLinksResp *FieldLinksResp) Data() []*FieldLinkInfo {
+// 	collection, _ := normalizeODataCollection(*fieldLinksResp)
+// 	resFieldLinks := []*FieldLinkInfo{}
+// 	for _, f := range collection {
+// 		linkInfo := &FieldLinkInfo{}
+// 		json.Unmarshal(f, &linkInfo)
+// 		resFieldLinks = append(resFieldLinks, linkInfo)
+// 	}
+// 	return resFieldLinks
+// }

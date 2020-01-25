@@ -1,6 +1,8 @@
 // Package api :: This is auto generated file, do not edit manually
 package api
 
+import "encoding/json"
+
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (web *Web) Conf(config *RequestConfig) *Web {
 	web.config = config
@@ -17,4 +19,19 @@ func (web *Web) Select(oDataSelect string) *Web {
 func (web *Web) Expand(oDataExpand string) *Web {
 	web.modifiers.AddExpand(oDataExpand)
 	return web
+}
+
+/* Response helpers */
+
+// Data response helper
+func (webResp *WebResp) Data() *WebInfo {
+	data := NormalizeODataItem(*webResp)
+	res := &WebInfo{}
+	json.Unmarshal(data, &res)
+	return res
+}
+
+// Normalized returns normalized body
+func (webResp *WebResp) Normalized() []byte {
+	return NormalizeODataItem(*webResp)
 }

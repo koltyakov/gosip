@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Lists -conf -mods Select,Expand,Filter,Top,OrderBy
+//go:generate ggen -ent Lists -item List -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Lists represent SharePoint Lists API queryable collection struct
 // Always use NewLists constructor instead of &Lists{}
@@ -113,22 +113,4 @@ func (lists *Lists) AddWithURI(title string, uri string, metadata map[string]int
 	body, _ := json.Marshal(metadata)
 
 	return lists.GetByID(data.Data().ID).Update(body)
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (listsResp *ListsResp) Data() []ListResp {
-	collection, _ := normalizeODataCollection(*listsResp)
-	lists := []ListResp{}
-	for _, list := range collection {
-		lists = append(lists, ListResp(list))
-	}
-	return lists
-}
-
-// Normalized returns normalized body
-func (listsResp *ListsResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*listsResp)
-	return normalized
 }

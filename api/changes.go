@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Changes -conf
+//go:generate ggen -ent Changes -conf -coll
 
 // Changes represent SharePoint Changes API queryable collection struct
 // Always use NewChanges constructor instead of &Changes{}

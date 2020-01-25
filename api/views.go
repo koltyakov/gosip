@@ -6,7 +6,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Views -conf -mods Select,Expand,Filter,Top,OrderBy
+//go:generate ggen -ent Views -item View -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Views  represent SharePoint List Views API queryable collection struct
 // Always use NewViews constructor instead of &Views{}
@@ -74,22 +74,4 @@ func (views *Views) DefaultView() *View {
 		fmt.Sprintf("%s/DefaultView", getPriorEndpoint(views.endpoint, "/Views")),
 		views.config,
 	)
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (viewsResp *ViewsResp) Data() []ViewResp {
-	collection, _ := normalizeODataCollection(*viewsResp)
-	views := []ViewResp{}
-	for _, view := range collection {
-		views = append(views, ViewResp(view))
-	}
-	return views
-}
-
-// Normalized returns normalized body
-func (viewsResp *ViewsResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*viewsResp)
-	return normalized
 }

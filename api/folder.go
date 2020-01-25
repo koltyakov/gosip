@@ -9,7 +9,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Folder -conf -mods Select,Expand
+//go:generate ggen -ent Folder -conf -mods Select,Expand -helpers Data,Normalized
 
 // Folder represents SharePoint Lists & Document Libraries Folder API queryable object struct
 // Always use NewFolder constructor instead of &Folder{}
@@ -173,18 +173,3 @@ func (folder *Folder) ContextInfo() (*ContextInfo, error) {
 
 // ToDo:
 // StorageMetrics
-
-/* Response helpers */
-
-// Data : to get typed data
-func (folderResp *FolderResp) Data() *FolderInfo {
-	data := NormalizeODataItem(*folderResp)
-	res := &FolderInfo{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (folderResp *FolderResp) Normalized() []byte {
-	return NormalizeODataItem(*folderResp)
-}

@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Profiles -conf
+//go:generate ggen -ent Profiles -conf -coll
 
 // Profiles  represent SharePoint User Profiles API queryable collection struct
 // Always use NewProfiles constructor instead of &Profiles{}
@@ -195,7 +195,7 @@ func (profiles *Profiles) HideSuggestion(loginName string) ([]byte, error) {
 	return sp.Post(endpoint, nil, getConfHeaders(profiles.config))
 }
 
-/* Response helpers */
+// /* Response helpers */
 
 // Data : to get typed data
 func (profileResp *ProfileResp) Data() *ProfileInfo {

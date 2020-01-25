@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent CustomActions -conf -mods Select,Filter,Top,OrderBy
+//go:generate ggen -ent CustomActions -conf -coll -mods Select,Filter,Top,OrderBy
 
 // CustomActions represent SharePoint CustomActions API queryable collection struct
 // Always use NewCustomActions constructor instead of &CustomActions{}

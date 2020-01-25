@@ -6,7 +6,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Folders -conf -mods Select,Expand,Filter,Top,OrderBy
+//go:generate ggen -ent Folders -item Folder -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Folders represent SharePoint Lists & Document Libraries Folders API queryable collection struct
 // Always use NewFolders constructor instead of &Folders{}
@@ -56,22 +56,4 @@ func (folders *Folders) GetByName(folderName string) *Folder {
 		fmt.Sprintf("%s('%s')", folders.endpoint, folderName),
 		folders.config,
 	)
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (foldersResp *FoldersResp) Data() []FolderResp {
-	collection, _ := normalizeODataCollection(*foldersResp)
-	folders := []FolderResp{}
-	for _, ct := range collection {
-		folders = append(folders, FolderResp(ct))
-	}
-	return folders
-}
-
-// Normalized returns normalized body
-func (foldersResp *FoldersResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*foldersResp)
-	return normalized
 }

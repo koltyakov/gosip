@@ -36,3 +36,21 @@ func (webs *Webs) OrderBy(oDataOrderBy string, ascending bool) *Webs {
 	webs.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return webs
 }
+
+/* Response helpers */
+
+// Data response helper
+func (websResp *WebsResp) Data() []WebResp {
+	collection, _ := normalizeODataCollection(*websResp)
+	webs := []WebResp{}
+	for _, item := range collection {
+		webs = append(webs, WebResp(item))
+	}
+	return webs
+}
+
+// Normalized returns normalized body
+func (websResp *WebsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*websResp)
+	return normalized
+}

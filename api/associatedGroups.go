@@ -5,7 +5,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent AssociatedGroups -conf
+//go:generate ggen -ent AssociatedGroups -conf -coll
 
 // AssociatedGroups web associated groups scope constructor
 // Always use NewAssociatedGroups constructor instead of &AssociatedGroups{}

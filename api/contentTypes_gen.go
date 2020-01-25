@@ -36,3 +36,21 @@ func (contentTypes *ContentTypes) OrderBy(oDataOrderBy string, ascending bool) *
 	contentTypes.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return contentTypes
 }
+
+/* Response helpers */
+
+// Data response helper
+func (contentTypesResp *ContentTypesResp) Data() []ContentTypeResp {
+	collection, _ := normalizeODataCollection(*contentTypesResp)
+	contentTypes := []ContentTypeResp{}
+	for _, item := range collection {
+		contentTypes = append(contentTypes, ContentTypeResp(item))
+	}
+	return contentTypes
+}
+
+// Normalized returns normalized body
+func (contentTypesResp *ContentTypesResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*contentTypesResp)
+	return normalized
+}

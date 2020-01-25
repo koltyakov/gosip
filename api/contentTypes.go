@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent ContentTypes -conf -mods Select,Expand,Filter,Top,OrderBy
+//go:generate ggen -ent ContentTypes -item ContentType -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // ContentTypes represent SharePoint Content Types API queryable collection struct
 // Always use NewContentTypes constructor instead of &ContentTypes{}
@@ -127,22 +127,4 @@ func (contentTypes *ContentTypes) Create(contentTypeInfo *ContentTypeCreationInf
 	rgx := regexp.MustCompile(`:contenttype:(.*?)"`)
 	rs := rgx.FindStringSubmatch(fmt.Sprintf("%s", resp))
 	return rs[1], nil
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (ctsResp *ContentTypesResp) Data() []ContentTypeResp {
-	collection, _ := normalizeODataCollection(*ctsResp)
-	cts := []ContentTypeResp{}
-	for _, ct := range collection {
-		cts = append(cts, ContentTypeResp(ct))
-	}
-	return cts
-}
-
-// Normalized returns normalized body
-func (ctsResp *ContentTypesResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*ctsResp)
-	return normalized
 }

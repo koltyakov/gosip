@@ -36,7 +36,7 @@ func TestFieldLinks(t *testing.T) {
 		if bytes.Compare(resp, resp.Normalized()) == -1 {
 			t.Error("response normalization error")
 		}
-		if resp.Data()[0].ID == "" {
+		if resp.Data()[0].Data().ID == "" {
 			t.Error("can't unmarshal field info")
 		}
 	})

@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Web -conf -mods Select,Expand
+//go:generate ggen -ent Web -conf -mods Select,Expand -helpers Data,Normalized
 
 // Web represents SharePoint Web API queryable object struct
 // Always use NewWeb constructor instead of &Web{}
@@ -347,21 +347,6 @@ func (web *Web) RecycleBin() *RecycleBin {
 // ContextInfo gets Context info object for this Web
 func (web *Web) ContextInfo() (*ContextInfo, error) {
 	return NewContext(web.client, web.ToURL(), web.config).Get()
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (webResp *WebResp) Data() *WebInfo {
-	data := NormalizeODataItem(*webResp)
-	res := &WebInfo{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (webResp *WebResp) Normalized() []byte {
-	return NormalizeODataItem(*webResp)
 }
 
 /* Miscellaneous */

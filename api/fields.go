@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Fields -conf -mods Select,Expand,Filter,Top,OrderBy
+//go:generate ggen -ent Fields -item Field -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Fields represent SharePoint Fields (Site Columns) API queryable collection struct
 // Always use NewFields constructor instead of &Fields{}
@@ -101,22 +101,4 @@ func (fields *Fields) GetByInternalNameOrTitle(internalName string) *Field {
 		fmt.Sprintf("%s/GetByInternalNameOrTitle('%s')", fields.endpoint, internalName),
 		fields.config,
 	)
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (fieldsResp *FieldsResp) Data() []FieldResp {
-	collection, _ := normalizeODataCollection(*fieldsResp)
-	resFields := []FieldResp{}
-	for _, f := range collection {
-		resFields = append(resFields, FieldResp(f))
-	}
-	return resFields
-}
-
-// Normalized returns normalized body
-func (fieldsResp *FieldsResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*fieldsResp)
-	return normalized
 }

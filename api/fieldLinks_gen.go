@@ -24,3 +24,21 @@ func (fieldLinks *FieldLinks) Top(oDataTop int) *FieldLinks {
 	fieldLinks.modifiers.AddTop(oDataTop)
 	return fieldLinks
 }
+
+/* Response helpers */
+
+// Data response helper
+func (fieldLinksResp *FieldLinksResp) Data() []FieldLinkResp {
+	collection, _ := normalizeODataCollection(*fieldLinksResp)
+	fieldLinks := []FieldLinkResp{}
+	for _, item := range collection {
+		fieldLinks = append(fieldLinks, FieldLinkResp(item))
+	}
+	return fieldLinks
+}
+
+// Normalized returns normalized body
+func (fieldLinksResp *FieldLinksResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*fieldLinksResp)
+	return normalized
+}

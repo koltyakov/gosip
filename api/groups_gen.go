@@ -36,3 +36,21 @@ func (groups *Groups) OrderBy(oDataOrderBy string, ascending bool) *Groups {
 	groups.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return groups
 }
+
+/* Response helpers */
+
+// Data response helper
+func (groupsResp *GroupsResp) Data() []GroupResp {
+	collection, _ := normalizeODataCollection(*groupsResp)
+	groups := []GroupResp{}
+	for _, item := range collection {
+		groups = append(groups, GroupResp(item))
+	}
+	return groups
+}
+
+// Normalized returns normalized body
+func (groupsResp *GroupsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*groupsResp)
+	return normalized
+}

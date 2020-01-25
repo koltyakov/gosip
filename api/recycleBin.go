@@ -1,14 +1,14 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent RecycleBin -conf -mods Select,Expand,Filter,Top,OrderBy
+//go:generate ggen -ent RecycleBin -item RecycleBinItem -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
+//go:generate ggen -ent RecycleBinItem -helpers Data,Normalized
 
 // RecycleBin represents SharePoint Recycle Bin API queryable collection struct
 // Always use NewRecycleBin constructor instead of &RecycleBin{}
@@ -19,8 +19,8 @@ type RecycleBin struct {
 	modifiers *ODataMods
 }
 
-// RecycledItem ...
-type RecycledItem struct {
+// RecycleBinItemInfo ...
+type RecycleBinItemInfo struct {
 	AuthorEmail               string      `json:"AuthorEmail"`
 	AuthorName                string      `json:"AuthorName"`
 	DeletedByEmail            string      `json:"DeletedByEmail"`
@@ -71,24 +71,6 @@ func (recycleBin *RecycleBin) GetByID(itemID string) *RecycleBinItem {
 	)
 }
 
-/* Response helpers */
-
-// Data : to get typed data
-func (recycleBinResp *RecycleBinResp) Data() []RecycleBinItemResp {
-	collection, _ := normalizeODataCollection(*recycleBinResp)
-	items := []RecycleBinItemResp{}
-	for _, item := range collection {
-		items = append(items, RecycleBinItemResp(item))
-	}
-	return items
-}
-
-// Normalized returns normalized body
-func (recycleBinResp *RecycleBinResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*recycleBinResp)
-	return normalized
-}
-
 /* Recycle bin item */
 
 // RecycleBinItem represent SharePoint Recycle Bin Item API queryable object struct
@@ -125,19 +107,4 @@ func (recycleBinItem *RecycleBinItem) Restore() error {
 	sp := NewHTTPClient(recycleBinItem.client)
 	_, err := sp.Post(endpoint, nil, getConfHeaders(recycleBinItem.config))
 	return err
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (recycleBinItemResp *RecycleBinItemResp) Data() *RecycledItem {
-	data := NormalizeODataItem(*recycleBinItemResp)
-	res := &RecycledItem{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (recycleBinItemResp *RecycleBinItemResp) Normalized() []byte {
-	return NormalizeODataItem(*recycleBinItemResp)
 }

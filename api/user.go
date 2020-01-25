@@ -1,13 +1,12 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent User -conf -mods Select,Expand
+//go:generate ggen -ent User -conf -mods Select,Expand -helpers Data,Normalized
 
 // User represents SharePoint Site User API queryable object struct
 // Always use NewUser constructor instead of &User{}
@@ -68,19 +67,4 @@ func (user *User) Groups() *Groups {
 		fmt.Sprintf("%s/Groups", user.endpoint),
 		user.config,
 	)
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (userResp *UserResp) Data() *UserInfo {
-	data := NormalizeODataItem(*userResp)
-	res := &UserInfo{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (userResp *UserResp) Normalized() []byte {
-	return NormalizeODataItem(*userResp)
 }

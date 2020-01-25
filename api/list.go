@@ -10,7 +10,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent List -conf -mods Select,Expand
+//go:generate ggen -ent List -conf -mods Select,Expand -helpers Normalized
 
 // List represents SharePoint List API queryable object struct
 // Always use NewList constructor instead of &List{}
@@ -290,10 +290,10 @@ func (listResp *ListResp) Data() *ListInfo {
 	return res
 }
 
-// Normalized returns normalized body
-func (listResp *ListResp) Normalized() []byte {
-	return NormalizeODataItem(*listResp)
-}
+// // Normalized returns normalized body
+// func (listResp *ListResp) Normalized() []byte {
+// 	return NormalizeODataItem(*listResp)
+// }
 
 // Data : to get typed data
 func (listData *RenderListDataResp) Data() *RenderListDataInfo {

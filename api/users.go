@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Users -conf -mods Select,Expand,Filter,Top,OrderBy
+//go:generate ggen -ent Users -item User -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Users represent SharePoint Site Users API queryable collection struct
 // Always use NewUsers constructor instead of &Users{}
@@ -67,22 +67,4 @@ func (users *Users) GetByEmail(email string) *User {
 		fmt.Sprintf("%s/GetByEmail('%s')", users.endpoint, url.QueryEscape(email)),
 		users.config,
 	)
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (usersResp *UsersResp) Data() []UserResp {
-	collection, _ := normalizeODataCollection(*usersResp)
-	users := []UserResp{}
-	for _, user := range collection {
-		users = append(users, UserResp(user))
-	}
-	return users
-}
-
-// Normalized returns normalized body
-func (usersResp *UsersResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*usersResp)
-	return normalized
 }

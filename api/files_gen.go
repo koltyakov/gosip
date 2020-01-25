@@ -36,3 +36,21 @@ func (files *Files) OrderBy(oDataOrderBy string, ascending bool) *Files {
 	files.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return files
 }
+
+/* Response helpers */
+
+// Data response helper
+func (filesResp *FilesResp) Data() []FileResp {
+	collection, _ := normalizeODataCollection(*filesResp)
+	files := []FileResp{}
+	for _, item := range collection {
+		files = append(files, FileResp(item))
+	}
+	return files
+}
+
+// Normalized returns normalized body
+func (filesResp *FilesResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*filesResp)
+	return normalized
+}

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -9,6 +8,9 @@ import (
 
 	"github.com/koltyakov/gosip"
 )
+
+//go:generate ggen -ent Attachments -item Attachment -coll -helpers Data,Normalized
+//go:generate ggen -ent Attachment -helpers Data,Normalized
 
 // Attachments represent SharePoint List Items Attachments API queryable collection struct
 // Always use NewAttachments constructor instead of &Attachments{}
@@ -134,35 +136,4 @@ func (attachment *Attachment) Dowload() ([]byte, error) {
 	}
 
 	return data, nil
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (attachmentsResp *AttachmentsResp) Data() []AttachmentResp {
-	collection, _ := normalizeODataCollection(*attachmentsResp)
-	attachments := []AttachmentResp{}
-	for _, attachment := range collection {
-		attachments = append(attachments, AttachmentResp(attachment))
-	}
-	return attachments
-}
-
-// Normalized returns normalized body
-func (attachmentsResp *AttachmentsResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*attachmentsResp)
-	return normalized
-}
-
-// Data : to get typed data
-func (attachmentResp *AttachmentResp) Data() *AttachmentInfo {
-	data := NormalizeODataItem(*attachmentResp)
-	res := &AttachmentInfo{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (attachmentResp *AttachmentResp) Normalized() []byte {
-	return NormalizeODataItem(*attachmentResp)
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Properties -conf -mods Select,Expand
+//go:generate ggen -ent Properties -conf -coll -mods Select,Expand
 
 // Properties represent SharePoint Property Bags API queryable collection struct
 // Always use NewProperties constructor instead of &Properties{}

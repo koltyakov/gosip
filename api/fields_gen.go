@@ -36,3 +36,21 @@ func (fields *Fields) OrderBy(oDataOrderBy string, ascending bool) *Fields {
 	fields.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return fields
 }
+
+/* Response helpers */
+
+// Data response helper
+func (fieldsResp *FieldsResp) Data() []FieldResp {
+	collection, _ := normalizeODataCollection(*fieldsResp)
+	fields := []FieldResp{}
+	for _, item := range collection {
+		fields = append(fields, FieldResp(item))
+	}
+	return fields
+}
+
+// Normalized returns normalized body
+func (fieldsResp *FieldsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*fieldsResp)
+	return normalized
+}

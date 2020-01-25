@@ -36,3 +36,21 @@ func (recycleBin *RecycleBin) OrderBy(oDataOrderBy string, ascending bool) *Recy
 	recycleBin.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return recycleBin
 }
+
+/* Response helpers */
+
+// Data response helper
+func (recycleBinResp *RecycleBinResp) Data() []RecycleBinItemResp {
+	collection, _ := normalizeODataCollection(*recycleBinResp)
+	recycleBin := []RecycleBinItemResp{}
+	for _, item := range collection {
+		recycleBin = append(recycleBin, RecycleBinItemResp(item))
+	}
+	return recycleBin
+}
+
+// Normalized returns normalized body
+func (recycleBinResp *RecycleBinResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*recycleBinResp)
+	return normalized
+}

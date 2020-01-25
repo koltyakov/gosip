@@ -82,7 +82,7 @@ func TestFields(t *testing.T) {
 
 }
 
-func getAnyField() (*GenericFieldInfo, error) {
+func getAnyField() (*FieldInfo, error) {
 	web := NewSP(spClient).Web()
 	data, err := web.Fields().Top(1).Get()
 	if err != nil {

@@ -36,3 +36,21 @@ func (views *Views) OrderBy(oDataOrderBy string, ascending bool) *Views {
 	views.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return views
 }
+
+/* Response helpers */
+
+// Data response helper
+func (viewsResp *ViewsResp) Data() []ViewResp {
+	collection, _ := normalizeODataCollection(*viewsResp)
+	views := []ViewResp{}
+	for _, item := range collection {
+		views = append(views, ViewResp(item))
+	}
+	return views
+}
+
+// Normalized returns normalized body
+func (viewsResp *ViewsResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*viewsResp)
+	return normalized
+}

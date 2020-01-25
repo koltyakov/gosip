@@ -6,7 +6,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Files -conf -mods Select,Expand,Filter,Top,OrderBy
+//go:generate ggen -ent Files -item File -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Files represent SharePoint Files API queryable collection struct
 // Always use NewFiles constructor instead of &Files{}
@@ -55,22 +55,4 @@ func (files *Files) Add(name string, content []byte, overwrite bool) (FileResp, 
 	sp := NewHTTPClient(files.client)
 	endpoint := fmt.Sprintf("%s/Add(overwrite=%t,url='%s')", files.endpoint, overwrite, name)
 	return sp.Post(endpoint, content, getConfHeaders(files.config))
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (filesResp *FilesResp) Data() []FileResp {
-	collection, _ := normalizeODataCollection(*filesResp)
-	files := []FileResp{}
-	for _, ct := range collection {
-		files = append(files, FileResp(ct))
-	}
-	return files
-}
-
-// Normalized returns normalized body
-func (filesResp *FilesResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*filesResp)
-	return normalized
 }

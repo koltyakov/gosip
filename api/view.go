@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent View -conf -mods Select,Expand
+//go:generate ggen -ent View -conf -mods Select,Expand -helpers Data,Normalized
 
 // View represents SharePoint List View API queryable object struct
 // Always use NewView constructor instead of &View{}
@@ -100,19 +100,4 @@ func (view *View) SetViewXML(viewXML string) (ViewResp, error) {
 	}
 	sp := NewHTTPClient(view.client)
 	return sp.Post(endpoint, payload, getConfHeaders(view.config))
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (viewResp *ViewResp) Data() *ViewInfo {
-	data := NormalizeODataItem(*viewResp)
-	res := &ViewInfo{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (viewResp *ViewResp) Normalized() []byte {
-	return NormalizeODataItem(*viewResp)
 }

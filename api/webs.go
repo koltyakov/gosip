@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Webs -conf -mods Select,Expand,Filter,Top,OrderBy
+//go:generate ggen -ent Webs -item Web -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Webs represent SharePoint Webs API queryable collection struct
 // Always use NewWebs constructor instead of &Webs{}
@@ -90,22 +90,4 @@ func (webs *Webs) Add(title string, url string, metadata map[string]interface{})
 	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
 
 	return sp.Post(endpoint, []byte(body), headers)
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (websResp *WebsResp) Data() []WebResp {
-	collection, _ := normalizeODataCollection(*websResp)
-	webs := []WebResp{}
-	for _, web := range collection {
-		webs = append(webs, WebResp(web))
-	}
-	return webs
-}
-
-// Normalized returns normalized body
-func (websResp *WebsResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*websResp)
-	return normalized
 }

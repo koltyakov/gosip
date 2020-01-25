@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Item -conf -mods Select,Expand
+//go:generate ggen -ent Item -conf -mods Select,Expand -helpers Normalized
 
 // Item represents SharePoint Lists & Document Libraries Items API queryable object struct
 // Always use NewItem constructor instead of &Item{}
@@ -129,7 +129,7 @@ func (itemResp *ItemResp) Data() *GenericItemInfo {
 	return res
 }
 
-// Normalized returns normalized body
-func (itemResp *ItemResp) Normalized() []byte {
-	return NormalizeODataItem(*itemResp)
-}
+// // Normalized returns normalized body
+// func (itemResp *ItemResp) Normalized() []byte {
+// 	return NormalizeODataItem(*itemResp)
+// }

@@ -10,7 +10,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Items -conf -mods Select,Expand,Filter,Top,Skip,OrderBy
+//go:generate ggen -ent Items -item Item -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized
 
 // Items represent SharePoint Lists & Document Libraries Items API queryable collection struct
 // Always use NewItems constructor instead of &Items{}
@@ -170,22 +170,6 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 // Batch
 
 /* Response helpers */
-
-// Data : to get typed data
-func (itemsResp *ItemsResp) Data() []ItemResp {
-	collection, _ := normalizeODataCollection(*itemsResp)
-	items := []ItemResp{}
-	for _, item := range collection {
-		items = append(items, ItemResp(item))
-	}
-	return items
-}
-
-// Normalized returns normalized body
-func (itemsResp *ItemsResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*itemsResp)
-	return normalized
-}
 
 // NextPageURL : gets next page OData collection
 func (itemsResp *ItemsResp) NextPageURL() string {

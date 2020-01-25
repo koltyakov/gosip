@@ -1,14 +1,13 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Site -conf -mods Select,Expand
+//go:generate ggen -ent Site -conf -mods Select,Expand -helpers Data,Normalized
 
 // Site represents SharePoint Site API queryable object struct
 // Always use NewSite constructor instead of &Site{}
@@ -167,19 +166,4 @@ func (site *Site) Owner() *User {
 		fmt.Sprintf("%s/Owner", site.endpoint),
 		site.config,
 	)
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (siteResp *SiteResp) Data() *SiteInfo {
-	data := NormalizeODataItem(*siteResp)
-	res := &SiteInfo{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (siteResp *SiteResp) Normalized() []byte {
-	return NormalizeODataItem(*siteResp)
 }

@@ -1,12 +1,10 @@
 package api
 
 import (
-	"encoding/json"
-
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Field -conf -mods Select,Expand
+//go:generate ggen -ent Field -conf -mods Select,Expand -helpers Data,Normalized
 
 // Field represents SharePoint Field (Site Column) API queryable object struct
 // Always use NewField constructor instead of &Field{}
@@ -17,8 +15,8 @@ type Field struct {
 	modifiers *ODataMods
 }
 
-// GenericFieldInfo - generic field API response payload structure
-type GenericFieldInfo struct {
+// FieldInfo - generic field API response payload structure
+type FieldInfo struct {
 	AutoIndexed          bool   `json:"AutoIndexed"`
 	CanBeDeleted         bool   `json:"CanBeDeleted"`
 	DefaultValue         string `json:"DefaultValue"`
@@ -90,27 +88,4 @@ func (field *Field) Delete() error {
 	sp := NewHTTPClient(field.client)
 	_, err := sp.Delete(field.endpoint, getConfHeaders(field.config))
 	return err
-}
-
-// // Recycle moves a field to the recycle bin
-// func (field *Field) Recycle() error {
-// 	sp := NewHTTPClient(field.client)
-// 	endpoint := fmt.Sprintf("%s/Recycle", field.endpoint)
-// 	_, err := sp.Post(endpoint, nil, getConfHeaders(field.config))
-// 	return err
-// }
-
-/* Response helpers */
-
-// Data : to get typed data
-func (fieldResp *FieldResp) Data() *GenericFieldInfo {
-	data := NormalizeODataItem(*fieldResp)
-	res := &GenericFieldInfo{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (fieldResp *FieldResp) Normalized() []byte {
-	return NormalizeODataItem(*fieldResp)
 }

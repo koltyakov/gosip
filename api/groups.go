@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Groups -conf -mods Select,Expand,Filter,Top,OrderBy
+//go:generate ggen -ent Groups -item Group -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Groups represent SharePoint Site Groups API queryable collection struct
 // Always use NewGroups constructor instead of &Groups{}
@@ -93,22 +93,4 @@ func (groups *Groups) RemoveByLoginName(loginName string) error {
 	sp := NewHTTPClient(groups.client)
 	_, err := sp.Post(endpoint, nil, getConfHeaders(groups.config))
 	return err
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (groupsResp *GroupsResp) Data() []GroupResp {
-	collection, _ := normalizeODataCollection(*groupsResp)
-	cts := []GroupResp{}
-	for _, ct := range collection {
-		cts = append(cts, GroupResp(ct))
-	}
-	return cts
-}
-
-// Normalized returns normalized body
-func (groupsResp *GroupsResp) Normalized() []byte {
-	normalized, _ := NormalizeODataCollection(*groupsResp)
-	return normalized
 }

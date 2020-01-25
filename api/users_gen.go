@@ -36,3 +36,21 @@ func (users *Users) OrderBy(oDataOrderBy string, ascending bool) *Users {
 	users.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return users
 }
+
+/* Response helpers */
+
+// Data response helper
+func (usersResp *UsersResp) Data() []UserResp {
+	collection, _ := normalizeODataCollection(*usersResp)
+	users := []UserResp{}
+	for _, item := range collection {
+		users = append(users, UserResp(item))
+	}
+	return users
+}
+
+// Normalized returns normalized body
+func (usersResp *UsersResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*usersResp)
+	return normalized
+}

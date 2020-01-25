@@ -6,7 +6,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent EventReceivers -conf -mods Select,Filter,Top,OrderBy
+//go:generate ggen -ent EventReceivers -conf -coll -mods Select,Filter,Top,OrderBy
 
 // EventReceivers represent SharePoint EventReceivers API queryable collection struct
 // Always use NewEventReceivers constructor instead of &EventReceivers{}

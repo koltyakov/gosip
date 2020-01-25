@@ -12,7 +12,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent File -conf -mods Select,Expand
+//go:generate ggen -ent File -conf -mods Select,Expand -helpers Data,Normalized
 
 // File represents SharePoint File API queryable object struct
 // Always use NewFile constructor instead of &File{}
@@ -251,19 +251,4 @@ func (file *File) Props() *Properties {
 		file.config,
 		"file",
 	)
-}
-
-/* Response helpers */
-
-// Data : to get typed data
-func (fileResp *FileResp) Data() *FileInfo {
-	data := NormalizeODataItem(*fileResp)
-	res := &FileInfo{}
-	json.Unmarshal(data, &res)
-	return res
-}
-
-// Normalized returns normalized body
-func (fileResp *FileResp) Normalized() []byte {
-	return NormalizeODataItem(*fileResp)
 }

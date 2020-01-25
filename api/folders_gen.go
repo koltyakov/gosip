@@ -36,3 +36,21 @@ func (folders *Folders) OrderBy(oDataOrderBy string, ascending bool) *Folders {
 	folders.modifiers.AddOrderBy(oDataOrderBy, ascending)
 	return folders
 }
+
+/* Response helpers */
+
+// Data response helper
+func (foldersResp *FoldersResp) Data() []FolderResp {
+	collection, _ := normalizeODataCollection(*foldersResp)
+	folders := []FolderResp{}
+	for _, item := range collection {
+		folders = append(folders, FolderResp(item))
+	}
+	return folders
+}
+
+// Normalized returns normalized body
+func (foldersResp *FoldersResp) Normalized() []byte {
+	normalized, _ := NormalizeODataCollection(*foldersResp)
+	return normalized
+}
