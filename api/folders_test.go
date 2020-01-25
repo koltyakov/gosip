@@ -14,21 +14,6 @@ func TestFolders(t *testing.T) {
 	newFolderName := uuid.New().String()
 	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 
-	t.Run("Conf", func(t *testing.T) {
-		f := web.GetFolder(rootFolderURI).Folders()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			g := f.Conf(preset)
-			if g.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		f := web.GetFolder(rootFolderURI).Folders()
 		mods := f.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers

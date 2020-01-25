@@ -33,14 +33,6 @@ func TestGroups(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		groups.config = nil
-		groups.Conf(headers.verbose)
-		if groups.config != headers.verbose {
-			t.Errorf("failed to apply config")
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		g := sp.Web().SiteGroups()
 		mods := g.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers

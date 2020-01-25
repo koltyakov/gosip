@@ -15,21 +15,6 @@ func TestViews(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Run("Conf", func(t *testing.T) {
-		v := web.GetList(listURI).Views()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			g := v.Conf(preset)
-			if g.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		mods := web.GetList(listURI).Views().
 			Select("*").Expand("*").Filter("*").OrderBy("*", true).

@@ -60,21 +60,6 @@ func TestCustomActions(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		ca := sp.Web().CustomActions()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			a := ca.Conf(preset)
-			if a.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		ca := sp.Web().CustomActions()
 		mods := ca.Select("*").Filter("*").Top(1).OrderBy("*", true).modifiers

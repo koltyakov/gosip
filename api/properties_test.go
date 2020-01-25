@@ -32,14 +32,6 @@ func TestProperties(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		webProps.config = nil
-		webProps.Conf(headers.verbose)
-		if webProps.config != headers.verbose {
-			t.Errorf("failed to apply config")
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		props := sp.Web().AllProps()
 		mods := props.Select("*").Expand("*").modifiers

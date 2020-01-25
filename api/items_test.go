@@ -24,21 +24,6 @@ func TestItems(t *testing.T) {
 	}
 	// startedOn := time.Now()
 
-	t.Run("Conf", func(t *testing.T) {
-		items := list.Items()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			i := items.Conf(preset)
-			if i.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		items := list.Items()
 		mods := items.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).Skip("*").modifiers

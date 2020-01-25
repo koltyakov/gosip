@@ -15,21 +15,6 @@ func TestGroup(t *testing.T) {
 	newGroupName := uuid.New().String()
 	group := &GroupInfo{}
 
-	t.Run("Conf", func(t *testing.T) {
-		g := web.AssociatedGroups().Visitors()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			u := g.Conf(preset)
-			if u.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		g := web.AssociatedGroups().Visitors()
 		mods := g.Select("*").Expand("*").modifiers

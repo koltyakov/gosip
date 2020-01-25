@@ -18,15 +18,6 @@ func TestSP(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		sp := NewSP(spClient)
-		sp.config = nil
-		sp.Conf(headers.verbose)
-		if sp.config != headers.verbose {
-			t.Errorf("failed to apply config")
-		}
-	})
-
 	t.Run("Web", func(t *testing.T) {
 		sp := NewSP(spClient)
 		if sp.Web() == nil {

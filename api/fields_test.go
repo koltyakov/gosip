@@ -19,21 +19,6 @@ func TestFields(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Run("Conf", func(t *testing.T) {
-		f := web.Fields()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			g := f.Conf(preset)
-			if g.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		f := web.Fields()
 		mods := f.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers

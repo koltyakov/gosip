@@ -49,14 +49,6 @@ func TestWeb(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		web.config = nil
-		web.Conf(headers.verbose)
-		if web.config != headers.verbose {
-			t.Errorf("failed to apply config")
-		}
-	})
-
 	t.Run("FromURL", func(t *testing.T) {
 		w := web.FromURL("site_url")
 		if w.endpoint != "site_url" {

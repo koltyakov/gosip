@@ -17,21 +17,6 @@ func TestRecycleBin(t *testing.T) {
 	}
 	list := sp.Web().Lists().GetByTitle(newListTitle)
 
-	t.Run("Conf", func(t *testing.T) {
-		rb := sp.Web().RecycleBin()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			i := rb.Conf(preset)
-			if i.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		rb := sp.Web().RecycleBin()
 		mods := rb.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers

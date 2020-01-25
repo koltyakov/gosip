@@ -29,14 +29,6 @@ func TestUser(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		user.config = nil
-		user.Conf(headers.verbose)
-		if user.config != headers.verbose {
-			t.Errorf("failed to apply config")
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		user := sp.Web().CurrentUser()
 		mods := user.Select("*").Expand("*").modifiers

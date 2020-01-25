@@ -29,14 +29,6 @@ func TestSite(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		site.config = nil
-		site.Conf(headers.verbose)
-		if site.config != headers.verbose {
-			t.Errorf("failed to apply config")
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		s := sp.Site()
 		mods := s.Select("*").Expand("*").modifiers

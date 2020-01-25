@@ -41,21 +41,6 @@ func TestContentTypes(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		cts := web.ContentTypes()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			c := cts.Conf(preset)
-			if c.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		cts := web.ContentTypes()
 		mods := cts.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers

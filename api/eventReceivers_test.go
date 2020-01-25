@@ -29,21 +29,6 @@ func TestEventReceivers(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		er := sp.Web().EventReceivers()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			r := er.Conf(preset)
-			if r.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		er := sp.Web().EventReceivers()
 		mods := er.Select("*").Filter("*").Top(1).OrderBy("*", true).modifiers

@@ -17,21 +17,6 @@ func TestList(t *testing.T) {
 	}
 	list := web.Lists().GetByID(listInfo.ID)
 
-	t.Run("Conf", func(t *testing.T) {
-		list := web.Lists().GetByID(listInfo.ID)
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			l := list.Conf(preset)
-			if l.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		list := web.Lists().GetByID(listInfo.ID)
 		mods := list.Select("*").Expand("*").modifiers

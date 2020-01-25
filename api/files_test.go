@@ -62,21 +62,6 @@ func TestFiles(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		files := web.GetFolder(newFolderURI).Files()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			f := files.Conf(preset)
-			if f.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		files := web.GetFolder(newFolderURI).Files()
 		mods := files.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers

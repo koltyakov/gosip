@@ -33,21 +33,6 @@ func TestWebs(t *testing.T) {
 		}
 	})
 
-	t.Run("Conf", func(t *testing.T) {
-		ws := sp.Web().Webs()
-		hs := map[string]*RequestConfig{
-			"nometadata":      HeadersPresets.Nometadata,
-			"minimalmetadata": HeadersPresets.Minimalmetadata,
-			"verbose":         HeadersPresets.Verbose,
-		}
-		for key, preset := range hs {
-			w := ws.Conf(preset)
-			if w.config != preset {
-				t.Errorf("can't %v config", key)
-			}
-		}
-	})
-
 	t.Run("Modifiers", func(t *testing.T) {
 		ws := sp.Web().Webs()
 		mods := ws.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
