@@ -6,6 +6,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Views -conf -mods Select,Expand,Filter,Top,OrderBy
+
 // Views  represent SharePoint List Views API queryable collection struct
 // Always use NewViews constructor instead of &Views{}
 type Views struct {
@@ -31,42 +33,6 @@ func NewViews(client *gosip.SPClient, endpoint string, config *RequestConfig) *V
 // ToURL gets endpoint with modificators raw URL
 func (views *Views) ToURL() string {
 	return toURL(views.endpoint, views.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (views *Views) Conf(config *RequestConfig) *Views {
-	views.config = config
-	return views
-}
-
-// Select adds $select OData modifier
-func (views *Views) Select(oDataSelect string) *Views {
-	views.modifiers.AddSelect(oDataSelect)
-	return views
-}
-
-// Expand adds $expand OData modifier
-func (views *Views) Expand(oDataExpand string) *Views {
-	views.modifiers.AddExpand(oDataExpand)
-	return views
-}
-
-// Filter adds $filter OData modifier
-func (views *Views) Filter(oDataFilter string) *Views {
-	views.modifiers.AddFilter(oDataFilter)
-	return views
-}
-
-// Top adds $top OData modifier
-func (views *Views) Top(oDataTop int) *Views {
-	views.modifiers.AddTop(oDataTop)
-	return views
-}
-
-// OrderBy adds $orderby OData modifier
-func (views *Views) OrderBy(oDataOrderBy string, ascending bool) *Views {
-	views.modifiers.AddOrderBy(oDataOrderBy, ascending)
-	return views
 }
 
 // Get gets this List or Document Library views collection

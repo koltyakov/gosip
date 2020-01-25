@@ -7,6 +7,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent ContentType -conf -mods Select,Expand
+
 // ContentType represents SharePoint Content Types API queryable object struct
 // Always use NewContentType constructor instead of &ContentType{}
 type ContentType struct {
@@ -46,24 +48,6 @@ func NewContentType(client *gosip.SPClient, endpoint string, config *RequestConf
 // ToURL gets endpoint with modificators raw URL
 func (ct *ContentType) ToURL() string {
 	return toURL(ct.endpoint, ct.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (ct *ContentType) Conf(config *RequestConfig) *ContentType {
-	ct.config = config
-	return ct
-}
-
-// Select adds $select OData modifier
-func (ct *ContentType) Select(oDataSelect string) *ContentType {
-	ct.modifiers.AddSelect(oDataSelect)
-	return ct
-}
-
-// Expand adds $expand OData modifier
-func (ct *ContentType) Expand(oDataExpand string) *ContentType {
-	ct.modifiers.AddExpand(oDataExpand)
-	return ct
 }
 
 // Get gets content type data object

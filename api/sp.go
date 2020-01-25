@@ -6,6 +6,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent SP -conf
+
 // SP represents SharePoint REST+ API root struct
 // Always use NewSP constructor instead of &SP{}
 type SP struct {
@@ -21,12 +23,6 @@ func NewSP(client *gosip.SPClient) *SP {
 // ToURL gets endpoint with modificators raw URL
 func (sp *SP) ToURL() string {
 	return sp.client.AuthCnfg.GetSiteURL()
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (sp *SP) Conf(config *RequestConfig) *SP {
-	sp.config = config
-	return sp
 }
 
 // Web API object getter

@@ -7,6 +7,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Webs -conf -mods Select,Expand,Filter,Top,OrderBy
+
 // Webs represent SharePoint Webs API queryable collection struct
 // Always use NewWebs constructor instead of &Webs{}
 type Webs struct {
@@ -32,42 +34,6 @@ func NewWebs(client *gosip.SPClient, endpoint string, config *RequestConfig) *We
 // ToURL gets endpoint with modificators raw URL
 func (webs *Webs) ToURL() string {
 	return toURL(webs.endpoint, webs.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (webs *Webs) Conf(config *RequestConfig) *Webs {
-	webs.config = config
-	return webs
-}
-
-// Select adds $select OData modifier
-func (webs *Webs) Select(oDataSelect string) *Webs {
-	webs.modifiers.AddSelect(oDataSelect)
-	return webs
-}
-
-// Expand adds $expand OData modifier
-func (webs *Webs) Expand(oDataExpand string) *Webs {
-	webs.modifiers.AddExpand(oDataExpand)
-	return webs
-}
-
-// Filter adds $filter OData modifier
-func (webs *Webs) Filter(oDataFilter string) *Webs {
-	webs.modifiers.AddFilter(oDataFilter)
-	return webs
-}
-
-// Top adds $top OData modifier
-func (webs *Webs) Top(oDataTop int) *Webs {
-	webs.modifiers.AddTop(oDataTop)
-	return webs
-}
-
-// OrderBy adds $orderby OData modifier
-func (webs *Webs) OrderBy(oDataOrderBy string, ascending bool) *Webs {
-	webs.modifiers.AddOrderBy(oDataOrderBy, ascending)
-	return webs
 }
 
 // Get gets Webs response - a collection of WebInfo for the parent Web

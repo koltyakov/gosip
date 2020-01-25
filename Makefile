@@ -10,6 +10,11 @@ test-api:
 format:
 	gofmt -s -w .
 
+generate:
+	go install ./cmd/ggen/...
+	go generate ./api/...
+	make format
+
 coverage:
 	SPAUTH_ENVCODE=spo SPAPI_HEAVY_TESTS=true go test ./... -count=1 -coverprofile=coverage.out
 	go tool cover -func=coverage.out

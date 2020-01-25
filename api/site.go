@@ -8,6 +8,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Site -conf -mods Select,Expand
+
 // Site represents SharePoint Site API queryable object struct
 // Always use NewSite constructor instead of &Site{}
 type Site struct {
@@ -83,24 +85,6 @@ func (site *Site) ToURL() string {
 func (site *Site) FromURL(url string) *Site {
 	url = strings.Split(url, "?")[0]
 	return NewSite(site.client, url, site.config)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (site *Site) Conf(config *RequestConfig) *Site {
-	site.config = config
-	return site
-}
-
-// Select adds $select OData modifier
-func (site *Site) Select(oDataSelect string) *Site {
-	site.modifiers.AddSelect(oDataSelect)
-	return site
-}
-
-// Expand adds $expand OData modifier
-func (site *Site) Expand(oDataExpand string) *Site {
-	site.modifiers.AddExpand(oDataExpand)
-	return site
 }
 
 // Get gets this Site data object

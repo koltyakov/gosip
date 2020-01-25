@@ -9,6 +9,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Folder -conf -mods Select,Expand
+
 // Folder represents SharePoint Lists & Document Libraries Folder API queryable object struct
 // Always use NewFolder constructor instead of &Folder{}
 type Folder struct {
@@ -48,24 +50,6 @@ func NewFolder(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 // ToURL gets endpoint with modificators raw URL
 func (folder *Folder) ToURL() string {
 	return toURL(folder.endpoint, folder.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (folder *Folder) Conf(config *RequestConfig) *Folder {
-	folder.config = config
-	return folder
-}
-
-// Select adds $select OData modifier
-func (folder *Folder) Select(oDataSelect string) *Folder {
-	folder.modifiers.AddSelect(oDataSelect)
-	return folder
-}
-
-// Expand adds $expand OData modifier
-func (folder *Folder) Expand(oDataExpand string) *Folder {
-	folder.modifiers.AddExpand(oDataExpand)
-	return folder
 }
 
 // Get gets this folder data object

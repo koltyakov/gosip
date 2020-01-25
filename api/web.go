@@ -8,6 +8,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Web -conf -mods Select,Expand
+
 // Web represents SharePoint Web API queryable object struct
 // Always use NewWeb constructor instead of &Web{}
 type Web struct {
@@ -88,24 +90,6 @@ func (web *Web) ToURL() string {
 func (web *Web) FromURL(url string) *Web {
 	url = strings.Split(url, "?")[0]
 	return NewWeb(web.client, url, web.config)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (web *Web) Conf(config *RequestConfig) *Web {
-	web.config = config
-	return web
-}
-
-// Select adds $select OData modifier
-func (web *Web) Select(oDataSelect string) *Web {
-	web.modifiers.AddSelect(oDataSelect)
-	return web
-}
-
-// Expand adds $expand OData modifier
-func (web *Web) Expand(oDataExpand string) *Web {
-	web.modifiers.AddExpand(oDataExpand)
-	return web
 }
 
 // Get gets this Web info

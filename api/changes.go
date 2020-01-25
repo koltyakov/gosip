@@ -8,6 +8,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Changes -conf
+
 // Changes represent SharePoint Changes API queryable collection struct
 // Always use NewChanges constructor instead of &Changes{}
 type Changes struct {
@@ -74,12 +76,6 @@ func NewChanges(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 		endpoint: endpoint,
 		config:   config,
 	}
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (changes *Changes) Conf(config *RequestConfig) *Changes {
-	changes.config = config
-	return changes
 }
 
 // GetCurrentToken gets current change token for this parent entity

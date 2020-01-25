@@ -7,6 +7,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Fields -conf -mods Select,Expand,Filter,Top,OrderBy
+
 // Fields represent SharePoint Fields (Site Columns) API queryable collection struct
 // Always use NewFields constructor instead of &Fields{}
 type Fields struct {
@@ -34,42 +36,6 @@ func NewFields(client *gosip.SPClient, endpoint string, config *RequestConfig, e
 // ToURL gets endpoint with modificators raw URL
 func (fields *Fields) ToURL() string {
 	return toURL(fields.endpoint, fields.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (fields *Fields) Conf(config *RequestConfig) *Fields {
-	fields.config = config
-	return fields
-}
-
-// Select adds $select OData modifier
-func (fields *Fields) Select(oDataSelect string) *Fields {
-	fields.modifiers.AddSelect(oDataSelect)
-	return fields
-}
-
-// Expand adds $expand OData modifier
-func (fields *Fields) Expand(oDataExpand string) *Fields {
-	fields.modifiers.AddExpand(oDataExpand)
-	return fields
-}
-
-// Filter adds $filter OData modifier
-func (fields *Fields) Filter(oDataFilter string) *Fields {
-	fields.modifiers.AddFilter(oDataFilter)
-	return fields
-}
-
-// Top adds $top OData modifier
-func (fields *Fields) Top(oDataTop int) *Fields {
-	fields.modifiers.AddTop(oDataTop)
-	return fields
-}
-
-// OrderBy adds $orderby OData modifier
-func (fields *Fields) OrderBy(oDataOrderBy string, ascending bool) *Fields {
-	fields.modifiers.AddOrderBy(oDataOrderBy, ascending)
-	return fields
 }
 
 // Get gets fieds response collection

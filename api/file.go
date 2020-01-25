@@ -12,6 +12,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent File -conf -mods Select,Expand
+
 // File represents SharePoint File API queryable object struct
 // Always use NewFile constructor instead of &File{}
 type File struct {
@@ -77,24 +79,6 @@ func NewFile(client *gosip.SPClient, endpoint string, config *RequestConfig) *Fi
 // ToURL gets endpoint with modificators raw URL
 func (file *File) ToURL() string {
 	return toURL(file.endpoint, file.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (file *File) Conf(config *RequestConfig) *File {
-	file.config = config
-	return file
-}
-
-// Select adds $select OData modifier
-func (file *File) Select(oDataSelect string) *File {
-	file.modifiers.AddSelect(oDataSelect)
-	return file
-}
-
-// Expand adds $expand OData modifier
-func (file *File) Expand(oDataExpand string) *File {
-	file.modifiers.AddExpand(oDataExpand)
-	return file
 }
 
 // Get gets file data object

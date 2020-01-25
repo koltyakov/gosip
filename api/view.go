@@ -7,6 +7,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent View -conf -mods Select,Expand
+
 // View represents SharePoint List View API queryable object struct
 // Always use NewView constructor instead of &View{}
 type View struct {
@@ -62,24 +64,6 @@ func NewView(client *gosip.SPClient, endpoint string, config *RequestConfig) *Vi
 // ToURL gets endpoint with modificators raw URL
 func (view *View) ToURL() string {
 	return toURL(view.endpoint, view.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (view *View) Conf(config *RequestConfig) *View {
-	view.config = config
-	return view
-}
-
-// Select adds $select OData modifier
-func (view *View) Select(oDataSelect string) *View {
-	view.modifiers.AddSelect(oDataSelect)
-	return view
-}
-
-// Expand adds $expand OData modifier
-func (view *View) Expand(oDataExpand string) *View {
-	view.modifiers.AddExpand(oDataExpand)
-	return view
 }
 
 // Get gets this View data response

@@ -7,6 +7,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Lists -conf -mods Select,Expand,Filter,Top,OrderBy
+
 // Lists represent SharePoint Lists API queryable collection struct
 // Always use NewLists constructor instead of &Lists{}
 type Lists struct {
@@ -32,42 +34,6 @@ func NewLists(client *gosip.SPClient, endpoint string, config *RequestConfig) *L
 // ToURL gets endpoint with modificators raw URL
 func (lists *Lists) ToURL() string {
 	return toURL(lists.endpoint, lists.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (lists *Lists) Conf(config *RequestConfig) *Lists {
-	lists.config = config
-	return lists
-}
-
-// Select adds $select OData modifier
-func (lists *Lists) Select(oDataSelect string) *Lists {
-	lists.modifiers.AddSelect(oDataSelect)
-	return lists
-}
-
-// Expand adds $expand OData modifier
-func (lists *Lists) Expand(oDataExpand string) *Lists {
-	lists.modifiers.AddExpand(oDataExpand)
-	return lists
-}
-
-// Filter adds $filter OData modifier
-func (lists *Lists) Filter(oDataFilter string) *Lists {
-	lists.modifiers.AddFilter(oDataFilter)
-	return lists
-}
-
-// Top adds $top OData modifier
-func (lists *Lists) Top(oDataTop int) *Lists {
-	lists.modifiers.AddTop(oDataTop)
-	return lists
-}
-
-// OrderBy adds $orderby OData modifier
-func (lists *Lists) OrderBy(oDataOrderBy string, ascending bool) *Lists {
-	lists.modifiers.AddOrderBy(oDataOrderBy, ascending)
-	return lists
 }
 
 // Get gets Lists API queryable collection

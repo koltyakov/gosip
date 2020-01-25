@@ -9,6 +9,7 @@
   "go.formatFlags": ["-s", "-w"],
   "go.lintOnSave": "file",
   "files.exclude": {
-    "**/*_test.go": false
+    "**/*_test.go": false,
+    "**/*_gen.go": true
   }
 }

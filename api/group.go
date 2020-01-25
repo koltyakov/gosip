@@ -8,6 +8,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Group -conf -mods Select,Expand
+
 // Group represents SharePoint Site Groups API queryable object struct
 // Always use NewGroup constructor instead of &Group{}
 type Group struct {
@@ -49,24 +51,6 @@ func NewGroup(client *gosip.SPClient, endpoint string, config *RequestConfig) *G
 // ToURL gets endpoint with modificators raw URL
 func (group *Group) ToURL() string {
 	return toURL(group.endpoint, group.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (group *Group) Conf(config *RequestConfig) *Group {
-	group.config = config
-	return group
-}
-
-// Select adds $select OData modifier
-func (group *Group) Select(oDataSelect string) *Group {
-	group.modifiers.AddSelect(oDataSelect)
-	return group
-}
-
-// Expand adds $expand OData modifier
-func (group *Group) Expand(oDataExpand string) *Group {
-	group.modifiers.AddExpand(oDataExpand)
-	return group
 }
 
 // Get gets group data object

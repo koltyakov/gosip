@@ -10,6 +10,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent List -conf -mods Select,Expand
+
 // List represents SharePoint List API queryable object struct
 // Always use NewList constructor instead of &List{}
 type List struct {
@@ -105,24 +107,6 @@ func NewList(client *gosip.SPClient, endpoint string, config *RequestConfig) *Li
 // ToURL gets endpoint with modificators raw URL
 func (list *List) ToURL() string {
 	return toURL(list.endpoint, list.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (list *List) Conf(config *RequestConfig) *List {
-	list.config = config
-	return list
-}
-
-// Select adds $select OData modifier
-func (list *List) Select(oDataSelect string) *List {
-	list.modifiers.AddSelect(oDataSelect)
-	return list
-}
-
-// Expand adds $expand OData modifier
-func (list *List) Expand(oDataExpand string) *List {
-	list.modifiers.AddExpand(oDataExpand)
-	return list
 }
 
 // Get gets list's data object

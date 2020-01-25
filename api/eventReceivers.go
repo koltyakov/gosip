@@ -6,6 +6,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent EventReceivers -conf -mods Select,Filter,Top,OrderBy
+
 // EventReceivers represent SharePoint EventReceivers API queryable collection struct
 // Always use NewEventReceivers constructor instead of &EventReceivers{}
 type EventReceivers struct {
@@ -40,36 +42,6 @@ func NewEventReceivers(client *gosip.SPClient, endpoint string, config *RequestC
 // ToURL gets endpoint with modificators raw URL
 func (receivers *EventReceivers) ToURL() string {
 	return toURL(receivers.endpoint, receivers.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (receivers *EventReceivers) Conf(config *RequestConfig) *EventReceivers {
-	receivers.config = config
-	return receivers
-}
-
-// Select adds $select OData modifier
-func (receivers *EventReceivers) Select(oDataSelect string) *EventReceivers {
-	receivers.modifiers.AddSelect(oDataSelect)
-	return receivers
-}
-
-// Filter adds $filter OData modifier
-func (receivers *EventReceivers) Filter(oDataFilter string) *EventReceivers {
-	receivers.modifiers.AddFilter(oDataFilter)
-	return receivers
-}
-
-// Top adds $top OData modifier
-func (receivers *EventReceivers) Top(oDataTop int) *EventReceivers {
-	receivers.modifiers.AddTop(oDataTop)
-	return receivers
-}
-
-// OrderBy adds $orderby OData modifier
-func (receivers *EventReceivers) OrderBy(oDataOrderBy string, ascending bool) *EventReceivers {
-	receivers.modifiers.AddOrderBy(oDataOrderBy, ascending)
-	return receivers
 }
 
 // Get gets event receivers collection

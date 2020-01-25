@@ -6,6 +6,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Field -conf -mods Select,Expand
+
 // Field represents SharePoint Field (Site Column) API queryable object struct
 // Always use NewField constructor instead of &Field{}
 type Field struct {
@@ -63,24 +65,6 @@ func NewField(client *gosip.SPClient, endpoint string, config *RequestConfig) *F
 // ToURL gets endpoint with modificators raw URL
 func (field *Field) ToURL() string {
 	return toURL(field.endpoint, field.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (field *Field) Conf(config *RequestConfig) *Field {
-	field.config = config
-	return field
-}
-
-// Select adds $select OData modifier
-func (field *Field) Select(oDataSelect string) *Field {
-	field.modifiers.AddSelect(oDataSelect)
-	return field
-}
-
-// Expand adds $expand OData modifier
-func (field *Field) Expand(oDataExpand string) *Field {
-	field.modifiers.AddExpand(oDataExpand)
-	return field
 }
 
 // Get gets field data object

@@ -8,6 +8,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Item -conf -mods Select,Expand
+
 // Item represents SharePoint Lists & Document Libraries Items API queryable object struct
 // Always use NewItem constructor instead of &Item{}
 type Item struct {
@@ -48,24 +50,6 @@ func NewItem(client *gosip.SPClient, endpoint string, config *RequestConfig) *It
 // ToURL gets endpoint with modificators raw URL
 func (item *Item) ToURL() string {
 	return toURL(item.endpoint, item.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (item *Item) Conf(config *RequestConfig) *Item {
-	item.config = config
-	return item
-}
-
-// Select adds $select OData modifier
-func (item *Item) Select(oDataSelect string) *Item {
-	item.modifiers.AddSelect(oDataSelect)
-	return item
-}
-
-// Expand adds $expand OData modifier
-func (item *Item) Expand(oDataExpand string) *Item {
-	item.modifiers.AddExpand(oDataExpand)
-	return item
 }
 
 // Get gets this Item info

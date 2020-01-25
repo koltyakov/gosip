@@ -8,6 +8,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent RecycleBin -conf -mods Select,Expand,Filter,Top,OrderBy
+
 // RecycleBin represents SharePoint Recycle Bin API queryable collection struct
 // Always use NewRecycleBin constructor instead of &RecycleBin{}
 type RecycleBin struct {
@@ -52,42 +54,6 @@ func NewRecycleBin(client *gosip.SPClient, endpoint string, config *RequestConfi
 // ToURL gets endpoint with modificators raw URL
 func (recycleBin *RecycleBin) ToURL() string {
 	return toURL(recycleBin.endpoint, recycleBin.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (recycleBin *RecycleBin) Conf(config *RequestConfig) *RecycleBin {
-	recycleBin.config = config
-	return recycleBin
-}
-
-// Select adds $select OData modifier
-func (recycleBin *RecycleBin) Select(oDataSelect string) *RecycleBin {
-	recycleBin.modifiers.AddSelect(oDataSelect)
-	return recycleBin
-}
-
-// Expand adds $expand OData modifier
-func (recycleBin *RecycleBin) Expand(oDataExpand string) *RecycleBin {
-	recycleBin.modifiers.AddExpand(oDataExpand)
-	return recycleBin
-}
-
-// Filter adds $filter OData modifier
-func (recycleBin *RecycleBin) Filter(oDataFilter string) *RecycleBin {
-	recycleBin.modifiers.AddFilter(oDataFilter)
-	return recycleBin
-}
-
-// Top adds $top OData modifier
-func (recycleBin *RecycleBin) Top(oDataTop int) *RecycleBin {
-	recycleBin.modifiers.AddTop(oDataTop)
-	return recycleBin
-}
-
-// OrderBy adds $orderby OData modifier
-func (recycleBin *RecycleBin) OrderBy(oDataOrderBy string, ascending bool) *RecycleBin {
-	recycleBin.modifiers.AddOrderBy(oDataOrderBy, ascending)
-	return recycleBin
 }
 
 // Get gets recycled items queryable collection

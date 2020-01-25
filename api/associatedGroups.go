@@ -5,6 +5,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent AssociatedGroups -conf
+
 // AssociatedGroups web associated groups scope constructor
 // Always use NewAssociatedGroups constructor instead of &AssociatedGroups{}
 type AssociatedGroups struct {
@@ -20,12 +22,6 @@ func NewAssociatedGroups(client *gosip.SPClient, endpoint string, config *Reques
 		endpoint: endpoint,
 		config:   config,
 	}
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (groups *AssociatedGroups) Conf(config *RequestConfig) *AssociatedGroups {
-	groups.config = config
-	return groups
 }
 
 // Visitors gets web associated visitors group API object

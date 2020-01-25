@@ -8,6 +8,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent FieldLinks -conf -mods Select,Filter,Top
+
 // FieldLinks represent SharePoint content type FieldLinks API queryable collection struct
 // Always use NewFieldLinks constructor instead of &FieldLinks{}
 type FieldLinks struct {
@@ -65,30 +67,6 @@ func NewFieldLink(client *gosip.SPClient, endpoint string, config *RequestConfig
 // ToURL gets endpoint with modificators raw URL
 func (fieldLinks *FieldLinks) ToURL() string {
 	return toURL(fieldLinks.endpoint, fieldLinks.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (fieldLinks *FieldLinks) Conf(config *RequestConfig) *FieldLinks {
-	fieldLinks.config = config
-	return fieldLinks
-}
-
-// Select adds $select OData modifier
-func (fieldLinks *FieldLinks) Select(oDataSelect string) *FieldLinks {
-	fieldLinks.modifiers.AddSelect(oDataSelect)
-	return fieldLinks
-}
-
-// Filter adds $filter OData modifier
-func (fieldLinks *FieldLinks) Filter(oDataFilter string) *FieldLinks {
-	fieldLinks.modifiers.AddFilter(oDataFilter)
-	return fieldLinks
-}
-
-// Top adds $top OData modifier
-func (fieldLinks *FieldLinks) Top(oDataTop int) *FieldLinks {
-	fieldLinks.modifiers.AddTop(oDataTop)
-	return fieldLinks
 }
 
 // Get gets fieds response collection

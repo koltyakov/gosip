@@ -7,6 +7,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent User -conf -mods Select,Expand
+
 // User represents SharePoint Site User API queryable object struct
 // Always use NewUser constructor instead of &User{}
 type User struct {
@@ -43,24 +45,6 @@ func NewUser(client *gosip.SPClient, endpoint string, config *RequestConfig) *Us
 // ToURL gets endpoint with modificators raw URL
 func (user *User) ToURL() string {
 	return toURL(user.endpoint, user.modifiers)
-}
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (user *User) Conf(config *RequestConfig) *User {
-	user.config = config
-	return user
-}
-
-// Select adds $select OData modifier
-func (user *User) Select(oDataSelect string) *User {
-	user.modifiers.AddSelect(oDataSelect)
-	return user
-}
-
-// Expand adds $expand OData modifier
-func (user *User) Expand(oDataExpand string) *User {
-	user.modifiers.AddExpand(oDataExpand)
-	return user
 }
 
 // Get gets this user data object

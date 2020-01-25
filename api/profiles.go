@@ -7,6 +7,8 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
+//go:generate ggen -ent Profiles -conf
+
 // Profiles  represent SharePoint User Profiles API queryable collection struct
 // Always use NewProfiles constructor instead of &Profiles{}
 type Profiles struct {
@@ -76,29 +78,6 @@ func NewProfiles(client *gosip.SPClient, endpoint string, config *RequestConfig)
 		modifiers: NewODataMods(),
 	}
 }
-
-// // ToURL gets endpoint with modificators raw URL
-// func (profiles *Profiles) ToURL() string {
-// 	return toURL(profiles.endpoint, profiles.modifiers)
-// }
-
-// Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (profiles *Profiles) Conf(config *RequestConfig) *Profiles {
-	profiles.config = config
-	return profiles
-}
-
-// // Select adds $select OData modifier
-// func (profiles *Profiles) Select(oDataSelect string) *Profiles {
-// 	profiles.modifiers.AddSelect(oDataSelect)
-// 	return profiles
-// }
-
-// // Expand adds $expand OData modifier
-// func (profiles *Profiles) Expand(oDataExpand string) *Profiles {
-// 	profiles.modifiers.AddExpand(oDataExpand)
-// 	return profiles
-// }
 
 // GetMyProperties gets current context user profile properties
 func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {
