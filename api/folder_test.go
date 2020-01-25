@@ -14,14 +14,6 @@ func TestFolder(t *testing.T) {
 	newFolderName := uuid.New().String()
 	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 
-	t.Run("Modifiers", func(t *testing.T) {
-		folder := web.GetFolder(rootFolderURI)
-		mods := folder.Select("*").Expand("*").modifiers
-		if mods == nil || len(mods.mods) != 2 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("Add", func(t *testing.T) {
 		if _, err := web.GetFolder(rootFolderURI).Folders().Add(newFolderName); err != nil {
 			t.Error(err)

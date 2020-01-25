@@ -25,14 +25,6 @@ func TestFieldLinks(t *testing.T) {
 	}
 	ctID = ctResp.Data().ID // content type ID can't be set in REST API https://github.com/pnp/pnpjs/issues/457
 
-	t.Run("Modifiers", func(t *testing.T) {
-		fl := web.ContentTypes().GetByID(ctID).FieldLinks()
-		mods := fl.Select("*").Filter("*").Top(1).modifiers
-		if mods == nil || len(mods.mods) != 3 {
-			t.Error("wrong number of modifiers")
-		}
-	})
-
 	t.Run("Get", func(t *testing.T) {
 		resp, err := web.ContentTypes().GetByID(ctID).FieldLinks().Get()
 		if err != nil {

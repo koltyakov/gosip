@@ -32,14 +32,6 @@ func TestProperties(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		props := sp.Web().AllProps()
-		mods := props.Select("*").Expand("*").modifiers
-		if mods == nil || len(mods.mods) != 2 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("Get", func(t *testing.T) {
 		if envCode == "2013" {
 			t.Skip("is not supported with SP 2013")

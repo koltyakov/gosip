@@ -30,14 +30,6 @@ func TestUsers(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		us := sp.Web().SiteUsers()
-		mods := us.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
-		if mods == nil || len(mods.mods) != 5 {
-			t.Error("wrong number of modifiers")
-		}
-	})
-
 	t.Run("GetUsers", func(t *testing.T) {
 		data, err := users.Select("Id").Top(5).Get()
 		if err != nil {

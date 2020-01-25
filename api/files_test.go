@@ -62,14 +62,6 @@ func TestFiles(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		files := web.GetFolder(newFolderURI).Files()
-		mods := files.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
-		if mods == nil || len(mods.mods) != 5 {
-			t.Error("wrong number of modifiers")
-		}
-	})
-
 	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
 		t.Error(err)
 	}

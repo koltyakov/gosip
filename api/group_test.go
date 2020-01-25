@@ -15,14 +15,6 @@ func TestGroup(t *testing.T) {
 	newGroupName := uuid.New().String()
 	group := &GroupInfo{}
 
-	t.Run("Modifiers", func(t *testing.T) {
-		g := web.AssociatedGroups().Visitors()
-		mods := g.Select("*").Expand("*").modifiers
-		if mods == nil || len(mods.mods) != 2 {
-			t.Error("wrong number of modifiers")
-		}
-	})
-
 	t.Run("Add", func(t *testing.T) {
 		data, err := web.SiteGroups().Add(newGroupName, nil)
 		if err != nil {

@@ -29,14 +29,6 @@ func TestFile(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		f := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt")
-		mods := f.Select("*").Expand("*").modifiers
-		if mods == nil || len(mods.mods) != 2 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("CheckOut", func(t *testing.T) {
 		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").CheckOut(); err != nil {
 			t.Error(err)

@@ -27,14 +27,6 @@ func TestView(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		mods := web.GetList(listURI).Views().DefaultView().
-			Select("*").Expand("*").modifiers
-		if mods == nil || len(mods.mods) != 2 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("SetViewXML", func(t *testing.T) {
 		guid := uuid.New().String()
 		meta := map[string]interface{}{

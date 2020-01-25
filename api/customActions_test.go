@@ -60,12 +60,4 @@ func TestCustomActions(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		ca := sp.Web().CustomActions()
-		mods := ca.Select("*").Filter("*").Top(1).OrderBy("*", true).modifiers
-		if mods == nil || len(mods.mods) != 4 {
-			t.Error("wrong number of modifiers")
-		}
-	})
-
 }

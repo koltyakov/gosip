@@ -33,14 +33,6 @@ func TestWebs(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		ws := sp.Web().Webs()
-		mods := ws.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
-		if mods == nil || len(mods.mods) != 5 {
-			t.Error("wrong number of modifiers")
-		}
-	})
-
 	t.Run("AddWeb", func(t *testing.T) {
 		if !heavyTests {
 			t.Skip("setup SPAPI_HEAVY_TESTS env var to \"true\" to run this test")

@@ -10,6 +10,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/koltyakov/gosip"
 )
 
 func TestConf(t *testing.T) {
@@ -21,6 +23,115 @@ func TestConf(t *testing.T) {
 		"verbose":         HeadersPresets.Verbose,
 	}
 
+	apiConstructors := getAllConstructors(spClient)
+
+	withNoContMethod := []string{}
+
+	for key, obj := range apiConstructors {
+		method := reflect.ValueOf(obj).MethodByName("Conf")
+		if method.IsValid() {
+			t.Run(strings.Replace(fmt.Sprintf("Conf/%T", obj), "*api.", "", 1), func(t *testing.T) {
+				for key, preset := range hs {
+					config := method.
+						Call([]reflect.Value{reflect.ValueOf(preset)})[0].
+						Elem().
+						FieldByName("config")
+					if fmt.Sprintf("%+v", config) != fmt.Sprintf("%+v", preset) {
+						t.Errorf("can't config %v", key)
+					}
+				}
+			})
+		} else {
+			withNoContMethod = append(withNoContMethod, key)
+		}
+	}
+
+	if len(withNoContMethod) > 0 {
+		t.Logf("the following constructors don't contain Conf method, but this is OK: %v\n", withNoContMethod)
+	}
+
+	missedConstructors := []string{}
+	for _, constructor := range getAstConstructors() {
+		found := false
+		for key := range apiConstructors {
+			if key == strings.Replace(constructor, "New", "", 1) {
+				found = true
+			}
+		}
+		if !found {
+			missedConstructors = append(missedConstructors, constructor)
+		}
+	}
+	if len(missedConstructors) > 0 {
+		t.Logf("the following API constructors are not covered: %v\n", missedConstructors)
+	}
+}
+
+func TestModifiers(t *testing.T) {
+	checkClient(t)
+
+	modsMethods := []string{
+		"Select",
+		"Expand",
+		"Filter",
+		"Skip",
+		"Top",
+		"OrderBy",
+	}
+
+	apiConstructors := getAllConstructors(spClient)
+	withNoModsMethod := []string{}
+
+	for key, obj := range apiConstructors {
+		mods := []string{}
+		for _, modMethodName := range modsMethods {
+			method := reflect.ValueOf(obj).MethodByName(modMethodName)
+			if method.IsValid() {
+				mods = append(mods, modMethodName)
+			}
+		}
+
+		if len(mods) == 0 {
+			withNoModsMethod = append(withNoModsMethod, key)
+			continue
+		}
+
+		t.Run(strings.Replace(fmt.Sprintf("Mods/%T", obj), "*api.", "", 1), func(t *testing.T) {
+			for _, modMethodName := range mods {
+				switch modMethodName {
+				case "Top":
+					obj = reflect.ValueOf(obj).MethodByName(modMethodName).
+						Call([]reflect.Value{reflect.ValueOf(1)})[0].
+						Interface()
+				case "OrderBy":
+					obj = reflect.ValueOf(obj).MethodByName(modMethodName).
+						Call([]reflect.Value{
+							reflect.ValueOf("*"),
+							reflect.ValueOf(true),
+						})[0].
+						Interface()
+				default:
+					obj = reflect.ValueOf(obj).MethodByName(modMethodName).
+						Call([]reflect.Value{reflect.ValueOf("*")})[0].
+						Interface()
+				}
+			}
+
+			m := reflect.ValueOf(obj).Elem().FieldByName("modifiers")
+			if !(m.IsValid() && !m.IsNil() && m.Elem().FieldByName("mods").Len() == len(mods)) {
+				t.Error("wrong number of modifiers")
+			}
+		})
+
+	}
+
+	if len(withNoModsMethod) > 0 {
+		t.Logf("the following constructors don't contain OData modifiers methods, but this is OK: %v\n", withNoModsMethod)
+	}
+
+}
+
+func getAllConstructors(spClient *gosip.SPClient) map[string]interface{} {
 	apiConstructors := map[string]interface{}{
 		"SP":               NewSP(spClient),
 		"Web":              NewWeb(spClient, "", nil),
@@ -67,51 +178,10 @@ func TestConf(t *testing.T) {
 		"HTTPClient":       NewHTTPClient(spClient),
 		"ODataMods":        NewODataMods(),
 	}
-
-	withNoContMethod := []string{}
-
-	for key, obj := range apiConstructors {
-		method := reflect.ValueOf(obj).MethodByName("Conf")
-		if method.IsValid() {
-			t.Run(strings.Replace(fmt.Sprintf("Conf/%T", obj), "*api.", "", 1), func(t *testing.T) {
-				for key, preset := range hs {
-					config := method.
-						Call([]reflect.Value{reflect.ValueOf(preset)})[0].
-						Elem().
-						FieldByName("config")
-					if fmt.Sprintf("%+v", config) != fmt.Sprintf("%+v", preset) {
-						t.Errorf("can't config %v", key)
-					}
-				}
-			})
-		} else {
-			withNoContMethod = append(withNoContMethod, key)
-		}
-	}
-
-	if len(withNoContMethod) > 0 {
-		t.Logf("the following constructors don't contain Conf method, but this is OK: %v\n", withNoContMethod)
-	}
-
-	missedConstructors := []string{}
-	for _, constructor := range getAllConstructors() {
-		found := false
-		for key := range apiConstructors {
-			if key == strings.Replace(constructor, "New", "", 1) {
-				found = true
-			}
-		}
-		if !found {
-			missedConstructors = append(missedConstructors, constructor)
-		}
-	}
-	if len(missedConstructors) > 0 {
-		t.Logf("the following API constructors are not covered: %v\n", missedConstructors)
-	}
-
+	return apiConstructors
 }
 
-func getAllConstructors() []string {
+func getAstConstructors() []string {
 	_, filename, _, _ := runtime.Caller(1)
 	pkgPath := path.Dir(filename)
 

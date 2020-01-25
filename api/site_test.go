@@ -29,14 +29,6 @@ func TestSite(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		s := sp.Site()
-		mods := s.Select("*").Expand("*").modifiers
-		if mods == nil || len(mods.mods) != 2 {
-			t.Error("wrong number of modifiers")
-		}
-	})
-
 	t.Run("GetURL", func(t *testing.T) {
 		data, err := site.Select("Url").Conf(headers.verbose).Get()
 		if err != nil {

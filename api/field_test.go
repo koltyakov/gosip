@@ -19,17 +19,6 @@ func TestField(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Run("Modifiers", func(t *testing.T) {
-		f, err := getRandomField()
-		if err != nil {
-			t.Error(err)
-		}
-		mods := f.Select("*").Expand("*").modifiers
-		if mods == nil || len(mods.mods) != 2 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("Get", func(t *testing.T) {
 		data, err := field.Select("Id").Get()
 		if err != nil {

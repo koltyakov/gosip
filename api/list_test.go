@@ -17,14 +17,6 @@ func TestList(t *testing.T) {
 	}
 	list := web.Lists().GetByID(listInfo.ID)
 
-	t.Run("Modifiers", func(t *testing.T) {
-		list := web.Lists().GetByID(listInfo.ID)
-		mods := list.Select("*").Expand("*").modifiers
-		if mods == nil || len(mods.mods) != 2 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("GetEntityType", func(t *testing.T) {
 		entType, err := list.GetEntityType()
 		if err != nil {

@@ -24,14 +24,6 @@ func TestItems(t *testing.T) {
 	}
 	// startedOn := time.Now()
 
-	t.Run("Modifiers", func(t *testing.T) {
-		items := list.Items()
-		mods := items.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).Skip("*").modifiers
-		if mods == nil || len(mods.mods) != 6 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("AddWithoutMetadataType", func(t *testing.T) {
 		body := []byte(`{"Title":"Item"}`)
 		if _, err := list.Items().Add(body); err != nil {

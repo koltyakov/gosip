@@ -41,14 +41,6 @@ func TestContentTypes(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		cts := web.ContentTypes()
-		mods := cts.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
-		if mods == nil || len(mods.mods) != 5 {
-			t.Error("wrong number of modifiers")
-		}
-	})
-
 	t.Run("CreateUsingParentID", func(t *testing.T) {
 		guid := uuid.New().String()
 		newCTID, err := web.ContentTypes().Create(&ContentTypeCreationInfo{

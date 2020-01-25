@@ -29,14 +29,6 @@ func TestUser(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		user := sp.Web().CurrentUser()
-		mods := user.Select("*").Expand("*").modifiers
-		if mods == nil || len(mods.mods) != 2 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("GetUserInfo", func(t *testing.T) {
 		data, err := user.Get()
 		if err != nil {

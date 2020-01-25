@@ -19,14 +19,6 @@ func TestFields(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Run("Modifiers", func(t *testing.T) {
-		f := web.Fields()
-		mods := f.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
-		if mods == nil || len(mods.mods) != 5 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("GetFromWeb", func(t *testing.T) {
 		data, err := web.Fields().Top(1).Get()
 		if err != nil {

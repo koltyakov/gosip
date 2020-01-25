@@ -17,14 +17,6 @@ func TestRecycleBin(t *testing.T) {
 	}
 	list := sp.Web().Lists().GetByTitle(newListTitle)
 
-	t.Run("Modifiers", func(t *testing.T) {
-		rb := sp.Web().RecycleBin()
-		mods := rb.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
-		if mods == nil || len(mods.mods) != 5 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("Get/Site", func(t *testing.T) {
 		data, err := sp.Site().RecycleBin().Top(1).Get()
 		if err != nil {

@@ -35,14 +35,6 @@ func TestItem(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		g := list.Items()
-		mods := g.Select("*").Expand("*").Filter("*").Top(1).OrderBy("*", true).modifiers
-		if mods == nil || len(mods.mods) != 5 {
-			t.Error("wrong number of modifiers")
-		}
-	})
-
 	t.Run("Get", func(t *testing.T) {
 		item, err := list.Items().GetByID(1).Conf(HeadersPresets.Verbose).Get()
 		if err != nil {

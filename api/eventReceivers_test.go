@@ -29,12 +29,4 @@ func TestEventReceivers(t *testing.T) {
 		}
 	})
 
-	t.Run("Modifiers", func(t *testing.T) {
-		er := sp.Web().EventReceivers()
-		mods := er.Select("*").Filter("*").Top(1).OrderBy("*", true).modifiers
-		if mods == nil || len(mods.mods) != 4 {
-			t.Error("wrong number of modifiers")
-		}
-	})
-
 }

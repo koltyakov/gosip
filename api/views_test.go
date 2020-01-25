@@ -15,15 +15,6 @@ func TestViews(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Run("Modifiers", func(t *testing.T) {
-		mods := web.GetList(listURI).Views().
-			Select("*").Expand("*").Filter("*").OrderBy("*", true).
-			modifiers
-		if mods == nil || len(mods.mods) != 4 {
-			t.Error("can't add modifiers")
-		}
-	})
-
 	t.Run("Get", func(t *testing.T) {
 		data, err := web.GetList(listURI).Views().Get()
 		if err != nil {
