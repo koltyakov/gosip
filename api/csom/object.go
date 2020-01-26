@@ -32,11 +32,11 @@ func NewObject(template string) Object {
 func (o *object) String() string {
 	o.err = nil
 
-	template, err := template.New("objectPath").Parse(o.template)
-	if err != nil {
-		o.err = err
-		return o.template
-	}
+	template, _ := template.New("objectPath").Parse(o.template)
+	// if err != nil {
+	// 	o.err = err
+	// 	return o.template
+	// }
 
 	data := &struct {
 		ID       int

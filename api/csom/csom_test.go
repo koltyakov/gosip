@@ -33,3 +33,43 @@ func TestCSOMBuilder(t *testing.T) {
 		t.Error("incorrect package")
 	}
 }
+
+func TestCSOMGetObjectID(t *testing.T) {
+	b := NewBuilder()
+
+	b.AddObject(NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
+	obj := NewObject(`
+		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetFolderByServerRelativeUrl">
+			<Parameters>
+				<Parameter Type="String">/sites/site/Lists/List</Parameter>
+			</Parameters>
+		</Method>
+	`)
+	b.AddObject(obj, nil)
+
+	objID, err := b.GetObjectID(obj)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if objID != 2 {
+		t.Error("wrong object ID")
+	}
+}
+
+func TestCSOMCompileError(t *testing.T) {
+	b := NewBuilder()
+
+	b.AddObject(NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
+	b.AddObject(NewObject(`
+		<Method Id="{{.ID}}" ParentId="{{.IncorrectID}}" Name="GetFolderByServerRelativeUrl">
+			<Parameters>
+				<Parameter Type="String">/sites/site/Lists/List</Parameter>
+			</Parameters>
+		</Method>
+	`), nil)
+
+	if _, err := b.Compile(); err == nil {
+		t.Error("should throw an error")
+	}
+}

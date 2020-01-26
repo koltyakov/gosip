@@ -32,11 +32,11 @@ func NewAction(template string) Action {
 func (a *action) String() string {
 	a.err = nil
 
-	template, err := template.New("action").Parse(a.template)
-	if err != nil {
-		a.err = err
-		return a.template
-	}
+	template, _ := template.New("action").Parse(a.template)
+	// if err != nil {
+	// 	a.err = err
+	// 	return a.template
+	// }
 
 	data := &struct {
 		ID       int
