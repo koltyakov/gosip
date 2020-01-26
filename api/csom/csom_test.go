@@ -55,6 +55,13 @@ func TestCSOMGetObjectID(t *testing.T) {
 	if objID != 2 {
 		t.Error("wrong object ID")
 	}
+
+	incorrectObj := NewObject(`<Property Id="{{.ID}}" ParentId="{{.Incorrect}}" Name="Web" />`)
+	b.AddObject(incorrectObj, nil)
+
+	if _, err := b.GetObjectID(incorrectObj); err == nil {
+		t.Error("should throw an error")
+	}
 }
 
 func TestCSOMCompileError(t *testing.T) {

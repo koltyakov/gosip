@@ -28,3 +28,10 @@ if [ -f api_coverage.out ]; then
     >> coverage.txt
   rm api_coverage.out
 fi
+
+if [ -f api_util1_coverage.out ]; then
+  cat api_util1_coverage.out \
+    | egrep -v '^mode.*' \
+    >> coverage.txt
+  rm api_util1_coverage.out
+fi

@@ -43,7 +43,8 @@ steps:
     SPAUTH_CLIENTSECRET: $(ci.spo.clientsecret)
 
 - script: |
-    go test ./api/... -v -count=1 -coverprofile=api_coverage.out -covermode=atomic
+    go test ./api -v -count=1 -coverprofile=api_coverage.out -covermode=atomic
+    go test ./api/csom/... -v -count=1 -coverprofile=api_util1_coverage.out -covermode=atomic
   workingDirectory: '$(modulePath)'
   displayName: 'Run API tests'
   env:
