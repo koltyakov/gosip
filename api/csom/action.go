@@ -12,6 +12,7 @@ type Action interface {
 	GetID() int
 	SetObjectID(objectID int)
 	GetObjectID() int
+	CheckErr() error
 }
 
 type action struct {
@@ -68,4 +69,8 @@ func (a *action) SetObjectID(objectID int) {
 
 func (a *action) GetObjectID() int {
 	return a.objectID
+}
+
+func (a *action) CheckErr() error {
+	return a.err
 }

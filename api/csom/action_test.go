@@ -28,4 +28,12 @@ func TestAction(t *testing.T) {
 		}
 	})
 
+	t.Run("CheckErr", func(t *testing.T) {
+		a := NewAction(`<Query Id="{{.ID}}" ObjectPathId="{{.IncorrectID}}"></Query>`)
+		_ = a.String()
+		if a.CheckErr() == nil {
+			t.Error("should throw an error")
+		}
+	})
+
 }

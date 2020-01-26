@@ -34,4 +34,10 @@ func TestCurrent(t *testing.T) {
 		}
 	})
 
+	t.Run("CheckErr", func(t *testing.T) {
+		if c.CheckErr() != nil {
+			t.Error("should return no error")
+		}
+	})
+
 }

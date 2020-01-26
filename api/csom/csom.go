@@ -1,6 +1,7 @@
 package csom
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -67,6 +68,7 @@ func (b *builder) GetObjectID(object Object) (int, error) {
 func (b *builder) Compile() (string, error) {
 	objects := ""
 	actions := ""
+	errors := []error{}
 	for i, edge := range b.objects {
 		if i > 1 {
 			if edge.Parent.GetID() == 0 {
@@ -80,6 +82,9 @@ func (b *builder) Compile() (string, error) {
 			}
 		}
 		objects += edge.Current.String()
+		if err := edge.Current.CheckErr(); err != nil {
+			errors = append(errors, err)
+		}
 	}
 	for _, edge := range b.actions {
 		if edge.Action.GetID() == 0 {
@@ -87,6 +92,9 @@ func (b *builder) Compile() (string, error) {
 			edge.Action.SetObjectID(edge.Object.GetID())
 		}
 		actions += edge.Action.String()
+		if err := edge.Action.CheckErr(); err != nil {
+			errors = append(errors, err)
+		}
 	}
 	csomPkg := trimMultiline(`
 		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Javascript Library">
@@ -94,6 +102,16 @@ func (b *builder) Compile() (string, error) {
 			<ObjectPaths>` + objects + `</ObjectPaths>
 		</Request>
 	`)
+	if len(errors) > 0 {
+		errStr := ""
+		for i, e := range errors {
+			if i > 0 {
+				errStr += ", "
+			}
+			errStr += e.Error()
+		}
+		return csomPkg, fmt.Errorf(errStr)
+	}
 	return csomPkg, nil
 }
 

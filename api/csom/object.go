@@ -12,6 +12,7 @@ type Object interface {
 	GetID() int
 	SetParentID(parentID int)
 	GetParentID() int
+	CheckErr() error
 }
 
 type object struct {
@@ -68,4 +69,8 @@ func (o *object) SetParentID(parentID int) {
 
 func (o *object) GetParentID() int {
 	return o.parentID
+}
+
+func (o *object) CheckErr() error {
+	return o.err
 }

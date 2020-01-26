@@ -28,4 +28,12 @@ func TestObject(t *testing.T) {
 		}
 	})
 
+	t.Run("CheckErr", func(t *testing.T) {
+		o := NewObject(`<Property Id="{{.ID}}" ParentId="{{.IncorrectID}}" Name="Web" />`)
+		_ = o.String()
+		if o.CheckErr() == nil {
+			t.Error("should throw an error")
+		}
+	})
+
 }

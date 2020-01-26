@@ -17,3 +17,7 @@ func (cw *current) SetParentID(parentID int) {}
 func (cw *current) GetParentID() int {
 	return -1
 }
+
+func (cw *current) CheckErr() error {
+	return nil
+}
