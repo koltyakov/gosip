@@ -348,36 +348,3 @@ func (web *Web) RecycleBin() *RecycleBin {
 func (web *Web) ContextInfo() (*ContextInfo, error) {
 	return NewContext(web.client, web.ToURL(), web.config).Get()
 }
-
-/* Miscellaneous */
-
-func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string) ([]byte, error) {
-	data, err := web.GetFolder(currentRelativeURL).Get()
-	if err != nil {
-		splitted := strings.Split(currentRelativeURL, "/")
-		if len(splitted) == 1 {
-			return nil, err
-		}
-		splitted = splitted[0 : len(splitted)-1]
-		currentRelativeURL = strings.Join(splitted, "/")
-		return ensureFolder(web, serverRelativeURL, currentRelativeURL)
-	}
-
-	curFolders := strings.Split(currentRelativeURL, "/")
-	expFolders := strings.Split(serverRelativeURL, "/")
-
-	if len(curFolders) == len(expFolders) {
-		return data, nil
-	}
-
-	createFolders := expFolders[len(curFolders):]
-	for _, folder := range createFolders {
-		data, err = web.GetFolder(currentRelativeURL).Folders().Add(folder)
-		if err != nil {
-			return nil, err
-		}
-		currentRelativeURL += "/" + folder
-	}
-
-	return data, nil
-}

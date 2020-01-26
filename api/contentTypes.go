@@ -77,19 +77,17 @@ func (contentTypes *ContentTypes) Create(contentTypeInfo *ContentTypeCreationInf
 
 	b := csom.NewBuilder()
 	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
-	ctsObj := csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="ContentTypes" />`)
-	b.AddObject(ctsObj, nil)
+	ctsObj, _ := b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="ContentTypes" />`), nil)
 
 	parentContentTypeID := 0
 	if contentTypeInfo.ParentContentTypeID != "" {
-		pCtObj := csom.NewObject(`
+		pCtObj, _ := b.AddObject(csom.NewObject(`
 			<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetById">
 				<Parameters>
-					<Parameter Type="String">` + contentTypeInfo.ParentContentTypeID + `</Parameter>
+					<Parameter Type="String">`+contentTypeInfo.ParentContentTypeID+`</Parameter>
 				</Parameters>
 			</Method>
-		`)
-		b.AddObject(pCtObj, ctsObj)
+		`), ctsObj)
 		id, err := b.GetObjectID(pCtObj)
 		if err != nil {
 			return "", err

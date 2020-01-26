@@ -7,8 +7,8 @@ import (
 
 // Builder ...
 type Builder interface {
-	AddObject(object Object, parent Object) Builder
-	AddAction(action Action, parent Object) Builder
+	AddObject(object Object, parent Object) (Object, Object)
+	AddAction(action Action, parent Object) (Action, Object)
 	GetObjectID(object Object) (int, error)
 	Compile() (string, error)
 }
@@ -35,7 +35,7 @@ func NewBuilder() Builder {
 	return b
 }
 
-func (b *builder) AddObject(object Object, parent Object) Builder {
+func (b *builder) AddObject(object Object, parent Object) (Object, Object) {
 	if parent == nil && len(b.objects) > 0 {
 		parent = b.objects[len(b.objects)-1].Current
 	}
@@ -43,10 +43,10 @@ func (b *builder) AddObject(object Object, parent Object) Builder {
 		Current: object,
 		Parent:  parent,
 	})
-	return b
+	return object, parent
 }
 
-func (b *builder) AddAction(action Action, object Object) Builder {
+func (b *builder) AddAction(action Action, object Object) (Action, Object) {
 	if object == nil && len(b.objects) > 0 {
 		object = b.objects[len(b.objects)-1].Current
 	}
@@ -54,7 +54,7 @@ func (b *builder) AddAction(action Action, object Object) Builder {
 		Action: action,
 		Object: object,
 	})
-	return b
+	return action, object
 }
 
 func (b *builder) GetObjectID(object Object) (int, error) {

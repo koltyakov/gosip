@@ -124,8 +124,7 @@ func (properties *Properties) setWebProps(props map[string]string) error {
 
 	b := csom.NewBuilder()
 	b.AddObject(csom.NewObject(`<Identity Id="{{.ID}}" Name="`+identity+`" />`), nil)
-	propsObj := csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="AllProperties" />`)
-	b.AddObject(propsObj, nil)
+	propsObj, _ := b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="AllProperties" />`), nil)
 	for key, val := range props {
 		b.AddAction(csom.NewAction(`
 			<Method Name="SetFieldValue" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
@@ -178,8 +177,7 @@ func (properties *Properties) setFolderProps(props map[string]string) error {
 
 	b := csom.NewBuilder()
 	b.AddObject(csom.NewObject(`<Identity Id="{{.ID}}" Name="`+identity+`" />`), nil)
-	propsObj := csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Properties" />`)
-	b.AddObject(propsObj, nil)
+	propsObj, _ := b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Properties" />`), nil)
 	for key, val := range props {
 		b.AddAction(csom.NewAction(`
 			<Method Name="SetFieldValue" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
@@ -221,8 +219,7 @@ func (properties *Properties) setFileProps(props map[string]string) error {
 			</Parameters>
 		</Method>
 	`), nil)
-	propsObj := csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Properties" />`)
-	b.AddObject(propsObj, nil)
+	propsObj, _ := b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Properties" />`), nil)
 	for key, val := range props {
 		b.AddAction(csom.NewAction(`
 			<Method Name="SetFieldValue" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">

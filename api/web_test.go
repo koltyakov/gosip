@@ -98,15 +98,15 @@ func TestWeb(t *testing.T) {
 	})
 
 	t.Run("EnsureFolder", func(t *testing.T) {
-		data, err := web.GetFolder("Shared Documents").Folders().Select("Name").Get()
-		if err != nil {
-			t.Error(err)
-		}
-		for _, folder := range data.Data() {
-			if folder.Data().Name == "doc1" {
-				web.GetFolder("Shared Documents/doc1").Delete()
-			}
-		}
+		// data, err := web.GetFolder("Shared Documents").Folders().Select("Name").Get()
+		// if err != nil {
+		// 	t.Error(err)
+		// }
+		// for _, folder := range data.Data() {
+		// 	if folder.Data().Name == "doc1" {
+		// 		web.GetFolder("Shared Documents/doc1").Delete()
+		// 	}
+		// }
 		if _, err := web.EnsureFolder("Shared Documents/doc1/doc2/doc3/doc4"); err != nil {
 			t.Error(err)
 		}
@@ -127,21 +127,6 @@ func TestWeb(t *testing.T) {
 			t.Error(err)
 		}
 	})
-
-	// t.Run("Recycle", func(t *testing.T) {
-	// 	if !heavyTests {
-	// 		t.Skip("setup SPAPI_HEAVY_TESTS env var to \"true\" to run this test")
-	// 	}
-	// 	newWebGUID := uuid.New().String()
-	// 	if _, err := sp.Web().Webs().Add("CI: "+newWebGUID, "ci_"+newWebGUID, nil); err != nil {
-	// 		t.Error(err)
-	// 	}
-	// 	createdWebURL := spClient.AuthCnfg.GetSiteURL() + "/ci_" + newWebGUID
-	// 	subWeb := NewWeb(spClient, createdWebURL, nil)
-	// 	if err := subWeb.Recycle(); err != nil {
-	// 		t.Error(err)
-	// 	}
-	// })
 
 	t.Run("AvailableContentTypes", func(t *testing.T) {
 		resp, err := sp.Web().AvailableContentTypes().Get()

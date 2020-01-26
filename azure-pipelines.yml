@@ -43,13 +43,13 @@ steps:
     SPAUTH_CLIENTSECRET: $(ci.spo.clientsecret)
 
 - script: |
-    go test ./cpass/... -v -count=1 -coverprofile=cpass_coverage.out -covermode=atomic
-    go test ./api/csom/... -v -count=1 -coverprofile=csom_coverage.out -covermode=atomic
+    go test ./cpass/... -v -race -count=1 -coverprofile=cpass_coverage.out -covermode=atomic
+    go test ./api/csom/... -v -race -count=1 -coverprofile=csom_coverage.out -covermode=atomic
   workingDirectory: '$(modulePath)'
   displayName: 'Run util tests'
 
 - script: |
-    go test ./api -v -count=1 -coverprofile=api_coverage.out -covermode=atomic
+    go test ./api -v -race -count=1 -coverprofile=api_coverage.out -covermode=atomic
   workingDirectory: '$(modulePath)'
   displayName: 'Run API tests'
   env:

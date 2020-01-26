@@ -150,38 +150,34 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 	}
 
 	b := csom.NewBuilder()
-	webObj := csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`)
-	b.AddObject(webObj, nil)
+	webObj, _ := b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
 	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Fields" />`), nil)
-	fieldObj := csom.NewObject(`
+	fieldObj, _ := b.AddObject(csom.NewObject(`
 		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetByInternalNameOrTitle">
 			<Parameters>
-				<Parameter Type="String">` + name + `</Parameter>
+				<Parameter Type="String">`+name+`</Parameter>
 			</Parameters>
 		</Method>
-	`)
-	b.AddObject(fieldObj, nil)
+	`), nil)
 	fieldID, _ := b.GetObjectID(fieldObj)
 	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="ContentTypes" />`), webObj)
-	ctObj := csom.NewObject(`
+	ctObj, _ := b.AddObject(csom.NewObject(`
 		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetById">
 			<Parameters>
-				<Parameter Type="String">` + fieldLinks.contentTypeID + `</Parameter>
+				<Parameter Type="String">`+fieldLinks.contentTypeID+`</Parameter>
 			</Parameters>
 		</Method>
-	`)
-	b.AddObject(ctObj, nil)
+	`), nil)
 	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="FieldLinks" />`), nil)
-	addObj := csom.NewObject(`
+	addObj, _ := b.AddObject(csom.NewObject(`
 		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Add">
 			<Parameters>
 				<Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}">
-					<Property Name="Field" ObjectPathId="` + strconv.Itoa(fieldID) + `" />
+					<Property Name="Field" ObjectPathId="`+strconv.Itoa(fieldID)+`" />
 				</Parameter>
 			</Parameters>
 		</Method>
-	`)
-	b.AddObject(addObj, nil)
+	`), nil)
 	b.AddAction(csom.NewAction(`<ObjectIdentityQuery Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`), addObj)
 	b.AddAction(csom.NewAction(`
 		<Method Name="Update" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
