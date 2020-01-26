@@ -49,7 +49,7 @@ steps:
   displayName: 'Run util tests'
 
 - script: |
-    go test ./api -v -race -count=1 -coverprofile=api_coverage.out -covermode=atomic
+    go test ./api -v -count=1 -coverprofile=api_coverage.out -covermode=atomic
   workingDirectory: '$(modulePath)'
   displayName: 'Run API tests'
   env:

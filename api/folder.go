@@ -176,7 +176,15 @@ func (folder *Folder) ContextInfo() (*ContextInfo, error) {
 // StorageMetrics
 
 func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string) ([]byte, error) {
-	data, err := web.GetFolder(currentRelativeURL).Get()
+	headers := map[string]string{}
+	for key, val := range getConfHeaders(web.config) {
+		headers[key] = val
+	}
+	headers["X-Gosip-NoRetry"] = "true"
+	conf := &RequestConfig{
+		Headers: headers,
+	}
+	data, err := web.GetFolder(currentRelativeURL).Conf(conf).Get()
 	if err != nil {
 		splitted := strings.Split(currentRelativeURL, "/")
 		if len(splitted) == 1 {

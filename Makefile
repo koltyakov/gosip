@@ -2,11 +2,11 @@ install:
 	go get -u ./... && go mod tidy
 
 test-auth:
-	mkdir tmp
+	mkdir -p tmp
 	go test ./... -v -race -count=1 -coverprofile=./tmp/auth_coverage.out
 
 test-api:
-	mkdir tmp
+	mkdir -p tmp
 	SPAUTH_ENVCODE=spo go test ./api/csom -v -race -count=1 -coverprofile=./tmp/csom_coverage.out
 	SPAUTH_ENVCODE=spo go test ./api -v -race -count=1 -coverprofile=./tmp/api_coverage.out
 
