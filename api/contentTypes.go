@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/koltyakov/gosip"
+	"github.com/koltyakov/gosip/api/csom"
 )
 
 //go:generate ggen -ent ContentTypes -item ContentType -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
@@ -73,54 +74,60 @@ func (contentTypes *ContentTypes) Add(body []byte) (ContentTypeResp, error) {
 // Create adds Content Type using CSOM polyfill as REST's Add method is limited (https://github.com/pnp/pnpjs/issues/457)
 func (contentTypes *ContentTypes) Create(contentTypeInfo *ContentTypeCreationInfo) (string, error) {
 	sp := NewHTTPClient(contentTypes.client)
-	objectPaths := TrimMultiline(`
-		<StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" />
-		<Property Id="2" ParentId="0" Name="Web" />
-		<Property Id="4" ParentId="2" Name="ContentTypes" />
-	`)
-	nextIndex := 6
+
+	b := csom.NewBuilder()
+	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
+	ctsObj := csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="ContentTypes" />`)
+	b.AddObject(ctsObj, nil)
+
+	parentContentTypeID := 0
 	if contentTypeInfo.ParentContentTypeID != "" {
-		objectPaths = TrimMultiline(objectPaths + `
-			<Method Id="6" ParentId="4" Name="GetById">
+		pCtObj := csom.NewObject(`
+			<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetById">
 				<Parameters>
 					<Parameter Type="String">` + contentTypeInfo.ParentContentTypeID + `</Parameter>
 				</Parameters>
 			</Method>
 		`)
-		nextIndex = 8
+		b.AddObject(pCtObj, ctsObj)
+		id, err := b.GetObjectID(pCtObj)
+		if err != nil {
+			return "", err
+		}
+		parentContentTypeID = id
 	}
+
 	ctIDProp := `<Property Name="Id" Type="Null" />`
 	if contentTypeInfo.ID != "" {
 		ctIDProp = `<Property Name="Id" Type="String">` + contentTypeInfo.ID + `</Property>`
 	}
 	pctIDProp := `<Property Name="ParentContentType" Type="Null" />`
 	if contentTypeInfo.ParentContentTypeID != "" {
-		pctIDProp = `<Property Name="ParentContentType" ObjectPathId="6" />`
+		pctIDProp = `<Property Name="ParentContentType" ObjectPathId="` + strconv.Itoa(parentContentTypeID) + `" />`
 	}
-	objectPaths = TrimMultiline(objectPaths + `
-		<Method Id="` + strconv.Itoa(nextIndex) + `" ParentId="4" Name="Add">
+
+	b.AddObject(csom.NewObject(`
+		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Add">
 			<Parameters>
 				<Parameter TypeId="{168f3091-4554-4f14-8866-b20d48e45b54}">
-					` + ctIDProp + `
-					<Property Name="Name" Type="String">` + contentTypeInfo.Name + `</Property>
-					<Property Name="Group" Type="String">` + contentTypeInfo.Group + `</Property>
-					<Property Name="Description" Type="String">` + contentTypeInfo.Description + `</Property>
-					` + pctIDProp + `
+					`+ctIDProp+`
+					<Property Name="Name" Type="String">`+contentTypeInfo.Name+`</Property>
+					<Property Name="Group" Type="String">`+contentTypeInfo.Group+`</Property>
+					<Property Name="Description" Type="String">`+contentTypeInfo.Description+`</Property>
+					`+pctIDProp+`
 				</Parameter>
 			</Parameters>
 		</Method>
-	`)
-	body := []byte(TrimMultiline(`
-		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Javascript Library">
-			<Actions>
-				<ObjectIdentityQuery Id="` + strconv.Itoa(nextIndex+2) + `" ObjectPathId="` + strconv.Itoa(nextIndex) + `" />
-			</Actions>
-			<ObjectPaths>
-				` + objectPaths + `
-			</ObjectPaths>
-		</Request>
-	`))
-	resp, err := sp.ProcessQuery(contentTypes.client.AuthCnfg.GetSiteURL(), body)
+	`), ctsObj)
+
+	b.AddAction(csom.NewAction(`<ObjectIdentityQuery Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`), nil)
+
+	csomPkg, err := b.Compile()
+	if err != nil {
+		return "", nil
+	}
+
+	resp, err := sp.ProcessQuery(contentTypes.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
 	if err != nil {
 		return "", nil
 	}

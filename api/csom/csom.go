@@ -8,6 +8,7 @@ import (
 type Builder interface {
 	AddObject(object Object, parent Object) Builder
 	AddAction(action Action, parent Object) Builder
+	GetObjectID(object Object) (int, error)
 	Compile() (string, error)
 }
 
@@ -53,6 +54,14 @@ func (b *builder) AddAction(action Action, object Object) Builder {
 		Object: object,
 	})
 	return b
+}
+
+func (b *builder) GetObjectID(object Object) (int, error) {
+	_, err := b.Compile()
+	if err != nil {
+		return object.GetID(), err
+	}
+	return object.GetID(), nil
 }
 
 func (b *builder) Compile() (string, error) {
