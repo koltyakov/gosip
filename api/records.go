@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/koltyakov/gosip/api/csom"
 )
 
 // Records represents SharePoint Item Records via REST+CSOM API object struct
@@ -83,118 +85,9 @@ func (records *Records) Undeclare() error {
 	return err
 }
 
-// func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) ([]byte, error) {
-// 	sp := NewHTTPClient(item.client)
-// 	site := NewSP(item.client).Site().Conf(item.config)
-// 	list := item.ParentList()
-// 	web := item.ParentList().ParentWeb()
-
-// 	var siteR SiteResp // Find a way to reduce requests number
-// 	var webR WebResp
-// 	var listR ListResp
-// 	var itemR ItemResp
-// 	errs := []error{}
-
-// 	var wg sync.WaitGroup
-
-// 	wg.Add(1)
-// 	go func() {
-// 		siteRR, err := site.Select("Id").Get()
-// 		if err != nil {
-// 			errs = append(errs, err)
-// 		}
-// 		siteR = siteRR
-// 		wg.Done()
-// 	}()
-
-// 	wg.Add(1)
-// 	go func() {
-// 		webRR, err := web.Select("Id").Get()
-// 		if err != nil {
-// 			errs = append(errs, err)
-// 		}
-// 		webR = webRR
-// 		wg.Done()
-// 	}()
-
-// 	wg.Add(1)
-// 	go func() {
-// 		listRR, err := list.Select("Id").Get()
-// 		if err != nil {
-// 			errs = append(errs, err)
-// 		}
-// 		listR = listRR
-// 		wg.Done()
-// 	}()
-
-// 	wg.Add(1)
-// 	go func() {
-// 		itemRR, err := item.Select("Id").Get()
-// 		if err != nil {
-// 			errs = append(errs, err)
-// 		}
-// 		itemR = itemRR
-// 		wg.Done()
-// 	}()
-
-// 	wg.Wait()
-
-// 	if len(errs) > 0 {
-// 		err := fmt.Errorf("")
-// 		for _, e := range errs {
-// 			if len(err.Error()) > 0 {
-// 				err = fmt.Errorf("%s; ", err)
-// 			}
-// 			err = fmt.Errorf("%s %s", err, e)
-// 		}
-// 		return nil, err
-// 	}
-
-// 	timeParameter := ""
-// 	if date != nil && csomStaticMethod == "DeclareItemAsRecordWithDeclarationDate" {
-// 		timeParameter = fmt.Sprintf(`<Parameter Type="DateTime">%s</Parameter>`, date.Format(time.RFC3339))
-// 	}
-// 	body := []byte(trimMultiline(`
-// 		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Gosip">
-// 			<Actions>
-// 				<StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="` + csomStaticMethod + `" Id="6">
-// 					<Parameters>
-// 						<Parameter ObjectPathId="5" />
-// 						` + timeParameter + `
-// 					</Parameters>
-// 				</StaticMethod>
-// 			</Actions>
-// 			<ObjectPaths>
-// 				<Identity Id="2" Name="740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:` + siteR.Data().ID + `:web:` + webR.Data().ID + `" />
-// 				<Property Id="3" ParentId="2" Name="Lists" />
-// 				<Method Id="4" ParentId="3" Name="GetById">
-// 					<Parameters>
-// 						<Parameter Type="String">` + listR.Data().ID + `</Parameter>
-// 					</Parameters>
-// 				</Method>
-// 				<Method Id="5" ParentId="4" Name="GetItemById">
-// 					<Parameters>
-// 						<Parameter Type="Number">` + strconv.Itoa(itemR.Data().ID) + `</Parameter>
-// 					</Parameters>
-// 				</Method>
-// 			</ObjectPaths>
-// 		</Request>
-// 	`))
-// 	jsomResp, err := sp.ProcessQuery(item.client.AuthCnfg.GetSiteURL(), body)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return jsomResp, nil
-// }
-
 // csomItemRecordMethod conscructs CSOM API process query to cover missed REST API functionality
 func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) ([]byte, error) {
 	sp := NewHTTPClient(item.client)
-	site := NewSP(item.client).Site().Conf(item.config)
-	siteR, err := site.Select("Id").Get()
-	if err != nil {
-		return nil, err
-	}
 	itemR, err := item.Select("Id").Get()
 	if err != nil {
 		return nil, err
@@ -204,42 +97,44 @@ func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) 
 	if err != nil {
 		return nil, err
 	}
-	web := item.ParentList().ParentWeb()
-	webR, err := web.Select("Id").Get()
-	if err != nil {
-		return nil, err
-	}
 	timeParameter := ""
 	if date != nil && csomStaticMethod == "DeclareItemAsRecordWithDeclarationDate" {
 		timeParameter = fmt.Sprintf(`<Parameter Type="DateTime">%s</Parameter>`, date.Format(time.RFC3339))
 	}
-	body := []byte(TrimMultiline(`
-		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Gosip">
-			<Actions>
-				<StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="` + csomStaticMethod + `" Id="6">
-					<Parameters>
-						<Parameter ObjectPathId="5" />
-						` + timeParameter + `
-					</Parameters>
-				</StaticMethod>
-			</Actions>
-			<ObjectPaths>
-				<Identity Id="2" Name="740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:` + siteR.Data().ID + `:web:` + webR.Data().ID + `" />
-				<Property Id="3" ParentId="2" Name="Lists" />
-				<Method Id="4" ParentId="3" Name="GetById">
-					<Parameters>
-						<Parameter Type="String">` + listR.Data().ID + `</Parameter>
-					</Parameters>
-				</Method>
-				<Method Id="5" ParentId="4" Name="GetItemById">
-					<Parameters>
-						<Parameter Type="Number">` + strconv.Itoa(itemR.Data().ID) + `</Parameter>
-					</Parameters>
-				</Method>
-			</ObjectPaths>
-		</Request>
-	`))
-	jsomResp, err := sp.ProcessQuery(item.client.AuthCnfg.GetSiteURL(), body)
+
+	b := csom.NewBuilder()
+
+	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
+	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Lists" />`), nil)
+	b.AddObject(csom.NewObject(`
+		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetById">
+			<Parameters>
+				<Parameter Type="String">`+listR.Data().ID+`</Parameter>
+			</Parameters>
+		</Method>
+	`), nil)
+	b.AddObject(csom.NewObject(`
+		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetItemById">
+			<Parameters>
+				<Parameter Type="Number">`+strconv.Itoa(itemR.Data().ID)+`</Parameter>
+			</Parameters>
+		</Method>
+	`), nil)
+	b.AddAction(csom.NewAction(`
+		<StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="`+csomStaticMethod+`" Id="{{.ID}}">
+			<Parameters>
+				<Parameter ObjectPathId="{{.ObjectID}}" />
+				`+timeParameter+`
+			</Parameters>
+		</StaticMethod>
+	`), nil)
+
+	csomPkg, err := b.Compile()
+	if err != nil {
+		return nil, err
+	}
+
+	jsomResp, err := sp.ProcessQuery(item.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
 	if err != nil {
 		return nil, err
 	}
