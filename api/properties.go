@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
 
 	"github.com/koltyakov/gosip"
+	"github.com/koltyakov/gosip/api/csom"
 )
 
 //go:generate ggen -ent Properties -conf -coll -mods Select,Expand
@@ -122,33 +122,28 @@ func (properties *Properties) setWebProps(props map[string]string) error {
 
 	identity := fmt.Sprintf("740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:%s:web:%s", siteR.Data().ID, webR.Data().ID)
 
-	methods := ""
-	csomIndex := 9
+	b := csom.NewBuilder()
+	b.AddObject(csom.NewObject(`<Identity Id="{{.ID}}" Name="`+identity+`" />`), nil)
+	propsObj := csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="AllProperties" />`)
+	b.AddObject(propsObj, nil)
 	for key, val := range props {
-		methods += TrimMultiline(`
-			<Method Name="SetFieldValue" Id="` + strconv.Itoa(csomIndex) + `" ObjectPathId="4">
+		b.AddAction(csom.NewAction(`
+			<Method Name="SetFieldValue" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
 				<Parameters>
-					<Parameter Type="String">` + key + `</Parameter>
-					<Parameter Type="String">` + val + `</Parameter>
+					<Parameter Type="String">`+key+`</Parameter>
+					<Parameter Type="String">`+val+`</Parameter>
 				</Parameters>
 			</Method>
-		`)
-		csomIndex++
+		`), propsObj)
 	}
+
+	csomPkg, err := b.Compile()
+	if err != nil {
+		return err
+	}
+
 	sp := NewHTTPClient(properties.client)
-	body := []byte(TrimMultiline(`
-		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Gosip">
-			<Actions>
-				` + methods + `
-				<Method Name="Update" Id="` + strconv.Itoa(csomIndex) + `" ObjectPathId="2" />
-			</Actions>
-			<ObjectPaths>
-				<Identity Id="2" Name="` + identity + `" />
-				<Property Id="4" ParentId="2" Name="AllProperties" />
-			</ObjectPaths>
-		</Request>
-	`))
-	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), body)
+	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err
@@ -181,33 +176,28 @@ func (properties *Properties) setFolderProps(props map[string]string) error {
 	}
 	identity = fmt.Sprintf("7394289f-308a-9000-9495-3d03f105ec57|%s:folder:%s", identity, folderR.Data().UniqueID)
 
-	methods := ""
-	csomIndex := 9
+	b := csom.NewBuilder()
+	b.AddObject(csom.NewObject(`<Identity Id="{{.ID}}" Name="`+identity+`" />`), nil)
+	propsObj := csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Properties" />`)
+	b.AddObject(propsObj, nil)
 	for key, val := range props {
-		methods += TrimMultiline(`
-			<Method Name="SetFieldValue" Id="` + strconv.Itoa(csomIndex) + `" ObjectPathId="4">
+		b.AddAction(csom.NewAction(`
+			<Method Name="SetFieldValue" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
 				<Parameters>
-					<Parameter Type="String">` + key + `</Parameter>
-					<Parameter Type="String">` + val + `</Parameter>
+					<Parameter Type="String">`+key+`</Parameter>
+					<Parameter Type="String">`+val+`</Parameter>
 				</Parameters>
 			</Method>
-		`)
-		csomIndex++
+		`), propsObj)
 	}
+
+	csomPkg, err := b.Compile()
+	if err != nil {
+		return err
+	}
+
 	sp := NewHTTPClient(properties.client)
-	body := []byte(TrimMultiline(`
-		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Gosip">
-			<Actions>
-				` + methods + `
-				<Method Name="Update" Id="` + strconv.Itoa(csomIndex) + `" ObjectPathId="2" />
-			</Actions>
-			<ObjectPaths>
-				<Identity Id="2" Name="` + identity + `" />
-				<Property Id="4" ParentId="2" Name="Properties" />
-			</ObjectPaths>
-		</Request>
-	`))
-	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), body)
+	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err
@@ -222,39 +212,35 @@ func (properties *Properties) setFileProps(props map[string]string) error {
 		return err
 	}
 
-	methods := ""
-	csomIndex := 24
+	b := csom.NewBuilder()
+	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
+	b.AddObject(csom.NewObject(`
+		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetFileById">
+			<Parameters>
+				<Parameter Type="String">`+fileR.Data().UniqueID+`</Parameter>
+			</Parameters>
+		</Method>
+	`), nil)
+	propsObj := csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Properties" />`)
+	b.AddObject(propsObj, nil)
 	for key, val := range props {
-		methods += TrimMultiline(`
-			<Method Name="SetFieldValue" Id="` + strconv.Itoa(csomIndex) + `" ObjectPathId="23">
+		b.AddAction(csom.NewAction(`
+			<Method Name="SetFieldValue" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
 				<Parameters>
-					<Parameter Type="String">` + key + `</Parameter>
-					<Parameter Type="String">` + val + `</Parameter>
+					<Parameter Type="String">`+key+`</Parameter>
+					<Parameter Type="String">`+val+`</Parameter>
 				</Parameters>
 			</Method>
-		`)
-		csomIndex++
+		`), propsObj)
 	}
+
+	csomPkg, err := b.Compile()
+	if err != nil {
+		return err
+	}
+
 	sp := NewHTTPClient(properties.client)
-	body := []byte(TrimMultiline(`
-		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Gosip">
-			<Actions>
-				` + methods + `
-				<Method Name="Update" Id="` + strconv.Itoa(csomIndex) + `" ObjectPathId="21" />
-			</Actions>
-			<ObjectPaths>
-				<StaticProperty Id="7" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" />
-				<Property Id="9" ParentId="7" Name="Web" />
-				<Method Id="21" ParentId="9" Name="GetFileById">
-					<Parameters>
-						<Parameter Type="String">` + fileR.Data().UniqueID + `</Parameter>
-					</Parameters>
-				</Method>
-				<Property Id="23" ParentId="21" Name="Properties" />
-			</ObjectPaths>
-		</Request>
-	`))
-	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), body)
+	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err
