@@ -3,8 +3,10 @@ package api
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 
 	"github.com/koltyakov/gosip"
+	"github.com/koltyakov/gosip/api/csom"
 )
 
 //go:generate ggen -ent FieldLinks -item FieldLink -conf -coll -mods Select,Filter,Top -helpers Data,Normalized
@@ -147,45 +149,55 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 		}
 	}
 
-	body := []byte(TrimMultiline(`
-		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Javascript Library">
-			<Actions>
-				<ObjectIdentityQuery Id="16" ObjectPathId="14" />
-				<Method Name="Update" Id="17" ObjectPathId="10">
-					<Parameters>
-						<Parameter Type="Boolean">false</Parameter>
-					</Parameters>
-				</Method>
-			</Actions>
-			<ObjectPaths>
-				<StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" />
-				<Property Id="2" ParentId="0" Name="Web" />
-				<Property Id="4" ParentId="2" Name="Fields" />
-				<Method Id="6" ParentId="4" Name="GetByInternalNameOrTitle">
-					<Parameters>
-						<Parameter Type="String">` + name + `</Parameter>
-					</Parameters>
-				</Method>
-				<Property Id="8" ParentId="2" Name="ContentTypes" />
-				<Method Id="10" ParentId="8" Name="GetById">
-					<Parameters>
-						<Parameter Type="String">` + fieldLinks.contentTypeID + `</Parameter>
-					</Parameters>
-				</Method>
-				<Property Id="12" ParentId="10" Name="FieldLinks" />
-				<Method Id="14" ParentId="12" Name="Add">
-					<Parameters>
-						<Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}">
-							<Property Name="Field" ObjectPathId="6" />
-						</Parameter>
-					</Parameters>
-				</Method>
-			</ObjectPaths>
-		</Request>
-	`))
+	b := csom.NewBuilder()
+	webObj := csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`)
+	b.AddObject(webObj, nil)
+	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Fields" />`), nil)
+	fieldObj := csom.NewObject(`
+		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetByInternalNameOrTitle">
+			<Parameters>
+				<Parameter Type="String">` + name + `</Parameter>
+			</Parameters>
+		</Method>
+	`)
+	b.AddObject(fieldObj, nil)
+	fieldID, _ := b.GetObjectID(fieldObj)
+	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="ContentTypes" />`), webObj)
+	ctObj := csom.NewObject(`
+		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetById">
+			<Parameters>
+				<Parameter Type="String">` + fieldLinks.contentTypeID + `</Parameter>
+			</Parameters>
+		</Method>
+	`)
+	b.AddObject(ctObj, nil)
+	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="FieldLinks" />`), nil)
+	addObj := csom.NewObject(`
+		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Add">
+			<Parameters>
+				<Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}">
+					<Property Name="Field" ObjectPathId="` + strconv.Itoa(fieldID) + `" />
+				</Parameter>
+			</Parameters>
+		</Method>
+	`)
+	b.AddObject(addObj, nil)
+	b.AddAction(csom.NewAction(`<ObjectIdentityQuery Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`), addObj)
+	b.AddAction(csom.NewAction(`
+		<Method Name="Update" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
+			<Parameters>
+				<Parameter Type="Boolean">false</Parameter>
+			</Parameters>
+		</Method>
+	`), ctObj)
+
+	csomPkg, err := b.Compile()
+	if err != nil {
+		return "", err
+	}
 
 	sp := NewHTTPClient(fieldLinks.client)
-	resp, err := sp.ProcessQuery(fieldLinks.client.AuthCnfg.GetSiteURL(), body)
+	resp, err := sp.ProcessQuery(fieldLinks.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
 	if err != nil {
 		return "", err
 	}
@@ -195,17 +207,3 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 
 	return fieldLinkID, nil
 }
-
-// /* Response helpers */
-
-// // Data : to get typed data
-// func (fieldLinksResp *FieldLinksResp) Data() []*FieldLinkInfo {
-// 	collection, _ := normalizeODataCollection(*fieldLinksResp)
-// 	resFieldLinks := []*FieldLinkInfo{}
-// 	for _, f := range collection {
-// 		linkInfo := &FieldLinkInfo{}
-// 		json.Unmarshal(f, &linkInfo)
-// 		resFieldLinks = append(resFieldLinks, linkInfo)
-// 	}
-// 	return resFieldLinks
-// }
