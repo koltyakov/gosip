@@ -29,9 +29,18 @@ if [ -f api_coverage.out ]; then
   rm api_coverage.out
 fi
 
+# Cpass
 if [ -f api_util1_coverage.out ]; then
   cat api_util1_coverage.out \
     | egrep -v '^mode.*' \
     >> coverage.txt
   rm api_util1_coverage.out
+fi
+
+# CSOM
+if [ -f api_util2_coverage.out ]; then
+  cat api_util2_coverage.out \
+    | egrep -v '^mode.*' \
+    >> coverage.txt
+  rm api_util2_coverage.out
 fi

@@ -32,7 +32,7 @@ steps:
   displayName: 'Get dependencies'
 
 - script: |
-    go test ./... -race -coverprofile=auth_coverage.out -covermode=atomic
+    go test ./auth/... -race -coverprofile=auth_coverage.out -covermode=atomic
   workingDirectory: '$(modulePath)'
   displayName: 'Run auth tests'
   env:
@@ -44,7 +44,8 @@ steps:
 
 - script: |
     go test ./api -v -count=1 -coverprofile=api_coverage.out -covermode=atomic
-    go test ./api/csom/... -v -count=1 -coverprofile=api_util1_coverage.out -covermode=atomic
+    go test ./cpass/... -v -count=1 -coverprofile=api_util1_coverage.out -covermode=atomic
+    go test ./api/csom/... -v -count=1 -coverprofile=api_util2_coverage.out -covermode=atomic
   workingDirectory: '$(modulePath)'
   displayName: 'Run API tests'
   env:
