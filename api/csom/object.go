@@ -5,7 +5,7 @@ import (
 	"text/template"
 )
 
-// Object ...
+// Object CSOM XML object path node builder interface
 type Object interface {
 	String() string
 	SetID(id int)
@@ -22,7 +22,7 @@ type object struct {
 	err      error
 }
 
-// NewObject ...
+// NewObject creates CSOM XML object path node builder instance
 func NewObject(template string) Object {
 	o := &object{}
 	o.template = template

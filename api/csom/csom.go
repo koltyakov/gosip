@@ -1,3 +1,4 @@
+// Package csom helps building CSOM XML requests
 package csom
 
 import (
@@ -5,12 +6,12 @@ import (
 	"strings"
 )
 
-// Builder ...
+// Builder CSOM packages builder interface
 type Builder interface {
-	AddObject(object Object, parent Object) (Object, Object)
-	AddAction(action Action, parent Object) (Action, Object)
-	GetObjectID(object Object) (int, error)
-	Compile() (string, error)
+	AddObject(object Object, parent Object) (Object, Object) // adds ObjectPath node to CSOM XML package
+	AddAction(action Action, parent Object) (Action, Object) // adds Action node to CSOM XML package
+	GetObjectID(object Object) (int, error)                  // gets provided object's ID, the object should be a pointer to already added ObjectPath node
+	Compile() (string, error)                                // compiles CSOM XML package
 }
 
 type builder struct {
@@ -28,13 +29,14 @@ type actionEdge struct {
 	Object Object
 }
 
-// NewBuilder ...
+// NewBuilder creates CSOM builder instance
 func NewBuilder() Builder {
 	b := &builder{}
 	b.AddObject(&current{}, nil)
 	return b
 }
 
+// AddObject adds ObjectPath node to CSOM XML package
 func (b *builder) AddObject(object Object, parent Object) (Object, Object) {
 	if parent == nil && len(b.objects) > 0 {
 		parent = b.objects[len(b.objects)-1].Current
@@ -46,6 +48,7 @@ func (b *builder) AddObject(object Object, parent Object) (Object, Object) {
 	return object, parent
 }
 
+// AddAction adds Action node to CSOM XML package
 func (b *builder) AddAction(action Action, object Object) (Action, Object) {
 	if object == nil && len(b.objects) > 0 {
 		object = b.objects[len(b.objects)-1].Current
@@ -57,6 +60,7 @@ func (b *builder) AddAction(action Action, object Object) (Action, Object) {
 	return action, object
 }
 
+// GetObjectID gets provided object's ID, the object should be a pointer to already added ObjectPath node
 func (b *builder) GetObjectID(object Object) (int, error) {
 	_, err := b.Compile()
 	if err != nil {
@@ -65,6 +69,7 @@ func (b *builder) GetObjectID(object Object) (int, error) {
 	return object.GetID(), nil
 }
 
+// Compile compiles CSOM XML package
 func (b *builder) Compile() (string, error) {
 	objects := ""
 	actions := ""
@@ -115,6 +120,7 @@ func (b *builder) Compile() (string, error) {
 	return csomPkg, nil
 }
 
+// nextObjectID calculates the ID for the next object
 func (b *builder) nextObjectID() int {
 	nextID := 0
 	for _, edge := range b.objects {
@@ -128,6 +134,7 @@ func (b *builder) nextObjectID() int {
 	return nextID
 }
 
+// nextActionID calculates the ID for the next action
 func (b *builder) nextActionID() int {
 	nextID := b.nextObjectID()
 	for _, edge := range b.actions {
@@ -138,6 +145,7 @@ func (b *builder) nextActionID() int {
 	return nextID
 }
 
+// trimMultiline trims multiline package
 func trimMultiline(multi string) string {
 	res := ""
 	for _, line := range strings.Split(multi, "\n") {

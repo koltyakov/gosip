@@ -5,7 +5,7 @@ import (
 	"text/template"
 )
 
-// Action ...
+// Action CSOM XML action node builder interface
 type Action interface {
 	String() string
 	SetID(id int)
@@ -22,7 +22,7 @@ type action struct {
 	err      error
 }
 
-// NewAction ...
+// NewAction creates CSOM XML action node builder instance
 func NewAction(template string) Action {
 	a := &action{}
 	a.template = template
