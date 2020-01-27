@@ -15,6 +15,7 @@ import (
 )
 
 func TestConf(t *testing.T) {
+	t.Parallel()
 	checkClient(t)
 
 	hs := map[string]*RequestConfig{

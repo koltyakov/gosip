@@ -6,6 +6,7 @@ import (
 )
 
 func TestOData(t *testing.T) {
+	t.Parallel()
 	checkClient(t)
 
 	t.Run("constructor", func(t *testing.T) {

@@ -6,6 +6,7 @@ import (
 )
 
 func TestHttp(t *testing.T) {
+	t.Parallel()
 	checkClient(t)
 
 	t.Run("CSOMErrorHandling", func(t *testing.T) {

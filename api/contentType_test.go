@@ -12,6 +12,7 @@ import (
 var ctID = ""
 
 func TestContentType(t *testing.T) {
+	t.Parallel()
 	checkClient(t)
 
 	web := NewSP(spClient).Web()

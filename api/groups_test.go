@@ -8,6 +8,7 @@ import (
 )
 
 func TestGroups(t *testing.T) {
+	t.Parallel()
 	checkClient(t)
 
 	sp := NewSP(spClient)

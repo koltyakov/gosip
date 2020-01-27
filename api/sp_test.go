@@ -5,6 +5,7 @@ import (
 )
 
 func TestSP(t *testing.T) {
+	t.Parallel()
 	checkClient(t)
 
 	t.Run("ToURL", func(t *testing.T) {

@@ -5,6 +5,7 @@ import (
 )
 
 func TestAssociatedGroups(t *testing.T) {
+	t.Parallel()
 	checkClient(t)
 
 	sp := NewSP(spClient)

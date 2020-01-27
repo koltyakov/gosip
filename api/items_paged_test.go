@@ -10,6 +10,7 @@ import (
 )
 
 func TestItemsPaged(t *testing.T) {
+	t.Parallel()
 	checkClient(t)
 
 	web := NewSP(spClient).Web()

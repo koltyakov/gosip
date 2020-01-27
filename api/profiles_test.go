@@ -6,6 +6,7 @@ import (
 )
 
 func TestProfiles(t *testing.T) {
+	t.Parallel()
 	checkClient(t)
 
 	sp := NewSP(spClient)
