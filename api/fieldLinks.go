@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/api/csom"
+	"github.com/koltyakov/gosip/csom"
 )
 
 //go:generate ggen -ent FieldLinks -item FieldLink -conf -coll -mods Select,Filter,Top -helpers Data,Normalized

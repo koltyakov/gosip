@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/api/csom"
+	"github.com/koltyakov/gosip/csom"
 )
 
 //go:generate ggen -ent Properties -conf -coll -mods Select,Expand

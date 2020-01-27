@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/api/csom"
+	"github.com/koltyakov/gosip/csom"
 )
 
 //go:generate ggen -ent ContentTypes -item ContentType -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized

@@ -3,7 +3,7 @@ package api
 import (
 	"testing"
 
-	"github.com/koltyakov/gosip/api/csom"
+	"github.com/koltyakov/gosip/csom"
 )
 
 func TestCsomRequest(t *testing.T) {
