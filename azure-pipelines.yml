@@ -55,6 +55,7 @@ steps:
   env:
     SPAUTH_ENVCODE: spo
     SPAPI_HEAVY_TESTS: true
+    GOMAXPROCS: 10
     ENV_SPO_SITEURL: $(ci.spo.siteurl)
     ENV_SPO_USERNAME: $(ci.spo.username)
     ENV_SPO_PASSWORD: $(ci.spo.password)

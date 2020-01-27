@@ -128,6 +128,9 @@ func checkClient(t *testing.T) {
 	if spClient == nil {
 		t.Skip("no auth context provided")
 	}
+	if os.Getenv("GOMAXPROCS") != "" {
+		t.Parallel()
+	}
 }
 
 func setHeadersPresets() {

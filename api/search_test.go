@@ -6,7 +6,6 @@ import (
 )
 
 func TestSearch(t *testing.T) {
-	t.Parallel()
 	checkClient(t)
 
 	t.Run("Basic", func(t *testing.T) {

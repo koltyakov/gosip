@@ -11,7 +11,7 @@ import (
 )
 
 func TestUtils(t *testing.T) {
-	t.Parallel()
+
 
 	t.Run("getConfHeaders", func(t *testing.T) {
 		h := getConfHeaders(headers.verbose)

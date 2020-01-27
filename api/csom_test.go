@@ -7,7 +7,6 @@ import (
 )
 
 func TestCsomRequest(t *testing.T) {
-	t.Parallel()
 	checkClient(t)
 
 	sp := NewHTTPClient(spClient)

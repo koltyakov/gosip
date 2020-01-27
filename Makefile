@@ -12,7 +12,11 @@ test-utils:
 
 test-api:
 	mkdir -p tmp
-	SPAUTH_ENVCODE=spo go test ./api/... -v -race -count=1 -coverprofile=./tmp/api_coverage.out
+	SPAUTH_ENVCODE=spo SPAPI_HEAVY_TESTS=true go test ./api/... -v -race -count=1 -coverprofile=./tmp/api_coverage.out
+
+test-api-p:
+	mkdir -p tmp
+	SPAUTH_ENVCODE=spo SPAPI_HEAVY_TESTS=true GOMAXPROCS=10 go test ./api/... -v -race -count=1 -coverprofile=./tmp/api_coverage.out
 
 format:
 	gofmt -s -w .

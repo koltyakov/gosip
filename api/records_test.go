@@ -9,7 +9,6 @@ import (
 )
 
 func TestRecords(t *testing.T) {
-	t.Parallel()
 	checkClient(t)
 
 	if envCode == "2013" {
