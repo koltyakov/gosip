@@ -2,6 +2,7 @@ package csom
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 )
 
@@ -27,6 +28,24 @@ func NewAction(template string) Action {
 	a := &action{}
 	a.template = template
 	return a
+}
+
+// NewActionIdentityQuery creates CSOM XML action node builder instance
+func NewActionIdentityQuery() Action {
+	return NewAction(`<ObjectIdentityQuery Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`)
+}
+
+// NewActionMethod creates CSOM XML action node builder instance
+func NewActionMethod(methodName string, parameters []string) Action {
+	params := ""
+	for _, param := range parameters {
+		params += param
+	}
+	return NewAction(fmt.Sprintf(`
+		<Method Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" Name="%s">
+			<Parameters>%s</Parameters>
+		</Method>
+	`, methodName, trimMultiline(params)))
 }
 
 func (a *action) String() string {

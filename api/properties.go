@@ -123,17 +123,13 @@ func (properties *Properties) setWebProps(props map[string]string) error {
 	identity := fmt.Sprintf("740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:%s:web:%s", siteR.Data().ID, webR.Data().ID)
 
 	b := csom.NewBuilder()
-	b.AddObject(csom.NewObject(`<Identity Id="{{.ID}}" Name="`+identity+`" />`), nil)
-	propsObj, _ := b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="AllProperties" />`), nil)
+	b.AddObject(csom.NewObjectIdentity(identity), nil)
+	propsObj, _ := b.AddObject(csom.NewObjectProperty("AllProperties"), nil)
 	for key, val := range props {
-		b.AddAction(csom.NewAction(`
-			<Method Name="SetFieldValue" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
-				<Parameters>
-					<Parameter Type="String">`+key+`</Parameter>
-					<Parameter Type="String">`+val+`</Parameter>
-				</Parameters>
-			</Method>
-		`), propsObj)
+		b.AddAction(csom.NewActionMethod("SetFieldValue", []string{
+			`<Parameter Type="String">` + key + `</Parameter>`,
+			`<Parameter Type="String">` + val + `</Parameter>`,
+		}), propsObj)
 	}
 
 	csomPkg, err := b.Compile()
@@ -176,17 +172,13 @@ func (properties *Properties) setFolderProps(props map[string]string) error {
 	identity = fmt.Sprintf("7394289f-308a-9000-9495-3d03f105ec57|%s:folder:%s", identity, folderR.Data().UniqueID)
 
 	b := csom.NewBuilder()
-	b.AddObject(csom.NewObject(`<Identity Id="{{.ID}}" Name="`+identity+`" />`), nil)
-	propsObj, _ := b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Properties" />`), nil)
+	b.AddObject(csom.NewObjectIdentity(identity), nil)
+	propsObj, _ := b.AddObject(csom.NewObjectProperty("Properties"), nil)
 	for key, val := range props {
-		b.AddAction(csom.NewAction(`
-			<Method Name="SetFieldValue" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
-				<Parameters>
-					<Parameter Type="String">`+key+`</Parameter>
-					<Parameter Type="String">`+val+`</Parameter>
-				</Parameters>
-			</Method>
-		`), propsObj)
+		b.AddAction(csom.NewActionMethod("SetFieldValue", []string{
+			`<Parameter Type="String">` + key + `</Parameter>`,
+			`<Parameter Type="String">` + val + `</Parameter>`,
+		}), propsObj)
 	}
 
 	csomPkg, err := b.Compile()
@@ -211,24 +203,14 @@ func (properties *Properties) setFileProps(props map[string]string) error {
 	}
 
 	b := csom.NewBuilder()
-	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
-	b.AddObject(csom.NewObject(`
-		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetFileById">
-			<Parameters>
-				<Parameter Type="String">`+fileR.Data().UniqueID+`</Parameter>
-			</Parameters>
-		</Method>
-	`), nil)
-	propsObj, _ := b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Properties" />`), nil)
+	b.AddObject(csom.NewObjectProperty("Web"), nil)
+	b.AddObject(csom.NewObjectMethod("GetFileById", []string{`<Parameter Type="String">` + fileR.Data().UniqueID + `</Parameter>`}), nil)
+	propsObj, _ := b.AddObject(csom.NewObjectProperty("Properties"), nil)
 	for key, val := range props {
-		b.AddAction(csom.NewAction(`
-			<Method Name="SetFieldValue" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
-				<Parameters>
-					<Parameter Type="String">`+key+`</Parameter>
-					<Parameter Type="String">`+val+`</Parameter>
-				</Parameters>
-			</Method>
-		`), propsObj)
+		b.AddAction(csom.NewActionMethod("SetFieldValue", []string{
+			`<Parameter Type="String">` + key + `</Parameter>`,
+			`<Parameter Type="String">` + val + `</Parameter>`,
+		}), propsObj)
 	}
 
 	csomPkg, err := b.Compile()

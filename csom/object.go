@@ -2,6 +2,7 @@ package csom
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 )
 
@@ -27,6 +28,29 @@ func NewObject(template string) Object {
 	o := &object{}
 	o.template = template
 	return o
+}
+
+// NewObjectProperty creates CSOM XML object path node builder instance
+func NewObjectProperty(propertyName string) Object {
+	return NewObject(fmt.Sprintf(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="%s" />`, propertyName))
+}
+
+// NewObjectMethod creates CSOM XML object path node builder instance
+func NewObjectMethod(methodName string, parameters []string) Object {
+	params := ""
+	for _, param := range parameters {
+		params += param
+	}
+	return NewObject(fmt.Sprintf(`
+		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="%s">
+			<Parameters>%s</Parameters>
+		</Method>
+	`, methodName, trimMultiline(params)))
+}
+
+// NewObjectIdentity creates CSOM XML object path node builder instance
+func NewObjectIdentity(identityPath string) Object {
+	return NewObject(`<Identity Id="{{.ID}}" Name="` + identityPath + `" />`)
 }
 
 func (o *object) String() string {

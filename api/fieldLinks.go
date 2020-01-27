@@ -150,42 +150,20 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 	}
 
 	b := csom.NewBuilder()
-	webObj, _ := b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
-	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Fields" />`), nil)
-	fieldObj, _ := b.AddObject(csom.NewObject(`
-		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetByInternalNameOrTitle">
-			<Parameters>
-				<Parameter Type="String">`+name+`</Parameter>
-			</Parameters>
-		</Method>
-	`), nil)
+	webObj, _ := b.AddObject(csom.NewObjectProperty("Web"), nil)
+	b.AddObject(csom.NewObjectProperty("Fields"), nil)
+	fieldObj, _ := b.AddObject(csom.NewObjectMethod("GetByInternalNameOrTitle", []string{`<Parameter Type="String">` + name + `</Parameter>`}), nil)
 	fieldID, _ := b.GetObjectID(fieldObj)
-	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="ContentTypes" />`), webObj)
-	ctObj, _ := b.AddObject(csom.NewObject(`
-		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetById">
-			<Parameters>
-				<Parameter Type="String">`+fieldLinks.contentTypeID+`</Parameter>
-			</Parameters>
-		</Method>
-	`), nil)
+	b.AddObject(csom.NewObjectProperty("ContentTypes"), webObj)
+	ctObj, _ := b.AddObject(csom.NewObjectMethod("GetById", []string{`<Parameter Type="String">` + fieldLinks.contentTypeID + `</Parameter>`}), nil)
 	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="FieldLinks" />`), nil)
-	addObj, _ := b.AddObject(csom.NewObject(`
-		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Add">
-			<Parameters>
-				<Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}">
-					<Property Name="Field" ObjectPathId="`+strconv.Itoa(fieldID)+`" />
-				</Parameter>
-			</Parameters>
-		</Method>
-	`), nil)
-	b.AddAction(csom.NewAction(`<ObjectIdentityQuery Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`), addObj)
-	b.AddAction(csom.NewAction(`
-		<Method Name="Update" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
-			<Parameters>
-				<Parameter Type="Boolean">false</Parameter>
-			</Parameters>
-		</Method>
-	`), ctObj)
+	addObj, _ := b.AddObject(csom.NewObjectMethod("Add", []string{`
+		<Parameter TypeId="{63fb2c92-8f65-4bbb-a658-b6cd294403f4}">
+			<Property Name="Field" ObjectPathId="` + strconv.Itoa(fieldID) + `" />
+		</Parameter>
+	`}), nil)
+	b.AddAction(csom.NewActionIdentityQuery(), addObj)
+	b.AddAction(csom.NewActionMethod("Update", []string{`<Parameter Type="Boolean">false</Parameter>`}), ctObj)
 
 	csomPkg, err := b.Compile()
 	if err != nil {

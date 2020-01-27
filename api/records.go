@@ -104,22 +104,10 @@ func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) 
 
 	b := csom.NewBuilder()
 
-	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
-	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Lists" />`), nil)
-	b.AddObject(csom.NewObject(`
-		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetById">
-			<Parameters>
-				<Parameter Type="String">`+listR.Data().ID+`</Parameter>
-			</Parameters>
-		</Method>
-	`), nil)
-	b.AddObject(csom.NewObject(`
-		<Method Id="{{.ID}}" ParentId="{{.ParentID}}" Name="GetItemById">
-			<Parameters>
-				<Parameter Type="Number">`+strconv.Itoa(itemR.Data().ID)+`</Parameter>
-			</Parameters>
-		</Method>
-	`), nil)
+	b.AddObject(csom.NewObjectProperty("Web"), nil)
+	b.AddObject(csom.NewObjectProperty("Lists"), nil)
+	b.AddObject(csom.NewObjectMethod("GetById", []string{`<Parameter Type="String">` + listR.Data().ID + `</Parameter>`}), nil)
+	b.AddObject(csom.NewObjectMethod("GetItemById", []string{`<Parameter Type="Number">` + strconv.Itoa(itemR.Data().ID) + `</Parameter>`}), nil)
 	b.AddAction(csom.NewAction(`
 		<StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="`+csomStaticMethod+`" Id="{{.ID}}">
 			<Parameters>
