@@ -36,4 +36,30 @@ func TestAction(t *testing.T) {
 		}
 	})
 
+	t.Run("NewActionIdentityQuery", func(t *testing.T) {
+		shouldBe := `<ObjectIdentityQuery Id="2" ObjectPathId="1" />`
+		o := NewActionIdentityQuery()
+		o.SetID(2)
+		o.SetObjectID(1)
+		if o.String() != shouldBe {
+			t.Error("wrong object property")
+		}
+		if err := o.CheckErr(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("NewActionMethod", func(t *testing.T) {
+		shouldBe := `<Method Id="2" ObjectPathId="1" Name="Update"><Parameters><Parameter /></Parameters></Method>`
+		o := NewActionMethod("Update", []string{"<Parameter />"})
+		o.SetID(2)
+		o.SetObjectID(1)
+		if o.String() != shouldBe {
+			t.Error("wrong object property")
+		}
+		if err := o.CheckErr(); err != nil {
+			t.Error(err)
+		}
+	})
+
 }

@@ -36,4 +36,43 @@ func TestObject(t *testing.T) {
 		}
 	})
 
+	t.Run("NewObjectProperty", func(t *testing.T) {
+		shouldBe := `<Property Id="2" ParentId="1" Name="Web" />`
+		o := NewObjectProperty("Web")
+		o.SetID(2)
+		o.SetParentID(1)
+		if o.String() != shouldBe {
+			t.Error("wrong object property")
+		}
+		if err := o.CheckErr(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("NewObjectMethod", func(t *testing.T) {
+		shouldBe := `<Method Id="2" ParentId="1" Name="Add"><Parameters><Parameter /></Parameters></Method>`
+		o := NewObjectMethod("Add", []string{"<Parameter />"})
+		o.SetID(2)
+		o.SetParentID(1)
+		if o.String() != shouldBe {
+			t.Error("wrong object property")
+		}
+		if err := o.CheckErr(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("NewObjectIdentity", func(t *testing.T) {
+		shouldBe := `<Identity Id="2" Name=":identity:" />`
+		o := NewObjectIdentity(":identity:")
+		o.SetID(2)
+		o.SetParentID(1)
+		if o.String() != shouldBe {
+			t.Error("wrong object property")
+		}
+		if err := o.CheckErr(); err != nil {
+			t.Error(err)
+		}
+	})
+
 }
