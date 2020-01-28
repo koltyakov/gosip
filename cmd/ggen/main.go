@@ -90,6 +90,8 @@ func generate(c *apiGenCnfg) error {
 		code += helpersGen(c)
 	}
 
+	fmt.Printf("Generated %s (%d bytes)\n", filepath.Join("./", genFileName), len([]byte(code)))
+
 	err := ioutil.WriteFile(filepath.Join("./", genFileName), []byte(code), 0644)
 	return err
 }

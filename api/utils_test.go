@@ -12,7 +12,6 @@ import (
 
 func TestUtils(t *testing.T) {
 
-
 	t.Run("getConfHeaders", func(t *testing.T) {
 		h := getConfHeaders(headers.verbose)
 		if !reflect.DeepEqual(h, headers.verbose.Headers) {
