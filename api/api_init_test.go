@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/koltyakov/gosip"
 	ntlm "github.com/koltyakov/gosip/auth/ntlm"
@@ -114,6 +115,8 @@ func init() {
 		spClient = envResolver[envCode]()
 		spClient.Hooks = handlers
 	}
+
+	spClient.Timeout = 30 * time.Second
 
 	setHeadersPresets()
 }
