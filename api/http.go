@@ -37,14 +37,14 @@ var HeadersPresets = struct {
 	Minimalmetadata: &RequestConfig{
 		Headers: map[string]string{
 			"Accept":          "application/json;odata=minimalmetadata",
-			"Content-Type":    "application/json;odata=minimalmetadata;charset=utf-8",
+			"Content-Type":    "application/json;odata=verbose;charset=utf-8",
 			"Accept-Language": "en-US,en;q=0.9",
 		},
 	},
 	Nometadata: &RequestConfig{
 		Headers: map[string]string{
 			"Accept":          "application/json;odata=nometadata",
-			"Content-Type":    "application/json;odata=nometadata;charset=utf-8",
+			"Content-Type":    "application/json;odata=verbose;charset=utf-8",
 			"Accept-Language": "en-US,en;q=0.9",
 		},
 	},
