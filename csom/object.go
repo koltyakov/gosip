@@ -56,11 +56,7 @@ func NewObjectIdentity(identityPath string) Object {
 func (o *object) String() string {
 	o.err = nil
 
-	template, _ := template.New("objectPath").Parse(o.template)
-	// if err != nil {
-	// 	o.err = err
-	// 	return o.template
-	// }
+	t, _ := template.New("objectPath").Parse(o.template)
 
 	data := &struct {
 		ID       int
@@ -71,7 +67,7 @@ func (o *object) String() string {
 	}
 
 	var tpl bytes.Buffer
-	if err := template.Execute(&tpl, data); err != nil {
+	if err := t.Execute(&tpl, data); err != nil {
 		o.err = err
 		return o.template
 	}

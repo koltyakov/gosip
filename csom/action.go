@@ -51,11 +51,7 @@ func NewActionMethod(methodName string, parameters []string) Action {
 func (a *action) String() string {
 	a.err = nil
 
-	template, _ := template.New("action").Parse(a.template)
-	// if err != nil {
-	// 	a.err = err
-	// 	return a.template
-	// }
+	t, _ := template.New("action").Parse(a.template)
 
 	data := &struct {
 		ID       int
@@ -66,7 +62,7 @@ func (a *action) String() string {
 	}
 
 	var tpl bytes.Buffer
-	if err := template.Execute(&tpl, data); err != nil {
+	if err := t.Execute(&tpl, data); err != nil {
 		a.err = err
 		return a.template
 	}
