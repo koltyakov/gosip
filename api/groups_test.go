@@ -17,8 +17,8 @@ func TestGroups(t *testing.T) {
 	newGroupNameRemove := uuid.New().String()
 
 	t.Run("Constructor", func(t *testing.T) {
-		groups := NewGroups(spClient, endpoint, nil)
-		if _, err := groups.Select("Id").Get(); err != nil {
+		g := NewGroups(spClient, endpoint, nil)
+		if _, err := g.Select("Id").Get(); err != nil {
 			t.Error(err)
 		}
 	})

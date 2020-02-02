@@ -17,8 +17,8 @@ func TestWebs(t *testing.T) {
 	newWebGUID := uuid.New().String()
 
 	t.Run("Constructor", func(t *testing.T) {
-		webs := NewWebs(spClient, endpoint, nil)
-		if _, err := webs.Select("Id").Get(); err != nil {
+		w := NewWebs(spClient, endpoint, nil)
+		if _, err := w.Select("Id").Get(); err != nil {
 			t.Error(err)
 		}
 	})

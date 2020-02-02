@@ -13,8 +13,8 @@ func TestSite(t *testing.T) {
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Site"
 
 	t.Run("Constructor", func(t *testing.T) {
-		site := NewSite(spClient, endpoint, nil)
-		if _, err := site.Select("Id").Get(); err != nil {
+		s := NewSite(spClient, endpoint, nil)
+		if _, err := s.Select("Id").Get(); err != nil {
 			t.Error(err)
 		}
 	})
