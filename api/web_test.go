@@ -16,8 +16,8 @@ func TestWeb(t *testing.T) {
 	endpoint := spClient.AuthCnfg.GetSiteURL() + "/_api/Web"
 
 	t.Run("Constructor", func(t *testing.T) {
-		web := NewWeb(spClient, endpoint, nil)
-		if _, err := web.Select("Id").Get(); err != nil {
+		w := NewWeb(spClient, endpoint, nil)
+		if _, err := w.Select("Id").Get(); err != nil {
 			t.Error(err)
 		}
 	})

@@ -80,8 +80,8 @@ func getConfHeaders(config *RequestConfig) map[string]string {
 
 // getRelativeURL out of an absolute one
 func getRelativeURL(absURL string) string {
-	url, _ := url.Parse(absURL)
-	return url.Path
+	u, _ := url.Parse(absURL)
+	return u.Path
 }
 
 // checkGetRelativeURL checks if URL is repative, prepends relative part if missed

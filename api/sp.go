@@ -1,3 +1,4 @@
+// Package api represents Fluent API for SharePoint object model
 package api
 
 import (
