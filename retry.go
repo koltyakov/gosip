@@ -9,10 +9,11 @@ import (
 
 // RetryPolicies : error state requests default retry policies
 var retryPolicies = map[int]int{
-	401: 5, // on 401 :: Unauthorized
-	429: 5, // on 429 :: Too many requests throttling error response
-	500: 1, // on 500 :: Internal Server Error
-	503: 5, // on 503 :: Service Unavailable
+	401: 5, // on 401 - Unauthorized
+	429: 5, // on 429 - Too many requests throttling error response
+	500: 1, // on 500 - Internal Server Error
+	503: 5, // on 503 - Service Unavailable
+	504: 5, // on 504 - Gateway Timeout Error
 }
 
 // getRetryPolicy receives retries policy retry number
