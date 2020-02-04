@@ -76,12 +76,12 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	reqTime = time.Now() // update request time to exclude auth-releted timings
 
 	// Creating backup reader to be able to retry none nil body requests
-	var backupReader io.Reader
+	var bodyBackup io.Reader
 	if req.Body != nil {
 		data, _ := ioutil.ReadAll(req.Body)
-		backupReader = bytes.NewReader(data)
+		bodyBackup = bytes.NewReader(data)
 		req.Body = ioutil.NopCloser(bytes.NewReader(data))
-	}
+	} // maybe there could be more effective way
 
 	// Sending actual request to SharePoint API/resource
 	resp, err := c.Do(req)
@@ -90,8 +90,8 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		if c.AuthCnfg.GetStrategy() == "ntlm" && c.shouldRetry(req, resp, 5) {
 			c.onRetry(req, reqTime, resp.StatusCode, nil)
 			// Reset body reader closer
-			if backupReader != nil {
-				req.Body = ioutil.NopCloser(backupReader)
+			if bodyBackup != nil {
+				req.Body = ioutil.NopCloser(bodyBackup)
 			}
 			return c.Execute(req)
 		}
@@ -105,8 +105,8 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		if c.shouldRetry(req, resp, retries) {
 			c.onRetry(req, reqTime, resp.StatusCode, nil)
 			// Reset body reader closer
-			if backupReader != nil {
-				req.Body = ioutil.NopCloser(backupReader)
+			if bodyBackup != nil {
+				req.Body = ioutil.NopCloser(bodyBackup)
 			}
 			return c.Execute(req)
 		}
