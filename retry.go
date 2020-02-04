@@ -38,7 +38,6 @@ func (c *SPClient) shouldRetry(req *http.Request, resp *http.Response, retries i
 	if noRetry == "true" {
 		return false
 	}
-	fmt.Println(resp.StatusCode)
 	retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
 	if retry < retries {
 		resp.Body.Close() // closing to reuse request
