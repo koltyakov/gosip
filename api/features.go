@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -49,7 +50,7 @@ func (features *Features) Add(featureID string, force bool) error {
 	endpoint := fmt.Sprintf("%s/Add", features.endpoint)
 	sp := NewHTTPClient(features.client)
 	body := []byte(fmt.Sprintf(`{"featdefScope":0,"featureId":"%s","force":%t}`, featureID, force))
-	_, err := sp.Post(endpoint, body, getConfHeaders(features.config))
+	_, err := sp.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(features.config))
 	return err
 }
 
@@ -58,6 +59,6 @@ func (features *Features) Remove(featureID string, force bool) error {
 	endpoint := fmt.Sprintf("%s/Remove", features.endpoint)
 	sp := NewHTTPClient(features.client)
 	body := []byte(fmt.Sprintf(`{"featureId":"%s","force":%t}`, featureID, force))
-	_, err := sp.Post(endpoint, body, getConfHeaders(features.config))
+	_, err := sp.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(features.config))
 	return err
 }

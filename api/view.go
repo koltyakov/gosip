@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -77,7 +78,7 @@ func (view *View) Get() (ViewResp, error) {
 func (view *View) Update(body []byte) (ViewResp, error) {
 	body = patchMetadataType(body, "SP.View")
 	sp := NewHTTPClient(view.client)
-	return sp.Update(view.endpoint, body, getConfHeaders(view.config))
+	return sp.Update(view.endpoint, bytes.NewBuffer(body), getConfHeaders(view.config))
 }
 
 // Delete deletes this View (can't be restored from a recycle bin)
@@ -99,5 +100,5 @@ func (view *View) SetViewXML(viewXML string) (ViewResp, error) {
 		return nil, err
 	}
 	sp := NewHTTPClient(view.client)
-	return sp.Post(endpoint, payload, getConfHeaders(view.config))
+	return sp.Post(endpoint, bytes.NewBuffer(payload), getConfHeaders(view.config))
 }

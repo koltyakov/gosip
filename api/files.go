@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -54,5 +55,5 @@ func (files *Files) GetByName(fileName string) *File {
 func (files *Files) Add(name string, content []byte, overwrite bool) (FileResp, error) {
 	sp := NewHTTPClient(files.client)
 	endpoint := fmt.Sprintf("%s/Add(overwrite=%t,url='%s')", files.endpoint, overwrite, name)
-	return sp.Post(endpoint, content, getConfHeaders(files.config))
+	return sp.Post(endpoint, bytes.NewBuffer(content), getConfHeaders(files.config))
 }

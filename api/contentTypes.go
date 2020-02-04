@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -68,7 +69,7 @@ func (contentTypes *ContentTypes) Add(body []byte) (ContentTypeResp, error) {
 	// REST API doesn't work in that context as supposed to https://github.com/pnp/pnpjs/issues/457
 	body = patchMetadataType(body, "SP.ContentType")
 	sp := NewHTTPClient(contentTypes.client)
-	return sp.Post(contentTypes.endpoint, body, getConfHeaders(contentTypes.config))
+	return sp.Post(contentTypes.endpoint, bytes.NewBuffer(body), getConfHeaders(contentTypes.config))
 }
 
 // Create adds Content Type using CSOM polyfill as REST's Add method is limited (https://github.com/pnp/pnpjs/issues/457)
@@ -125,7 +126,7 @@ func (contentTypes *ContentTypes) Create(contentTypeInfo *ContentTypeCreationInf
 		return "", nil
 	}
 
-	resp, err := sp.ProcessQuery(contentTypes.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
+	resp, err := sp.ProcessQuery(contentTypes.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 	if err != nil {
 		return "", nil
 	}

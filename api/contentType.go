@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -60,7 +61,7 @@ func (ct *ContentType) Get() (ContentTypeResp, error) {
 func (ct *ContentType) Update(body []byte) (ContentTypeResp, error) {
 	body = patchMetadataType(body, "SP.ContentType")
 	sp := NewHTTPClient(ct.client)
-	return sp.Update(ct.endpoint, body, getConfHeaders(ct.config))
+	return sp.Update(ct.endpoint, bytes.NewBuffer(body), getConfHeaders(ct.config))
 }
 
 // Delete deletes a content type skipping recycle bin

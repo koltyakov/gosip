@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -62,6 +63,6 @@ func (utility *Utility) SendEmail(options *EmailProps) error {
 	JSONProps := fmt.Sprintf("%s", props)
 	body := []byte(TrimMultiline(`{ "properties": ` + JSONProps + `}`))
 
-	_, err := sp.Post(endpoint, body, getConfHeaders(utility.config))
+	_, err := sp.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(utility.config))
 	return err
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -64,7 +65,7 @@ func (group *Group) Get() (GroupResp, error) {
 func (group *Group) Update(body []byte) (GroupResp, error) {
 	body = patchMetadataType(body, "SP.Group")
 	sp := NewHTTPClient(group.client)
-	return sp.Update(group.endpoint, body, getConfHeaders(group.config))
+	return sp.Update(group.endpoint, bytes.NewBuffer(body), getConfHeaders(group.config))
 }
 
 // Users gets Users API queryable collection
@@ -86,7 +87,7 @@ func (group *Group) AddUser(loginName string) error {
 	}
 	metadata["LoginName"] = loginName
 	body, _ := json.Marshal(metadata)
-	_, err := sp.Post(endpoint, body, getConfHeaders(group.config))
+	_, err := sp.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(group.config))
 	return err
 }
 

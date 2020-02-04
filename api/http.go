@@ -1,9 +1,9 @@
 package api
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -80,8 +80,9 @@ func (ctx *HTTPClient) Get(endpoint string, headers map[string]string) ([]byte, 
 }
 
 // Post - generic POST request wrapper
-func (ctx *HTTPClient) Post(endpoint string, body []byte, headers map[string]string) ([]byte, error) {
-	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
+func (ctx *HTTPClient) Post(endpoint string, body io.Reader, headers map[string]string) ([]byte, error) {
+	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)
 	}
@@ -132,8 +133,9 @@ func (ctx *HTTPClient) Delete(endpoint string, headers map[string]string) ([]byt
 }
 
 // Update - generic MERGE request wrapper
-func (ctx *HTTPClient) Update(endpoint string, body []byte, headers map[string]string) ([]byte, error) {
-	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
+func (ctx *HTTPClient) Update(endpoint string, body io.Reader, headers map[string]string) ([]byte, error) {
+	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)
 	}
@@ -159,12 +161,13 @@ func (ctx *HTTPClient) Update(endpoint string, body []byte, headers map[string]s
 }
 
 // ProcessQuery - CSOM requests helper
-func (ctx *HTTPClient) ProcessQuery(endpoint string, body []byte) ([]byte, error) {
+func (ctx *HTTPClient) ProcessQuery(endpoint string, body io.Reader) ([]byte, error) {
 	if strings.Index(strings.ToLower(endpoint), strings.ToLower("/_vti_bin/client.svc/ProcessQuery")) == -1 {
 		endpoint = fmt.Sprintf("%s/_vti_bin/client.svc/ProcessQuery", getPriorEndpoint(endpoint, "/_api"))
 	}
 
-	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
+	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)
 	}

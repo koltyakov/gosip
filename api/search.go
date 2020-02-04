@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -197,7 +198,7 @@ func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 		"Content-Type": "application/json;odata=verbose;charset=utf-8",
 	}
 
-	return sp.Post(endpoint, body, headers)
+	return sp.Post(endpoint, bytes.NewBuffer(body), headers)
 }
 
 // ToDo:

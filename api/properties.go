@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -138,7 +139,7 @@ func (properties *Properties) setWebProps(props map[string]string) error {
 	}
 
 	sp := NewHTTPClient(properties.client)
-	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
+	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err
@@ -187,7 +188,7 @@ func (properties *Properties) setFolderProps(props map[string]string) error {
 	}
 
 	sp := NewHTTPClient(properties.client)
-	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
+	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err
@@ -219,7 +220,7 @@ func (properties *Properties) setFileProps(props map[string]string) error {
 	}
 
 	sp := NewHTTPClient(properties.client)
-	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
+	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err

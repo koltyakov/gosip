@@ -65,7 +65,7 @@ func (attachments *Attachments) Get() (AttachmentsResp, error) {
 }
 
 // Add uploads new attachment to the item
-func (attachments *Attachments) Add(name string, content []byte) (AttachmentResp, error) {
+func (attachments *Attachments) Add(name string, content io.Reader) (AttachmentResp, error) {
 	sp := NewHTTPClient(attachments.client)
 	endpoint := fmt.Sprintf("%s/Add(FileName='%s')", attachments.endpoint, name)
 	return sp.Post(endpoint, content, getConfHeaders(attachments.config))

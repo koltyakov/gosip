@@ -33,6 +33,7 @@ func (c *SPClient) getRetryPolicy(statusCode int) int {
 
 // shouldRetry checks should the request be retried, used with specific resp.StatusCode's
 func (c *SPClient) shouldRetry(req *http.Request, resp *http.Response, retries int) bool {
+	// ToDo: Do not retry POST requests with closed body reader
 	noRetry := req.Header.Get("X-Gosip-NoRetry")
 	if noRetry == "true" {
 		return false

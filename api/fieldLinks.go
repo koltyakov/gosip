@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -171,7 +172,7 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 	}
 
 	sp := NewHTTPClient(fieldLinks.client)
-	resp, err := sp.ProcessQuery(fieldLinks.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
+	resp, err := sp.ProcessQuery(fieldLinks.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 	if err != nil {
 		return "", err
 	}

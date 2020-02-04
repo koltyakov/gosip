@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
@@ -97,7 +98,7 @@ func (site *Site) Get() (SiteResp, error) {
 func (site *Site) Update(body []byte) (SiteResp, error) {
 	body = patchMetadataType(body, "SP.Site")
 	sp := NewHTTPClient(site.client)
-	return sp.Update(site.endpoint, body, getConfHeaders(site.config))
+	return sp.Update(site.endpoint, bytes.NewBuffer(body), getConfHeaders(site.config))
 }
 
 // Delete deletes current site (can't be restored from a recycle bin)

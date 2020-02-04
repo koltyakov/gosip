@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -82,7 +83,7 @@ func (item *Item) Update(body []byte) (ItemResp, error) {
 		return oDataType
 	})
 	sp := NewHTTPClient(item.client)
-	return sp.Update(item.endpoint, body, getConfHeaders(item.config))
+	return sp.Update(item.endpoint, bytes.NewBuffer(body), getConfHeaders(item.config))
 }
 
 // Roles gets Roles API instance queryable collection for this Item

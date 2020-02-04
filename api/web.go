@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -118,7 +119,7 @@ func (web *Web) Delete() error {
 func (web *Web) Update(body []byte) (WebResp, error) {
 	body = patchMetadataType(body, "SP.Web")
 	sp := NewHTTPClient(web.client)
-	return sp.Update(web.endpoint, body, getConfHeaders(web.config))
+	return sp.Update(web.endpoint, bytes.NewBuffer(body), getConfHeaders(web.config))
 }
 
 // Lists gets Lists API instance object
@@ -214,7 +215,7 @@ func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
 
 	body := fmt.Sprintf(`{"logonName": "%s"}`, loginName)
 
-	data, err := sp.Post(endpoint, []byte(body), headers)
+	data, err := sp.Post(endpoint, bytes.NewBuffer([]byte(body)), headers)
 	if err != nil {
 		return nil, err
 	}

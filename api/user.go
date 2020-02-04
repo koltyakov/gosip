@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -57,7 +58,7 @@ func (user *User) Get() (UserResp, error) {
 func (user *User) Update(body []byte) (UserResp, error) {
 	body = patchMetadataType(body, "SP.User")
 	sp := NewHTTPClient(user.client)
-	return sp.Update(user.endpoint, body, getConfHeaders(user.config))
+	return sp.Update(user.endpoint, bytes.NewBuffer(body), getConfHeaders(user.config))
 }
 
 // Groups gets Groups API instance queryable collection for this User

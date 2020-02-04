@@ -30,7 +30,7 @@ func TestAttachments(t *testing.T) {
 			"att_04.txt": []byte("attachment 04"),
 		}
 		for fileName, content := range attachments {
-			if _, err := list.Items().GetByID(item.Data().ID).Attachments().Add(fileName, content); err != nil {
+			if _, err := list.Items().GetByID(item.Data().ID).Attachments().Add(fileName, bytes.NewBuffer(content)); err != nil {
 				t.Error(err)
 			}
 		}

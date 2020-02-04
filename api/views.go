@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -46,7 +47,7 @@ func (views *Views) Get() (ViewsResp, error) {
 func (views *Views) Add(body []byte) (ViewResp, error) {
 	body = patchMetadataType(body, "SP.View")
 	sp := NewHTTPClient(views.client)
-	return sp.Post(views.endpoint, body, getConfHeaders(views.config))
+	return sp.Post(views.endpoint, bytes.NewBuffer(body), getConfHeaders(views.config))
 }
 
 // GetByID gets a view by its ID (GUID)

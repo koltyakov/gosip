@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -54,7 +55,7 @@ func (groups *Groups) Add(title string, metadata map[string]interface{}) (GroupR
 	metadata["Title"] = title
 	body, _ := json.Marshal(metadata)
 	sp := NewHTTPClient(groups.client)
-	return sp.Post(groups.endpoint, body, getConfHeaders(groups.config))
+	return sp.Post(groups.endpoint, bytes.NewBuffer(body), getConfHeaders(groups.config))
 }
 
 // GetByID gets a group object by its ID

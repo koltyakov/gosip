@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -89,5 +90,5 @@ func (webs *Webs) Add(title string, url string, metadata map[string]interface{})
 	headers["Accept"] = "application/json;odata=verbose"
 	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
 
-	return sp.Post(endpoint, []byte(body), headers)
+	return sp.Post(endpoint, bytes.NewBuffer([]byte(body)), headers)
 }

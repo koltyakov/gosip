@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -122,7 +123,7 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, err
 	if err != nil {
 		return nil, err
 	}
-	data, err := sp.Post(endpoint, body, getConfHeaders(changes.config))
+	data, err := sp.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(changes.config))
 	if err != nil {
 		return nil, err
 	}

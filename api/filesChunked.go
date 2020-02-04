@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -126,7 +127,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/StartUpload(uploadId=guid'%s')", file.endpoint, uploadID)
-	data, err := sp.Post(endpoint, chunk, getConfHeaders(file.config))
+	data, err := sp.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
 	if err != nil {
 		return 0, err
 	}
@@ -147,7 +148,7 @@ func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) (int, error) {
 	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/ContinueUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)
-	data, err := sp.Post(endpoint, chunk, getConfHeaders(file.config))
+	data, err := sp.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
 	if err != nil {
 		return 0, err
 	}
@@ -176,5 +177,5 @@ func (file *File) cancelUpload(uploadID string) error {
 func (file *File) finishUpload(uploadID string, fileOffset int, chunk []byte) (FileResp, error) {
 	sp := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/FinishUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)
-	return sp.Post(endpoint, chunk, getConfHeaders(file.config))
+	return sp.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -76,7 +77,7 @@ func (customActions *CustomActions) Get() ([]*CustomActionInfo, error) {
 func (customActions *CustomActions) Add(payload []byte) (*CustomActionInfo, error) {
 	body := patchMetadataType(payload, "SP.UserCustomAction")
 	sp := NewHTTPClient(customActions.client)
-	data, err := sp.Post(customActions.endpoint, body, getConfHeaders(customActions.config))
+	data, err := sp.Post(customActions.endpoint, bytes.NewBuffer(body), getConfHeaders(customActions.config))
 	if err != nil {
 		return nil, err
 	}

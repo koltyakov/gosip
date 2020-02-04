@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -122,7 +123,7 @@ func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) 
 		return nil, err
 	}
 
-	jsomResp, err := sp.ProcessQuery(item.client.AuthCnfg.GetSiteURL(), []byte(csomPkg))
+	jsomResp, err := sp.ProcessQuery(item.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 	if err != nil {
 		return nil, err
 	}

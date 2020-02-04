@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -64,7 +65,7 @@ func (folder *Folder) Get() (FolderResp, error) {
 func (folder *Folder) Update(body []byte) (FolderResp, error) {
 	body = patchMetadataType(body, "SP.Folder")
 	sp := NewHTTPClient(folder.client)
-	return sp.Update(folder.endpoint, body, getConfHeaders(folder.config))
+	return sp.Update(folder.endpoint, bytes.NewBuffer(body), getConfHeaders(folder.config))
 }
 
 // Delete deletes this folder (can't be restored from a recycle bin)

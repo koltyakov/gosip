@@ -1,6 +1,8 @@
 package api
 
 import (
+	"bytes"
+
 	"github.com/koltyakov/gosip"
 )
 
@@ -80,7 +82,7 @@ func (field *Field) Get() (FieldResp, error) {
 func (field *Field) Update(body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.Field")
 	sp := NewHTTPClient(field.client)
-	return sp.Update(field.endpoint, body, getConfHeaders(field.config))
+	return sp.Update(field.endpoint, bytes.NewBuffer(body), getConfHeaders(field.config))
 }
 
 // Delete deletes a field skipping recycle bin

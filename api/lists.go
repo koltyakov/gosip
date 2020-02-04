@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -94,7 +95,7 @@ func (lists *Lists) Add(title string, metadata map[string]interface{}) (ListResp
 	headers["Accept"] = "application/json;odata=verbose"
 	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
 
-	return sp.Post(lists.endpoint, []byte(body), headers)
+	return sp.Post(lists.endpoint, bytes.NewBuffer([]byte(body)), headers)
 }
 
 // AddWithURI creates new list on this web with a provided `title` and `uri`.

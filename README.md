@@ -206,10 +206,10 @@ func main() {
 		log.Fatalf("%v\n", err)
 	}
 
-	// sp.Post(endpoint, []byte(body), nil) // generic POST
+	// sp.Post(endpoint, body, nil) // generic POST
 	// sp.Delete(endpoint, nil) // generic DELETE helper crafts "X-Http-Method"="DELETE" header
 	// sp.Update(endpoint, nil) // generic UPDATE helper crafts "X-Http-Method"="MERGE" header
-	// sp.ProcessQuery(endpoint, []byte(body)) // CSOM helper (client.svc/ProcessQuery)
+	// sp.ProcessQuery(endpoint, body) // CSOM helper (client.svc/ProcessQuery)
 
 	fmt.Printf("response: %s\n", data)
 }

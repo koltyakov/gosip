@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 )
@@ -25,7 +26,7 @@ func TestHttp(t *testing.T) {
 				</ObjectPaths>
 			</Request>
 		`))
-		if _, err := sp.ProcessQuery(spClient.AuthCnfg.GetSiteURL(), body); err == nil {
+		if _, err := sp.ProcessQuery(spClient.AuthCnfg.GetSiteURL(), bytes.NewBuffer(body)); err == nil {
 			if !strings.Contains(err.Error(), "Microsoft.SharePoint.Client.InvalidClientQueryException") {
 				t.Error(err)
 			}

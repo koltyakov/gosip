@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/url"
 
@@ -171,7 +172,7 @@ func (profiles *Profiles) SetSingleValueProfileProperty(loginName string, proper
 	prop["propertyName"] = property
 	prop["propertyValue"] = value
 	body, _ := json.Marshal(prop)
-	_, err := sp.Post(endpoint, body, getConfHeaders(profiles.config))
+	_, err := sp.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(profiles.config))
 	return err
 }
 
@@ -184,7 +185,7 @@ func (profiles *Profiles) SetMultiValuedProfileProperty(loginName string, proper
 	prop["propertyName"] = property
 	prop["propertyValues"] = values
 	body, _ := json.Marshal(prop)
-	_, err := sp.Post(endpoint, body, getConfHeaders(profiles.config))
+	_, err := sp.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(profiles.config))
 	return err
 }
 

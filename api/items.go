@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -126,7 +127,7 @@ func (items *Items) Add(body []byte) (ItemResp, error) {
 		return oDataType
 	})
 	sp := NewHTTPClient(items.client)
-	return sp.Post(items.endpoint, body, getConfHeaders(items.config))
+	return sp.Post(items.endpoint, bytes.NewBuffer(body), getConfHeaders(items.config))
 }
 
 // GetByID gets item data object by its ID
@@ -163,7 +164,7 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 	body, _ := json.Marshal(request)
 
 	sp := NewHTTPClient(items.client)
-	return sp.Post(apiURL.String(), []byte(body), getConfHeaders(items.config))
+	return sp.Post(apiURL.String(), bytes.NewBuffer(body), getConfHeaders(items.config))
 }
 
 // ToDo:

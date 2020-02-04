@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -49,7 +50,7 @@ func (fields *Fields) Get() (FieldsResp, error) {
 func (fields *Fields) Add(body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.Field")
 	sp := NewHTTPClient(fields.client)
-	return sp.Post(fields.endpoint, body, getConfHeaders(fields.config))
+	return sp.Post(fields.endpoint, bytes.NewBuffer(body), getConfHeaders(fields.config))
 }
 
 // CreateFieldAsXML creates a field using XML schema definition
@@ -73,7 +74,7 @@ func (fields *Fields) CreateFieldAsXML(schemaXML string, options int) (FieldResp
 		return nil, err
 	}
 	sp := NewHTTPClient(fields.client)
-	return sp.Post(endpoint, payload, getConfHeaders(fields.config))
+	return sp.Post(endpoint, bytes.NewBuffer(payload), getConfHeaders(fields.config))
 }
 
 // GetByID gets a field by its ID (GUID)

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -135,7 +136,7 @@ func (list *List) Recycle() error {
 func (list *List) Update(body []byte) (ListResp, error) {
 	body = patchMetadataType(body, "SP.List")
 	sp := NewHTTPClient(list.client)
-	return sp.Update(list.endpoint, body, getConfHeaders(list.config))
+	return sp.Update(list.endpoint, bytes.NewBuffer(body), getConfHeaders(list.config))
 }
 
 // Items gets Items API instance queryable collection
