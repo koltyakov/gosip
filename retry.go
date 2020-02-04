@@ -1,6 +1,7 @@
 package gosip
 
 import (
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -9,11 +10,11 @@ import (
 
 // RetryPolicies : error state requests default retry policies
 var retryPolicies = map[int]int{
-	401: 5, // on 401 - Unauthorized
-	429: 5, // on 429 - Too many requests throttling error response
-	500: 1, // on 500 - Internal Server Error
-	503: 5, // on 503 - Service Unavailable
-	504: 5, // on 504 - Gateway Timeout Error
+	401: 5,  // on 401 - Unauthorized
+	429: 5,  // on 429 - Too many requests throttling error response
+	500: 1,  // on 500 - Internal Server Error
+	503: 10, // on 503 - Service Unavailable
+	504: 5,  // on 504 - Gateway Timeout Error
 }
 
 // getRetryPolicy receives retries policy retry number
@@ -33,17 +34,18 @@ func (c *SPClient) getRetryPolicy(statusCode int) int {
 
 // shouldRetry checks should the request be retried, used with specific resp.StatusCode's
 func (c *SPClient) shouldRetry(req *http.Request, resp *http.Response, retries int) bool {
-	// ToDo: Do not retry POST requests with closed body reader
 	noRetry := req.Header.Get("X-Gosip-NoRetry")
 	if noRetry == "true" {
 		return false
 	}
+	fmt.Println(resp.StatusCode)
 	retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
 	if retry < retries {
 		resp.Body.Close() // closing to reuse request
 		retryAfter := 0
-		if resp != nil {
+		if resp != nil && resp.StatusCode == 429 { // sometimes SPO is abusing Retry-After header on 503 errors
 			retryAfter, _ = strconv.Atoi(resp.Header.Get("Retry-After"))
+			fmt.Println("Retry after", retryAfter)
 		}
 		req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
 		if retryAfter != 0 {

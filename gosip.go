@@ -15,7 +15,9 @@ Amongst supported platform versions are:
 package gosip
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -73,12 +75,24 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	c.onRequest(req, reqTime, 0, nil)
 	reqTime = time.Now() // update request time to exclude auth-releted timings
 
+	// Creating backup reader to be able to retry none nil body requests
+	var backupReader io.Reader
+	if req.Body != nil {
+		data, _ := ioutil.ReadAll(req.Body)
+		backupReader = bytes.NewReader(data)
+		req.Body = ioutil.NopCloser(bytes.NewReader(data))
+	}
+
 	// Sending actual request to SharePoint API/resource
 	resp, err := c.Do(req)
 	if err != nil {
 		// Retry only for NTML
 		if c.AuthCnfg.GetStrategy() == "ntlm" && c.shouldRetry(req, resp, 5) {
 			c.onRetry(req, reqTime, resp.StatusCode, nil)
+			// Reset body reader closer
+			if backupReader != nil {
+				req.Body = ioutil.NopCloser(backupReader)
+			}
 			return c.Execute(req)
 		}
 		c.onError(req, reqTime, 0, err)
@@ -90,6 +104,10 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		// When it should, shouldRetry not only checks but waits before a retry
 		if c.shouldRetry(req, resp, retries) {
 			c.onRetry(req, reqTime, resp.StatusCode, nil)
+			// Reset body reader closer
+			if backupReader != nil {
+				req.Body = ioutil.NopCloser(backupReader)
+			}
 			return c.Execute(req)
 		}
 	}
