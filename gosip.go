@@ -20,7 +20,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -45,8 +44,6 @@ type SPClient struct {
 
 	RetryPolicies map[int]int   // allows redefining error state requests retry policies
 	Hooks         *HookHandlers // hook handlers definition
-
-	mux sync.Mutex
 }
 
 // Execute : SharePoint HTTP client

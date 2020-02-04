@@ -18,20 +18,17 @@ var retryPolicies = map[int]int{
 
 // getRetryPolicy receives retries policy retry number
 func (c *SPClient) getRetryPolicy(statusCode int) int {
-	c.mux.Lock()
-	// Apply default policies
+	// Return defaults when no custom
 	if c.RetryPolicies == nil {
-		c.RetryPolicies = retryPolicies
-	} else {
-		// Append defaults to custom
-		for status, retries := range retryPolicies {
-			if _, ok := c.RetryPolicies[status]; !ok {
-				c.RetryPolicies[status] = retries
-			}
-		}
+		return retryPolicies[statusCode]
 	}
-	c.mux.Unlock()
-	return c.RetryPolicies[statusCode]
+	// Check in custom
+	retries, ok := c.RetryPolicies[statusCode]
+	if !ok {
+		// Fallback to default
+		return retryPolicies[statusCode]
+	}
+	return retries
 }
 
 // shouldRetry checks should the request be retried, used with specific resp.StatusCode's
