@@ -49,8 +49,8 @@ func (items *Items) ToURL() string {
 
 // Get gets Items API queryable collection
 func (items *Items) Get() (ItemsResp, error) {
-	sp := NewHTTPClient(items.client)
-	data, err := sp.Get(items.ToURL(), getConfHeaders(items.config))
+	client := NewHTTPClient(items.client)
+	data, err := client.Get(items.ToURL(), getConfHeaders(items.config))
 	if err != nil {
 		return nil, err
 	}
@@ -126,8 +126,8 @@ func (items *Items) Add(body []byte) (ItemResp, error) {
 		oDataType, _ := list.GetEntityType() // ToDo: add caching for Entity Types
 		return oDataType
 	})
-	sp := NewHTTPClient(items.client)
-	return sp.Post(items.endpoint, bytes.NewBuffer(body), getConfHeaders(items.config))
+	client := NewHTTPClient(items.client)
+	return client.Post(items.endpoint, bytes.NewBuffer(body), getConfHeaders(items.config))
 }
 
 // GetByID gets item data object by its ID
@@ -163,8 +163,8 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 
 	body, _ := json.Marshal(request)
 
-	sp := NewHTTPClient(items.client)
-	return sp.Post(apiURL.String(), bytes.NewBuffer(body), getConfHeaders(items.config))
+	client := NewHTTPClient(items.client)
+	return client.Post(apiURL.String(), bytes.NewBuffer(body), getConfHeaders(items.config))
 }
 
 // ToDo:

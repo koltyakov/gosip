@@ -38,8 +38,8 @@ func (users *Users) ToURL() string {
 
 // Get gets Users queryable collection
 func (users *Users) Get() (UsersResp, error) {
-	sp := NewHTTPClient(users.client)
-	return sp.Get(users.ToURL(), getConfHeaders(users.config))
+	client := NewHTTPClient(users.client)
+	return client.Get(users.ToURL(), getConfHeaders(users.config))
 }
 
 // GetByID gets a user by his/her ID (numeric ID from User Information List)

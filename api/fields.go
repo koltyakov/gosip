@@ -41,16 +41,16 @@ func (fields *Fields) ToURL() string {
 
 // Get gets fieds response collection
 func (fields *Fields) Get() (FieldsResp, error) {
-	sp := NewHTTPClient(fields.client)
-	return sp.Get(fields.ToURL(), getConfHeaders(fields.config))
+	client := NewHTTPClient(fields.client)
+	return client.Get(fields.ToURL(), getConfHeaders(fields.config))
 }
 
 // Add adds field with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Field object
 func (fields *Fields) Add(body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.Field")
-	sp := NewHTTPClient(fields.client)
-	return sp.Post(fields.endpoint, bytes.NewBuffer(body), getConfHeaders(fields.config))
+	client := NewHTTPClient(fields.client)
+	return client.Post(fields.endpoint, bytes.NewBuffer(body), getConfHeaders(fields.config))
 }
 
 // CreateFieldAsXML creates a field using XML schema definition
@@ -73,8 +73,8 @@ func (fields *Fields) CreateFieldAsXML(schemaXML string, options int) (FieldResp
 	if err != nil {
 		return nil, err
 	}
-	sp := NewHTTPClient(fields.client)
-	return sp.Post(endpoint, bytes.NewBuffer(payload), getConfHeaders(fields.config))
+	client := NewHTTPClient(fields.client)
+	return client.Post(endpoint, bytes.NewBuffer(payload), getConfHeaders(fields.config))
 }
 
 // GetByID gets a field by its ID (GUID)

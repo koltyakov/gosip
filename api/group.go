@@ -56,16 +56,16 @@ func (group *Group) ToURL() string {
 
 // Get gets group data object
 func (group *Group) Get() (GroupResp, error) {
-	sp := NewHTTPClient(group.client)
-	return sp.Get(group.ToURL(), getConfHeaders(group.config))
+	client := NewHTTPClient(group.client)
+	return client.Get(group.ToURL(), getConfHeaders(group.config))
 }
 
 // Update updates Group's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Group object
 func (group *Group) Update(body []byte) (GroupResp, error) {
 	body = patchMetadataType(body, "SP.Group")
-	sp := NewHTTPClient(group.client)
-	return sp.Update(group.endpoint, bytes.NewBuffer(body), getConfHeaders(group.config))
+	client := NewHTTPClient(group.client)
+	return client.Update(group.endpoint, bytes.NewBuffer(body), getConfHeaders(group.config))
 }
 
 // Users gets Users API queryable collection
@@ -80,14 +80,14 @@ func (group *Group) Users() *Users {
 // AddUser adds a user by login name to this group
 func (group *Group) AddUser(loginName string) error {
 	endpoint := fmt.Sprintf("%s/Users", group.ToURL())
-	sp := NewHTTPClient(group.client)
+	client := NewHTTPClient(group.client)
 	metadata := make(map[string]interface{})
 	metadata["__metadata"] = map[string]string{
 		"type": "SP.User",
 	}
 	metadata["LoginName"] = loginName
 	body, _ := json.Marshal(metadata)
-	_, err := sp.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(group.config))
+	_, err := client.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(group.config))
 	return err
 }
 
@@ -104,8 +104,8 @@ func (group *Group) AddUserByID(userID int) error {
 // SetAsOwner sets a user as owner
 func (group *Group) SetAsOwner(userID int) error {
 	endpoint := fmt.Sprintf("%s/SetUserAsOwner(%d)", group.ToURL(), userID)
-	sp := NewHTTPClient(group.client)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(group.config))
+	client := NewHTTPClient(group.client)
+	_, err := client.Post(endpoint, nil, getConfHeaders(group.config))
 	return err
 }
 
@@ -116,15 +116,15 @@ func (group *Group) RemoveUser(loginName string) error {
 		group.ToURL(),
 		url.QueryEscape(loginName),
 	)
-	sp := NewHTTPClient(group.client)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(group.config))
+	client := NewHTTPClient(group.client)
+	_, err := client.Post(endpoint, nil, getConfHeaders(group.config))
 	return err
 }
 
 // RemoveUserByID removes a user from group
 func (group *Group) RemoveUserByID(userID int) error {
 	endpoint := fmt.Sprintf("%s/Users/RemoveById(%d)", group.ToURL(), userID)
-	sp := NewHTTPClient(group.client)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(group.config))
+	client := NewHTTPClient(group.client)
+	_, err := client.Post(endpoint, nil, getConfHeaders(group.config))
 	return err
 }

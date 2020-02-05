@@ -83,30 +83,30 @@ func (file *File) ToURL() string {
 
 // Get gets file data object
 func (file *File) Get() (FileResp, error) {
-	sp := NewHTTPClient(file.client)
-	return sp.Get(file.ToURL(), getConfHeaders(file.config))
+	client := NewHTTPClient(file.client)
+	return client.Get(file.ToURL(), getConfHeaders(file.config))
 }
 
 // // Update updates Field's metadata with properties provided in `body` parameter
 // // where `body` is byte array representation of JSON string payload relevalt to SP.File object
 // func (file *File) Update(body []byte) (FieldResp, error) {
 // 	body = patchMetadataType(body, "SP.File")
-// 	sp := NewHTTPClient(file.client)
-// 	return sp.Update(file.endpoint, body, getConfHeaders(file.config))
+// 	client := NewHTTPClient(file.client)
+// 	return client.Update(file.endpoint, body, getConfHeaders(file.config))
 // }
 
 // Delete deletes this file skipping recycle bin
 func (file *File) Delete() error {
-	sp := NewHTTPClient(file.client)
-	_, err := sp.Delete(file.endpoint, getConfHeaders(file.config))
+	client := NewHTTPClient(file.client)
+	_, err := client.Delete(file.endpoint, getConfHeaders(file.config))
 	return err
 }
 
 // Recycle moves this file to the recycle bin
 func (file *File) Recycle() error {
-	sp := NewHTTPClient(file.client)
+	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/Recycle", file.endpoint)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(file.config))
+	_, err := client.Post(endpoint, nil, getConfHeaders(file.config))
 	return err
 }
 
@@ -121,9 +121,9 @@ func (file *File) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	}
 
 	apiURL.RawQuery = query.Encode()
-	sp := NewHTTPClient(file.client)
+	client := NewHTTPClient(file.client)
 
-	data, err := sp.Get(apiURL.String(), getConfHeaders(file.config))
+	data, err := client.Get(apiURL.String(), getConfHeaders(file.config))
 	if err != nil {
 		return nil, err
 	}
@@ -166,22 +166,22 @@ func (file *File) CheckIn(comment string, checkInType int) ([]byte, error) {
 		comment,
 		checkInType,
 	)
-	sp := NewHTTPClient(file.client)
-	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+	client := NewHTTPClient(file.client)
+	return client.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
 // CheckOut checks file out
 func (file *File) CheckOut() ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/CheckOut", file.endpoint)
-	sp := NewHTTPClient(file.client)
-	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+	client := NewHTTPClient(file.client)
+	return client.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
 // UndoCheckOut undoes file check out
 func (file *File) UndoCheckOut() ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/UndoCheckOut", file.endpoint)
-	sp := NewHTTPClient(file.client)
-	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+	client := NewHTTPClient(file.client)
+	return client.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
 // GetReader gets file io.ReadCloser
@@ -227,15 +227,15 @@ func (file *File) MoveTo(newURL string, overwrite bool) ([]byte, error) {
 		flag = 1
 	}
 	endpoint := fmt.Sprintf("%s/MoveTo(newurl='%s',flags=%d)", file.endpoint, newURL, flag)
-	sp := NewHTTPClient(file.client)
-	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+	client := NewHTTPClient(file.client)
+	return client.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
 // CopyTo file to new location within the same site
 func (file *File) CopyTo(newURL string, overwrite bool) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/CopyTo(strnewurl='%s',boverwrite=%t)", file.endpoint, newURL, overwrite)
-	sp := NewHTTPClient(file.client)
-	return sp.Post(endpoint, nil, getConfHeaders(file.config))
+	client := NewHTTPClient(file.client)
+	return client.Post(endpoint, nil, getConfHeaders(file.config))
 }
 
 // ContextInfo ...

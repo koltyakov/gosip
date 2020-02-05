@@ -60,15 +60,15 @@ func NewAttachment(client *gosip.SPClient, endpoint string, config *RequestConfi
 
 // Get gets attachments collection response
 func (attachments *Attachments) Get() (AttachmentsResp, error) {
-	sp := NewHTTPClient(attachments.client)
-	return sp.Get(attachments.endpoint, getConfHeaders(attachments.config))
+	client := NewHTTPClient(attachments.client)
+	return client.Get(attachments.endpoint, getConfHeaders(attachments.config))
 }
 
 // Add uploads new attachment to the item
 func (attachments *Attachments) Add(name string, content io.Reader) (AttachmentResp, error) {
-	sp := NewHTTPClient(attachments.client)
+	client := NewHTTPClient(attachments.client)
 	endpoint := fmt.Sprintf("%s/Add(FileName='%s')", attachments.endpoint, name)
-	return sp.Post(endpoint, content, getConfHeaders(attachments.config))
+	return client.Post(endpoint, content, getConfHeaders(attachments.config))
 }
 
 // GetByName gets an attachment by its name
@@ -82,22 +82,22 @@ func (attachments *Attachments) GetByName(fileName string) *Attachment {
 
 // Get gets attachment data object
 func (attachment *Attachment) Get() (AttachmentResp, error) {
-	sp := NewHTTPClient(attachment.client)
-	return sp.Get(attachment.endpoint, getConfHeaders(attachment.config))
+	client := NewHTTPClient(attachment.client)
+	return client.Get(attachment.endpoint, getConfHeaders(attachment.config))
 }
 
 // Delete delete an attachment skipping recycle bin
 func (attachment *Attachment) Delete() error {
-	sp := NewHTTPClient(attachment.client)
-	_, err := sp.Delete(attachment.endpoint, getConfHeaders(attachment.config))
+	client := NewHTTPClient(attachment.client)
+	_, err := client.Delete(attachment.endpoint, getConfHeaders(attachment.config))
 	return err
 }
 
 // Recycle moves an attachment to the recycle bin
 func (attachment *Attachment) Recycle() error {
-	sp := NewHTTPClient(attachment.client)
+	client := NewHTTPClient(attachment.client)
 	endpoint := fmt.Sprintf("%s/RecycleObject", attachment.endpoint)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(attachment.config))
+	_, err := client.Post(endpoint, nil, getConfHeaders(attachment.config))
 	return err
 }
 

@@ -125,9 +125,9 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 
 // startUpload starts uploading a document using chunk API
 func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
-	sp := NewHTTPClient(file.client)
+	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/StartUpload(uploadId=guid'%s')", file.endpoint, uploadID)
-	data, err := sp.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
+	data, err := client.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
 	if err != nil {
 		return 0, err
 	}
@@ -146,9 +146,9 @@ func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 
 // continueUpload continues uploading a document using chunk API
 func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) (int, error) {
-	sp := NewHTTPClient(file.client)
+	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/ContinueUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)
-	data, err := sp.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
+	data, err := client.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
 	if err != nil {
 		return 0, err
 	}
@@ -167,15 +167,15 @@ func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) 
 
 // cancelUpload cancels document upload using chunk API
 func (file *File) cancelUpload(uploadID string) error {
-	sp := NewHTTPClient(file.client)
+	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/CancelUpload(uploadId=guid'%s')", file.endpoint, uploadID)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(file.config))
+	_, err := client.Post(endpoint, nil, getConfHeaders(file.config))
 	return err
 }
 
 // finishUpload finiches uploading a document using chunk API
 func (file *File) finishUpload(uploadID string, fileOffset int, chunk []byte) (FileResp, error) {
-	sp := NewHTTPClient(file.client)
+	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/FinishUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)
-	return sp.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
+	return client.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
 }

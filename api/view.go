@@ -69,22 +69,22 @@ func (view *View) ToURL() string {
 
 // Get gets this View data response
 func (view *View) Get() (ViewResp, error) {
-	sp := NewHTTPClient(view.client)
-	return sp.Get(view.ToURL(), getConfHeaders(view.config))
+	client := NewHTTPClient(view.client)
+	return client.Get(view.ToURL(), getConfHeaders(view.config))
 }
 
 // Update updates View's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.View object
 func (view *View) Update(body []byte) (ViewResp, error) {
 	body = patchMetadataType(body, "SP.View")
-	sp := NewHTTPClient(view.client)
-	return sp.Update(view.endpoint, bytes.NewBuffer(body), getConfHeaders(view.config))
+	client := NewHTTPClient(view.client)
+	return client.Update(view.endpoint, bytes.NewBuffer(body), getConfHeaders(view.config))
 }
 
 // Delete deletes this View (can't be restored from a recycle bin)
 func (view *View) Delete() error {
-	sp := NewHTTPClient(view.client)
-	_, err := sp.Delete(view.endpoint, getConfHeaders(view.config))
+	client := NewHTTPClient(view.client)
+	_, err := client.Delete(view.endpoint, getConfHeaders(view.config))
 	return err
 }
 
@@ -99,6 +99,6 @@ func (view *View) SetViewXML(viewXML string) (ViewResp, error) {
 	if err != nil {
 		return nil, err
 	}
-	sp := NewHTTPClient(view.client)
-	return sp.Post(endpoint, bytes.NewBuffer(payload), getConfHeaders(view.config))
+	client := NewHTTPClient(view.client)
+	return client.Post(endpoint, bytes.NewBuffer(payload), getConfHeaders(view.config))
 }

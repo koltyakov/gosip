@@ -50,8 +50,8 @@ func (contentTypes *ContentTypes) ToURL() string {
 
 // Get gets content typed queryable collection response
 func (contentTypes *ContentTypes) Get() (ContentTypesResp, error) {
-	sp := NewHTTPClient(contentTypes.client)
-	return sp.Get(contentTypes.ToURL(), getConfHeaders(contentTypes.config))
+	client := NewHTTPClient(contentTypes.client)
+	return client.Get(contentTypes.ToURL(), getConfHeaders(contentTypes.config))
 }
 
 // GetByID gets a content type by its ID (GUID)
@@ -68,13 +68,13 @@ func (contentTypes *ContentTypes) GetByID(contentTypeID string) *ContentType {
 func (contentTypes *ContentTypes) Add(body []byte) (ContentTypeResp, error) {
 	// REST API doesn't work in that context as supposed to https://github.com/pnp/pnpjs/issues/457
 	body = patchMetadataType(body, "SP.ContentType")
-	sp := NewHTTPClient(contentTypes.client)
-	return sp.Post(contentTypes.endpoint, bytes.NewBuffer(body), getConfHeaders(contentTypes.config))
+	client := NewHTTPClient(contentTypes.client)
+	return client.Post(contentTypes.endpoint, bytes.NewBuffer(body), getConfHeaders(contentTypes.config))
 }
 
 // Create adds Content Type using CSOM polyfill as REST's Add method is limited (https://github.com/pnp/pnpjs/issues/457)
 func (contentTypes *ContentTypes) Create(contentTypeInfo *ContentTypeCreationInfo) (string, error) {
-	sp := NewHTTPClient(contentTypes.client)
+	client := NewHTTPClient(contentTypes.client)
 
 	b := csom.NewBuilder()
 	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
@@ -126,7 +126,7 @@ func (contentTypes *ContentTypes) Create(contentTypeInfo *ContentTypeCreationInf
 		return "", nil
 	}
 
-	resp, err := sp.ProcessQuery(contentTypes.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
+	resp, err := client.ProcessQuery(contentTypes.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 	if err != nil {
 		return "", nil
 	}

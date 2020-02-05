@@ -19,6 +19,7 @@ type HTTPClient struct {
 // RequestConfig struct
 type RequestConfig struct {
 	Headers map[string]string
+	// Context context.Context
 }
 
 // HeadersPresets : SP REST OData headers presets

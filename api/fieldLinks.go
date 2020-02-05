@@ -74,8 +74,8 @@ func (fieldLinks *FieldLinks) ToURL() string {
 
 // Get gets fieds response collection
 func (fieldLinks *FieldLinks) Get() (FieldLinksResp, error) {
-	sp := NewHTTPClient(fieldLinks.client)
-	return sp.Get(fieldLinks.ToURL(), getConfHeaders(fieldLinks.config))
+	client := NewHTTPClient(fieldLinks.client)
+	return client.Get(fieldLinks.ToURL(), getConfHeaders(fieldLinks.config))
 }
 
 // GetByID gets a field link by its ID (GUID)
@@ -89,16 +89,16 @@ func (fieldLinks *FieldLinks) GetByID(fieldLinkID string) *FieldLink {
 
 // Delete deletes a field link by its ID (GUID)
 func (fieldLink *FieldLink) Delete() error {
-	sp := NewHTTPClient(fieldLink.client)
-	_, err := sp.Delete(fieldLink.endpoint, getConfHeaders(fieldLink.config))
+	client := NewHTTPClient(fieldLink.client)
+	_, err := client.Delete(fieldLink.endpoint, getConfHeaders(fieldLink.config))
 	return err
 }
 
 // // Update updates a field link
 // func (fieldLink *FieldLink) Update(body []byte) (FieldLinkResp, error) {
 // 	body = patchMetadataType(body, "SP.FieldLink")
-// 	sp := NewHTTPClient(fieldLink.client)
-// 	return sp.Update(fieldLink.endpoint, body, getConfHeaders(fieldLink.config))
+// 	client := NewHTTPClient(fieldLink.client)
+// 	return client.Update(fieldLink.endpoint, body, getConfHeaders(fieldLink.config))
 // }
 
 // GetFields gets fieds response collection
@@ -123,8 +123,8 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 	// 	"Hidden": %t,
 	// 	"Required": %t
 	// }`, name, hidden, required)))
-	// sp := NewHTTPClient(fieldLinks.client)
-	// resp, err := sp.Post(fieldLinks.endpoint, body, getConfHeaders(fieldLinks.config))
+	// client := NewHTTPClient(fieldLinks.client)
+	// resp, err := client.Post(fieldLinks.endpoint, body, getConfHeaders(fieldLinks.config))
 	// if err != nil {
 	// 	return nil, err
 	// }
@@ -171,8 +171,8 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 		return "", err
 	}
 
-	sp := NewHTTPClient(fieldLinks.client)
-	resp, err := sp.ProcessQuery(fieldLinks.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
+	client := NewHTTPClient(fieldLinks.client)
+	resp, err := client.ProcessQuery(fieldLinks.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 	if err != nil {
 		return "", err
 	}

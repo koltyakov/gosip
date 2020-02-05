@@ -95,22 +95,22 @@ func (web *Web) FromURL(url string) *Web {
 
 // Get gets this Web info
 func (web *Web) Get() (WebResp, error) {
-	sp := NewHTTPClient(web.client)
-	return sp.Get(web.ToURL(), getConfHeaders(web.config))
+	client := NewHTTPClient(web.client)
+	return client.Get(web.ToURL(), getConfHeaders(web.config))
 }
 
 // Delete deletes this Web
 func (web *Web) Delete() error {
-	sp := NewHTTPClient(web.client)
-	_, err := sp.Delete(web.endpoint, getConfHeaders(web.config))
+	client := NewHTTPClient(web.client)
+	_, err := client.Delete(web.endpoint, getConfHeaders(web.config))
 	return err
 }
 
 // // Recycle moves this web to the recycle bin
 // func (web *Web) Recycle() error {
 // 	endpoint := fmt.Sprintf("%s/Recycle", web.endpoint)
-// 	sp := NewHTTPClient(web.client)
-// 	_, err := sp.Post(endpoint, nil, getConfHeaders(web.config))
+// 	client := NewHTTPClient(web.client)
+// 	_, err := client.Post(endpoint, nil, getConfHeaders(web.config))
 // 	return err
 // }
 
@@ -118,8 +118,8 @@ func (web *Web) Delete() error {
 // where `body` is byte array representation of JSON string payload relevalt to SP.Web object
 func (web *Web) Update(body []byte) (WebResp, error) {
 	body = patchMetadataType(body, "SP.Web")
-	sp := NewHTTPClient(web.client)
-	return sp.Update(web.endpoint, bytes.NewBuffer(body), getConfHeaders(web.config))
+	client := NewHTTPClient(web.client)
+	return client.Update(web.endpoint, bytes.NewBuffer(body), getConfHeaders(web.config))
 }
 
 // Lists gets Lists API instance object
@@ -207,7 +207,7 @@ func (web *Web) GetList(listURI string) *List {
 
 // EnsureUser ensures a user by a `loginName` parameter and returns UserInfo
 func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
-	sp := NewHTTPClient(web.client)
+	client := NewHTTPClient(web.client)
 	endpoint := fmt.Sprintf("%s/EnsureUser", web.endpoint)
 
 	headers := getConfHeaders(web.config)
@@ -215,7 +215,7 @@ func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
 
 	body := fmt.Sprintf(`{"logonName": "%s"}`, loginName)
 
-	data, err := sp.Post(endpoint, bytes.NewBuffer([]byte(body)), headers)
+	data, err := client.Post(endpoint, bytes.NewBuffer([]byte(body)), headers)
 	if err != nil {
 		return nil, err
 	}

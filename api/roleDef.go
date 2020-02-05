@@ -61,8 +61,8 @@ func (def *RoleDefinitions) GetByType(roleTypeKind int) (*RoleDefInfo, error) {
 
 // Get gets a collection of available role definitions
 func (def *RoleDefinitions) Get() ([]*RoleDefInfo, error) {
-	sp := NewHTTPClient(def.client)
-	data, err := sp.Get(def.endpoint, getConfHeaders(def.config))
+	client := NewHTTPClient(def.client)
+	data, err := client.Get(def.endpoint, getConfHeaders(def.config))
 	if err != nil {
 		return nil, err
 	}
@@ -82,9 +82,9 @@ func (def *RoleDefinitions) Get() ([]*RoleDefInfo, error) {
 }
 
 func getRoleDef(def *RoleDefinitions, endpoint string) (*RoleDefInfo, error) {
-	sp := NewHTTPClient(def.client)
+	client := NewHTTPClient(def.client)
 
-	data, err := sp.Post(endpoint, nil, HeadersPresets.Verbose.Headers)
+	data, err := client.Post(endpoint, nil, HeadersPresets.Verbose.Headers)
 	if err != nil {
 		return nil, err
 	}

@@ -44,8 +44,8 @@ func (properties *Properties) ToURL() string {
 
 // Get gets properties collection
 func (properties *Properties) Get() (PropsResp, error) {
-	sp := NewHTTPClient(properties.client)
-	return sp.Get(properties.ToURL(), getConfHeaders(properties.config))
+	client := NewHTTPClient(properties.client)
+	return client.Get(properties.ToURL(), getConfHeaders(properties.config))
 }
 
 // GetProps gets specific props values
@@ -138,8 +138,8 @@ func (properties *Properties) setWebProps(props map[string]string) error {
 		return err
 	}
 
-	sp := NewHTTPClient(properties.client)
-	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
+	client := NewHTTPClient(properties.client)
+	_, err = client.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err
@@ -187,8 +187,8 @@ func (properties *Properties) setFolderProps(props map[string]string) error {
 		return err
 	}
 
-	sp := NewHTTPClient(properties.client)
-	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
+	client := NewHTTPClient(properties.client)
+	_, err = client.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err
@@ -219,8 +219,8 @@ func (properties *Properties) setFileProps(props map[string]string) error {
 		return err
 	}
 
-	sp := NewHTTPClient(properties.client)
-	_, err = sp.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
+	client := NewHTTPClient(properties.client)
+	_, err = client.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err

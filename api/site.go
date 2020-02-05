@@ -89,22 +89,22 @@ func (site *Site) FromURL(url string) *Site {
 
 // Get gets this Site data object
 func (site *Site) Get() (SiteResp, error) {
-	sp := NewHTTPClient(site.client)
-	return sp.Get(site.ToURL(), getConfHeaders(site.config))
+	client := NewHTTPClient(site.client)
+	return client.Get(site.ToURL(), getConfHeaders(site.config))
 }
 
 // Update updates Site's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Site object
 func (site *Site) Update(body []byte) (SiteResp, error) {
 	body = patchMetadataType(body, "SP.Site")
-	sp := NewHTTPClient(site.client)
-	return sp.Update(site.endpoint, bytes.NewBuffer(body), getConfHeaders(site.config))
+	client := NewHTTPClient(site.client)
+	return client.Update(site.endpoint, bytes.NewBuffer(body), getConfHeaders(site.config))
 }
 
 // Delete deletes current site (can't be restored from a recycle bin)
 func (site *Site) Delete() error {
-	sp := NewHTTPClient(site.client)
-	_, err := sp.Delete(site.endpoint, getConfHeaders(site.config))
+	client := NewHTTPClient(site.client)
+	_, err := client.Delete(site.endpoint, getConfHeaders(site.config))
 	return err
 }
 
@@ -117,8 +117,8 @@ func (site *Site) RootWeb() *Web {
 // OpenWebByID gets a Web data object by its ID (GUID)
 func (site *Site) OpenWebByID(webID string) (WebResp, error) {
 	endpoint := fmt.Sprintf("%s/OpenWebById('%s')", site.endpoint, webID)
-	sp := NewHTTPClient(site.client)
-	return sp.Post(endpoint, nil, getConfHeaders(site.config))
+	client := NewHTTPClient(site.client)
+	return client.Post(endpoint, nil, getConfHeaders(site.config))
 }
 
 // Features gets Features API instance queryable collection for this Site

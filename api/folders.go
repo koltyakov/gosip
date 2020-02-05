@@ -38,15 +38,15 @@ func (folders *Folders) ToURL() string {
 
 // Get gets folders collection response in this folder
 func (folders *Folders) Get() (FoldersResp, error) {
-	sp := NewHTTPClient(folders.client)
-	return sp.Get(folders.ToURL(), getConfHeaders(folders.config))
+	client := NewHTTPClient(folders.client)
+	return client.Get(folders.ToURL(), getConfHeaders(folders.config))
 }
 
 // Add created a folder with specified name in this folder
 func (folders *Folders) Add(folderName string) (FolderResp, error) {
-	sp := NewHTTPClient(folders.client)
+	client := NewHTTPClient(folders.client)
 	endpoint := fmt.Sprintf("%s/Add('%s')", folders.endpoint, folderName)
-	return sp.Post(endpoint, nil, getConfHeaders(folders.config))
+	return client.Post(endpoint, nil, getConfHeaders(folders.config))
 }
 
 // GetByName gets a folder by its name in this folder

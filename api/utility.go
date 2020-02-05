@@ -41,7 +41,7 @@ func (utility *Utility) SendEmail(options *EmailProps) error {
 		"%s/_api/SP.Utilities.Utility.SendEmail",
 		getPriorEndpoint(utility.endpoint, "/_api"),
 	)
-	sp := NewHTTPClient(utility.client)
+	client := NewHTTPClient(utility.client)
 
 	properties := map[string]interface{}{}
 	properties["__metadata"] = map[string]string{"type": "SP.Utilities.EmailProperties"}
@@ -63,6 +63,6 @@ func (utility *Utility) SendEmail(options *EmailProps) error {
 	JSONProps := fmt.Sprintf("%s", props)
 	body := []byte(TrimMultiline(`{ "properties": ` + JSONProps + `}`))
 
-	_, err := sp.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(utility.config))
+	_, err := client.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(utility.config))
 	return err
 }

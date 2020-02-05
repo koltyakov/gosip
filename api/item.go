@@ -55,22 +55,22 @@ func (item *Item) ToURL() string {
 
 // Get gets this Item info
 func (item *Item) Get() (ItemResp, error) {
-	sp := NewHTTPClient(item.client)
-	return sp.Get(item.ToURL(), getConfHeaders(item.config))
+	client := NewHTTPClient(item.client)
+	return client.Get(item.ToURL(), getConfHeaders(item.config))
 }
 
 // Delete deletes this Item (can't be restored from a recycle bin)
 func (item *Item) Delete() error {
-	sp := NewHTTPClient(item.client)
-	_, err := sp.Delete(item.endpoint, getConfHeaders(item.config))
+	client := NewHTTPClient(item.client)
+	_, err := client.Delete(item.endpoint, getConfHeaders(item.config))
 	return err
 }
 
 // Recycle moves this item to the recycle bin
 func (item *Item) Recycle() error {
 	endpoint := fmt.Sprintf("%s/Recycle", item.endpoint)
-	sp := NewHTTPClient(item.client)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(item.config))
+	client := NewHTTPClient(item.client)
+	_, err := client.Post(endpoint, nil, getConfHeaders(item.config))
 	return err
 }
 
@@ -82,8 +82,8 @@ func (item *Item) Update(body []byte) (ItemResp, error) {
 		oDataType, _ := list.GetEntityType()
 		return oDataType
 	})
-	sp := NewHTTPClient(item.client)
-	return sp.Update(item.endpoint, bytes.NewBuffer(body), getConfHeaders(item.config))
+	client := NewHTTPClient(item.client)
+	return client.Update(item.endpoint, bytes.NewBuffer(body), getConfHeaders(item.config))
 }
 
 // Roles gets Roles API instance queryable collection for this Item

@@ -38,8 +38,8 @@ func (files *Files) ToURL() string {
 
 // Get gets Files collection response
 func (files *Files) Get() (FilesResp, error) {
-	sp := NewHTTPClient(files.client)
-	return sp.Get(files.ToURL(), getConfHeaders(files.config))
+	client := NewHTTPClient(files.client)
+	return client.Get(files.ToURL(), getConfHeaders(files.config))
 }
 
 // GetByName gets a file by its name
@@ -53,7 +53,7 @@ func (files *Files) GetByName(fileName string) *File {
 
 // Add uploads file into the folder
 func (files *Files) Add(name string, content []byte, overwrite bool) (FileResp, error) {
-	sp := NewHTTPClient(files.client)
+	client := NewHTTPClient(files.client)
 	endpoint := fmt.Sprintf("%s/Add(overwrite=%t,url='%s')", files.endpoint, overwrite, name)
-	return sp.Post(endpoint, bytes.NewBuffer(content), getConfHeaders(files.config))
+	return client.Post(endpoint, bytes.NewBuffer(content), getConfHeaders(files.config))
 }

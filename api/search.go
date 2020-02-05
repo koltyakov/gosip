@@ -155,7 +155,7 @@ func NewSearch(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 // PostQuery gets search results based on a `query`
 func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 	endpoint := fmt.Sprintf("%s/PostQuery", search.endpoint)
-	sp := NewHTTPClient(search.client)
+	client := NewHTTPClient(search.client)
 
 	request := map[string]interface{}{}
 	queryBytes, _ := json.Marshal(query)
@@ -198,7 +198,7 @@ func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 		"Content-Type": "application/json;odata=verbose;charset=utf-8",
 	}
 
-	return sp.Post(endpoint, bytes.NewBuffer(body), headers)
+	return client.Post(endpoint, bytes.NewBuffer(body), headers)
 }
 
 // ToDo:

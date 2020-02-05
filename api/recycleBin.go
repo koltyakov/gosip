@@ -58,8 +58,8 @@ func (recycleBin *RecycleBin) ToURL() string {
 
 // Get gets recycled items queryable collection
 func (recycleBin *RecycleBin) Get() (RecycleBinResp, error) {
-	sp := NewHTTPClient(recycleBin.client)
-	return sp.Get(recycleBin.ToURL(), getConfHeaders(recycleBin.config))
+	client := NewHTTPClient(recycleBin.client)
+	return client.Get(recycleBin.ToURL(), getConfHeaders(recycleBin.config))
 }
 
 // GetByID gets a recycled item by its ID
@@ -97,14 +97,14 @@ func NewRecycleBinItem(client *gosip.SPClient, endpoint string, config *RequestC
 
 // Get gets this recycle item data object
 func (recycleBinItem *RecycleBinItem) Get() (RecycleBinItemResp, error) {
-	sp := NewHTTPClient(recycleBinItem.client)
-	return sp.Get(recycleBinItem.endpoint, getConfHeaders(recycleBinItem.config))
+	client := NewHTTPClient(recycleBinItem.client)
+	return client.Get(recycleBinItem.endpoint, getConfHeaders(recycleBinItem.config))
 }
 
 // Restore restores this recycled item
 func (recycleBinItem *RecycleBinItem) Restore() error {
 	endpoint := fmt.Sprintf("%s/Restore()", recycleBinItem.endpoint)
-	sp := NewHTTPClient(recycleBinItem.client)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(recycleBinItem.config))
+	client := NewHTTPClient(recycleBinItem.client)
+	_, err := client.Post(endpoint, nil, getConfHeaders(recycleBinItem.config))
 	return err
 }

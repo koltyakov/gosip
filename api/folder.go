@@ -56,30 +56,30 @@ func (folder *Folder) ToURL() string {
 
 // Get gets this folder data object
 func (folder *Folder) Get() (FolderResp, error) {
-	sp := NewHTTPClient(folder.client)
-	return sp.Get(folder.ToURL(), getConfHeaders(folder.config))
+	client := NewHTTPClient(folder.client)
+	return client.Get(folder.ToURL(), getConfHeaders(folder.config))
 }
 
 // Update updates Folder's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Folder object
 func (folder *Folder) Update(body []byte) (FolderResp, error) {
 	body = patchMetadataType(body, "SP.Folder")
-	sp := NewHTTPClient(folder.client)
-	return sp.Update(folder.endpoint, bytes.NewBuffer(body), getConfHeaders(folder.config))
+	client := NewHTTPClient(folder.client)
+	return client.Update(folder.endpoint, bytes.NewBuffer(body), getConfHeaders(folder.config))
 }
 
 // Delete deletes this folder (can't be restored from a recycle bin)
 func (folder *Folder) Delete() error {
-	sp := NewHTTPClient(folder.client)
-	_, err := sp.Delete(folder.endpoint, getConfHeaders(folder.config))
+	client := NewHTTPClient(folder.client)
+	_, err := client.Delete(folder.endpoint, getConfHeaders(folder.config))
 	return err
 }
 
 // Recycle moves this folder to the recycle bin
 func (folder *Folder) Recycle() error {
-	sp := NewHTTPClient(folder.client)
+	client := NewHTTPClient(folder.client)
 	endpoint := fmt.Sprintf("%s/Recycle", folder.endpoint)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(folder.config))
+	_, err := client.Post(endpoint, nil, getConfHeaders(folder.config))
 	return err
 }
 
@@ -131,9 +131,9 @@ func (folder *Folder) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	}
 
 	apiURL.RawQuery = query.Encode()
-	sp := NewHTTPClient(folder.client)
+	client := NewHTTPClient(folder.client)
 
-	data, err := sp.Get(apiURL.String(), getConfHeaders(folder.config))
+	data, err := client.Get(apiURL.String(), getConfHeaders(folder.config))
 	if err != nil {
 		return nil, err
 	}

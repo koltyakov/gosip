@@ -52,22 +52,22 @@ func (ct *ContentType) ToURL() string {
 
 // Get gets content type data object
 func (ct *ContentType) Get() (ContentTypeResp, error) {
-	sp := NewHTTPClient(ct.client)
-	return sp.Get(ct.ToURL(), getConfHeaders(ct.config))
+	client := NewHTTPClient(ct.client)
+	return client.Get(ct.ToURL(), getConfHeaders(ct.config))
 }
 
 // Update updates Content Types's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.ContentType object
 func (ct *ContentType) Update(body []byte) (ContentTypeResp, error) {
 	body = patchMetadataType(body, "SP.ContentType")
-	sp := NewHTTPClient(ct.client)
-	return sp.Update(ct.endpoint, bytes.NewBuffer(body), getConfHeaders(ct.config))
+	client := NewHTTPClient(ct.client)
+	return client.Update(ct.endpoint, bytes.NewBuffer(body), getConfHeaders(ct.config))
 }
 
 // Delete deletes a content type skipping recycle bin
 func (ct *ContentType) Delete() error {
-	sp := NewHTTPClient(ct.client)
-	_, err := sp.Delete(ct.endpoint, getConfHeaders(ct.config))
+	client := NewHTTPClient(ct.client)
+	_, err := client.Delete(ct.endpoint, getConfHeaders(ct.config))
 	return err
 }
 

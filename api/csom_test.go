@@ -10,7 +10,7 @@ import (
 func TestCsomRequest(t *testing.T) {
 	checkClient(t)
 
-	sp := NewHTTPClient(spClient)
+	client := NewHTTPClient(spClient)
 
 	b := csom.NewBuilder()
 
@@ -28,7 +28,7 @@ func TestCsomRequest(t *testing.T) {
 		t.Error(err)
 	}
 
-	if _, err := sp.ProcessQuery(spClient.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomXML))); err != nil {
+	if _, err := client.ProcessQuery(spClient.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomXML))); err != nil {
 		t.Error(err)
 	}
 }

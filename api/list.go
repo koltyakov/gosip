@@ -112,22 +112,22 @@ func (list *List) ToURL() string {
 
 // Get gets list's data object
 func (list *List) Get() (ListResp, error) {
-	sp := NewHTTPClient(list.client)
-	return sp.Get(list.ToURL(), getConfHeaders(list.config))
+	client := NewHTTPClient(list.client)
+	return client.Get(list.ToURL(), getConfHeaders(list.config))
 }
 
 // Delete deletes a list (can't be restored from a recycle bin)
 func (list *List) Delete() error {
-	sp := NewHTTPClient(list.client)
-	_, err := sp.Delete(list.endpoint, getConfHeaders(list.config))
+	client := NewHTTPClient(list.client)
+	_, err := client.Delete(list.endpoint, getConfHeaders(list.config))
 	return err
 }
 
 // Recycle moves this list to the recycle bin
 func (list *List) Recycle() error {
 	endpoint := fmt.Sprintf("%s/Recycle", list.endpoint)
-	sp := NewHTTPClient(list.client)
-	_, err := sp.Post(endpoint, nil, getConfHeaders(list.config))
+	client := NewHTTPClient(list.client)
+	_, err := client.Post(endpoint, nil, getConfHeaders(list.config))
 	return err
 }
 
@@ -135,8 +135,8 @@ func (list *List) Recycle() error {
 // where `body` is byte array representation of JSON string payload relevalt to SP.List object
 func (list *List) Update(body []byte) (ListResp, error) {
 	body = patchMetadataType(body, "SP.List")
-	sp := NewHTTPClient(list.client)
-	return sp.Update(list.endpoint, bytes.NewBuffer(body), getConfHeaders(list.config))
+	client := NewHTTPClient(list.client)
+	return client.Update(list.endpoint, bytes.NewBuffer(body), getConfHeaders(list.config))
 }
 
 // Items gets Items API instance queryable collection
@@ -215,9 +215,9 @@ func (list *List) GetEntityType() (string, error) {
 
 // ReserveListItemID reserves item's ID in this list
 func (list *List) ReserveListItemID() (int, error) {
-	sp := NewHTTPClient(list.client)
+	client := NewHTTPClient(list.client)
 	endpoint := fmt.Sprintf("%s/ReserveListItemId", list.endpoint)
-	data, err := sp.Post(endpoint, nil, getConfHeaders(list.config))
+	data, err := client.Post(endpoint, nil, getConfHeaders(list.config))
 	if err != nil {
 		return 0, err
 	}
@@ -236,12 +236,12 @@ func (list *List) ReserveListItemID() (int, error) {
 
 // RenderListData renders lists content using CAML
 func (list *List) RenderListData(viewXML string) (RenderListDataResp, error) {
-	sp := NewHTTPClient(list.client)
+	client := NewHTTPClient(list.client)
 	apiURL, _ := url.Parse(fmt.Sprintf("%s/RenderListData(@viewXml)", list.endpoint))
 	query := apiURL.Query()
 	query.Set("@viewXml", `'`+TrimMultiline(viewXML)+`'`)
 	apiURL.RawQuery = query.Encode()
-	data, err := sp.Post(apiURL.String(), nil, getConfHeaders(list.config))
+	data, err := client.Post(apiURL.String(), nil, getConfHeaders(list.config))
 	if err != nil {
 		return nil, err
 	}

@@ -69,8 +69,8 @@ func (field *Field) ToURL() string {
 
 // Get gets field data object
 func (field *Field) Get() (FieldResp, error) {
-	sp := NewHTTPClient(field.client)
-	data, err := sp.Get(field.ToURL(), getConfHeaders(field.config))
+	client := NewHTTPClient(field.client)
+	data, err := client.Get(field.ToURL(), getConfHeaders(field.config))
 	if err != nil {
 		return nil, err
 	}
@@ -81,13 +81,13 @@ func (field *Field) Get() (FieldResp, error) {
 // where `body` is byte array representation of JSON string payload relevalt to SP.Field object
 func (field *Field) Update(body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.Field")
-	sp := NewHTTPClient(field.client)
-	return sp.Update(field.endpoint, bytes.NewBuffer(body), getConfHeaders(field.config))
+	client := NewHTTPClient(field.client)
+	return client.Update(field.endpoint, bytes.NewBuffer(body), getConfHeaders(field.config))
 }
 
 // Delete deletes a field skipping recycle bin
 func (field *Field) Delete() error {
-	sp := NewHTTPClient(field.client)
-	_, err := sp.Delete(field.endpoint, getConfHeaders(field.config))
+	client := NewHTTPClient(field.client)
+	_, err := client.Delete(field.endpoint, getConfHeaders(field.config))
 	return err
 }

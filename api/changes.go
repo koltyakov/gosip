@@ -82,8 +82,8 @@ func NewChanges(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 // GetCurrentToken gets current change token for this parent entity
 func (changes *Changes) GetCurrentToken() (string, error) {
 	endpoint := fmt.Sprintf("%s?$select=CurrentChangeToken", changes.endpoint)
-	sp := NewHTTPClient(changes.client)
-	data, err := sp.Get(endpoint, getConfHeaders(changes.config))
+	client := NewHTTPClient(changes.client)
+	data, err := client.Get(endpoint, getConfHeaders(changes.config))
 	if err != nil {
 		return "", err
 	}
@@ -100,7 +100,7 @@ func (changes *Changes) GetCurrentToken() (string, error) {
 // GetChanges gets changes in scope of the parent container using provided change query
 func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
 	endpoint := fmt.Sprintf("%s/GetChanges", changes.endpoint)
-	sp := NewHTTPClient(changes.client)
+	client := NewHTTPClient(changes.client)
 	metadata := map[string]interface{}{}
 	if changeQuery != nil {
 		optsRaw, _ := json.Marshal(changeQuery)
@@ -123,7 +123,7 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, err
 	if err != nil {
 		return nil, err
 	}
-	data, err := sp.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(changes.config))
+	data, err := client.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(changes.config))
 	if err != nil {
 		return nil, err
 	}

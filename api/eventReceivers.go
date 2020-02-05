@@ -46,8 +46,8 @@ func (receivers *EventReceivers) ToURL() string {
 
 // Get gets event receivers collection
 func (receivers *EventReceivers) Get() ([]*EventReceiverInfo, error) {
-	sp := NewHTTPClient(receivers.client)
-	data, err := sp.Get(receivers.ToURL(), getConfHeaders(receivers.config))
+	client := NewHTTPClient(receivers.client)
+	data, err := client.Get(receivers.ToURL(), getConfHeaders(receivers.config))
 	if err != nil {
 		return nil, err
 	}

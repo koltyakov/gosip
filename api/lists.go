@@ -39,8 +39,8 @@ func (lists *Lists) ToURL() string {
 
 // Get gets Lists API queryable collection
 func (lists *Lists) Get() (ListsResp, error) {
-	sp := NewHTTPClient(lists.client)
-	return sp.Get(lists.ToURL(), getConfHeaders(lists.config))
+	client := NewHTTPClient(lists.client)
+	return client.Get(lists.ToURL(), getConfHeaders(lists.config))
 }
 
 // GetByTitle gets a list by its Display Name (Title)
@@ -89,13 +89,13 @@ func (lists *Lists) Add(title string, metadata map[string]interface{}) (ListResp
 	parameters, _ := json.Marshal(metadata)
 	body := fmt.Sprintf("%s", parameters)
 
-	sp := NewHTTPClient(lists.client)
+	client := NewHTTPClient(lists.client)
 	headers := getConfHeaders(lists.config)
 
 	headers["Accept"] = "application/json;odata=verbose"
 	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
 
-	return sp.Post(lists.endpoint, bytes.NewBuffer([]byte(body)), headers)
+	return client.Post(lists.endpoint, bytes.NewBuffer([]byte(body)), headers)
 }
 
 // AddWithURI creates new list on this web with a provided `title` and `uri`.

@@ -88,7 +88,7 @@ func (records *Records) Undeclare() error {
 
 // csomItemRecordMethod conscructs CSOM API process query to cover missed REST API functionality
 func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) ([]byte, error) {
-	sp := NewHTTPClient(item.client)
+	client := NewHTTPClient(item.client)
 	itemR, err := item.Select("Id").Get()
 	if err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) 
 		return nil, err
 	}
 
-	jsomResp, err := sp.ProcessQuery(item.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
+	jsomResp, err := client.ProcessQuery(item.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
 	if err != nil {
 		return nil, err
 	}

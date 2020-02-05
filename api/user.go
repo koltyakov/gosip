@@ -49,16 +49,16 @@ func (user *User) ToURL() string {
 
 // Get gets this user data object
 func (user *User) Get() (UserResp, error) {
-	sp := NewHTTPClient(user.client)
-	return sp.Get(user.ToURL(), getConfHeaders(user.config))
+	client := NewHTTPClient(user.client)
+	return client.Get(user.ToURL(), getConfHeaders(user.config))
 }
 
 // Update updates User's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.User object
 func (user *User) Update(body []byte) (UserResp, error) {
 	body = patchMetadataType(body, "SP.User")
-	sp := NewHTTPClient(user.client)
-	return sp.Update(user.endpoint, bytes.NewBuffer(body), getConfHeaders(user.config))
+	client := NewHTTPClient(user.client)
+	return client.Update(user.endpoint, bytes.NewBuffer(body), getConfHeaders(user.config))
 }
 
 // Groups gets Groups API instance queryable collection for this User

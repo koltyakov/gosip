@@ -60,8 +60,8 @@ func (customActions *CustomActions) ToURL() string {
 
 // Get gets event customActions collection
 func (customActions *CustomActions) Get() ([]*CustomActionInfo, error) {
-	sp := NewHTTPClient(customActions.client)
-	data, err := sp.Get(customActions.ToURL(), getConfHeaders(customActions.config))
+	client := NewHTTPClient(customActions.client)
+	data, err := client.Get(customActions.ToURL(), getConfHeaders(customActions.config))
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +76,8 @@ func (customActions *CustomActions) Get() ([]*CustomActionInfo, error) {
 // Add register new user custom action
 func (customActions *CustomActions) Add(payload []byte) (*CustomActionInfo, error) {
 	body := patchMetadataType(payload, "SP.UserCustomAction")
-	sp := NewHTTPClient(customActions.client)
-	data, err := sp.Post(customActions.endpoint, bytes.NewBuffer(body), getConfHeaders(customActions.config))
+	client := NewHTTPClient(customActions.client)
+	data, err := client.Post(customActions.endpoint, bytes.NewBuffer(body), getConfHeaders(customActions.config))
 	if err != nil {
 		return nil, err
 	}
@@ -119,8 +119,8 @@ func (customActions *CustomActions) GetByID(actionID string) *CustomAction {
 
 // Get gets this action metadata
 func (customAction *CustomAction) Get() (*CustomActionInfo, error) {
-	sp := NewHTTPClient(customAction.client)
-	data, err := sp.Get(customAction.endpoint, getConfHeaders(customAction.config))
+	client := NewHTTPClient(customAction.client)
+	data, err := client.Get(customAction.endpoint, getConfHeaders(customAction.config))
 	if err != nil {
 		return nil, err
 	}
@@ -135,8 +135,8 @@ func (customAction *CustomAction) Get() (*CustomActionInfo, error) {
 // // Update updates this custom action
 // func (customAction *CustomAction) Update(payload []byte) (*CustomActionInfo, error) {
 // 	body := patchMetadataType(payload, "SP.UserCustomAction")
-// 	sp := NewHTTPClient(customAction.client)
-// 	data, err := sp.Post(customAction.endpoint, body, getConfHeaders(customAction.config))
+// 	client := NewHTTPClient(customAction.client)
+// 	data, err := client.Post(customAction.endpoint, body, getConfHeaders(customAction.config))
 // 	if err != nil {
 // 		return nil, err
 // 	}
@@ -150,7 +150,7 @@ func (customAction *CustomAction) Get() (*CustomActionInfo, error) {
 
 // Delete deletes this custom action
 func (customAction *CustomAction) Delete() error {
-	sp := NewHTTPClient(customAction.client)
-	_, err := sp.Delete(customAction.endpoint, getConfHeaders(customAction.config))
+	client := NewHTTPClient(customAction.client)
+	_, err := client.Delete(customAction.endpoint, getConfHeaders(customAction.config))
 	return err
 }
