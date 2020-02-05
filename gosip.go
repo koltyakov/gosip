@@ -78,10 +78,11 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	// Creating backup reader to be able to retry none nil body requests
 	var bodyBackup io.Reader
 	if req.Body != nil {
-		data, _ := ioutil.ReadAll(req.Body)
-		bodyBackup = bytes.NewReader(data)
-		req.Body = ioutil.NopCloser(bytes.NewReader(data))
-	} // maybe there could be more effective way
+		var buf bytes.Buffer
+		tee := io.TeeReader(req.Body, &buf)
+		bodyBackup = &buf
+		req.Body = ioutil.NopCloser(tee)
+	}
 
 	// Sending actual request to SharePoint API/resource
 	resp, err := c.Do(req)
@@ -113,14 +114,16 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	}
 
 	// Return meaningful error message
-	if err == nil && !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
-		defer resp.Body.Close()
-		details, _ := ioutil.ReadAll(resp.Body)
+	if !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
+		var buf bytes.Buffer
+		tee := io.TeeReader(resp.Body, &buf)
+		details, _ := ioutil.ReadAll(tee)
 		err = fmt.Errorf("%s :: %s", resp.Status, details)
 		// Unescape unicode-escaped error messages for non Latin languages
 		if unescaped, e := strconv.Unquote(`"` + strings.Replace(fmt.Sprintf("%s", details), `"`, `\"`, -1) + `"`); e == nil {
 			err = fmt.Errorf("%s :: %s", resp.Status, unescaped)
 		}
+		resp.Body = ioutil.NopCloser(&buf)
 		c.onError(req, reqTime, resp.StatusCode, err)
 	}
 
