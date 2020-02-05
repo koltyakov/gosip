@@ -1,12 +1,5 @@
 echo "mode: atomic" > coverage.txt
 
-if [ -f gosip_coverage.out ]; then
-  cat gosip_coverage.out \
-    | egrep -v '^mode.*' \
-    >> coverage.txt
-  rm gosip_coverage.out
-fi
-
 # Locally precovered strategies
 strategies=( addin adfs anon fba ntml saml tmg )
 for strategy in "${strategies[@]}"
@@ -48,4 +41,11 @@ if [ -f csom_coverage.out ]; then
     | egrep -v '^mode.*' \
     >> coverage.txt
   rm csom_coverage.out
+fi
+
+if [ -f gosip_coverage.out ]; then
+  cat gosip_coverage.out \
+    | egrep -v '^mode.*' \
+    >> coverage.txt
+  rm gosip_coverage.out
 fi
