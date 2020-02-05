@@ -311,4 +311,29 @@ func TestUtils(t *testing.T) {
 		}
 	})
 
+	t.Run("patchConfigHeaders", func(t *testing.T) {
+		headers := map[string]string{
+			"Accept": "application/json",
+		}
+		conf := patchConfigHeaders(nil, headers)
+		if conf == nil {
+			t.Error("empty request config")
+		}
+		if conf.Headers["Accept"] != "application/json" {
+			t.Error("incorrect headers")
+		}
+		conf2 := patchConfigHeaders(&RequestConfig{
+			Headers: map[string]string{
+				"Accept":       "application/xml",
+				"Content-Type": "application/json",
+			},
+		}, headers)
+		if conf2.Headers["Content-Type"] != "application/json" {
+			t.Error("incorrect headers")
+		}
+		if conf2.Headers["Accept"] != "application/json" {
+			t.Error("incorrect headers")
+		}
+	})
+
 }
