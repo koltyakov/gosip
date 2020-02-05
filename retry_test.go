@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 )
@@ -185,7 +186,7 @@ func TestRetry(t *testing.T) {
 
 		dur := time.Now().Sub(beforeReq)
 		if dur < 1*time.Second {
-			t.Error("Retry after is ignored")
+			t.Error("retry after is ignored")
 		}
 	})
 
@@ -209,10 +210,7 @@ func TestRetry(t *testing.T) {
 
 	t.Run("ContextCancel", func(t *testing.T) {
 		client := &SPClient{
-			AuthCnfg: &AnonymousCnfg{
-				SiteURL:  siteURL,
-				Strategy: "ntlm",
-			},
+			AuthCnfg: &AnonymousCnfg{SiteURL: siteURL},
 		}
 
 		req, err := http.NewRequest("GET", client.AuthCnfg.GetSiteURL()+"/_api/contextcancel", nil)
@@ -235,6 +233,27 @@ func TestRetry(t *testing.T) {
 
 		dur := time.Now().Sub(beforeReq)
 		if dur > 1*time.Second {
+			t.Error("context canceling failed")
+		}
+	})
+
+	t.Run("ContextCancel", func(t *testing.T) {
+		client := &SPClient{
+			AuthCnfg: &AnonymousCnfg{SiteURL: siteURL},
+		}
+
+		req, err := http.NewRequest("GET", client.AuthCnfg.GetSiteURL()+"/_api/contextcancel_2", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		ctx, cancel := context.WithCancel(context.Background())
+		req = req.WithContext(ctx)
+
+		cancel()
+
+		_, err = client.Execute(req) // should be prevented due to already closed context
+
+		if strings.Index(err.Error(), "context canceled") == -1 {
 			t.Error("context canceling failed")
 		}
 	})
