@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestRetry(t *testing.T) {
@@ -14,6 +15,13 @@ func TestRetry(t *testing.T) {
 		// faking digest response
 		if r.RequestURI == "/_api/ContextInfo" {
 			fmt.Fprintf(w, `{"d":{"GetContextWebInformation":{"FormDigestValue":"FAKE","FormDigestTimeoutSeconds":120,"LibraryVersion":"FAKE"}}}`)
+			return
+		}
+		// retry after
+		if r.RequestURI == "/_api/retryafter" && r.Header.Get("X-Gosip-Retry") == "1" {
+			w.Header().Add("Retry-After", "1")
+			w.WriteHeader(http.StatusTooManyRequests)
+			w.Write([]byte(`{ "error": "Body is not backed off" }`))
 			return
 		}
 		if r.Body != nil {
@@ -123,6 +131,47 @@ func TestRetry(t *testing.T) {
 
 		if rsp.StatusCode != 503 {
 			t.Error("should receive 503")
+		}
+	})
+
+	t.Run("DisableRetry", func(t *testing.T) {
+		client := &SPClient{
+			AuthCnfg: &AnonymousCnfg{SiteURL: siteURL},
+		}
+
+		req, err := http.NewRequest("GET", client.AuthCnfg.GetSiteURL()+"/_api/get", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		req.Header.Add("X-Gosip-NoRetry", "true")
+
+		rsp, _ := client.Execute(req)
+		defer rsp.Body.Close()
+
+		if rsp.StatusCode != 503 {
+			t.Error("should receive 503")
+		}
+	})
+
+	t.Run("RetryAfter", func(t *testing.T) {
+		client := &SPClient{
+			AuthCnfg: &AnonymousCnfg{SiteURL: siteURL},
+		}
+
+		req, err := http.NewRequest("GET", client.AuthCnfg.GetSiteURL()+"/_api/retryafter", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		beforeReq := time.Now()
+		if _, err := client.Execute(req); err != nil {
+			t.Error(err)
+		}
+
+		dur := time.Now().Sub(beforeReq)
+		if dur < 1*time.Second {
+			t.Error("Retry after is ignored")
 		}
 	})
 

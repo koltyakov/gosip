@@ -1,7 +1,6 @@
 package gosip
 
 import (
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -44,7 +43,6 @@ func (c *SPClient) shouldRetry(req *http.Request, resp *http.Response, retries i
 		retryAfter := 0
 		if resp != nil && resp.StatusCode == 429 { // sometimes SPO is abusing Retry-After header on 503 errors
 			retryAfter, _ = strconv.Atoi(resp.Header.Get("Retry-After"))
-			fmt.Println("Retry after", retryAfter)
 		}
 		req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
 		if retryAfter != 0 {

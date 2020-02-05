@@ -42,3 +42,10 @@ if [ -f csom_coverage.out ]; then
     >> coverage.txt
   rm csom_coverage.out
 fi
+
+if [ -f gosip_coverage.out ]; then
+  cat gosip_coverage.out \
+    | egrep -v '^mode.*' \
+    >> coverage.txt
+  rm gosip_coverage.out
+fi

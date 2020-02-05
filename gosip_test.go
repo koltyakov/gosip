@@ -1,64 +1,58 @@
 package gosip
 
 import (
-	"io"
-	"net"
 	"net/http"
+	"testing"
 )
 
-type AnonymousCnfg struct {
-	SiteURL string `json:"siteUrl"` // SPSite or SPWeb URL, which is the context target for the API calls
-}
+func TestEdges(t *testing.T) {
 
-// ReadConfig : reads private config with auth options
-func (c *AnonymousCnfg) ReadConfig(privateFile string) error {
-	return nil
-}
+	t.Run("EmptyURLShouldFail", func(t *testing.T) {
+		client := &SPClient{
+			AuthCnfg: &AnonymousCnfg{SiteURL: ""},
+		}
 
-// WriteConfig : writes private config with auth options
-func (c *AnonymousCnfg) WriteConfig(privateFile string) error {
-	return nil
-}
+		req, err := http.NewRequest("POST", client.AuthCnfg.GetSiteURL()+"/_api/post", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-// GetAuth : authenticates, receives access token
-func (c *AnonymousCnfg) GetAuth() (string, error) {
-	return "", nil
-}
+		if _, err := client.Execute(req); err == nil {
+			t.Error(err)
+		}
+	})
 
-// GetSiteURL : gets siteURL
-func (c *AnonymousCnfg) GetSiteURL() string {
-	return c.SiteURL
-}
+	t.Run("ImcorrectConfigShouldFail", func(t *testing.T) {
+		client := &SPClient{
+			AuthCnfg:   &AnonymousCnfg{},
+			ConfigPath: "incorrect",
+		}
 
-// GetStrategy : gets auth strategy name
-func (c *AnonymousCnfg) GetStrategy() string {
-	return "anonymous"
-}
+		req, err := http.NewRequest("POST", client.AuthCnfg.GetSiteURL()+"/_api/post", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-// SetAuth : authenticate request
-func (c *AnonymousCnfg) SetAuth(req *http.Request, httpClient *SPClient) error {
-	return nil
-}
+		if _, err := client.Execute(req); err == nil {
+			t.Error(err)
+		}
+	})
 
-// Fake server bootstrap helper
+	t.Run("SetAuthReturnError", func(t *testing.T) {
+		client := &SPClient{
+			AuthCnfg: &AnonymousCnfg{
+				SiteURL: "http://restricted",
+			},
+		}
 
-func startFakeServer(addr string, handler http.Handler) (io.Closer, error) {
-	srv := &http.Server{Addr: addr, Handler: handler}
-	if addr == "" {
-		addr = ":8989"
-	}
+		req, err := http.NewRequest("POST", client.AuthCnfg.GetSiteURL()+"/_api/post", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	listener, err := net.Listen("tcp", addr)
-	if err != nil {
-		return nil, err
-	}
+		if _, err := client.Execute(req); err == nil {
+			t.Error(err)
+		}
+	})
 
-	go func() {
-		_ = srv.Serve(listener.(*net.TCPListener))
-		// if err != nil {
-		// 	log.Println("HTTP Server Error - ", err)
-		// }
-	}()
-
-	return listener, nil
 }
