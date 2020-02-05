@@ -45,12 +45,17 @@ func (c *SPClient) shouldRetry(req *http.Request, resp *http.Response, retries i
 			retryAfter, _ = strconv.Atoi(resp.Header.Get("Retry-After"))
 		}
 		req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
+		sleepTimeout := time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond // default, no Retry-After header
 		if retryAfter != 0 {
-			time.Sleep(time.Duration(retryAfter) * time.Second) // wait for Retry-After header info value
-		} else {
-			time.Sleep(time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond) // no Retry-After header
+			sleepTimeout = time.Duration(retryAfter) * time.Second // wait for Retry-After header info value
 		}
-		return true
+		// time.Sleep(sleepTimeout)
+		select {
+		case <-req.Context().Done():
+			return false // do not retry when context is canceled
+		case <-time.After(sleepTimeout):
+			return true
+		}
 	}
 	return false
 }

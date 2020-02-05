@@ -2,6 +2,7 @@ package gosip
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -28,6 +29,13 @@ func TestRetry(t *testing.T) {
 		if r.RequestURI == "/_api/ntlm" && r.Header.Get("X-Gosip-Retry") == "" {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(`{ "error": "NTLM force retry" }`))
+			return
+		}
+		// context cancel
+		if r.RequestURI == "/_api/contextcancel" && r.Header.Get("X-Gosip-Retry") == "" {
+			w.Header().Add("Retry-After", "5")
+			w.WriteHeader(http.StatusTooManyRequests)
+			w.Write([]byte(`{ "error": "context cancel" }`))
 			return
 		}
 		if r.Body != nil {
@@ -199,4 +207,35 @@ func TestRetry(t *testing.T) {
 		}
 	})
 
+	t.Run("ContextCancel", func(t *testing.T) {
+		client := &SPClient{
+			AuthCnfg: &AnonymousCnfg{
+				SiteURL:  siteURL,
+				Strategy: "ntlm",
+			},
+		}
+
+		req, err := http.NewRequest("GET", client.AuthCnfg.GetSiteURL()+"/_api/contextcancel", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		ctx, cancel := context.WithCancel(context.Background())
+		req = req.WithContext(ctx)
+
+		beforeReq := time.Now()
+
+		go func() {
+			select {
+			case <-time.After(900 * time.Millisecond):
+				cancel()
+			}
+		}()
+
+		client.Execute(req) // should be canceled with a context after 900 milliseconds
+
+		dur := time.Now().Sub(beforeReq)
+		if dur > 1*time.Second {
+			t.Error("context canceling failed")
+		}
+	})
 }
