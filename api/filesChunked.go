@@ -127,7 +127,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/StartUpload(uploadId=guid'%s')", file.endpoint, uploadID)
-	data, err := client.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
+	data, err := client.Post(endpoint, bytes.NewBuffer(chunk), file.config)
 	if err != nil {
 		return 0, err
 	}
@@ -148,7 +148,7 @@ func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) (int, error) {
 	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/ContinueUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)
-	data, err := client.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
+	data, err := client.Post(endpoint, bytes.NewBuffer(chunk), file.config)
 	if err != nil {
 		return 0, err
 	}
@@ -169,7 +169,7 @@ func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) 
 func (file *File) cancelUpload(uploadID string) error {
 	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/CancelUpload(uploadId=guid'%s')", file.endpoint, uploadID)
-	_, err := client.Post(endpoint, nil, getConfHeaders(file.config))
+	_, err := client.Post(endpoint, nil, file.config)
 	return err
 }
 
@@ -177,5 +177,5 @@ func (file *File) cancelUpload(uploadID string) error {
 func (file *File) finishUpload(uploadID string, fileOffset int, chunk []byte) (FileResp, error) {
 	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/FinishUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)
-	return client.Post(endpoint, bytes.NewBuffer(chunk), getConfHeaders(file.config))
+	return client.Post(endpoint, bytes.NewBuffer(chunk), file.config)
 }

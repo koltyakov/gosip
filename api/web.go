@@ -96,13 +96,13 @@ func (web *Web) FromURL(url string) *Web {
 // Get gets this Web info
 func (web *Web) Get() (WebResp, error) {
 	client := NewHTTPClient(web.client)
-	return client.Get(web.ToURL(), getConfHeaders(web.config))
+	return client.Get(web.ToURL(), web.config)
 }
 
 // Delete deletes this Web
 func (web *Web) Delete() error {
 	client := NewHTTPClient(web.client)
-	_, err := client.Delete(web.endpoint, getConfHeaders(web.config))
+	_, err := client.Delete(web.endpoint, web.config)
 	return err
 }
 
@@ -119,7 +119,7 @@ func (web *Web) Delete() error {
 func (web *Web) Update(body []byte) (WebResp, error) {
 	body = patchMetadataType(body, "SP.Web")
 	client := NewHTTPClient(web.client)
-	return client.Update(web.endpoint, bytes.NewBuffer(body), getConfHeaders(web.config))
+	return client.Update(web.endpoint, bytes.NewBuffer(body), web.config)
 }
 
 // Lists gets Lists API instance object
@@ -215,7 +215,7 @@ func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
 
 	body := fmt.Sprintf(`{"logonName": "%s"}`, loginName)
 
-	data, err := client.Post(endpoint, bytes.NewBuffer([]byte(body)), headers)
+	data, err := client.Post(endpoint, bytes.NewBuffer([]byte(body)), patchConfigHeaders(web.config, headers))
 	if err != nil {
 		return nil, err
 	}

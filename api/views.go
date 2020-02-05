@@ -39,7 +39,7 @@ func (views *Views) ToURL() string {
 // Get gets this List or Document Library views collection
 func (views *Views) Get() (ViewsResp, error) {
 	client := NewHTTPClient(views.client)
-	return client.Get(views.ToURL(), getConfHeaders(views.config))
+	return client.Get(views.ToURL(), views.config)
 }
 
 // Add adds view with properties provided in `body` parameter
@@ -47,7 +47,7 @@ func (views *Views) Get() (ViewsResp, error) {
 func (views *Views) Add(body []byte) (ViewResp, error) {
 	body = patchMetadataType(body, "SP.View")
 	client := NewHTTPClient(views.client)
-	return client.Post(views.endpoint, bytes.NewBuffer(body), getConfHeaders(views.config))
+	return client.Post(views.endpoint, bytes.NewBuffer(body), views.config)
 }
 
 // GetByID gets a view by its ID (GUID)

@@ -40,11 +40,7 @@ func (webs *Webs) ToURL() string {
 // Get gets Webs response - a collection of WebInfo for the parent Web
 func (webs *Webs) Get() (WebsResp, error) {
 	client := NewHTTPClient(webs.client)
-	headers := map[string]string{}
-	if webs.config != nil {
-		headers = webs.config.Headers
-	}
-	return client.Get(webs.ToURL(), headers)
+	return client.Get(webs.ToURL(), webs.config)
 }
 
 // Add creates a subweb for a parent web with provided `title` and `url`.
@@ -90,5 +86,5 @@ func (webs *Webs) Add(title string, url string, metadata map[string]interface{})
 	headers["Accept"] = "application/json;odata=verbose"
 	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
 
-	return client.Post(endpoint, bytes.NewBuffer([]byte(body)), headers)
+	return client.Post(endpoint, bytes.NewBuffer([]byte(body)), patchConfigHeaders(webs.config, headers))
 }

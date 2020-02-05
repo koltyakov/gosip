@@ -70,7 +70,7 @@ func (field *Field) ToURL() string {
 // Get gets field data object
 func (field *Field) Get() (FieldResp, error) {
 	client := NewHTTPClient(field.client)
-	data, err := client.Get(field.ToURL(), getConfHeaders(field.config))
+	data, err := client.Get(field.ToURL(), field.config)
 	if err != nil {
 		return nil, err
 	}
@@ -82,12 +82,12 @@ func (field *Field) Get() (FieldResp, error) {
 func (field *Field) Update(body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.Field")
 	client := NewHTTPClient(field.client)
-	return client.Update(field.endpoint, bytes.NewBuffer(body), getConfHeaders(field.config))
+	return client.Update(field.endpoint, bytes.NewBuffer(body), field.config)
 }
 
 // Delete deletes a field skipping recycle bin
 func (field *Field) Delete() error {
 	client := NewHTTPClient(field.client)
-	_, err := client.Delete(field.endpoint, getConfHeaders(field.config))
+	_, err := client.Delete(field.endpoint, field.config)
 	return err
 }

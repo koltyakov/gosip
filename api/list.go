@@ -113,13 +113,13 @@ func (list *List) ToURL() string {
 // Get gets list's data object
 func (list *List) Get() (ListResp, error) {
 	client := NewHTTPClient(list.client)
-	return client.Get(list.ToURL(), getConfHeaders(list.config))
+	return client.Get(list.ToURL(), list.config)
 }
 
 // Delete deletes a list (can't be restored from a recycle bin)
 func (list *List) Delete() error {
 	client := NewHTTPClient(list.client)
-	_, err := client.Delete(list.endpoint, getConfHeaders(list.config))
+	_, err := client.Delete(list.endpoint, list.config)
 	return err
 }
 
@@ -127,7 +127,7 @@ func (list *List) Delete() error {
 func (list *List) Recycle() error {
 	endpoint := fmt.Sprintf("%s/Recycle", list.endpoint)
 	client := NewHTTPClient(list.client)
-	_, err := client.Post(endpoint, nil, getConfHeaders(list.config))
+	_, err := client.Post(endpoint, nil, list.config)
 	return err
 }
 
@@ -136,7 +136,7 @@ func (list *List) Recycle() error {
 func (list *List) Update(body []byte) (ListResp, error) {
 	body = patchMetadataType(body, "SP.List")
 	client := NewHTTPClient(list.client)
-	return client.Update(list.endpoint, bytes.NewBuffer(body), getConfHeaders(list.config))
+	return client.Update(list.endpoint, bytes.NewBuffer(body), list.config)
 }
 
 // Items gets Items API instance queryable collection
@@ -217,7 +217,7 @@ func (list *List) GetEntityType() (string, error) {
 func (list *List) ReserveListItemID() (int, error) {
 	client := NewHTTPClient(list.client)
 	endpoint := fmt.Sprintf("%s/ReserveListItemId", list.endpoint)
-	data, err := client.Post(endpoint, nil, getConfHeaders(list.config))
+	data, err := client.Post(endpoint, nil, list.config)
 	if err != nil {
 		return 0, err
 	}
@@ -241,7 +241,7 @@ func (list *List) RenderListData(viewXML string) (RenderListDataResp, error) {
 	query := apiURL.Query()
 	query.Set("@viewXml", `'`+TrimMultiline(viewXML)+`'`)
 	apiURL.RawQuery = query.Encode()
-	data, err := client.Post(apiURL.String(), nil, getConfHeaders(list.config))
+	data, err := client.Post(apiURL.String(), nil, list.config)
 	if err != nil {
 		return nil, err
 	}

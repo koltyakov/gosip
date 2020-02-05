@@ -70,7 +70,7 @@ func (view *View) ToURL() string {
 // Get gets this View data response
 func (view *View) Get() (ViewResp, error) {
 	client := NewHTTPClient(view.client)
-	return client.Get(view.ToURL(), getConfHeaders(view.config))
+	return client.Get(view.ToURL(), view.config)
 }
 
 // Update updates View's metadata with properties provided in `body` parameter
@@ -78,13 +78,13 @@ func (view *View) Get() (ViewResp, error) {
 func (view *View) Update(body []byte) (ViewResp, error) {
 	body = patchMetadataType(body, "SP.View")
 	client := NewHTTPClient(view.client)
-	return client.Update(view.endpoint, bytes.NewBuffer(body), getConfHeaders(view.config))
+	return client.Update(view.endpoint, bytes.NewBuffer(body), view.config)
 }
 
 // Delete deletes this View (can't be restored from a recycle bin)
 func (view *View) Delete() error {
 	client := NewHTTPClient(view.client)
-	_, err := client.Delete(view.endpoint, getConfHeaders(view.config))
+	_, err := client.Delete(view.endpoint, view.config)
 	return err
 }
 
@@ -100,5 +100,5 @@ func (view *View) SetViewXML(viewXML string) (ViewResp, error) {
 		return nil, err
 	}
 	client := NewHTTPClient(view.client)
-	return client.Post(endpoint, bytes.NewBuffer(payload), getConfHeaders(view.config))
+	return client.Post(endpoint, bytes.NewBuffer(payload), view.config)
 }

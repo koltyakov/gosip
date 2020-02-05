@@ -56,13 +56,13 @@ func (item *Item) ToURL() string {
 // Get gets this Item info
 func (item *Item) Get() (ItemResp, error) {
 	client := NewHTTPClient(item.client)
-	return client.Get(item.ToURL(), getConfHeaders(item.config))
+	return client.Get(item.ToURL(), item.config)
 }
 
 // Delete deletes this Item (can't be restored from a recycle bin)
 func (item *Item) Delete() error {
 	client := NewHTTPClient(item.client)
-	_, err := client.Delete(item.endpoint, getConfHeaders(item.config))
+	_, err := client.Delete(item.endpoint, item.config)
 	return err
 }
 
@@ -70,7 +70,7 @@ func (item *Item) Delete() error {
 func (item *Item) Recycle() error {
 	endpoint := fmt.Sprintf("%s/Recycle", item.endpoint)
 	client := NewHTTPClient(item.client)
-	_, err := client.Post(endpoint, nil, getConfHeaders(item.config))
+	_, err := client.Post(endpoint, nil, item.config)
 	return err
 }
 
@@ -83,7 +83,7 @@ func (item *Item) Update(body []byte) (ItemResp, error) {
 		return oDataType
 	})
 	client := NewHTTPClient(item.client)
-	return client.Update(item.endpoint, bytes.NewBuffer(body), getConfHeaders(item.config))
+	return client.Update(item.endpoint, bytes.NewBuffer(body), item.config)
 }
 
 // Roles gets Roles API instance queryable collection for this Item

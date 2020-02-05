@@ -49,7 +49,7 @@ func NewRoles(client *gosip.SPClient, endpoint string, config *RequestConfig) *R
 func (permissions *Roles) HasUniqueAssignments() (bool, error) {
 	client := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf("%s/HasUniqueRoleAssignments", permissions.endpoint)
-	data, err := client.Post(endpoint, nil, getConfHeaders(permissions.config))
+	data, err := client.Post(endpoint, nil, permissions.config)
 	if err != nil {
 		return false, err
 	}
@@ -68,7 +68,7 @@ func (permissions *Roles) HasUniqueAssignments() (bool, error) {
 func (permissions *Roles) ResetInheritance() error {
 	client := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf("%s/ResetRoleInheritance", permissions.endpoint)
-	_, err := client.Post(endpoint, nil, getConfHeaders(permissions.config))
+	_, err := client.Post(endpoint, nil, permissions.config)
 	return err
 }
 
@@ -83,7 +83,7 @@ func (permissions *Roles) BreakInheritance(copyRoleAssigments bool, clearSubScop
 		copyRoleAssigments,
 		clearSubScopes,
 	)
-	_, err := client.Post(endpoint, nil, getConfHeaders(permissions.config))
+	_, err := client.Post(endpoint, nil, permissions.config)
 	return err
 }
 
@@ -98,7 +98,7 @@ func (permissions *Roles) AddAssigment(principalID int, roleDefID int) error {
 		principalID,
 		roleDefID,
 	)
-	_, err := client.Post(endpoint, nil, getConfHeaders(permissions.config))
+	_, err := client.Post(endpoint, nil, permissions.config)
 	return err
 }
 
@@ -113,7 +113,7 @@ func (permissions *Roles) RemoveAssigment(principalID int, roleDefID int) error 
 		principalID,
 		roleDefID,
 	)
-	_, err := client.Post(endpoint, nil, getConfHeaders(permissions.config))
+	_, err := client.Post(endpoint, nil, permissions.config)
 	return err
 }
 

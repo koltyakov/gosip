@@ -83,7 +83,7 @@ func NewChanges(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 func (changes *Changes) GetCurrentToken() (string, error) {
 	endpoint := fmt.Sprintf("%s?$select=CurrentChangeToken", changes.endpoint)
 	client := NewHTTPClient(changes.client)
-	data, err := client.Get(endpoint, getConfHeaders(changes.config))
+	data, err := client.Get(endpoint, changes.config)
 	if err != nil {
 		return "", err
 	}
@@ -123,7 +123,7 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, err
 	if err != nil {
 		return nil, err
 	}
-	data, err := client.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(changes.config))
+	data, err := client.Post(endpoint, bytes.NewBuffer(body), changes.config)
 	if err != nil {
 		return nil, err
 	}

@@ -50,7 +50,7 @@ func (items *Items) ToURL() string {
 // Get gets Items API queryable collection
 func (items *Items) Get() (ItemsResp, error) {
 	client := NewHTTPClient(items.client)
-	data, err := client.Get(items.ToURL(), getConfHeaders(items.config))
+	data, err := client.Get(items.ToURL(), items.config)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (items *Items) Add(body []byte) (ItemResp, error) {
 		return oDataType
 	})
 	client := NewHTTPClient(items.client)
-	return client.Post(items.endpoint, bytes.NewBuffer(body), getConfHeaders(items.config))
+	return client.Post(items.endpoint, bytes.NewBuffer(body), items.config)
 }
 
 // GetByID gets item data object by its ID
@@ -164,7 +164,7 @@ func (items *Items) GetByCAML(caml string) (ItemsResp, error) {
 	body, _ := json.Marshal(request)
 
 	client := NewHTTPClient(items.client)
-	return client.Post(apiURL.String(), bytes.NewBuffer(body), getConfHeaders(items.config))
+	return client.Post(apiURL.String(), bytes.NewBuffer(body), items.config)
 }
 
 // ToDo:

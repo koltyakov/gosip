@@ -89,7 +89,7 @@ func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {
 		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
-	return client.Post(apiURL.String(), nil, getConfHeaders(profiles.config))
+	return client.Post(apiURL.String(), nil, profiles.config)
 }
 
 // GetPropertiesFor gets properties of a specified user profile (by user login name)
@@ -104,7 +104,7 @@ func (profiles *Profiles) GetPropertiesFor(loginName string) (ProfilePropsResp, 
 		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
-	return client.Get(apiURL.String(), getConfHeaders(profiles.config))
+	return client.Get(apiURL.String(), profiles.config)
 }
 
 // GetUserProfilePropertyFor gets specific properte of a specified user profile (by user login name)
@@ -114,7 +114,7 @@ func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property s
 		"/GetUserProfilePropertyFor(" +
 		"accountname='" + url.QueryEscape(loginName) + "'," +
 		"propertyname='" + url.QueryEscape(property) + "')"
-	data, err := client.Get(endpoint, getConfHeaders(profiles.config))
+	data, err := client.Get(endpoint, profiles.config)
 	if err != nil {
 		return "", err
 	}
@@ -145,7 +145,7 @@ func (profiles *Profiles) GetOwnerUserProfile() (ProfileResp, error) {
 		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
-	return client.Post(apiURL.String(), nil, getConfHeaders(profiles.config))
+	return client.Post(apiURL.String(), nil, profiles.config)
 }
 
 // UserProfile gets current context user profile object
@@ -160,7 +160,7 @@ func (profiles *Profiles) UserProfile() (ProfileResp, error) {
 		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
-	return client.Post(apiURL.String(), nil, getConfHeaders(profiles.config))
+	return client.Post(apiURL.String(), nil, profiles.config)
 }
 
 // SetSingleValueProfileProperty sets a single value property for the profile by its email
@@ -172,7 +172,7 @@ func (profiles *Profiles) SetSingleValueProfileProperty(loginName string, proper
 	prop["propertyName"] = property
 	prop["propertyValue"] = value
 	body, _ := json.Marshal(prop)
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(profiles.config))
+	_, err := client.Post(endpoint, bytes.NewBuffer(body), profiles.config)
 	return err
 }
 
@@ -185,7 +185,7 @@ func (profiles *Profiles) SetMultiValuedProfileProperty(loginName string, proper
 	prop["propertyName"] = property
 	prop["propertyValues"] = values
 	body, _ := json.Marshal(prop)
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(profiles.config))
+	_, err := client.Post(endpoint, bytes.NewBuffer(body), profiles.config)
 	return err
 }
 
@@ -193,7 +193,7 @@ func (profiles *Profiles) SetMultiValuedProfileProperty(loginName string, proper
 func (profiles *Profiles) HideSuggestion(loginName string) ([]byte, error) {
 	client := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint + "/HideSuggestion('" + url.QueryEscape(loginName) + "')"
-	return client.Post(endpoint, nil, getConfHeaders(profiles.config))
+	return client.Post(endpoint, nil, profiles.config)
 }
 
 // /* Response helpers */

@@ -90,7 +90,7 @@ func (site *Site) FromURL(url string) *Site {
 // Get gets this Site data object
 func (site *Site) Get() (SiteResp, error) {
 	client := NewHTTPClient(site.client)
-	return client.Get(site.ToURL(), getConfHeaders(site.config))
+	return client.Get(site.ToURL(), site.config)
 }
 
 // Update updates Site's metadata with properties provided in `body` parameter
@@ -98,13 +98,13 @@ func (site *Site) Get() (SiteResp, error) {
 func (site *Site) Update(body []byte) (SiteResp, error) {
 	body = patchMetadataType(body, "SP.Site")
 	client := NewHTTPClient(site.client)
-	return client.Update(site.endpoint, bytes.NewBuffer(body), getConfHeaders(site.config))
+	return client.Update(site.endpoint, bytes.NewBuffer(body), site.config)
 }
 
 // Delete deletes current site (can't be restored from a recycle bin)
 func (site *Site) Delete() error {
 	client := NewHTTPClient(site.client)
-	_, err := client.Delete(site.endpoint, getConfHeaders(site.config))
+	_, err := client.Delete(site.endpoint, site.config)
 	return err
 }
 
@@ -118,7 +118,7 @@ func (site *Site) RootWeb() *Web {
 func (site *Site) OpenWebByID(webID string) (WebResp, error) {
 	endpoint := fmt.Sprintf("%s/OpenWebById('%s')", site.endpoint, webID)
 	client := NewHTTPClient(site.client)
-	return client.Post(endpoint, nil, getConfHeaders(site.config))
+	return client.Post(endpoint, nil, site.config)
 }
 
 // Features gets Features API instance queryable collection for this Site

@@ -70,24 +70,24 @@ func (records *Records) RecordDate() (time.Time, error) {
 
 // Declare declares this item as a record (CSOM helper)
 func (records *Records) Declare() error {
-	_, err := csomItemRecordMethod(records.item, "DeclareItemAsRecord", nil)
+	_, err := csomItemRecordMethod(records.item, "DeclareItemAsRecord", nil, records.item.config)
 	return err
 }
 
 // DeclareWithDate declares this item as a record with record declaration date (CSOM helper)
 func (records *Records) DeclareWithDate(date time.Time) error {
-	_, err := csomItemRecordMethod(records.item, "DeclareItemAsRecordWithDeclarationDate", &date)
+	_, err := csomItemRecordMethod(records.item, "DeclareItemAsRecordWithDeclarationDate", &date, records.item.config)
 	return err
 }
 
 // Undeclare undeclared this item as a record (the item is not a record after an action is done) (CSOM helper)
 func (records *Records) Undeclare() error {
-	_, err := csomItemRecordMethod(records.item, "UndeclareItemAsRecord", nil)
+	_, err := csomItemRecordMethod(records.item, "UndeclareItemAsRecord", nil, records.item.config)
 	return err
 }
 
 // csomItemRecordMethod conscructs CSOM API process query to cover missed REST API functionality
-func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) ([]byte, error) {
+func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time, config *RequestConfig) ([]byte, error) {
 	client := NewHTTPClient(item.client)
 	itemR, err := item.Select("Id").Get()
 	if err != nil {
@@ -123,7 +123,7 @@ func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time) 
 		return nil, err
 	}
 
-	jsomResp, err := client.ProcessQuery(item.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
+	jsomResp, err := client.ProcessQuery(item.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), config)
 	if err != nil {
 		return nil, err
 	}

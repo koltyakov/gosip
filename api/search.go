@@ -198,7 +198,7 @@ func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 		"Content-Type": "application/json;odata=verbose;charset=utf-8",
 	}
 
-	return client.Post(endpoint, bytes.NewBuffer(body), headers)
+	return client.Post(endpoint, bytes.NewBuffer(body), patchConfigHeaders(search.config, headers))
 }
 
 // ToDo:

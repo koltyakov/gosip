@@ -57,7 +57,7 @@ func (group *Group) ToURL() string {
 // Get gets group data object
 func (group *Group) Get() (GroupResp, error) {
 	client := NewHTTPClient(group.client)
-	return client.Get(group.ToURL(), getConfHeaders(group.config))
+	return client.Get(group.ToURL(), group.config)
 }
 
 // Update updates Group's metadata with properties provided in `body` parameter
@@ -65,7 +65,7 @@ func (group *Group) Get() (GroupResp, error) {
 func (group *Group) Update(body []byte) (GroupResp, error) {
 	body = patchMetadataType(body, "SP.Group")
 	client := NewHTTPClient(group.client)
-	return client.Update(group.endpoint, bytes.NewBuffer(body), getConfHeaders(group.config))
+	return client.Update(group.endpoint, bytes.NewBuffer(body), group.config)
 }
 
 // Users gets Users API queryable collection
@@ -87,7 +87,7 @@ func (group *Group) AddUser(loginName string) error {
 	}
 	metadata["LoginName"] = loginName
 	body, _ := json.Marshal(metadata)
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(group.config))
+	_, err := client.Post(endpoint, bytes.NewBuffer(body), group.config)
 	return err
 }
 
@@ -105,7 +105,7 @@ func (group *Group) AddUserByID(userID int) error {
 func (group *Group) SetAsOwner(userID int) error {
 	endpoint := fmt.Sprintf("%s/SetUserAsOwner(%d)", group.ToURL(), userID)
 	client := NewHTTPClient(group.client)
-	_, err := client.Post(endpoint, nil, getConfHeaders(group.config))
+	_, err := client.Post(endpoint, nil, group.config)
 	return err
 }
 
@@ -117,7 +117,7 @@ func (group *Group) RemoveUser(loginName string) error {
 		url.QueryEscape(loginName),
 	)
 	client := NewHTTPClient(group.client)
-	_, err := client.Post(endpoint, nil, getConfHeaders(group.config))
+	_, err := client.Post(endpoint, nil, group.config)
 	return err
 }
 
@@ -125,6 +125,6 @@ func (group *Group) RemoveUser(loginName string) error {
 func (group *Group) RemoveUserByID(userID int) error {
 	endpoint := fmt.Sprintf("%s/Users/RemoveById(%d)", group.ToURL(), userID)
 	client := NewHTTPClient(group.client)
-	_, err := client.Post(endpoint, nil, getConfHeaders(group.config))
+	_, err := client.Post(endpoint, nil, group.config)
 	return err
 }

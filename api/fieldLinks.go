@@ -75,7 +75,7 @@ func (fieldLinks *FieldLinks) ToURL() string {
 // Get gets fieds response collection
 func (fieldLinks *FieldLinks) Get() (FieldLinksResp, error) {
 	client := NewHTTPClient(fieldLinks.client)
-	return client.Get(fieldLinks.ToURL(), getConfHeaders(fieldLinks.config))
+	return client.Get(fieldLinks.ToURL(), fieldLinks.config)
 }
 
 // GetByID gets a field link by its ID (GUID)
@@ -90,7 +90,7 @@ func (fieldLinks *FieldLinks) GetByID(fieldLinkID string) *FieldLink {
 // Delete deletes a field link by its ID (GUID)
 func (fieldLink *FieldLink) Delete() error {
 	client := NewHTTPClient(fieldLink.client)
-	_, err := client.Delete(fieldLink.endpoint, getConfHeaders(fieldLink.config))
+	_, err := client.Delete(fieldLink.endpoint, fieldLink.config)
 	return err
 }
 
@@ -172,7 +172,7 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 	}
 
 	client := NewHTTPClient(fieldLinks.client)
-	resp, err := client.ProcessQuery(fieldLinks.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)))
+	resp, err := client.ProcessQuery(fieldLinks.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), fieldLinks.config)
 	if err != nil {
 		return "", err
 	}

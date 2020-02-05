@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -19,7 +20,7 @@ type HTTPClient struct {
 // RequestConfig struct
 type RequestConfig struct {
 	Headers map[string]string
-	// Context context.Context
+	Context context.Context
 }
 
 // HeadersPresets : SP REST OData headers presets
@@ -57,21 +58,28 @@ func NewHTTPClient(spClient *gosip.SPClient) *HTTPClient {
 }
 
 // Get - generic GET request wrapper
-func (ctx *HTTPClient) Get(endpoint string, headers map[string]string) ([]byte, error) {
+func (client *HTTPClient) Get(endpoint string, conf *RequestConfig) ([]byte, error) {
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)
+	}
+
+	// Apply context
+	if conf != nil && conf.Context != nil {
+		req = req.WithContext(conf.Context)
 	}
 
 	// Default headers
 	req.Header.Set("Accept", "application/json;odata=verbose") // default to SP2013 for backwards compatibility
 
 	// Apply custom headers
-	for key, value := range headers {
-		req.Header.Set(key, value)
+	if conf != nil && conf.Headers != nil {
+		for key, value := range conf.Headers {
+			req.Header.Set(key, value)
+		}
 	}
 
-	resp, err := ctx.sp.Execute(req)
+	resp, err := client.sp.Execute(req)
 	if err != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}
@@ -81,11 +89,16 @@ func (ctx *HTTPClient) Get(endpoint string, headers map[string]string) ([]byte, 
 }
 
 // Post - generic POST request wrapper
-func (ctx *HTTPClient) Post(endpoint string, body io.Reader, headers map[string]string) ([]byte, error) {
+func (client *HTTPClient) Post(endpoint string, body io.Reader, conf *RequestConfig) ([]byte, error) {
 	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
 	req, err := http.NewRequest("POST", endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)
+	}
+
+	// Apply context
+	if conf != nil && conf.Context != nil {
+		req = req.WithContext(conf.Context)
 	}
 
 	// Default headers
@@ -93,11 +106,13 @@ func (ctx *HTTPClient) Post(endpoint string, body io.Reader, headers map[string]
 	req.Header.Set("Content-Type", "application/json;odata=verbose;charset=utf-8")
 
 	// Apply custom headers
-	for key, value := range headers {
-		req.Header.Set(key, value)
+	if conf != nil && conf.Headers != nil {
+		for key, value := range conf.Headers {
+			req.Header.Set(key, value)
+		}
 	}
 
-	resp, err := ctx.sp.Execute(req)
+	resp, err := client.sp.Execute(req)
 	if err != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}
@@ -107,10 +122,15 @@ func (ctx *HTTPClient) Post(endpoint string, body io.Reader, headers map[string]
 }
 
 // Delete - generic DELETE request wrapper
-func (ctx *HTTPClient) Delete(endpoint string, headers map[string]string) ([]byte, error) {
+func (client *HTTPClient) Delete(endpoint string, conf *RequestConfig) ([]byte, error) {
 	req, err := http.NewRequest("POST", endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)
+	}
+
+	// Apply context
+	if conf != nil && conf.Context != nil {
+		req = req.WithContext(conf.Context)
 	}
 
 	// Default headers
@@ -120,11 +140,13 @@ func (ctx *HTTPClient) Delete(endpoint string, headers map[string]string) ([]byt
 	req.Header.Add("If-Match", "*")
 
 	// Apply custom headers
-	for key, value := range headers {
-		req.Header.Set(key, value)
+	if conf != nil && conf.Headers != nil {
+		for key, value := range conf.Headers {
+			req.Header.Set(key, value)
+		}
 	}
 
-	resp, err := ctx.sp.Execute(req)
+	resp, err := client.sp.Execute(req)
 	if err != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}
@@ -134,11 +156,16 @@ func (ctx *HTTPClient) Delete(endpoint string, headers map[string]string) ([]byt
 }
 
 // Update - generic MERGE request wrapper
-func (ctx *HTTPClient) Update(endpoint string, body io.Reader, headers map[string]string) ([]byte, error) {
+func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestConfig) ([]byte, error) {
 	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
 	req, err := http.NewRequest("POST", endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %v", err)
+	}
+
+	// Apply context
+	if conf != nil && conf.Context != nil {
+		req = req.WithContext(conf.Context)
 	}
 
 	// Default headers
@@ -148,12 +175,14 @@ func (ctx *HTTPClient) Update(endpoint string, body io.Reader, headers map[strin
 	req.Header.Add("If-Match", "*")
 
 	// Apply custom headers
-	for key, value := range headers {
-		req.Header.Set(key, value)
+	if conf != nil {
+		for key, value := range conf.Headers {
+			req.Header.Set(key, value)
+		}
 	}
 
-	resp, err := ctx.sp.Execute(req)
-	if err != nil {
+	resp, err := client.sp.Execute(req)
+	if err != nil && conf.Headers != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}
 	defer resp.Body.Close()
@@ -162,7 +191,7 @@ func (ctx *HTTPClient) Update(endpoint string, body io.Reader, headers map[strin
 }
 
 // ProcessQuery - CSOM requests helper
-func (ctx *HTTPClient) ProcessQuery(endpoint string, body io.Reader) ([]byte, error) {
+func (client *HTTPClient) ProcessQuery(endpoint string, body io.Reader, conf *RequestConfig) ([]byte, error) {
 	if strings.Index(strings.ToLower(endpoint), strings.ToLower("/_vti_bin/client.svc/ProcessQuery")) == -1 {
 		endpoint = fmt.Sprintf("%s/_vti_bin/client.svc/ProcessQuery", getPriorEndpoint(endpoint, "/_api"))
 	}
@@ -173,12 +202,24 @@ func (ctx *HTTPClient) ProcessQuery(endpoint string, body io.Reader) ([]byte, er
 		return nil, fmt.Errorf("unable to create a request: %v", err)
 	}
 
+	// Apply context
+	if conf != nil && conf.Context != nil {
+		req = req.WithContext(conf.Context)
+	}
+
 	// CSOM headers
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Content-Type", `text/xml;charset="UTF-8"`)
 	req.Header.Add("X-Requested-With", "XMLHttpRequest")
 
-	resp, err := ctx.sp.Execute(req)
+	// // Apply custom headers
+	// if conf != nil && conf.Headers != nil {
+	// 	for key, value := range conf.Headers {
+	// 		req.Header.Set(key, value)
+	// 	}
+	// }
+
+	resp, err := client.sp.Execute(req)
 	if err != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}

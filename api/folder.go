@@ -57,7 +57,7 @@ func (folder *Folder) ToURL() string {
 // Get gets this folder data object
 func (folder *Folder) Get() (FolderResp, error) {
 	client := NewHTTPClient(folder.client)
-	return client.Get(folder.ToURL(), getConfHeaders(folder.config))
+	return client.Get(folder.ToURL(), folder.config)
 }
 
 // Update updates Folder's metadata with properties provided in `body` parameter
@@ -65,13 +65,13 @@ func (folder *Folder) Get() (FolderResp, error) {
 func (folder *Folder) Update(body []byte) (FolderResp, error) {
 	body = patchMetadataType(body, "SP.Folder")
 	client := NewHTTPClient(folder.client)
-	return client.Update(folder.endpoint, bytes.NewBuffer(body), getConfHeaders(folder.config))
+	return client.Update(folder.endpoint, bytes.NewBuffer(body), folder.config)
 }
 
 // Delete deletes this folder (can't be restored from a recycle bin)
 func (folder *Folder) Delete() error {
 	client := NewHTTPClient(folder.client)
-	_, err := client.Delete(folder.endpoint, getConfHeaders(folder.config))
+	_, err := client.Delete(folder.endpoint, folder.config)
 	return err
 }
 
@@ -79,7 +79,7 @@ func (folder *Folder) Delete() error {
 func (folder *Folder) Recycle() error {
 	client := NewHTTPClient(folder.client)
 	endpoint := fmt.Sprintf("%s/Recycle", folder.endpoint)
-	_, err := client.Post(endpoint, nil, getConfHeaders(folder.config))
+	_, err := client.Post(endpoint, nil, folder.config)
 	return err
 }
 
@@ -133,7 +133,7 @@ func (folder *Folder) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	apiURL.RawQuery = query.Encode()
 	client := NewHTTPClient(folder.client)
 
-	data, err := client.Get(apiURL.String(), getConfHeaders(folder.config))
+	data, err := client.Get(apiURL.String(), folder.config)
 	if err != nil {
 		return nil, err
 	}

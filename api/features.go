@@ -33,7 +33,7 @@ func NewFeatures(client *gosip.SPClient, endpoint string, config *RequestConfig)
 // Get gets features collection (IDs)
 func (features *Features) Get() ([]*FeatureInfo, error) {
 	client := NewHTTPClient(features.client)
-	data, err := client.Get(features.endpoint, getConfHeaders(features.config))
+	data, err := client.Get(features.endpoint, features.config)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (features *Features) Add(featureID string, force bool) error {
 	endpoint := fmt.Sprintf("%s/Add", features.endpoint)
 	client := NewHTTPClient(features.client)
 	body := []byte(fmt.Sprintf(`{"featdefScope":0,"featureId":"%s","force":%t}`, featureID, force))
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(features.config))
+	_, err := client.Post(endpoint, bytes.NewBuffer(body), features.config)
 	return err
 }
 
@@ -59,6 +59,6 @@ func (features *Features) Remove(featureID string, force bool) error {
 	endpoint := fmt.Sprintf("%s/Remove", features.endpoint)
 	client := NewHTTPClient(features.client)
 	body := []byte(fmt.Sprintf(`{"featureId":"%s","force":%t}`, featureID, force))
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(features.config))
+	_, err := client.Post(endpoint, bytes.NewBuffer(body), features.config)
 	return err
 }

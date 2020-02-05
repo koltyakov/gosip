@@ -37,7 +37,7 @@ func NewContext(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 // Get gets context info data object
 func (context *Context) Get() (*ContextInfo, error) {
 	endpoint := fmt.Sprintf("%s/_api/ContextInfo", getPriorEndpoint(context.endpoint, "/_api"))
-	resp, err := NewHTTPClient(context.client).Post(endpoint, nil, getConfHeaders(context.config))
+	resp, err := NewHTTPClient(context.client).Post(endpoint, nil, context.config)
 	if err != nil {
 		return nil, err
 	}

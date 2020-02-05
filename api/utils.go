@@ -78,6 +78,21 @@ func getConfHeaders(config *RequestConfig) map[string]string {
 	return headers
 }
 
+func patchConfigHeaders(config *RequestConfig, headers map[string]string) *RequestConfig {
+	conf := &RequestConfig{}
+	if config != nil {
+		conf.Context = config.Context
+		conf.Headers = config.Headers
+	}
+	if conf.Headers == nil {
+		conf.Headers = map[string]string{}
+	}
+	for k, v := range headers {
+		conf.Headers[k] = v
+	}
+	return conf
+}
+
 // getRelativeURL out of an absolute one
 func getRelativeURL(absURL string) string {
 	u, _ := url.Parse(absURL)

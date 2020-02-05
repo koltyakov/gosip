@@ -63,6 +63,6 @@ func (utility *Utility) SendEmail(options *EmailProps) error {
 	JSONProps := fmt.Sprintf("%s", props)
 	body := []byte(TrimMultiline(`{ "properties": ` + JSONProps + `}`))
 
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), getConfHeaders(utility.config))
+	_, err := client.Post(endpoint, bytes.NewBuffer(body), utility.config)
 	return err
 }

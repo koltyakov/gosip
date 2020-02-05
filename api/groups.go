@@ -40,7 +40,7 @@ func (groups *Groups) ToURL() string {
 // Get gets site Groups response - a collection of GroupInfo
 func (groups *Groups) Get() (GroupsResp, error) {
 	client := NewHTTPClient(groups.client)
-	return client.Get(groups.ToURL(), getConfHeaders(groups.config))
+	return client.Get(groups.ToURL(), groups.config)
 }
 
 // Add creates new group with a specified name. Additional metadata can optionally be provided as string map object.
@@ -55,7 +55,7 @@ func (groups *Groups) Add(title string, metadata map[string]interface{}) (GroupR
 	metadata["Title"] = title
 	body, _ := json.Marshal(metadata)
 	client := NewHTTPClient(groups.client)
-	return client.Post(groups.endpoint, bytes.NewBuffer(body), getConfHeaders(groups.config))
+	return client.Post(groups.endpoint, bytes.NewBuffer(body), groups.config)
 }
 
 // GetByID gets a group object by its ID
@@ -80,7 +80,7 @@ func (groups *Groups) GetByName(groupName string) *Group {
 func (groups *Groups) RemoveByID(groupID int) error {
 	endpoint := fmt.Sprintf("%s/RemoveById(%d)", groups.ToURL(), groupID)
 	client := NewHTTPClient(groups.client)
-	_, err := client.Post(endpoint, nil, getConfHeaders(groups.config))
+	_, err := client.Post(endpoint, nil, groups.config)
 	return err
 }
 
@@ -92,6 +92,6 @@ func (groups *Groups) RemoveByLoginName(loginName string) error {
 		loginName, // url.QueryEscape(loginName),
 	)
 	client := NewHTTPClient(groups.client)
-	_, err := client.Post(endpoint, nil, getConfHeaders(groups.config))
+	_, err := client.Post(endpoint, nil, groups.config)
 	return err
 }
