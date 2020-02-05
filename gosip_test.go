@@ -9,14 +9,14 @@ import (
 )
 
 func TestEdges(t *testing.T) {
-	siteURL := "http://localhost:8989"
+	siteURL := "http://localhost:8989/sub" // sub URI to avoid digest caching when running tests in parallel
 	closer, err := startFakeServer(":8989", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// faking digest response
-		if r.RequestURI == "/_api/ContextInfo" {
+		if r.RequestURI == "/sub/_api/ContextInfo" {
 			fmt.Fprintf(w, `{"d":{"GetContextWebInformation":{"FormDigestValue":"","FormDigestTimeoutSeconds":120,"LibraryVersion":"FAKE"}}}`)
 			return
 		}
-		if r.RequestURI == "/_api/wait" {
+		if r.RequestURI == "/sub/_api/wait" {
 			time.Sleep(1 * time.Second)
 			fmt.Fprintf(w, `{"result":"one eternity later"}`)
 			return
@@ -87,7 +87,7 @@ func TestEdges(t *testing.T) {
 		}
 
 		if _, err := client.Execute(req); err == nil {
-			t.Error(err)
+			t.Error("should fail to retrieve digest")
 		}
 	})
 
