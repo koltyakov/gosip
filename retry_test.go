@@ -24,6 +24,12 @@ func TestRetry(t *testing.T) {
 			w.Write([]byte(`{ "error": "Body is not backed off" }`))
 			return
 		}
+		// ntlm retry
+		if r.RequestURI == "/_api/ntlm" && r.Header.Get("X-Gosip-Retry") == "" {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{ "error": "NTLM force retry" }`))
+			return
+		}
 		if r.Body != nil {
 			defer r.Body.Close()
 			data, _ := ioutil.ReadAll(r.Body)
@@ -172,6 +178,24 @@ func TestRetry(t *testing.T) {
 		dur := time.Now().Sub(beforeReq)
 		if dur < 1*time.Second {
 			t.Error("Retry after is ignored")
+		}
+	})
+
+	t.Run("NtlmRetry", func(t *testing.T) {
+		client := &SPClient{
+			AuthCnfg: &AnonymousCnfg{
+				SiteURL:  siteURL,
+				Strategy: "ntlm",
+			},
+		}
+
+		req, err := http.NewRequest("GET", client.AuthCnfg.GetSiteURL()+"/_api/ntlm", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if _, err := client.Execute(req); err != nil {
+			t.Error(err)
 		}
 	})
 

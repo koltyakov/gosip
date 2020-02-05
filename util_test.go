@@ -8,7 +8,8 @@ import (
 )
 
 type AnonymousCnfg struct {
-	SiteURL string `json:"siteUrl"` // SPSite or SPWeb URL, which is the context target for the API calls
+	SiteURL  string `json:"siteUrl"` // SPSite or SPWeb URL, which is the context target for the API calls
+	Strategy string
 }
 
 // ReadConfig : reads private config with auth options
@@ -33,6 +34,9 @@ func (c *AnonymousCnfg) GetSiteURL() string {
 
 // GetStrategy : gets auth strategy name
 func (c *AnonymousCnfg) GetStrategy() string {
+	if c.Strategy != "" {
+		return c.Strategy
+	}
 	return "anonymous"
 }
 
