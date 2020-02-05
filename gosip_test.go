@@ -2,7 +2,6 @@ package gosip
 
 import (
 	"io"
-	"log"
 	"net"
 	"net/http"
 )
@@ -55,10 +54,10 @@ func startFakeServer(addr string, handler http.Handler) (io.Closer, error) {
 	}
 
 	go func() {
-		err := srv.Serve(listener.(*net.TCPListener))
-		if err != nil {
-			log.Println("HTTP Server Error - ", err)
-		}
+		_ = srv.Serve(listener.(*net.TCPListener))
+		// if err != nil {
+		// 	log.Println("HTTP Server Error - ", err)
+		// }
 	}()
 
 	return listener, nil
