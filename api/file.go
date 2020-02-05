@@ -193,6 +193,11 @@ func (file *File) GetReader() (io.ReadCloser, error) {
 		return nil, err
 	}
 
+	// Apply context
+	if file.config != nil && file.config.Context != nil {
+		req = req.WithContext(file.config.Context)
+	}
+
 	req.TransferEncoding = []string{"null"}
 	for key, value := range getConfHeaders(file.config) {
 		req.Header.Set(key, value)

@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -18,7 +19,7 @@ func CheckDigest(auth gosip.AuthCnfg, cnfgPath string) error {
 		AuthCnfg: auth,
 	}
 
-	digest, err := gosip.GetDigest(client)
+	digest, err := gosip.GetDigest(context.Background(), client)
 	if err != nil {
 		return fmt.Errorf("unable to get digest: %v", err)
 	}
@@ -27,7 +28,7 @@ func CheckDigest(auth gosip.AuthCnfg, cnfgPath string) error {
 		return fmt.Errorf("got empty digest")
 	}
 
-	cachedDigest, err := gosip.GetDigest(client)
+	cachedDigest, err := gosip.GetDigest(context.Background(), client)
 	if err != nil {
 		return fmt.Errorf("unable to get cached digest: %v", err)
 	}

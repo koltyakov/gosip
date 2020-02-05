@@ -1,6 +1,7 @@
 package gosip
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -24,7 +25,7 @@ type contextInfoResponse struct {
 }
 
 // GetDigest retrieves and caches SharePoint API X-RequestDigest value
-func GetDigest(client *SPClient) (string, error) {
+func GetDigest(context context.Context, client *SPClient) (string, error) {
 	siteURL := client.AuthCnfg.GetSiteURL()
 
 	cacheKey := siteURL + "@digest@" + fmt.Sprintf("%#v", client.AuthCnfg)
@@ -36,6 +37,10 @@ func GetDigest(client *SPClient) (string, error) {
 	req, err := http.NewRequest("POST", contextInfoURL, nil)
 	if err != nil {
 		return "", err
+	}
+
+	if context != nil {
+		req = req.WithContext(context)
 	}
 
 	req.Header.Set("Accept", "application/json;odata=verbose")

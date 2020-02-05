@@ -110,6 +110,11 @@ func (attachment *Attachment) GetReader() (io.ReadCloser, error) {
 		return nil, err
 	}
 
+	// Apply context
+	if attachment.config != nil && attachment.config.Context != nil {
+		req = req.WithContext(attachment.config.Context)
+	}
+
 	req.TransferEncoding = []string{"null"}
 	for key, value := range getConfHeaders(attachment.config) {
 		req.Header.Set(key, value)

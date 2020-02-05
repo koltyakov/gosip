@@ -170,7 +170,7 @@ func (c *SPClient) applyHeaders(req *http.Request) error {
 		req.Header.Get("X-RequestDigest") == ""
 
 	if digestIsRequired {
-		digest, err := GetDigest(c)
+		digest, err := GetDigest(req.Context(), c)
 		if err != nil {
 			return err
 		}
