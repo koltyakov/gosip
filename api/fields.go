@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Fields -item Field -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized
+//go:generate ggen -ent Fields -item Field -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Fields represent SharePoint Fields (Site Columns) API queryable collection struct
 // Always use NewFields constructor instead of &Fields{}
