@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Groups -item Group -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
+//go:generate ggen -ent Groups -item Group -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized,Pagination
 
 // Groups represent SharePoint Site Groups API queryable collection struct
 // Always use NewGroups constructor instead of &Groups{}

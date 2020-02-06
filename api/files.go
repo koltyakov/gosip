@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Files -item File -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
+//go:generate ggen -ent Files -item File -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized,Pagination
 
 // Files represent SharePoint Files API queryable collection struct
 // Always use NewFiles constructor instead of &Files{}

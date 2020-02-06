@@ -6,7 +6,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Folders -item Folder -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
+//go:generate ggen -ent Folders -item Folder -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized,Pagination
 
 // Folders represent SharePoint Lists & Document Libraries Folders API queryable collection struct
 // Always use NewFolders constructor instead of &Folders{}

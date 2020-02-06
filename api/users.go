@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Users -item User -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
+//go:generate ggen -ent Users -item User -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized,Pagination
 
 // Users represent SharePoint Site Users API queryable collection struct
 // Always use NewUsers constructor instead of &Users{}

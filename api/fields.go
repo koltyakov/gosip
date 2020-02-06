@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Fields -item Field -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
+//go:generate ggen -ent Fields -item Field -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized
 
 // Fields represent SharePoint Fields (Site Columns) API queryable collection struct
 // Always use NewFields constructor instead of &Fields{}
@@ -102,4 +102,45 @@ func (fields *Fields) GetByInternalNameOrTitle(internalName string) *Field {
 		fmt.Sprintf("%s/GetByInternalNameOrTitle('%s')", fields.endpoint, internalName),
 		fields.config,
 	)
+}
+
+/* Pagination helpers */
+
+// FieldsPage - paged items
+type FieldsPage struct {
+	Items       FieldsResp
+	HasNextPage func() bool
+	GetNextPage func() (*FieldsPage, error)
+}
+
+// GetPaged gets Paged Items collection
+func (fields *Fields) GetPaged() (*FieldsPage, error) {
+	data, err := fields.Get()
+	if err != nil {
+		return nil, err
+	}
+	res := &FieldsPage{
+		Items: data,
+		HasNextPage: func() bool {
+			return data.HasNextPage()
+		},
+		GetNextPage: func() (*FieldsPage, error) {
+			nextURL := data.NextPageURL()
+			if nextURL == "" {
+				return nil, fmt.Errorf("unable to get next page")
+			}
+			return NewFields(fields.client, nextURL, fields.config, fields.entity).GetPaged()
+		},
+	}
+	return res, nil
+}
+
+// NextPageURL gets next page OData collection
+func (fieldsResp *FieldsResp) NextPageURL() string {
+	return getODataCollectionNextPageURL(*fieldsResp)
+}
+
+// HasNextPage returns is true if next page exists
+func (fieldsResp *FieldsResp) HasNextPage() bool {
+	return fieldsResp.NextPageURL() != ""
 }

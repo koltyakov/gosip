@@ -10,7 +10,7 @@ import (
 	"github.com/koltyakov/gosip/csom"
 )
 
-//go:generate ggen -ent ContentTypes -item ContentType -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
+//go:generate ggen -ent ContentTypes -item ContentType -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized,Pagination
 
 // ContentTypes represent SharePoint Content Types API queryable collection struct
 // Always use NewContentTypes constructor instead of &ContentTypes{}
