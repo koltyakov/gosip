@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Lists -item List -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized,Pagination
+//go:generate ggen -ent Lists -item List -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Lists represent SharePoint Lists API queryable collection struct
 // Always use NewLists constructor instead of &Lists{}

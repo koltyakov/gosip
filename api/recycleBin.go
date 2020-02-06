@@ -7,7 +7,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent RecycleBin -item RecycleBinItem -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized,Pagination
+//go:generate ggen -ent RecycleBin -item RecycleBinItem -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 //go:generate ggen -ent RecycleBinItem -helpers Data,Normalized
 
 // RecycleBin represents SharePoint Recycle Bin API queryable collection struct

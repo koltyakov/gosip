@@ -8,7 +8,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Webs -item Web -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized,Pagination
+//go:generate ggen -ent Webs -item Web -conf -coll -mods Select,Expand,Filter,Top,OrderBy -helpers Data,Normalized
 
 // Webs represent SharePoint Webs API queryable collection struct
 // Always use NewWebs constructor instead of &Webs{}
