@@ -2,7 +2,9 @@
 
 package api
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod
 func (contentType *ContentType) Conf(config *RequestConfig) *ContentType {

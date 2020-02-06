@@ -2,7 +2,9 @@
 
 package api
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 /* Response helpers */
 
