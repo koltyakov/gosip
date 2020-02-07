@@ -14,7 +14,7 @@ func TestHttpRetry(t *testing.T) {
 	t.Run("ShouldForceRetry", func(t *testing.T) {
 		guid := uuid.New().String()
 		if _, err := sp.Web().GetFolder("Shared Documents/" + guid).Folders().Add("123"); err == nil {
-			t.Error("should not succeded, but force a retries")
+			t.Error("should not succeeded, but force a retries")
 		}
 	})
 
