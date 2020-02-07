@@ -159,7 +159,6 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) (*ChangesResp, erro
 			return nil, fmt.Errorf("can't get next page of an empty collection")
 		}
 		changeQuery.ChangeTokenStart = result.data[len(result.data)-1].ChangeToken.StringValue
-		changeQuery.ChangeTokenEnd = ""
 		return changes.GetChanges(changeQuery)
 	}
 
