@@ -9,14 +9,22 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Changes -conf -coll
+//go:generate ggen -ent Changes -conf -coll -mods Top
 
 // Changes represent SharePoint Changes API queryable collection struct
 // Always use NewChanges constructor instead of &Changes{}
 type Changes struct {
-	client   *gosip.SPClient
-	config   *RequestConfig
-	endpoint string
+	client    *gosip.SPClient
+	config    *RequestConfig
+	endpoint  string
+	modifiers *ODataMods
+}
+
+// ChangesResp - changes response type with helper processor methods
+type ChangesResp struct {
+	Data        func() []*ChangeInfo         // gets change info collection
+	GetNextPage func() (*ChangesResp, error) // gets next page changes collection
+	data        []*ChangeInfo
 }
 
 // ChangeInfo - changes API response payload structure
@@ -73,9 +81,10 @@ type ChangeQuery struct {
 // NewChanges - Changes struct constructor function
 func NewChanges(client *gosip.SPClient, endpoint string, config *RequestConfig) *Changes {
 	return &Changes{
-		client:   client,
-		endpoint: endpoint,
-		config:   config,
+		client:    client,
+		endpoint:  endpoint,
+		config:    config,
+		modifiers: NewODataMods(),
 	}
 }
 
@@ -98,8 +107,8 @@ func (changes *Changes) GetCurrentToken() (string, error) {
 }
 
 // GetChanges gets changes in scope of the parent container using provided change query
-func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, error) {
-	endpoint := fmt.Sprintf("%s/GetChanges", changes.endpoint)
+func (changes *Changes) GetChanges(changeQuery *ChangeQuery) (*ChangesResp, error) {
+	endpoint := toURL(fmt.Sprintf("%s/GetChanges", changes.endpoint), changes.modifiers)
 	client := NewHTTPClient(changes.client)
 	metadata := map[string]interface{}{}
 	if changeQuery != nil {
@@ -127,16 +136,32 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) ([]*ChangeInfo, err
 	if err != nil {
 		return nil, err
 	}
-	collection, _ := normalizeODataCollection(data)
-	results := []*ChangeInfo{}
-	for _, changeItem := range collection {
-		c := &ChangeInfo{}
-		if err := json.Unmarshal(changeItem, &c); err == nil {
-			results = append(results, c)
-		}
-	}
-	return results, nil
-}
 
-// ToDo:
-// Pagination
+	result := &ChangesResp{}
+	result.Data = func() []*ChangeInfo {
+		result.data = nil
+		collection, _ := normalizeODataCollection(data)
+		changesInfo := []*ChangeInfo{}
+		for _, changeItem := range collection {
+			c := &ChangeInfo{}
+			if err := json.Unmarshal(changeItem, &c); err == nil {
+				changesInfo = append(changesInfo, c)
+			}
+		}
+		result.data = changesInfo
+		return changesInfo
+	}
+	result.GetNextPage = func() (*ChangesResp, error) {
+		if result.data == nil {
+			result.Data()
+		}
+		if len(result.data) == 0 {
+			return nil, fmt.Errorf("can't get next page of an empty collection")
+		}
+		changeQuery.ChangeTokenStart = result.data[len(result.data)-1].ChangeToken.StringValue
+		changeQuery.ChangeTokenEnd = ""
+		return changes.GetChanges(changeQuery)
+	}
+
+	return result, nil
+}

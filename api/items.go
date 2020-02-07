@@ -11,7 +11,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Items -item Item -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized,Pagination
+//go:generate ggen -ent Items -item Item -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized
 
 // Items represent SharePoint Lists & Document Libraries Items API queryable collection struct
 // Always use NewItems constructor instead of &Items{}
@@ -141,4 +141,45 @@ func getAll(res []ItemResp, cur ItemsResp, items *Items) ([]ItemResp, error) {
 	}
 	res = append(res, nextItemsResp.Data()...)
 	return getAll(res, nextItemsResp, items)
+}
+
+/* Pagination helpers */
+
+// ItemsPage - paged items
+type ItemsPage struct {
+	Items       ItemsResp
+	HasNextPage func() bool
+	GetNextPage func() (*ItemsPage, error)
+}
+
+// GetPaged gets Paged Items collection
+func (items *Items) GetPaged() (*ItemsPage, error) {
+	data, err := items.Get()
+	if err != nil {
+		return nil, err
+	}
+	res := &ItemsPage{
+		Items: data,
+		HasNextPage: func() bool {
+			return data.HasNextPage()
+		},
+		GetNextPage: func() (*ItemsPage, error) {
+			nextURL := data.NextPageURL()
+			if nextURL == "" {
+				return nil, fmt.Errorf("unable to get next page")
+			}
+			return NewItems(items.client, nextURL, items.config).GetPaged()
+		},
+	}
+	return res, nil
+}
+
+// NextPageURL gets next page OData collection
+func (itemsResp *ItemsResp) NextPageURL() string {
+	return getODataCollectionNextPageURL(*itemsResp)
+}
+
+// HasNextPage returns is true if next page exists
+func (itemsResp *ItemsResp) HasNextPage() bool {
+	return itemsResp.NextPageURL() != ""
 }

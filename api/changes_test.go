@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
@@ -64,7 +65,7 @@ func TestChanges(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if len(changes) == 0 {
+		if len(changes.Data()) == 0 {
 			t.Error("incorrect changes data")
 		}
 	})
@@ -89,7 +90,7 @@ func TestChanges(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if len(changes) == 0 {
+		if len(changes.Data()) == 0 {
 			t.Error("incorrect changes data")
 		}
 	})
@@ -114,9 +115,66 @@ func TestChanges(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if len(changes) == 0 {
+		if len(changes.Data()) == 0 {
 			t.Error("incorrect changes data")
 		}
+	})
+
+	if err := list.Delete(); err != nil {
+		t.Error(err)
+	}
+
+}
+
+func TestChangesPagination(t *testing.T) {
+	checkClient(t)
+
+	sp := NewSP(spClient)
+	listTitle := uuid.New().String()
+
+	if _, err := sp.Web().Lists().Add(listTitle, nil); err != nil {
+		t.Error(err)
+	}
+	list := sp.Web().Lists().GetByTitle(listTitle)
+
+	t.Run("ListChanges", func(t *testing.T) {
+		token, err := list.Changes().GetCurrentToken()
+		if err != nil {
+			t.Error(err)
+		}
+		if token == "" {
+			t.Error("empty change token")
+		}
+		for i := 1; i <= 5; i++ {
+			if _, err := list.Items().Add([]byte(fmt.Sprintf(`{"Title":"Item %d"}`, i))); err != nil {
+				t.Error(err)
+			}
+		}
+		changesFIrstPage, err := list.Changes().Top(1).GetChanges(&ChangeQuery{
+			ChangeTokenStart: token,
+			List:             true,
+			Item:             true,
+			Add:              true,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		if len(changesFIrstPage.Data()) == 0 {
+			t.Error("incorrect changes data")
+		}
+
+		changesSecondPage, err := changesFIrstPage.GetNextPage()
+		if err != nil {
+			t.Error(err)
+		}
+		if len(changesSecondPage.Data()) == 0 {
+			t.Error("incorrect changes data")
+		}
+
+		if changesFIrstPage.Data()[0].ChangeToken.StringValue == changesSecondPage.Data()[0].ChangeToken.StringValue {
+			t.Error("should be different change tokens")
+		}
+
 	})
 
 	if err := list.Delete(); err != nil {

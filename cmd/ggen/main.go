@@ -69,13 +69,13 @@ func generate(c *apiGenCnfg) error {
 	code += fmt.Sprintf("package %s\n", pkg)
 
 	imports := map[string]bool{}
-	if c.IsCollection && len(c.Helpers) > 0 {
-		for _, helper := range c.Helpers {
-			if helper == "Pagination" {
-				imports["fmt"] = true
-			}
-		}
-	}
+	// if c.IsCollection && len(c.Helpers) > 0 {
+	// 	for _, helper := range c.Helpers {
+	// 		if helper == "Pagination" {
+	// 			imports["fmt"] = true
+	// 		}
+	// 	}
+	// }
 	if !c.IsCollection && len(c.Helpers) > 0 {
 		for _, helper := range c.Helpers {
 			if helper == "Data" {
@@ -211,8 +211,6 @@ func helpersGen(c *apiGenCnfg) string {
 						return normalized
 					}
 				`
-			case "Pagination":
-				code += paginationGen(c.Entity)
 			}
 		}
 	}
@@ -242,52 +240,52 @@ func helpersGen(c *apiGenCnfg) string {
 	return code
 }
 
-func paginationGen(entity string) string {
-	Ent := entity
-	ent := instanceOf(Ent)
-	return `
-		/* Pagination helpers */
+// func paginationGen(entity string) string {
+// 	Ent := entity
+// 	ent := instanceOf(Ent)
+// 	return `
+// 		/* Pagination helpers */
 
-		// ` + Ent + `Page - paged items
-		type ` + Ent + `Page struct {
-			Items       ` + Ent + `Resp
-			HasNextPage func() bool
-			GetNextPage func() (*` + Ent + `Page, error)
-		}
+// 		// ` + Ent + `Page - paged items
+// 		type ` + Ent + `Page struct {
+// 			Items       ` + Ent + `Resp
+// 			HasNextPage func() bool
+// 			GetNextPage func() (*` + Ent + `Page, error)
+// 		}
 
-		// GetPaged gets Paged Items collection
-		func (` + ent + ` *` + Ent + `) GetPaged() (*` + Ent + `Page, error) {
-			data, err := ` + ent + `.Get()
-			if err != nil {
-				return nil, err
-			}
-			res := &` + Ent + `Page{
-				Items: data,
-				HasNextPage: func() bool {
-					return data.HasNextPage()
-				},
-				GetNextPage: func() (*` + Ent + `Page, error) {
-					nextURL := data.NextPageURL()
-					if nextURL == "" {
-						return nil, fmt.Errorf("unable to get next page")
-					}
-					return New` + Ent + `(` + ent + `.client, nextURL, ` + ent + `.config).GetPaged()
-				},
-			}
-			return res, nil
-		}
+// 		// GetPaged gets Paged Items collection
+// 		func (` + ent + ` *` + Ent + `) GetPaged() (*` + Ent + `Page, error) {
+// 			data, err := ` + ent + `.Get()
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 			res := &` + Ent + `Page{
+// 				Items: data,
+// 				HasNextPage: func() bool {
+// 					return data.HasNextPage()
+// 				},
+// 				GetNextPage: func() (*` + Ent + `Page, error) {
+// 					nextURL := data.NextPageURL()
+// 					if nextURL == "" {
+// 						return nil, fmt.Errorf("unable to get next page")
+// 					}
+// 					return New` + Ent + `(` + ent + `.client, nextURL, ` + ent + `.config).GetPaged()
+// 				},
+// 			}
+// 			return res, nil
+// 		}
 
-		// NextPageURL gets next page OData collection
-		func (` + ent + `Resp *` + Ent + `Resp) NextPageURL() string {
-			return getODataCollectionNextPageURL(*` + ent + `Resp)
-		}
+// 		// NextPageURL gets next page OData collection
+// 		func (` + ent + `Resp *` + Ent + `Resp) NextPageURL() string {
+// 			return getODataCollectionNextPageURL(*` + ent + `Resp)
+// 		}
 
-		// HasNextPage returns is true if next page exists
-		func (` + ent + `Resp *` + Ent + `Resp) HasNextPage() bool {
-			return ` + ent + `Resp.NextPageURL() != ""
-		}
-	`
-}
+// 		// HasNextPage returns is true if next page exists
+// 		func (` + ent + `Resp *` + Ent + `Resp) HasNextPage() bool {
+// 			return ` + ent + `Resp.NextPageURL() != ""
+// 		}
+// 	`
+// }
 
 func instanceOf(entity string) string {
 	if len(entity) < 4 {
