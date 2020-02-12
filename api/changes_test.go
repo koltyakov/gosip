@@ -150,7 +150,7 @@ func TestChangesPagination(t *testing.T) {
 				t.Error(err)
 			}
 		}
-		changesFIrstPage, err := list.Changes().Top(1).GetChanges(&ChangeQuery{
+		changesFirstPage, err := list.Changes().Top(1).GetChanges(&ChangeQuery{
 			ChangeTokenStart: token,
 			List:             true,
 			Item:             true,
@@ -159,11 +159,11 @@ func TestChangesPagination(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if len(changesFIrstPage.Data()) == 0 {
+		if len(changesFirstPage.Data()) == 0 {
 			t.Error("incorrect changes data")
 		}
 
-		changesSecondPage, err := changesFIrstPage.GetNextPage()
+		changesSecondPage, err := changesFirstPage.GetNextPage()
 		if err != nil {
 			t.Error(err)
 		}
@@ -171,7 +171,7 @@ func TestChangesPagination(t *testing.T) {
 			t.Error("incorrect changes data")
 		}
 
-		if changesFIrstPage.Data()[0].ChangeToken.StringValue == changesSecondPage.Data()[0].ChangeToken.StringValue {
+		if changesFirstPage.Data()[0].ChangeToken.StringValue == changesSecondPage.Data()[0].ChangeToken.StringValue {
 			t.Error("should be different change tokens")
 		}
 
