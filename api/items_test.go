@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -13,7 +14,7 @@ func TestItems(t *testing.T) {
 	checkClient(t)
 
 	web := NewSP(spClient).Web()
-	newListTitle := uuid.New().String()
+	newListTitle := strings.Replace(uuid.New().String(), "-", "", -1)
 	if _, err := web.Lists().Add(newListTitle, nil); err != nil {
 		t.Error(err)
 	}
@@ -55,12 +56,20 @@ func TestItems(t *testing.T) {
 	})
 
 	t.Run("AddValidate", func(t *testing.T) {
-		options := &AddValidateOptions{
-			NewDocumentUpdate: true,
+		options := &ValidateAddOptions{NewDocumentUpdate: true, CheckInComment: "test"}
+		data := map[string]string{"Title": "New item"}
+		if _, err := list.Items().AddValidate(data, options); err != nil {
+			t.Error(err)
 		}
-		data := map[string]string{
-			"Title": "New item",
+	})
+
+	t.Run("AddValidateWithPath", func(t *testing.T) {
+		if _, err := list.RootFolder().Folders().Add("subfolder"); err != nil {
+			t.Error(err)
 		}
+		options := &ValidateAddOptions{NewDocumentUpdate: true, CheckInComment: "test"}
+		options.DecodedPath = "Lists/" + newListTitle + "/subfolder"
+		data := map[string]string{"Title": "New item"}
 		if _, err := list.Items().AddValidate(data, options); err != nil {
 			t.Error(err)
 		}

@@ -68,15 +68,16 @@ func (items *Items) Add(body []byte) (ItemResp, error) {
 	return client.Post(items.endpoint, bytes.NewBuffer(body), items.config)
 }
 
-// AddValidateOptions add/update validate options
-type AddValidateOptions struct {
+// ValidateAddOptions AddValidateUpdateItemUsingPath method options
+type ValidateAddOptions struct {
 	DecodedPath       string
 	NewDocumentUpdate bool
 	CheckInComment    string
 }
 
 // AddValidate adds new item in this list using AddValidateUpdateItemUsingPath method.
-func (items *Items) AddValidate(formValues map[string]string, options *AddValidateOptions) ([]byte, error) {
+// formValues fingerprints https://github.com/koltyakov/sp-sig-20180705-demo/blob/master/src/03-pnp/FieldTypes.md#field-data-types-fingerprints-sample
+func (items *Items) AddValidate(formValues map[string]string, options *ValidateAddOptions) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/AddValidateUpdateItemUsingPath()", getPriorEndpoint(items.endpoint, "/items"))
 	client := NewHTTPClient(items.client)
 	type formValue struct {
@@ -94,15 +95,15 @@ func (items *Items) AddValidate(formValues map[string]string, options *AddValida
 	if options != nil {
 		payload["bNewDocumentUpdate"] = options.NewDocumentUpdate
 		payload["checkInComment"] = options.CheckInComment
-		// if options.DecodedPath != "" {
-		// 	payload["listItemCreateInfo"] = map[string]interface{}{
-		// 		"__metadata": map[string]string{"type": "SP.ListItemCreationInformationUsingPath"},
-		// 		"FolderPath": map[string]interface{}{
-		// 			"__metadata": map[string]string{"type": "SP.ResourcePath"},
-		// 			"DecodedUrl": options.DecodedPath,
-		// 		},
-		// 	}
-		// }
+		if options.DecodedPath != "" {
+			payload["listItemCreateInfo"] = map[string]interface{}{
+				"__metadata": map[string]string{"type": "SP.ListItemCreationInformationUsingPath"},
+				"FolderPath": map[string]interface{}{
+					"__metadata": map[string]string{"type": "SP.ResourcePath"},
+					"DecodedUrl": checkGetRelativeURL(options.DecodedPath, items.endpoint),
+				},
+			}
+		}
 	}
 	body, _ := json.Marshal(payload)
 	return client.Post(endpoint, bytes.NewBuffer(body), items.config)
