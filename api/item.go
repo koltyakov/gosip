@@ -86,6 +86,37 @@ func (item *Item) Update(body []byte) (ItemResp, error) {
 	return client.Update(item.endpoint, bytes.NewBuffer(body), item.config)
 }
 
+// ValidateUpdateOptions ValidateUpdateListItem request options
+type ValidateUpdateOptions struct {
+	NewDocumentUpdate bool
+	CheckInComment    string
+}
+
+// UpdateValidate updates an item in this list using ValidateUpdateListItem method.
+// formValues fingerprints https://github.com/koltyakov/sp-sig-20180705-demo/blob/master/src/03-pnp/FieldTypes.md#field-data-types-fingerprints-sample
+func (item *Item) UpdateValidate(formValues map[string]string, options *ValidateUpdateOptions) ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/ValidateUpdateListItem", item.endpoint)
+	client := NewHTTPClient(item.client)
+	type formValue struct {
+		FieldName  string `json:"FieldName"`
+		FieldValue string `json:"FieldValue"`
+	}
+	formValuesArray := []*formValue{}
+	for n, v := range formValues {
+		formValuesArray = append(formValuesArray, &formValue{
+			FieldName:  n,
+			FieldValue: v,
+		})
+	}
+	payload := map[string]interface{}{"formValues": formValuesArray}
+	if options != nil {
+		payload["bNewDocumentUpdate"] = options.NewDocumentUpdate
+		payload["checkInComment"] = options.CheckInComment
+	}
+	body, _ := json.Marshal(payload)
+	return client.Post(endpoint, bytes.NewBuffer(body), item.config)
+}
+
 // Roles gets Roles API instance queryable collection for this Item
 func (item *Item) Roles() *Roles {
 	return NewRoles(item.client, item.endpoint, item.config)
