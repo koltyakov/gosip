@@ -54,6 +54,18 @@ func TestItems(t *testing.T) {
 		}
 	})
 
+	t.Run("AddValidate", func(t *testing.T) {
+		options := &AddValidateOptions{
+			NewDocumentUpdate: true,
+		}
+		data := map[string]string{
+			"Title": "New item",
+		}
+		if _, err := list.Items().AddValidate(data, options); err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("Get", func(t *testing.T) {
 		items, err := list.Items().Top(100).OrderBy("Title", false).Get()
 		if err != nil {

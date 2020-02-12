@@ -68,6 +68,46 @@ func (items *Items) Add(body []byte) (ItemResp, error) {
 	return client.Post(items.endpoint, bytes.NewBuffer(body), items.config)
 }
 
+// AddValidateOptions add/update validate options
+type AddValidateOptions struct {
+	DecodedPath       string
+	NewDocumentUpdate bool
+	CheckInComment    string
+}
+
+// AddValidate adds new item in this list using AddValidateUpdateItemUsingPath method.
+func (items *Items) AddValidate(formValues map[string]string, options *AddValidateOptions) ([]byte, error) {
+	endpoint := fmt.Sprintf("%s/AddValidateUpdateItemUsingPath()", getPriorEndpoint(items.endpoint, "/items"))
+	client := NewHTTPClient(items.client)
+	type formValue struct {
+		FieldName  string `json:"FieldName"`
+		FieldValue string `json:"FieldValue"`
+	}
+	formValuesArray := []*formValue{}
+	for n, v := range formValues {
+		formValuesArray = append(formValuesArray, &formValue{
+			FieldName:  n,
+			FieldValue: v,
+		})
+	}
+	payload := map[string]interface{}{"formValues": formValuesArray}
+	if options != nil {
+		payload["bNewDocumentUpdate"] = options.NewDocumentUpdate
+		payload["checkInComment"] = options.CheckInComment
+		// if options.DecodedPath != "" {
+		// 	payload["listItemCreateInfo"] = map[string]interface{}{
+		// 		"__metadata": map[string]string{"type": "SP.ListItemCreationInformationUsingPath"},
+		// 		"FolderPath": map[string]interface{}{
+		// 			"__metadata": map[string]string{"type": "SP.ResourcePath"},
+		// 			"DecodedUrl": options.DecodedPath,
+		// 		},
+		// 	}
+		// }
+	}
+	body, _ := json.Marshal(payload)
+	return client.Post(endpoint, bytes.NewBuffer(body), items.config)
+}
+
 // GetByID gets item data object by its ID
 func (items *Items) GetByID(itemID int) *Item {
 	return NewItem(
