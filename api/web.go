@@ -261,6 +261,7 @@ func (web *Web) CurrentUser() *User {
 
 // GetFolder gets a folder by its relevant URI, URI can be host relevant (e.g. `/sites/site/lib/folder`)
 // or web relavant (e.g. `lib/folder`, with web relevant URI there should be no slash at the beginning)
+// A wrapper of `GetFolderByServerRelativeUrl`
 func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 	return NewFolder(
 		web.client,
@@ -273,6 +274,32 @@ func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 	)
 }
 
+// GetFolderByPath gets a folder by its relevant URI, URI can be host relevant (e.g. `/sites/site/lib/folder`)
+// or web relavant (e.g. `lib/folder`, with web relevant URI there should be no slash at the beginning)
+// A wrapper of `GetFolderByServerRelativePath`
+// Supported only in modern SharePoint, differs from GetFile with its capability of dealing with special chars in path
+func (web *Web) GetFolderByPath(serverRelativeURL string) *Folder {
+	return NewFolder(
+		web.client,
+		fmt.Sprintf(
+			"%s/GetFolderByServerRelativePath(decodedUrl='%s')",
+			web.endpoint,
+			checkGetRelativeURL(serverRelativeURL, web.endpoint),
+		),
+		web.config,
+	)
+}
+
+// GetFolderByID gets Folder API instance object by its unique ID
+// Supported only in modern SharePoint
+func (web *Web) GetFolderByID(uniqueID string) *Folder {
+	return NewFolder(
+		web.client,
+		fmt.Sprintf("%s/GetFolderByID('%s')", web.endpoint, uniqueID),
+		web.config,
+	)
+}
+
 // EnsureFolder is a helper to ensure a folder by its relevalt URI, when there was no folder it's created
 func (web *Web) EnsureFolder(serverRelativeURL string) ([]byte, error) {
 	return ensureFolder(web, serverRelativeURL, serverRelativeURL)
@@ -281,6 +308,7 @@ func (web *Web) EnsureFolder(serverRelativeURL string) ([]byte, error) {
 // GetFile gets File API instance object by its relevant URI
 // File URI can be host relevant (e.g. `/sites/site/lib/folder/file.txt`)
 // or web relavant (e.g. `lib/folder/file.txt`, with web relevant URI there should be no slash at the beginning)
+// A wrapper of `GetFileByServerRelativeUrl`
 func (web *Web) GetFile(serverRelativeURL string) *File {
 	return NewFile(
 		web.client,
@@ -289,6 +317,33 @@ func (web *Web) GetFile(serverRelativeURL string) *File {
 			web.endpoint,
 			checkGetRelativeURL(serverRelativeURL, web.endpoint),
 		),
+		web.config,
+	)
+}
+
+// GetFileByPath gets File API instance object by its relevant URI
+// File URI can be host relevant (e.g. `/sites/site/lib/folder/file.txt`)
+// or web relavant (e.g. `lib/folder/file.txt`, with web relevant URI there should be no slash at the beginning)
+// A wrapper of `GetFileByServerRelativePath`
+// Supported only in modern SharePoint, differs from GetFile with its capability of dealing with special chars in path
+func (web *Web) GetFileByPath(serverRelativeURL string) *File {
+	return NewFile(
+		web.client,
+		fmt.Sprintf(
+			"%s/GetFileByServerRelativePath(decodedUrl='%s')",
+			web.endpoint,
+			checkGetRelativeURL(serverRelativeURL, web.endpoint),
+		),
+		web.config,
+	)
+}
+
+// GetFileByID gets File API instance object by its unique ID
+// Supported only in modern SharePoint
+func (web *Web) GetFileByID(uniqueID string) *File {
+	return NewFile(
+		web.client,
+		fmt.Sprintf("%s/GetFileByID('%s')", web.endpoint, uniqueID),
 		web.config,
 	)
 }
