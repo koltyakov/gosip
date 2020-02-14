@@ -39,4 +39,11 @@ func TestSP(t *testing.T) {
 		}
 	})
 
+	t.Run("Metadata", func(t *testing.T) {
+		sp := NewSP(spClient)
+		if _, err := sp.Metadata(); err != nil {
+			t.Error(err)
+		}
+	})
+
 }

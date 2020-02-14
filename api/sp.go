@@ -71,3 +71,12 @@ func (sp *SP) Profiles() *Profiles {
 func (sp *SP) ContextInfo() (*ContextInfo, error) {
 	return NewContext(sp.client, sp.ToURL(), sp.config).Get()
 }
+
+// Metadata returns $metadata info
+func (sp *SP) Metadata() ([]byte, error) {
+	client := NewHTTPClient(sp.client)
+	return client.Get(
+		fmt.Sprintf("%s/_api/$metadata", sp.ToURL()),
+		sp.config,
+	)
+}
