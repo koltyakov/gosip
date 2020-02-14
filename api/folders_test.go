@@ -52,7 +52,4 @@ func TestFolders(t *testing.T) {
 		}
 	})
 
-	// ToDo:
-	// Recycle
-
 }

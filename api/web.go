@@ -106,14 +106,6 @@ func (web *Web) Delete() error {
 	return err
 }
 
-// // Recycle moves this web to the recycle bin
-// func (web *Web) Recycle() error {
-// 	endpoint := fmt.Sprintf("%s/Recycle", web.endpoint)
-// 	client := NewHTTPClient(web.client)
-// 	_, err := client.Post(endpoint, nil, getConfHeaders(web.config))
-// 	return err
-// }
-
 // Update updates Web's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevalt to SP.Web object
 func (web *Web) Update(body []byte) (WebResp, error) {
