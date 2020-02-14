@@ -62,6 +62,26 @@ func TestFiles(t *testing.T) {
 		}
 	})
 
+	t.Run("GetFileByPath", func(t *testing.T) {
+		data, err := web.GetFileByPath(newFolderURI + "/File_2.txt").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if data.Data().Name == "" {
+			t.Error("can't get file props")
+		}
+	})
+
+	t.Run("GetFileByID", func(t *testing.T) {
+		data, err := web.GetFile(newFolderURI + "/File_2.txt").Select("UniqueId").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if _, err := web.GetFileByID(data.Data().UniqueID).Get(); err != nil {
+			t.Error(err)
+		}
+	})
+
 	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
 		t.Error(err)
 	}

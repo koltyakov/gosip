@@ -46,6 +46,22 @@ func TestFolders(t *testing.T) {
 		}
 	})
 
+	t.Run("GetFolderByPath", func(t *testing.T) {
+		if _, err := web.GetFolderByPath(rootFolderURI).Get(); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("GetFolderByID", func(t *testing.T) {
+		data, err := web.GetFolder(rootFolderURI).Select("UniqueId").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if _, err := web.GetFolderByID(data.Data().UniqueID).Get(); err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("Delete", func(t *testing.T) {
 		if err := web.GetFolder(rootFolderURI + "/" + newFolderName).Delete(); err != nil {
 			t.Error(err)

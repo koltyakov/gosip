@@ -64,13 +64,6 @@ func TestFile(t *testing.T) {
 		}
 	})
 
-	// t.Run("Update", func(t *testing.T) {
-	// 	fm := []byte(`{"Name":"Test"}`)
-	// 	if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Update(fm); err != nil {
-	// 		t.Error(err)
-	// 	}
-	// })
-
 	t.Run("Delete", func(t *testing.T) {
 		if err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Delete(); err != nil {
 			t.Error(err)
