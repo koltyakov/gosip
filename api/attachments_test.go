@@ -17,7 +17,7 @@ func TestAttachments(t *testing.T) {
 		t.Error(err)
 	}
 	list := web.Lists().GetByTitle(listTitle)
-	item, err := list.Items().Add([]byte(`{"Title":"Attchment test"}`))
+	item, err := list.Items().Add([]byte(`{"Title":"Attachment test"}`))
 	if err != nil {
 		t.Error(err)
 	}
