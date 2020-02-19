@@ -114,6 +114,10 @@ func init() {
 	if envCode != "" && envResolver[envCode] != nil {
 		spClient = envResolver[envCode]()
 		spClient.Hooks = handlers
+
+		spClient.RetryPolicies = map[int]int{
+			404: 1,
+		}
 	}
 
 	spClient.Timeout = 30 * time.Second
