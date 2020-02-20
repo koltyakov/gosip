@@ -43,8 +43,8 @@ steps:
     SPAUTH_CLIENTSECRET: $(ci.spo.clientsecret)
 
 - script: |
-    go test ./ -v -count=1 -coverprofile=gosip_coverage.out -covermode=atomic
-    go test ./cpass/... -v -race -count=1 -coverprofile=cpass_coverage.out -covermode=atomic
+    go test ./ -v -count=1 -coverprofile=gosip_coverage.out -covermode=atomic && \
+    go test ./cpass/... -v -race -count=1 -coverprofile=cpass_coverage.out -covermode=atomic && \
     go test ./csom/... -v -race -count=1 -coverprofile=csom_coverage.out -covermode=atomic
   workingDirectory: '$(modulePath)'
   displayName: 'Run util tests'
