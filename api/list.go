@@ -259,11 +259,11 @@ func (list *List) RenderListData(viewXML string) (RenderListDataResp, error) {
 	if res.Value != "" {
 		data = []byte(res.Value)
 	}
-	return []byte(data), nil
+	return data, nil
 }
 
+// ToDo:
 // RenderListDataAsStream ...
-// ToDo
 
 // Roles gets list's Roles API instance queryable collection
 func (list *List) Roles() *Roles {
@@ -287,7 +287,7 @@ func (listResp *ListResp) Data() *ListInfo {
 		"LastItemUserModifiedDate",
 	})
 	res := &ListInfo{}
-	json.Unmarshal(data, &res)
+	_ = json.Unmarshal(data, &res)
 	return res
 }
 
@@ -299,6 +299,6 @@ func (listResp *ListResp) Data() *ListInfo {
 // Data : to get typed data
 func (listData *RenderListDataResp) Data() *RenderListDataInfo {
 	res := &RenderListDataInfo{}
-	json.Unmarshal(*listData, &res)
+	_ = json.Unmarshal(*listData, &res)
 	return res
 }

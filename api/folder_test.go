@@ -79,7 +79,6 @@ func TestFolder(t *testing.T) {
 		if err := web.GetFolder(rootFolderURI + "/" + newFolderName).Delete(); err != nil {
 			t.Error(err)
 		}
-		// ToDo: Empty Recycle Bin
 	})
 
 	t.Run("Recycle", func(t *testing.T) {
@@ -91,7 +90,6 @@ func TestFolder(t *testing.T) {
 		if err := web.GetFolder(fr.Data().ServerRelativeURL).Recycle(); err != nil {
 			t.Error(err)
 		}
-		// ToDo: Empty Recycle Bin
 	})
 
 }

@@ -11,8 +11,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/patrickmn/go-cache"
+
 	"github.com/koltyakov/gosip/templates"
-	cache "github.com/patrickmn/go-cache"
 )
 
 var (
@@ -32,7 +33,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	}
 
 	var authCookie, expires string
-	var expirity time.Duration
+	var expiry time.Duration
 
 	// In case of WAP
 	if c.AdfsCookie == "EdgeAccessCookie" {
@@ -41,7 +42,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 			return "", err
 		}
 		if expires == "" {
-			expirity = 30 * time.Minute // ToDO: move to settings or dynamically get
+			expiry = 30 * time.Minute // ToDO: move to settings or dynamically get
 		}
 	} else {
 		authCookie, expires, err = adfsAuthFlow(c, "")
@@ -49,10 +50,10 @@ func GetAuth(c *AuthCnfg) (string, error) {
 			return "", err
 		}
 		expiresTime, _ := time.Parse(time.RFC3339, expires)
-		expirity = time.Until(expiresTime) - 60*time.Second
+		expiry = time.Until(expiresTime) - 60*time.Second
 	}
 
-	storage.Set(cacheKey, authCookie, expirity)
+	storage.Set(cacheKey, authCookie, expiry)
 
 	return authCookie, nil
 }
@@ -84,7 +85,7 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -169,7 +170,7 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	authCookie := resp.Header.Get("Set-Cookie") // FedAuth
 	authCookie = strings.Split(authCookie, ";")[0]
@@ -190,7 +191,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Response location with WAP login endpoint is used to send form auth request
 	redirect, err := resp.Location()
@@ -209,7 +210,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Request to redirect URL using MSISAuth
 	req, err := http.NewRequest("GET", redirectURL, nil)
@@ -230,7 +231,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Yet another redirect using JWT at this point (spUrl?authToken=JWT&client-request-id=)
 	redirect, err = resp.Location()
@@ -250,9 +251,9 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
-	// TODO: get expirity somehow
+	// TODO: get expiry somehow
 	authCookie := resp.Header.Get("Set-Cookie") // EdgeAccessCookie
 	authCookie = strings.Split(authCookie, ";")[0]
 
@@ -275,7 +276,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 			if err != nil {
 				return "", "", err
 			}
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 
 			cc := *c
 			cc.RelyingParty = resp.Request.URL.Query().Get("wtrealm")

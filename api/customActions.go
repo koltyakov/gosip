@@ -66,7 +66,7 @@ func (customActions *CustomActions) Get() ([]*CustomActionInfo, error) {
 		return nil, err
 	}
 	data, _ = NormalizeODataCollection(data)
-	res := []*CustomActionInfo{}
+	var res []*CustomActionInfo
 	if err := json.Unmarshal(data, &res); err != nil {
 		return nil, err
 	}

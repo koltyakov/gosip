@@ -82,6 +82,9 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 			if !options.Progress(progress) {
 				return nil, cancelUpload(file, uploadID)
 			}
+			if file == nil {
+				return nil, fmt.Errorf("can't get file object")
+			}
 			return file.finishUpload(uploadID, progress.FileOffset, chunk)
 		}
 
@@ -106,6 +109,9 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 			if !options.Progress(progress) {
 				return nil, cancelUpload(file, uploadID)
 			}
+			if file == nil {
+				return nil, fmt.Errorf("can't get file object")
+			}
 			offset, err := file.continueUpload(uploadID, progress.FileOffset, chunk)
 			if err != nil {
 				return nil, err
@@ -119,6 +125,9 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 	progress.Stage = "finishing"
 	if !options.Progress(progress) {
 		return nil, cancelUpload(file, uploadID)
+	}
+	if file == nil {
+		return nil, fmt.Errorf("can't get file object")
 	}
 	return file.finishUpload(uploadID, progress.FileOffset, nil)
 }

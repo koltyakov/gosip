@@ -32,17 +32,17 @@ func main() {
 		return
 	}
 
-	m := []string{}
+	var m []string
 	if len(*mods) > 0 {
 		m = strings.Split(*mods, ",")
 	}
 
-	h := []string{}
+	var h []string
 	if len(*helpers) > 0 {
 		h = strings.Split(*helpers, ",")
 	}
 
-	generate(&apiGenCnfg{
+	_ = generate(&apiGenCnfg{
 		Entity:       *ent,
 		Item:         *item,
 		Configurable: *conf,

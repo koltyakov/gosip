@@ -10,7 +10,7 @@ func TestFeatures(t *testing.T) {
 	sp := NewSP(spClient)
 	mdsFeatureID := "87294c72-f260-42f3-a41b-981a2ffce37a"
 
-	sp.Web().Features().Remove(mdsFeatureID, true)
+	_ = sp.Web().Features().Remove(mdsFeatureID, true)
 
 	t.Run("Get/Site", func(t *testing.T) {
 		if _, err := sp.Site().Features().Get(); err != nil {

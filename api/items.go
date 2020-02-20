@@ -84,7 +84,7 @@ func (items *Items) AddValidate(formValues map[string]string, options *ValidateA
 		FieldName  string `json:"FieldName"`
 		FieldValue string `json:"FieldValue"`
 	}
-	formValuesArray := []*formValue{}
+	var formValuesArray []*formValue
 	for n, v := range formValues {
 		formValuesArray = append(formValuesArray, &formValue{
 			FieldName:  n,

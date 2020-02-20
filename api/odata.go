@@ -61,7 +61,7 @@ func (oData *ODataMods) AddFilter(values string) *ODataMods {
 // AddSkip adds $skiptoken OData modifier
 func (oData *ODataMods) AddSkip(value string) *ODataMods {
 	if oData == nil {
-		oData = &ODataMods{mods: map[string]string{}}
+		oData.mods = map[string]string{}
 	}
 	if oData.mods == nil {
 		oData.mods = map[string]string{}

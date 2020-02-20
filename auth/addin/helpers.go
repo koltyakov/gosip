@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	cache "github.com/patrickmn/go-cache"
+	"github.com/patrickmn/go-cache"
 )
 
 var (
@@ -84,7 +84,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -112,8 +112,8 @@ func GetAuth(c *AuthCnfg) (string, error) {
 		return "", fmt.Errorf("%s", results.Error)
 	}
 
-	expirity := (results.ExpiresIn - 60) * time.Second
-	storage.Set(cacheKey, results.AccessToken, expirity)
+	expiry := (results.ExpiresIn - 60) * time.Second
+	storage.Set(cacheKey, results.AccessToken, expiry)
 
 	return results.AccessToken, nil
 
@@ -131,7 +131,7 @@ func getAuthURL(realm string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -190,7 +190,7 @@ func getRealm(c *AuthCnfg) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	authHeader := resp.Header.Get("www-authenticate")
 

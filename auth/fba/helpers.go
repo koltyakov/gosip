@@ -10,8 +10,9 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/patrickmn/go-cache"
+
 	"github.com/koltyakov/gosip/templates"
-	cache "github.com/patrickmn/go-cache"
 )
 
 var (
@@ -49,7 +50,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -79,9 +80,9 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	// fmt.Printf("FBA: %s\n", string(result.CookieName))
 
 	authCookie := resp.Header.Get("Set-Cookie") // TODO: parse FBA cookie only (?)
-	expirity := (result.TimeoutSeconds - 60) * time.Second
+	expiry := (result.TimeoutSeconds - 60) * time.Second
 
-	storage.Set(cacheKey, authCookie, expirity)
+	storage.Set(cacheKey, authCookie, expiry)
 
 	return authCookie, nil
 }

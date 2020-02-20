@@ -73,7 +73,7 @@ func (b *builder) GetObjectID(object Object) (int, error) {
 func (b *builder) Compile() (string, error) {
 	objects := ""
 	actions := ""
-	errors := []error{}
+	var errors []error
 	for i, edge := range b.objects {
 		if i > 1 {
 			if edge.Parent.GetID() == 0 {

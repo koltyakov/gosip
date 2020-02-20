@@ -14,7 +14,7 @@ func AdfsSamlWsfedTemplate(to, username, password, relyingParty string) (string,
 		RelyingParty string
 	}
 
-	template, err := template.New("adfsSamlWsfed").Parse(`
+	t, err := template.New("adfsSamlWsfed").Parse(`
 		<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing" xmlns:u="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
 			<s:Header>
 				<a:Action s:mustUnderstand="1">http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue</a:Action>
@@ -54,7 +54,7 @@ func AdfsSamlWsfedTemplate(to, username, password, relyingParty string) (string,
 	}
 
 	var tpl bytes.Buffer
-	if err := template.Execute(&tpl, data); err != nil {
+	if err := t.Execute(&tpl, data); err != nil {
 		return "", err
 	}
 
@@ -72,7 +72,7 @@ func AdfsSamlTokenTemplate(token []byte, notBefore, notAfter, relyingParty strin
 		RelyingParty string
 	}
 
-	template, err := template.New("adfsSamlToken").Parse(`
+	t, err := template.New("adfsSamlToken").Parse(`
 		<t:RequestSecurityTokenResponse xmlns:t="http://schemas.xmlsoap.org/ws/2005/02/trust">
 			<t:Lifetime>
 				<wsu:Created xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">{{.NotBefore}}</wsu:Created>
@@ -101,7 +101,7 @@ func AdfsSamlTokenTemplate(token []byte, notBefore, notAfter, relyingParty strin
 	}
 
 	var tpl bytes.Buffer
-	if err := template.Execute(&tpl, data); err != nil {
+	if err := t.Execute(&tpl, data); err != nil {
 		return "", err
 	}
 

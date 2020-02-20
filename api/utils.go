@@ -35,8 +35,8 @@ func NormalizeODataItem(payload []byte) []byte {
 
 // NormalizeODataCollection parses OData resp taking care of OData mode
 func NormalizeODataCollection(payload []byte) ([]byte, string) {
-	bb, netxtURL := normalizeODataCollection(payload)
-	mapRes := []map[string]interface{}{}
+	bb, nextURL := normalizeODataCollection(payload)
+	var mapRes []map[string]interface{}
 	for _, b := range bb {
 		mapItem := map[string]interface{}{}
 		if err := json.Unmarshal(b, &mapItem); err == nil {
@@ -45,9 +45,9 @@ func NormalizeODataCollection(payload []byte) ([]byte, string) {
 	}
 	res, err := json.Marshal(mapRes)
 	if err != nil {
-		return payload, netxtURL
+		return payload, nextURL
 	}
-	return res, netxtURL
+	return res, nextURL
 }
 
 // ExtractEntityURI extracts REST entity URI from payload
@@ -194,10 +194,10 @@ func normalizeODataCollection(payload []byte) ([][]byte, string) {
 			return [][]byte{payload}, ""
 		}
 	}
-	res := [][]byte{}
+	var res [][]byte
 	for _, mapItem := range mapRes {
 		r, _ := json.Marshal(mapItem)
-		res = append(res, []byte(r))
+		res = append(res, r)
 	}
 	return res, nextURL
 }

@@ -40,7 +40,7 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 	if err != nil {
 		return err
 	}
-	defer jsonFile.Close()
+	defer func() { _ = jsonFile.Close() }()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	if err := json.Unmarshal(byteValue, &c); err != nil {
@@ -93,6 +93,7 @@ func (c *AuthCnfg) GetStrategy() string {
 }
 
 // SetAuth : authenticate request
+//noinspection GoUnusedParameter
 func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
 	authCookie, err := c.GetAuth()
 	if err != nil {

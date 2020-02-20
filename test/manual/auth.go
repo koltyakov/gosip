@@ -22,22 +22,22 @@ func GetTestClient(strategy string) (*gosip.SPClient, error) {
 	var err error
 	switch strategy {
 	case "addin":
-		client, err = GetAddinAuthTest()
+		client, err = getAddinAuthTest()
 		break
 	case "adfs":
-		client, err = GetAdfsAuthTest()
+		client, err = getAdfsAuthTest()
 		break
 	case "fba":
-		client, err = GetFbaAuthTest()
+		client, err = getFbaAuthTest()
 		break
 	case "ntlm":
-		client, err = GetNtlmAuthTest()
+		client, err = getNtlmAuthTest()
 		break
 	case "saml":
-		client, err = GetSamlAuthTest()
+		client, err = getSamlAuthTest()
 		break
 	case "tmg":
-		client, err = GetTmgAuthTest()
+		client, err = getTmgAuthTest()
 		break
 	default:
 		return nil, fmt.Errorf("can't resolve the strategy: %s", strategy)
@@ -45,52 +45,42 @@ func GetTestClient(strategy string) (*gosip.SPClient, error) {
 	return client, err
 }
 
-// GetAddinAuthTest : Addin auth test scenario
-func GetAddinAuthTest() (*gosip.SPClient, error) {
+// getAddinAuthTest : Addin auth test scenario
+func getAddinAuthTest() (*gosip.SPClient, error) {
 	return r(&addin.AuthCnfg{}, "./config/private.spo-addin.json")
 }
 
-// GetAdfsAuthTest : ADFS auth test scenario
-func GetAdfsAuthTest() (*gosip.SPClient, error) {
+// getAdfsAuthTest : ADFS auth test scenario
+func getAdfsAuthTest() (*gosip.SPClient, error) {
 	return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap.json")
 	// return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap-adfs.json")
 	// return r(&adfs.AuthCnfg{}, "./config/private.onprem-adfs.json")
 }
 
-// GetWapAuthTest : WAP -> Basic auth test scenario
-func GetWapAuthTest() (*gosip.SPClient, error) {
-	return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap.json")
-}
-
-// GetWapAdfsAuthTest : WAP -> ADFS auth test scenario
-func GetWapAdfsAuthTest() (*gosip.SPClient, error) {
-	return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap-adfs.json")
-}
-
-// GetNtlmAuthTest : NTML auth test scenario
-func GetNtlmAuthTest() (*gosip.SPClient, error) {
+// getNtlmAuthTest : NTML auth test scenario
+func getNtlmAuthTest() (*gosip.SPClient, error) {
 	return r(&ntlm.AuthCnfg{}, "./config/private.onprem-ntlm.json")
 }
 
-// GetFbaAuthTest : FBA auth test scenario
-func GetFbaAuthTest() (*gosip.SPClient, error) {
+// getFbaAuthTest : FBA auth test scenario
+func getFbaAuthTest() (*gosip.SPClient, error) {
 	return r(&fba.AuthCnfg{}, "./config/private.onprem-fba.json")
 }
 
-// GetSamlAuthTest : SAML auth test scenario
-func GetSamlAuthTest() (*gosip.SPClient, error) {
+// getSamlAuthTest : SAML auth test scenario
+func getSamlAuthTest() (*gosip.SPClient, error) {
 	return r(&saml.AuthCnfg{}, "./config/private.spo-user.json")
 }
 
-// GetTmgAuthTest : TMG auth test scenario
-func GetTmgAuthTest() (*gosip.SPClient, error) {
+// getTmgAuthTest : TMG auth test scenario
+func getTmgAuthTest() (*gosip.SPClient, error) {
 	return r(&tmg.AuthCnfg{}, "./config/private.onprem-tmg.json")
 }
 
-// GetOnlineADFSTest : SPO ADFS auth test scenario
-func GetOnlineADFSTest() (*gosip.SPClient, error) {
-	return r(&saml.AuthCnfg{}, "./config/private.spo-adfs.json")
-}
+//// GetOnlineADFSTest : SPO ADFS auth test scenario
+//func GetOnlineADFSTest() (*gosip.SPClient, error) {
+//	return r(&saml.AuthCnfg{}, "./config/private.spo-adfs.json")
+//}
 
 func r(auth gosip.AuthCnfg, cnfgPath string) (*gosip.SPClient, error) {
 	startAt := time.Now()
@@ -117,7 +107,7 @@ func r(auth gosip.AuthCnfg, cnfgPath string) (*gosip.SPClient, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to request the api: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if _, err := ioutil.ReadAll(resp.Body); err != nil {
 		return nil, fmt.Errorf("unable to read api response: %v", err)

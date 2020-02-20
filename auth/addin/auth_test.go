@@ -23,7 +23,7 @@ func init() {
 			ClientID:     os.Getenv("SPAUTH_CLIENTID"),
 			ClientSecret: os.Getenv("SPAUTH_CLIENTSECRET"),
 		}
-		auth.WriteConfig(u.ResolveCnfgPath(cnfgPath))
+		_ = auth.WriteConfig(u.ResolveCnfgPath(cnfgPath))
 	}
 }
 
@@ -81,11 +81,11 @@ func TestAuthEdgeCases(t *testing.T) {
 		folderPath := u.ResolveCnfgPath("./test/tmp")
 		filePath := u.ResolveCnfgPath("./test/tmp/addin.json")
 		cnfg := &AuthCnfg{SiteURL: "test"}
-		os.MkdirAll(folderPath, os.ModePerm)
+		_ = os.MkdirAll(folderPath, os.ModePerm)
 		if err := cnfg.WriteConfig(filePath); err != nil {
 			t.Error(err)
 		}
-		os.RemoveAll(filePath)
+		_ = os.RemoveAll(filePath)
 	})
 
 	t.Run("SetMasterkey", func(t *testing.T) {

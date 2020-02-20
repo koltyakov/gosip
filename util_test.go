@@ -13,11 +13,13 @@ type AnonymousCnfg struct {
 }
 
 // ReadConfig : reads private config with auth options
+//noinspection GoUnusedParameter
 func (c *AnonymousCnfg) ReadConfig(privateFile string) error {
 	return nil
 }
 
 // WriteConfig : writes private config with auth options
+//noinspection GoUnusedParameter
 func (c *AnonymousCnfg) WriteConfig(privateFile string) error {
 	return nil
 }
@@ -41,6 +43,7 @@ func (c *AnonymousCnfg) GetStrategy() string {
 }
 
 // SetAuth : authenticate request
+//noinspection GoUnusedParameter
 func (c *AnonymousCnfg) SetAuth(req *http.Request, httpClient *SPClient) error {
 	if c.SiteURL == "http://restricted" {
 		return fmt.Errorf("can't set auth")

@@ -13,15 +13,15 @@ func TestDigest(t *testing.T) {
 		// faking digest response
 		if r.RequestURI == "/_api/ContextInfo" {
 			digestTriggered = true
-			fmt.Fprintf(w, `{"d":{"GetContextWebInformation":{"FormDigestValue":"FAKE","FormDigestTimeoutSeconds":120,"LibraryVersion":"FAKE"}}}`)
+			_, _ = fmt.Fprintf(w, `{"d":{"GetContextWebInformation":{"FormDigestValue":"FAKE","FormDigestTimeoutSeconds":120,"LibraryVersion":"FAKE"}}}`)
 			return
 		}
-		fmt.Fprintf(w, `{ "result": "Cool alfter some retries" }`)
+		_, _ = fmt.Fprintf(w, `{ "result": "Cool alfter some retries" }`)
 	}))
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer closer.Close()
+	defer func() { _ = closer.Close() }()
 
 	t.Run("ShouldTriggerDigest", func(t *testing.T) {
 		client := &SPClient{

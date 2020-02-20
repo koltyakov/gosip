@@ -113,13 +113,13 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) (*ChangesResp, erro
 	metadata := map[string]interface{}{}
 	if changeQuery != nil {
 		optsRaw, _ := json.Marshal(changeQuery)
-		json.Unmarshal(optsRaw, &metadata)
+		_ = json.Unmarshal(optsRaw, &metadata)
 	}
 	metadata["__metadata"] = map[string]string{"type": "SP.ChangeQuery"}
-	if changeQuery.ChangeTokenStart != "" {
+	if changeQuery != nil && changeQuery.ChangeTokenStart != "" {
 		metadata["ChangeTokenStart"] = map[string]string{"StringValue": changeQuery.ChangeTokenStart}
 	}
-	if changeQuery.ChangeTokenEnd != "" {
+	if changeQuery != nil && changeQuery.ChangeTokenEnd != "" {
 		metadata["ChangeTokenEnd"] = map[string]string{"StringValue": changeQuery.ChangeTokenEnd}
 	}
 	for k, v := range metadata {
@@ -141,7 +141,7 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) (*ChangesResp, erro
 	result.Data = func() []*ChangeInfo {
 		result.data = nil
 		collection, _ := normalizeODataCollection(data)
-		changesInfo := []*ChangeInfo{}
+		var changesInfo []*ChangeInfo
 		for _, changeItem := range collection {
 			c := &ChangeInfo{}
 			if err := json.Unmarshal(changeItem, &c); err == nil {

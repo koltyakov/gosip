@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/koltyakov/gosip/templates"
+	"github.com/patrickmn/go-cache"
 
-	cache "github.com/patrickmn/go-cache"
+	"github.com/koltyakov/gosip/templates"
 )
 
 var (
@@ -39,8 +39,8 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	}
 
 	notAfterTime, _ := time.Parse(time.RFC3339, notAfter)
-	expirity := time.Until(notAfterTime) - 60*time.Second
-	storage.Set(cacheKey, authCookie, expirity)
+	expiry := time.Until(notAfterTime) - 60*time.Second
+	storage.Set(cacheKey, authCookie, expiry)
 
 	return authCookie, nil
 }
@@ -61,7 +61,7 @@ func getSecurityToken(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -98,7 +98,7 @@ func getSecurityToken(c *AuthCnfg) (string, string, error) {
 		return getSecurityTokenWithAdfs(userRealm.AuthURL, c)
 	}
 
-	return "", "", fmt.Errorf("Unable to resolve namespace authentiation type. Type received: %s", userRealm.NameSpaceType)
+	return "", "", fmt.Errorf("unable to resolve namespace authentiation type. Type received: %s", userRealm.NameSpaceType)
 }
 
 func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
@@ -132,7 +132,7 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	xmlResponse, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -160,7 +160,7 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// cookie := resp.Header.Get("Set-Cookie") // TODO: parse FedAuth and rtFa cookies only (?)
 	// fmt.Printf("Cookie: %s\n", cookie)
@@ -204,7 +204,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -264,7 +264,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	xmlResponse, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -304,7 +304,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 	if err != nil {
 		return "", "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	var authCookie string
 	for _, coo := range resp.Cookies() {

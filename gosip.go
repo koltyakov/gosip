@@ -89,7 +89,11 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		// Retry only for NTML
 		if c.AuthCnfg.GetStrategy() == "ntlm" && c.shouldRetry(req, resp, 5) {
-			c.onRetry(req, reqTime, resp.StatusCode, nil)
+			statusCode := 400
+			if resp != nil {
+				statusCode = resp.StatusCode
+			}
+			c.onRetry(req, reqTime, statusCode, nil)
 			// Reset body reader closer
 			if bodyBackup != nil {
 				req.Body = ioutil.NopCloser(bodyBackup)
@@ -131,11 +135,11 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
-// applyAuth applyes authentication flow
+// applyAuth applies authentication flow
 func (c *SPClient) applyAuth(req *http.Request) (*http.Response, error) {
 	// Read stored creds and config
 	if c.ConfigPath != "" && c.AuthCnfg.GetSiteURL() == "" {
-		c.AuthCnfg.ReadConfig(c.ConfigPath)
+		_ = c.AuthCnfg.ReadConfig(c.ConfigPath)
 	}
 
 	// Can't resolve context siteURL

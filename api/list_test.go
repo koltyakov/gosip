@@ -87,7 +87,6 @@ func TestList(t *testing.T) {
 		if err := web.Lists().GetByID(lr.Data().ID).Recycle(); err != nil {
 			t.Error(err)
 		}
-		// ToDo: Empty Recycle Bin
 	})
 
 }

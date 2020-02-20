@@ -25,7 +25,7 @@ func TestConf(t *testing.T) {
 
 	apiConstructors := getAllConstructors(spClient)
 
-	withNoContMethod := []string{}
+	var withNoContMethod []string
 
 	for key, obj := range apiConstructors {
 		method := reflect.ValueOf(obj).MethodByName("Conf")
@@ -50,7 +50,7 @@ func TestConf(t *testing.T) {
 		t.Logf("the following constructors don't contain Conf method, but this is OK: %v\n", withNoContMethod)
 	}
 
-	missedConstructors := []string{}
+	var missedConstructors []string
 	for _, constructor := range getAstConstructors() {
 		found := false
 		for key := range apiConstructors {
@@ -80,10 +80,10 @@ func TestModifiers(t *testing.T) {
 	}
 
 	apiConstructors := getAllConstructors(spClient)
-	withNoModsMethod := []string{}
+	var withNoModsMethod []string
 
 	for key, obj := range apiConstructors {
-		mods := []string{}
+		var mods []string
 		for _, modMethodName := range modsMethods {
 			method := reflect.ValueOf(obj).MethodByName(modMethodName)
 			if method.IsValid() {
@@ -192,7 +192,7 @@ func getAstConstructors() []string {
 		os.Exit(1)
 	}
 
-	constructors := []string{}
+	var constructors []string
 
 	for _, pack := range packs {
 		for _, f := range pack.Files {

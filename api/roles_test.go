@@ -34,13 +34,13 @@ func TestRoles(t *testing.T) {
 	})
 
 	t.Run("HasUniqueAssignments", func(t *testing.T) {
-		list.Roles().BreakInheritance(false, true)
-		hassUniqueAssigments, err := list.Roles().HasUniqueAssignments()
+		_ = list.Roles().BreakInheritance(false, true)
+		hasUniqueAssignments, err := list.Roles().HasUniqueAssignments()
 		if err != nil {
 			t.Error(err)
 		}
-		if !hassUniqueAssigments {
-			t.Error("should have had unique role assigments")
+		if !hasUniqueAssignments {
+			t.Error("should have had unique role assignments")
 		}
 	})
 

@@ -208,7 +208,7 @@ func (file *File) Download() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer body.Close()
+	defer func() { _ = body.Close() }()
 
 	data, err := ioutil.ReadAll(body)
 	if err != nil {

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	cache "github.com/patrickmn/go-cache"
+	"github.com/patrickmn/go-cache"
 )
 
 var (
@@ -61,14 +61,14 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// fmt.Println(resp.StatusCode)
 	authCookie := resp.Header.Get("Set-Cookie") // TODO: parse TMG cookie only (?)
 
 	// TODO: ttl detection
-	expirity := time.Hour
-	storage.Set(cacheKey, authCookie, expirity)
+	expiry := time.Hour
+	storage.Set(cacheKey, authCookie, expiry)
 
 	return authCookie, nil
 }
@@ -93,7 +93,7 @@ func detectCookieAuthURL(siteURL string) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	redirect, err := resp.Location()
 	if err != nil {

@@ -101,7 +101,7 @@ func (item *Item) UpdateValidate(formValues map[string]string, options *Validate
 		FieldName  string `json:"FieldName"`
 		FieldValue string `json:"FieldValue"`
 	}
-	formValuesArray := []*formValue{}
+	var formValuesArray []*formValue
 	for n, v := range formValues {
 		formValuesArray = append(formValuesArray, &formValue{
 			FieldName:  n,
@@ -157,7 +157,7 @@ func (itemResp *ItemResp) Data() *GenericItemInfo {
 	data := NormalizeODataItem(*itemResp)
 	data = fixDatesInResponse(data, []string{"Created", "Modified"})
 	res := &GenericItemInfo{}
-	json.Unmarshal(data, &res)
+	_ = json.Unmarshal(data, &res)
 	return res
 }
 

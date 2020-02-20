@@ -127,13 +127,13 @@ func (attachment *Attachment) GetReader() (io.ReadCloser, error) {
 	return resp.Body, err
 }
 
-// Dowload downloads attachment's as byte array
-func (attachment *Attachment) Dowload() ([]byte, error) {
+// Download downloads attachment's as byte array
+func (attachment *Attachment) Download() ([]byte, error) {
 	body, err := attachment.GetReader()
 	if err != nil {
 		return nil, err
 	}
-	defer body.Close()
+	defer func() { _ = body.Close() }()
 
 	data, err := ioutil.ReadAll(body)
 	if err != nil {

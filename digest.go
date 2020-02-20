@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	cache "github.com/patrickmn/go-cache"
+	"github.com/patrickmn/go-cache"
 )
 
 var storage = cache.New(5*time.Minute, 10*time.Minute)
@@ -49,7 +49,7 @@ func GetDigest(context context.Context, client *SPClient) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -67,12 +67,12 @@ func GetDigest(context context.Context, client *SPClient) (string, error) {
 		return "", errors.New("received empty FormDigestValue")
 	}
 
-	expirity := (results.D.GetContextWebInformation.FormDigestTimeoutSeconds - 60) * time.Second
+	expiry := (results.D.GetContextWebInformation.FormDigestTimeoutSeconds - 60) * time.Second
 
 	storage.Set(
 		cacheKey,
 		results.D.GetContextWebInformation.FormDigestValue,
-		expirity,
+		expiry,
 	)
 
 	return results.D.GetContextWebInformation.FormDigestValue, nil

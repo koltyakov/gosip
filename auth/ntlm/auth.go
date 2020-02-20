@@ -16,7 +16,8 @@ import (
 	"strings"
 	"sync"
 
-	ntlmssp "github.com/Azure/go-ntlmssp"
+	"github.com/Azure/go-ntlmssp"
+
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/cpass"
 )
@@ -53,7 +54,7 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 	if err != nil {
 		return err
 	}
-	defer jsonFile.Close()
+	defer func() { _ = jsonFile.Close() }()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	if err := json.Unmarshal(byteValue, &c); err != nil {

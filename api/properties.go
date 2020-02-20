@@ -248,7 +248,7 @@ func printNoScriptWarning(endpoint string, err error) {
 func (propsResp *PropsResp) Data() map[string]string {
 	data := NormalizeODataItem(*propsResp)
 	resAll := map[string]interface{}{}
-	json.Unmarshal(data, &resAll)
+	_ = json.Unmarshal(data, &resAll)
 	res := map[string]string{}
 	for key, val := range resAll {
 		if reflect.TypeOf(val).String() == "string" {

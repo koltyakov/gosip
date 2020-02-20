@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/koltyakov/gosip"
-	ntlm "github.com/koltyakov/gosip/auth/ntlm"
-	saml "github.com/koltyakov/gosip/auth/saml"
+	"github.com/koltyakov/gosip/auth/ntlm"
+	"github.com/koltyakov/gosip/auth/saml"
 	h "github.com/koltyakov/gosip/test/helpers"
 )
 

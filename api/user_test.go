@@ -50,7 +50,4 @@ func TestUser(t *testing.T) {
 		}
 	})
 
-	// ToDo:
-	// Update
-
 }

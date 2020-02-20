@@ -81,7 +81,7 @@ func TestDecryptWithIncorrectKey(t *testing.T) {
 func TestEdgeCases(t *testing.T) {
 
 	t.Run("encrypt/EmptyKey", func(t *testing.T) {
-		if _, err := encrypt("secret", []byte("")); err == nil {
+		if _, err := encrypt("secret", []byte("")); err != nil {
 			if !strings.Contains(err.Error(), "invalid key size") {
 				t.Error("empty key should not pass")
 			}
@@ -89,7 +89,7 @@ func TestEdgeCases(t *testing.T) {
 	})
 
 	t.Run("encrypt/WrongSizeKey", func(t *testing.T) {
-		if _, err := encrypt("secret", []byte("wrong_size")); err == nil {
+		if _, err := encrypt("secret", []byte("wrong_size")); err != nil {
 			if !strings.Contains(err.Error(), "invalid key size") {
 				t.Error("short key should not pass")
 			}
@@ -101,7 +101,7 @@ func TestEdgeCases(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := decrypt(secured, []byte("")); err == nil {
+		if _, err := decrypt(secured, []byte("")); err != nil {
 			if !strings.Contains(err.Error(), "invalid key size") {
 				t.Error("empty key should not pass")
 			}
@@ -109,7 +109,7 @@ func TestEdgeCases(t *testing.T) {
 	})
 
 	t.Run("decrypt/IllegaBase64", func(t *testing.T) {
-		if _, err := decrypt("incorrect", []byte("key")); err == nil {
+		if _, err := decrypt("incorrect", []byte("key")); err != nil {
 			if !strings.Contains(err.Error(), "illegal base64 data") {
 				t.Error("illegal base64 data should not pass")
 			}
@@ -117,7 +117,7 @@ func TestEdgeCases(t *testing.T) {
 	})
 
 	t.Run("decrypt/SmallBlockSize", func(t *testing.T) {
-		if _, err := decrypt("YQ==", hashCipherKey("key")); err == nil {
+		if _, err := decrypt("YQ==", hashCipherKey("key")); err != nil {
 			if !strings.Contains(err.Error(), "ciphertext block size is too short") {
 				t.Error("too short ciphertext block size should not pass")
 			}

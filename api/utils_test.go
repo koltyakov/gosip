@@ -146,12 +146,12 @@ func TestUtils(t *testing.T) {
 	t.Run("parseODataCollection", func(t *testing.T) {
 		resulted := []byte(`[{"prop":"val1"},{"prop":"val2"}]`)
 		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, resulted))
-		fromVerbose := []byte{}
+		var fromVerbose []byte
 		coll, _ := normalizeODataCollection(verbose)
 		for _, b := range coll {
 			fromVerbose = append(fromVerbose, b...)
 		}
-		fromMinimal := []byte{}
+		var fromMinimal []byte
 		coll, _ = normalizeODataCollection(resulted)
 		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
@@ -165,12 +165,12 @@ func TestUtils(t *testing.T) {
 		resulted := []byte(`[{"prop":"val1"},{"prop":"val2"}]`)
 		minimal := []byte(fmt.Sprintf(`{"value":%s}`, resulted))
 		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, resulted))
-		fromVerbose := []byte{}
+		var fromVerbose []byte
 		coll, _ := normalizeODataCollection(verbose)
 		for _, b := range coll {
 			fromVerbose = append(fromVerbose, b...)
 		}
-		fromMinimal := []byte{}
+		var fromMinimal []byte
 		coll, _ = normalizeODataCollection(minimal)
 		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
@@ -183,12 +183,12 @@ func TestUtils(t *testing.T) {
 	t.Run("parseODataCollection/Empty", func(t *testing.T) {
 		minimal := []byte(`[]`)
 		verbose := []byte(fmt.Sprintf(`{"d":{"results":%s}}`, minimal))
-		fromVerbose := []byte{}
+		var fromVerbose []byte
 		coll, _ := normalizeODataCollection(verbose)
 		for _, b := range coll {
 			fromVerbose = append(fromVerbose, b...)
 		}
-		fromMinimal := []byte{}
+		var fromMinimal []byte
 		coll, _ = normalizeODataCollection(minimal)
 		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
@@ -211,7 +211,7 @@ func TestUtils(t *testing.T) {
 		expected := []byte(`{"test1":[1,2,3],"test2":{"other":[1,2,3]}}`)
 
 		rawMap := map[string]interface{}{}
-		json.Unmarshal(raw, &rawMap)
+		_ = json.Unmarshal(raw, &rawMap)
 		resMap := normalizeMultiLookupsMap(rawMap)
 
 		res, err := json.Marshal(resMap)
@@ -240,7 +240,7 @@ func TestUtils(t *testing.T) {
 		}`)
 
 		rawMap := map[string]interface{}{}
-		json.Unmarshal(raw, &rawMap)
+		_ = json.Unmarshal(raw, &rawMap)
 		resMap := normalizeMultiLookupsMap(rawMap)
 
 		_, err := json.Marshal(resMap)
@@ -318,6 +318,7 @@ func TestUtils(t *testing.T) {
 		conf := patchConfigHeaders(nil, headers)
 		if conf == nil {
 			t.Error("empty request config")
+			return
 		}
 		if conf.Headers["Accept"] != "application/json" {
 			t.Error("incorrect headers")

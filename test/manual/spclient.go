@@ -9,7 +9,8 @@ import (
 	"runtime"
 	"time"
 
-	ntlmssp "github.com/Azure/go-ntlmssp"
+	"github.com/Azure/go-ntlmssp"
+
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/auth/adfs"
 	"github.com/koltyakov/gosip/auth/fba"
@@ -83,7 +84,7 @@ func apiCallTest(client *gosip.SPClient, siteURL string) {
 		fmt.Printf("Unable to request api: %v\n", err)
 		return
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

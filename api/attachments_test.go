@@ -76,7 +76,7 @@ func TestAttachments(t *testing.T) {
 
 	t.Run("Download", func(t *testing.T) {
 		expectedContent := []byte("attachment 04")
-		content, err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_04.txt").Dowload()
+		content, err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_04.txt").Download()
 		if err != nil {
 			t.Error(err)
 		}

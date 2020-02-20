@@ -8,8 +8,8 @@
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkoltyakov%2Fgosip.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkoltyakov%2Fgosip?ref=badge_shield)
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/koltyakov/gosip-docs/master/.gitbook/assets/gosip.png" />
+<div style="margin: auto;">
+  <img alt="Gosip" src="https://raw.githubusercontent.com/koltyakov/gosip-docs/master/.gitbook/assets/gosip.png" />
 </div>
 
 ## Main features
@@ -73,7 +73,7 @@ auth := &strategy.AuthCnfg{
 
 AuthCnfg from different strategies contains different options relevant for a specified auth type.
 
-The authentication options can be provided explicitly or can be read from a configuration file (see [more](#authentication-strategies-1)).
+The authentication options can be provided explicitly or can be read from a configuration file.
 
 ```golang
 configPath := "./config/private.json"

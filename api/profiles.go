@@ -203,7 +203,7 @@ func (profileResp *ProfileResp) Data() *ProfileInfo {
 	data := NormalizeODataItem(*profileResp)
 	data = normalizeMultiLookups(data)
 	res := &ProfileInfo{}
-	json.Unmarshal(data, &res)
+	_ = json.Unmarshal(data, &res)
 	return res
 }
 
@@ -217,7 +217,7 @@ func (profilePropsResp *ProfilePropsResp) Data() *ProfilePropsInto {
 	data := NormalizeODataItem(*profilePropsResp)
 	data = normalizeMultiLookups(data)
 	res := &ProfilePropsInto{}
-	json.Unmarshal(data, &res)
+	_ = json.Unmarshal(data, &res)
 	return res
 }
 

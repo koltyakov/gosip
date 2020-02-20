@@ -14,30 +14,30 @@ func TestHooks(t *testing.T) {
 		if r.RequestURI == "/_api/error" {
 			// intentional 404
 			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(`{ "error": "404 Page not found" }`))
+			_, _ = w.Write([]byte(`{ "error": "404 Page not found" }`))
 			return
 		}
 		// faking digest response
 		if r.RequestURI == "/_api/ContextInfo" {
-			fmt.Fprintf(w, `{"d":{"GetContextWebInformation":{"FormDigestValue":"FAKE","FormDigestTimeoutSeconds":120,"LibraryVersion":"FAKE"}}}`)
+			_, _ = fmt.Fprintf(w, `{"d":{"GetContextWebInformation":{"FormDigestValue":"FAKE","FormDigestTimeoutSeconds":120,"LibraryVersion":"FAKE"}}}`)
 			return
 		}
 		// backoff after 2 retries
 		if r.Header.Get("X-Gosip-Retry") == "2" {
-			fmt.Fprintf(w, `{ "result": "Cool alfter some retries" }`)
+			_, _ = fmt.Fprintf(w, `{ "result": "Cool alfter some retries" }`)
 			return
 		}
 		// intentional 503
 		w.WriteHeader(http.StatusServiceUnavailable)
-		w.Write([]byte(`{ "error": "503 Retry Please" }`))
+		_, _ = w.Write([]byte(`{ "error": "503 Retry Please" }`))
 	}))
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer closer.Close()
+	defer func() { _ = closer.Close() }()
 
 	// Request counters
-	var requestCntrs = struct {
+	var requestCounters = struct {
 		Errors    int32
 		Responses int32
 		Retries   int32
@@ -55,16 +55,16 @@ func TestHooks(t *testing.T) {
 			RetryPolicies: map[int]int{503: 3},
 			Hooks: &HookHandlers{
 				OnError: func(e *HookEvent) {
-					atomic.AddInt32(&requestCntrs.Errors, 1)
+					atomic.AddInt32(&requestCounters.Errors, 1)
 				},
 				OnResponse: func(e *HookEvent) {
-					atomic.AddInt32(&requestCntrs.Responses, 1)
+					atomic.AddInt32(&requestCounters.Responses, 1)
 				},
 				OnRetry: func(e *HookEvent) {
-					atomic.AddInt32(&requestCntrs.Retries, 1)
+					atomic.AddInt32(&requestCounters.Retries, 1)
 				},
 				OnRequest: func(e *HookEvent) {
-					atomic.AddInt32(&requestCntrs.Requests, 1)
+					atomic.AddInt32(&requestCounters.Requests, 1)
 				},
 			},
 		}
@@ -78,22 +78,22 @@ func TestHooks(t *testing.T) {
 		}
 
 		// 4 requests
-		if requestCntrs.Requests != 4 {
+		if requestCounters.Requests != 4 {
 			t.Error("wrong number of requests")
 		}
 
 		// 2 retries
-		if requestCntrs.Retries != 2 {
+		if requestCounters.Retries != 2 {
 			t.Error("wrong number of retries")
 		}
 
 		// 2 response
-		if requestCntrs.Responses != 2 {
+		if requestCounters.Responses != 2 {
 			t.Error("wrong number of responses")
 		}
 
 		// 1 error
-		if requestCntrs.Errors != 1 {
+		if requestCounters.Errors != 1 {
 			t.Error("wrong number of errors")
 		}
 
@@ -111,7 +111,7 @@ func simpleCall(client *SPClient, uri string) error {
 	if err != nil {
 		return err
 	}
-	defer rsp.Body.Close()
+	defer func() { _ = rsp.Body.Close() }()
 
 	if rsp.StatusCode != 200 {
 		return fmt.Errorf("can't retry a request")

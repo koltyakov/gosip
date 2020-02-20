@@ -13,7 +13,7 @@ func OnlineSamlWsfedTemplate(endpoint, username, password string) (string, error
 		Password string
 	}
 
-	template, err := template.New("onlineSamlWsfed").Parse(`
+	t, err := template.New("onlineSamlWsfed").Parse(`
 		<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing" xmlns:u="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
 			<s:Header>
 				<a:Action s:mustUnderstand="1">http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue</a:Action>
@@ -53,7 +53,7 @@ func OnlineSamlWsfedTemplate(endpoint, username, password string) (string, error
 	}
 
 	var tpl bytes.Buffer
-	if err := template.Execute(&tpl, data); err != nil {
+	if err := t.Execute(&tpl, data); err != nil {
 		return "", err
 	}
 
@@ -69,7 +69,7 @@ func OnlineSamlWsfedAdfsTemplate(endpoint, token string) (string, error) {
 		Token    string
 	}
 
-	template, err := template.New("onlineSamlWsfedAdfs").Parse(`
+	t, err := template.New("onlineSamlWsfedAdfs").Parse(`
 		<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing" xmlns:u="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
 			<s:Header>
 				<a:Action s:mustUnderstand="1">http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue</a:Action>
@@ -103,7 +103,7 @@ func OnlineSamlWsfedAdfsTemplate(endpoint, token string) (string, error) {
 	}
 
 	var tpl bytes.Buffer
-	if err := template.Execute(&tpl, data); err != nil {
+	if err := t.Execute(&tpl, data); err != nil {
 		return "", err
 	}
 

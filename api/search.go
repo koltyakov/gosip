@@ -159,7 +159,7 @@ func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 
 	request := map[string]interface{}{}
 	queryBytes, _ := json.Marshal(query)
-	json.Unmarshal(queryBytes, &request)
+	_ = json.Unmarshal(queryBytes, &request)
 
 	request["__metadata"] = map[string]interface{}{"type": "Microsoft.Office.Server.Search.REST.SearchRequest"}
 
@@ -210,7 +210,7 @@ func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 func (searchResp *SearchResp) Data() *SearchResults {
 	data := NormalizeODataItem(*searchResp)
 	res := &SearchResults{}
-	json.Unmarshal(data, &res)
+	_ = json.Unmarshal(data, &res)
 	return res
 }
 
@@ -221,7 +221,7 @@ func (searchResp *SearchResp) Normalized() []byte {
 
 // Results : to get typed data
 func (searchResp *SearchResp) Results() []map[string]string {
-	results := []map[string]string{}
+	var results []map[string]string
 	rows := searchResp.Data().PrimaryQueryResult.RelevantResults.Table.Rows
 	for _, row := range rows {
 		rowMap := map[string]string{}

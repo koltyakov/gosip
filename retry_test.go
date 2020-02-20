@@ -16,53 +16,53 @@ func TestRetry(t *testing.T) {
 	closer, err := startFakeServer(":8989", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// faking digest response
 		if r.RequestURI == "/_api/ContextInfo" {
-			fmt.Fprintf(w, `{"d":{"GetContextWebInformation":{"FormDigestValue":"FAKE","FormDigestTimeoutSeconds":120,"LibraryVersion":"FAKE"}}}`)
+			_, _ = fmt.Fprintf(w, `{"d":{"GetContextWebInformation":{"FormDigestValue":"FAKE","FormDigestTimeoutSeconds":120,"LibraryVersion":"FAKE"}}}`)
 			return
 		}
 		// retry after
 		if r.RequestURI == "/_api/retryafter" && r.Header.Get("X-Gosip-Retry") == "1" {
 			w.Header().Add("Retry-After", "1")
 			w.WriteHeader(http.StatusTooManyRequests)
-			w.Write([]byte(`{ "error": "Body is not backed off" }`))
+			_, _ = w.Write([]byte(`{ "error": "Body is not backed off" }`))
 			return
 		}
 		// ntlm retry
 		if r.RequestURI == "/_api/ntlm" && r.Header.Get("X-Gosip-Retry") == "" {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{ "error": "NTLM force retry" }`))
+			_, _ = w.Write([]byte(`{ "error": "NTLM force retry" }`))
 			return
 		}
 		// context cancel
 		if r.RequestURI == "/_api/contextcancel" && r.Header.Get("X-Gosip-Retry") == "" {
 			w.Header().Add("Retry-After", "5")
 			w.WriteHeader(http.StatusTooManyRequests)
-			w.Write([]byte(`{ "error": "context cancel" }`))
+			_, _ = w.Write([]byte(`{ "error": "context cancel" }`))
 			return
 		}
 		if r.Body != nil {
-			defer r.Body.Close()
+			defer func() { _ = r.Body.Close() }()
 			data, _ := ioutil.ReadAll(r.Body)
 			if r.RequestURI == "/_api/post/keepbody" && r.Header.Get("X-Gosip-Retry") == "1" {
 				if fmt.Sprintf("%s", data) != "none-empty" {
 					w.WriteHeader(http.StatusInternalServerError)
-					w.Write([]byte(`{ "error": "Body is not backed off" }`))
+					_, _ = w.Write([]byte(`{ "error": "Body is not backed off" }`))
 					return
 				}
 			}
 		}
 		// backoff after 2 retries
 		if r.Header.Get("X-Gosip-Retry") == "2" {
-			fmt.Fprintf(w, `{ "result": "Cool alfter some retries" }`)
+			_, _ = fmt.Fprintf(w, `{ "result": "Cool alfter some retries" }`)
 			return
 		}
 		// intentional 503
 		w.WriteHeader(http.StatusServiceUnavailable)
-		w.Write([]byte(`{ "error": "503 Retry Please" }`))
+		_, _ = w.Write([]byte(`{ "error": "503 Retry Please" }`))
 	}))
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer closer.Close()
+	defer func() { _ = closer.Close() }()
 
 	t.Run("GetRequest", func(t *testing.T) {
 		client := &SPClient{
@@ -79,7 +79,7 @@ func TestRetry(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		defer rsp.Body.Close()
+		defer func() { _ = rsp.Body.Close() }()
 
 		if rsp.StatusCode != 200 {
 			t.Error("can't retry a request")
@@ -101,7 +101,7 @@ func TestRetry(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		defer rsp.Body.Close()
+		defer func() { _ = rsp.Body.Close() }()
 
 		if rsp.StatusCode != 200 {
 			t.Error("can't retry a request")
@@ -123,7 +123,7 @@ func TestRetry(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		defer rsp.Body.Close()
+		defer func() { _ = rsp.Body.Close() }()
 
 		if rsp.StatusCode != 200 {
 			t.Error("can't retry a request")
@@ -142,7 +142,7 @@ func TestRetry(t *testing.T) {
 		}
 
 		rsp, _ := client.Execute(req)
-		defer rsp.Body.Close()
+		defer func() { _ = rsp.Body.Close() }()
 
 		if rsp.StatusCode != 503 {
 			t.Error("should receive 503")
@@ -162,7 +162,7 @@ func TestRetry(t *testing.T) {
 		req.Header.Add("X-Gosip-NoRetry", "true")
 
 		rsp, _ := client.Execute(req)
-		defer rsp.Body.Close()
+		defer func() { _ = rsp.Body.Close() }()
 
 		if rsp.StatusCode != 503 {
 			t.Error("should receive 503")
@@ -229,7 +229,7 @@ func TestRetry(t *testing.T) {
 			}
 		}()
 
-		client.Execute(req) // should be canceled with a context after 900 milliseconds
+		_, _ = client.Execute(req) // should be canceled with a context after 900 milliseconds
 
 		dur := time.Now().Sub(beforeReq)
 		if dur > 1*time.Second {
@@ -253,7 +253,7 @@ func TestRetry(t *testing.T) {
 
 		_, err = client.Execute(req) // should be prevented due to already closed context
 
-		if strings.Index(err.Error(), "context canceled") == -1 {
+		if err != nil && strings.Index(err.Error(), "context canceled") == -1 {
 			t.Error("context canceling failed")
 		}
 	})

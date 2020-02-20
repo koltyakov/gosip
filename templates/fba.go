@@ -12,7 +12,7 @@ func FbaWsTemplate(username, password string) (string, error) {
 		Password string
 	}
 
-	template, err := template.New("fbaWsTemplate").Parse(`
+	t, err := template.New("fbaWsTemplate").Parse(`
 		<?xml version="1.0" encoding="utf-8"?>
 		<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 			<soap:Body>
@@ -33,7 +33,7 @@ func FbaWsTemplate(username, password string) (string, error) {
 	}
 
 	var tpl bytes.Buffer
-	if err := template.Execute(&tpl, data); err != nil {
+	if err := t.Execute(&tpl, data); err != nil {
 		return "", err
 	}
 

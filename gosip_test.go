@@ -13,20 +13,20 @@ func TestEdges(t *testing.T) {
 	closer, err := startFakeServer(":8989", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// faking digest response
 		if r.RequestURI == "/sub/_api/ContextInfo" {
-			fmt.Fprintf(w, `{"d":{"GetContextWebInformation":{"FormDigestValue":"","FormDigestTimeoutSeconds":120,"LibraryVersion":"FAKE"}}}`)
+			_, _ = fmt.Fprintf(w, `{"d":{"GetContextWebInformation":{"FormDigestValue":"","FormDigestTimeoutSeconds":120,"LibraryVersion":"FAKE"}}}`)
 			return
 		}
 		if r.RequestURI == "/sub/_api/wait" {
 			time.Sleep(1 * time.Second)
-			fmt.Fprintf(w, `{"result":"one eternity later"}`)
+			_, _ = fmt.Fprintf(w, `{"result":"one eternity later"}`)
 			return
 		}
-		fmt.Fprintf(w, `{ "result": "Cool alfter some retries" }`)
+		_, _ = fmt.Fprintf(w, `{ "result": "Cool alfter some retries" }`)
 	}))
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer closer.Close()
+	defer func() { _ = closer.Close() }()
 
 	t.Run("EmptyURLShouldFail", func(t *testing.T) {
 		client := &SPClient{
@@ -103,7 +103,7 @@ func TestEdges(t *testing.T) {
 		}
 
 		_, err = client.Execute(req) // should fail after a timeout
-		if strings.Index(err.Error(), "request canceled") == -1 {
+		if err != nil && strings.Index(err.Error(), "request canceled") == -1 {
 			t.Error("request canceling failed")
 		}
 	})

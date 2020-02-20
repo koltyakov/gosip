@@ -74,7 +74,7 @@ func (field *Field) Get() (FieldResp, error) {
 	if err != nil {
 		return nil, err
 	}
-	return FieldResp(data), nil
+	return data, nil
 }
 
 // Update updates Field's metadata with properties provided in `body` parameter

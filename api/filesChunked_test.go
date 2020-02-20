@@ -84,7 +84,7 @@ func TestFilesChunked(t *testing.T) {
 		if err == nil {
 			t.Error("cancel upload was not handled")
 		}
-		if err.Error() != "file upload was canceled" {
+		if err != nil && err.Error() != "file upload was canceled" {
 			t.Error(err)
 		}
 	})
