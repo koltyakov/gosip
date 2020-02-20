@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -11,11 +12,13 @@ func TestList(t *testing.T) {
 	checkClient(t)
 
 	web := NewSP(spClient).Web()
-	listInfo, err := getAnyList()
+	listTitle := strings.Replace(uuid.New().String(), "-", "", -1)
+	listInfo, err := web.Lists().Add(listTitle, nil)
 	if err != nil {
 		t.Error(err)
 	}
-	list := web.Lists().GetByID(listInfo.ID)
+	list := web.Lists().GetByID(listInfo.Data().ID)
+	defer func() { _ = list.Delete() }()
 
 	t.Run("GetEntityType", func(t *testing.T) {
 		entType, err := list.GetEntityType()
