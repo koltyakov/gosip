@@ -5,7 +5,7 @@ It supports a variety of different authentication strategies such as:
   - ADFS user credentials
   - Auth to SharePoint behind a reverse proxy (TMG, WAP)
   - Form-based authentication (FBA)
-  - Addin only permissions
+  - Add-in only permissions
   - SAML based with user credentials
 
 Amongst supported platform versions are:
@@ -73,7 +73,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	}
 
 	c.onRequest(req, reqTime, 0, nil)
-	reqTime = time.Now() // update request time to exclude auth-releted timings
+	reqTime = time.Now() // update request time to exclude auth-related timings
 
 	// Creating backup reader to be able to retry none nil body requests
 	var bodyBackup io.Reader
