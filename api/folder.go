@@ -61,7 +61,7 @@ func (folder *Folder) Get() (FolderResp, error) {
 }
 
 // Update updates Folder's metadata with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.Folder object
+// where `body` is byte array representation of JSON string payload relevant to SP.Folder object
 func (folder *Folder) Update(body []byte) (FolderResp, error) {
 	body = patchMetadataType(body, "SP.Folder")
 	client := NewHTTPClient(folder.client)
@@ -83,7 +83,7 @@ func (folder *Folder) Recycle() error {
 	return err
 }
 
-// Folders gets subfolders queryable collection
+// Folders gets sub folders queryable collection
 func (folder *Folder) Folders() *Folders {
 	return NewFolders(
 		folder.client,

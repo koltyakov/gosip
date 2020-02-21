@@ -107,7 +107,7 @@ func (web *Web) Delete() error {
 }
 
 // Update updates Web's metadata with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.Web object
+// where `body` is byte array representation of JSON string payload relevant to SP.Web object
 func (web *Web) Update(body []byte) (WebResp, error) {
 	body = patchMetadataType(body, "SP.Web")
 	client := NewHTTPClient(web.client)
@@ -132,7 +132,7 @@ func (web *Web) Changes() *Changes {
 	)
 }
 
-// Webs gets Webs API instance queryable collection for this Web (Subwebs)
+// Webs gets Webs API instance queryable collection for this Web (sub webs)
 func (web *Web) Webs() *Webs {
 	return NewWebs(
 		web.client,
@@ -260,7 +260,7 @@ func (web *Web) CurrentUser() *User {
 }
 
 // GetFolder gets a folder by its relevant URI, URI can be host relevant (e.g. `/sites/site/lib/folder`)
-// or web relavant (e.g. `lib/folder`, with web relevant URI there should be no slash at the beginning)
+// or web relevant (e.g. `lib/folder`, with web relevant URI there should be no slash at the beginning)
 // A wrapper of `GetFolderByServerRelativeUrl`
 func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 	return NewFolder(
@@ -275,7 +275,7 @@ func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 }
 
 // GetFolderByPath gets a folder by its relevant URI, URI can be host relevant (e.g. `/sites/site/lib/folder`)
-// or web relavant (e.g. `lib/folder`, with web relevant URI there should be no slash at the beginning)
+// or web relevant (e.g. `lib/folder`, with web relevant URI there should be no slash at the beginning)
 // A wrapper of `GetFolderByServerRelativePath`
 // Supported only in modern SharePoint, differs from GetFile with its capability of dealing with special chars in path
 func (web *Web) GetFolderByPath(serverRelativeURL string) *Folder {
@@ -300,14 +300,14 @@ func (web *Web) GetFolderByID(uniqueID string) *Folder {
 	)
 }
 
-// EnsureFolder is a helper to ensure a folder by its relevalt URI, when there was no folder it's created
+// EnsureFolder is a helper to ensure a folder by its relevant URI, when there was no folder it's created
 func (web *Web) EnsureFolder(serverRelativeURL string) ([]byte, error) {
 	return ensureFolder(web, serverRelativeURL, serverRelativeURL)
 }
 
 // GetFile gets File API instance object by its relevant URI
 // File URI can be host relevant (e.g. `/sites/site/lib/folder/file.txt`)
-// or web relavant (e.g. `lib/folder/file.txt`, with web relevant URI there should be no slash at the beginning)
+// or web relevant (e.g. `lib/folder/file.txt`, with web relevant URI there should be no slash at the beginning)
 // A wrapper of `GetFileByServerRelativeUrl`
 func (web *Web) GetFile(serverRelativeURL string) *File {
 	return NewFile(
@@ -323,7 +323,7 @@ func (web *Web) GetFile(serverRelativeURL string) *File {
 
 // GetFileByPath gets File API instance object by its relevant URI
 // File URI can be host relevant (e.g. `/sites/site/lib/folder/file.txt`)
-// or web relavant (e.g. `lib/folder/file.txt`, with web relevant URI there should be no slash at the beginning)
+// or web relevant (e.g. `lib/folder/file.txt`, with web relevant URI there should be no slash at the beginning)
 // A wrapper of `GetFileByServerRelativePath`
 // Supported only in modern SharePoint, differs from GetFile with its capability of dealing with special chars in path
 func (web *Web) GetFileByPath(serverRelativeURL string) *File {

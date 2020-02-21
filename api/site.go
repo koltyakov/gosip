@@ -94,7 +94,7 @@ func (site *Site) Get() (SiteResp, error) {
 }
 
 // Update updates Site's metadata with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.Site object
+// where `body` is byte array representation of JSON string payload relevant to SP.Site object
 func (site *Site) Update(body []byte) (SiteResp, error) {
 	body = patchMetadataType(body, "SP.Site")
 	client := NewHTTPClient(site.client)

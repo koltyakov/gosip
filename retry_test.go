@@ -40,7 +40,7 @@ func TestRetry(t *testing.T) {
 			return
 		}
 		if r.Body != nil {
-			defer shut(r.Body)
+			defer func() { _ = r.Body.Close() }()
 			data, _ := ioutil.ReadAll(r.Body)
 			if r.RequestURI == "/_api/post/keepbody" && r.Header.Get("X-Gosip-Retry") == "1" {
 				if fmt.Sprintf("%s", data) != "none-empty" {
@@ -62,7 +62,7 @@ func TestRetry(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer shut(closer)
+	defer func() { _ = closer.Close() }()
 
 	t.Run("GetRequest", func(t *testing.T) {
 		client := &SPClient{
@@ -75,13 +75,13 @@ func TestRetry(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		rsp, err := client.Execute(req)
+		resp, err := client.Execute(req)
 		if err != nil {
 			t.Error(err)
 		}
-		defer shut(rsp.Body)
+		defer func() { _ = resp.Body.Close() }()
 
-		if rsp.StatusCode != 200 {
+		if resp.StatusCode != 200 {
 			t.Error("can't retry a request")
 		}
 	})
@@ -97,13 +97,13 @@ func TestRetry(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		rsp, err := client.Execute(req)
+		resp, err := client.Execute(req)
 		if err != nil {
 			t.Error(err)
 		}
-		defer shut(rsp.Body)
+		defer func() { _ = resp.Body.Close() }()
 
-		if rsp.StatusCode != 200 {
+		if resp.StatusCode != 200 {
 			t.Error("can't retry a request")
 		}
 	})
@@ -119,13 +119,13 @@ func TestRetry(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		rsp, err := client.Execute(req)
+		resp, err := client.Execute(req)
 		if err != nil {
 			t.Error(err)
 		}
-		defer shut(rsp.Body)
+		defer func() { _ = resp.Body.Close() }()
 
-		if rsp.StatusCode != 200 {
+		if resp.StatusCode != 200 {
 			t.Error("can't retry a request")
 		}
 	})
@@ -141,10 +141,10 @@ func TestRetry(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		rsp, _ := client.Execute(req)
-		defer shut(rsp.Body)
+		resp, _ := client.Execute(req)
+		defer func() { _ = resp.Body.Close() }()
 
-		if rsp.StatusCode != 503 {
+		if resp.StatusCode != 503 {
 			t.Error("should receive 503")
 		}
 	})
@@ -161,10 +161,10 @@ func TestRetry(t *testing.T) {
 
 		req.Header.Add("X-Gosip-NoRetry", "true")
 
-		rsp, _ := client.Execute(req)
-		defer shut(rsp.Body)
+		resp, _ := client.Execute(req)
+		defer func() { _ = resp.Body.Close() }()
 
-		if rsp.StatusCode != 503 {
+		if resp.StatusCode != 503 {
 			t.Error("should receive 503")
 		}
 	})

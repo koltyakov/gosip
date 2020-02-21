@@ -13,7 +13,7 @@ func TestRoles(t *testing.T) {
 	web := NewSP(spClient).Web()
 	newListTitle := uuid.New().String()
 
-	// Preconfiguration
+	// Pre-configuration
 	if _, err := web.Lists().Add(newListTitle, nil); err != nil {
 		t.Errorf("can't create a list to test permissions: %s", err)
 	}
@@ -62,7 +62,7 @@ func TestRoles(t *testing.T) {
 		}
 	})
 
-	// Postconfigurations
+	// Post-configurations
 	if err := list.Delete(); err != nil {
 		t.Errorf("can't delete a list: %s", err)
 	}

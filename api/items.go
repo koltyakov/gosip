@@ -56,7 +56,7 @@ func (items *Items) GetAll() ([]ItemResp, error) {
 	return getAll(nil, nil, items)
 }
 
-// Add adds new item in this list. `body` parameter is byte array representation of JSON string payload relevalt to item metadata object.
+// Add adds new item in this list. `body` parameter is byte array representation of JSON string payload relevant to item metadata object.
 func (items *Items) Add(body []byte) (ItemResp, error) {
 	body = patchMetadataTypeCB(body, func() string {
 		endpoint := getPriorEndpoint(items.endpoint, "/Items")

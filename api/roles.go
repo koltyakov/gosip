@@ -72,15 +72,15 @@ func (permissions *Roles) ResetInheritance() error {
 	return err
 }
 
-// BreakInheritance breaked permissions inheritance for this securable object
-// `copyRoleAssigments` - if true the permissions are copied from the current parent scope
+// BreakInheritance breaks permissions inheritance for this securable object
+// `copyRoleAssignments` - if true the permissions are copied from the current parent scope
 // `clearSubScopes` - true to make all child securable objects inherit role assignments from the current object
-func (permissions *Roles) BreakInheritance(copyRoleAssigments bool, clearSubScopes bool) error {
+func (permissions *Roles) BreakInheritance(copyRoleAssignments bool, clearSubScopes bool) error {
 	client := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf(
 		"%s/BreakRoleInheritance(copyroleassignments=%t,clearsubscopes=%t)",
 		permissions.endpoint,
-		copyRoleAssigments,
+		copyRoleAssignments,
 		clearSubScopes,
 	)
 	_, err := client.Post(endpoint, nil, permissions.config)

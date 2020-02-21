@@ -16,7 +16,7 @@ type Utility struct {
 	endpoint string
 }
 
-// EmailProps struct for SendEmail method parametes
+// EmailProps struct for SendEmail method parameters
 type EmailProps struct {
 	Subject string   // Email subject
 	Body    string   // Email text or HTML body

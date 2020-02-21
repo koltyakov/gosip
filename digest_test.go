@@ -21,7 +21,7 @@ func TestDigest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer shut(closer)
+	defer func() { _ = closer.Close() }()
 
 	t.Run("ShouldTriggerDigest", func(t *testing.T) {
 		client := &SPClient{

@@ -39,14 +39,14 @@ func (fields *Fields) ToURL() string {
 	return toURL(fields.endpoint, fields.modifiers)
 }
 
-// Get gets fieds response collection
+// Get gets fields response collection
 func (fields *Fields) Get() (FieldsResp, error) {
 	client := NewHTTPClient(fields.client)
 	return client.Get(fields.ToURL(), fields.config)
 }
 
 // Add adds field with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.Field object
+// where `body` is byte array representation of JSON string payload relevant to SP.Field object
 func (fields *Fields) Add(body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.Field")
 	client := NewHTTPClient(fields.client)

@@ -54,7 +54,7 @@ func (user *User) Get() (UserResp, error) {
 }
 
 // Update updates User's metadata with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.User object
+// where `body` is byte array representation of JSON string payload relevant to SP.User object
 func (user *User) Update(body []byte) (UserResp, error) {
 	body = patchMetadataType(body, "SP.User")
 	client := NewHTTPClient(user.client)

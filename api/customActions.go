@@ -108,7 +108,7 @@ func NewCustomAction(client *gosip.SPClient, endpoint string, config *RequestCon
 	}
 }
 
-// GetByID gets action API onject by ID (GUID)
+// GetByID gets action API object by ID (GUID)
 func (customActions *CustomActions) GetByID(actionID string) *CustomAction {
 	return NewCustomAction(
 		customActions.client,

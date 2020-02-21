@@ -10,7 +10,7 @@ It supports a variety of different authentication strategies such as:
 
 Amongst supported platform versions are:
   - SharePoint Online (SPO)
-  - On-Prem: 2019, 2016, and 2013
+  - On-Premise: 2019, 2016, and 2013
 */
 package gosip
 

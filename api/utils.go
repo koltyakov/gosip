@@ -100,7 +100,7 @@ func getRelativeURL(absURL string) string {
 	return u.Path
 }
 
-// checkGetRelativeURL checks if URL is repative, prepends relative part if missed
+// checkGetRelativeURL checks if URL is relative, prepends relative part if missed
 func checkGetRelativeURL(relativeURI string, ctxURL string) string {
 	// Prepend web relative URL to "Lists/ListPath" URIs
 	if string([]rune(relativeURI)[0]) != "/" {

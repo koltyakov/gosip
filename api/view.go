@@ -74,7 +74,7 @@ func (view *View) Get() (ViewResp, error) {
 }
 
 // Update updates View's metadata with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.View object
+// where `body` is byte array representation of JSON string payload relevant to SP.View object
 func (view *View) Update(body []byte) (ViewResp, error) {
 	body = patchMetadataType(body, "SP.View")
 	client := NewHTTPClient(view.client)

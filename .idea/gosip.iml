@@ -7,7 +7,6 @@
       <excludeFolder url="file://$MODULE_DIR$/../.vscode" />
       <excludeFolder url="file://$MODULE_DIR$/../bin" />
       <excludeFolder url="file://$MODULE_DIR$/../tmp" />
-      <excludePattern pattern="*_gen.go" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

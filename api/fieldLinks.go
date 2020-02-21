@@ -72,7 +72,7 @@ func (fieldLinks *FieldLinks) ToURL() string {
 	return toURL(fieldLinks.endpoint, fieldLinks.modifiers)
 }
 
-// Get gets fieds response collection
+// Get gets fields response collection
 func (fieldLinks *FieldLinks) Get() (FieldLinksResp, error) {
 	client := NewHTTPClient(fieldLinks.client)
 	return client.Get(fieldLinks.ToURL(), fieldLinks.config)
@@ -101,7 +101,7 @@ func (fieldLink *FieldLink) Delete() error {
 // 	return client.Update(fieldLink.endpoint, body, getConfHeaders(fieldLink.config))
 // }
 
-// GetFields gets fieds response collection
+// GetFields gets fields response collection
 func (fieldLinks *FieldLinks) GetFields() (FieldsResp, error) {
 	endpoint := getPriorEndpoint(fieldLinks.endpoint, "/FieldLinks")
 	fields := NewFields(

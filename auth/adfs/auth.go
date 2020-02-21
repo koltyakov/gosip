@@ -3,7 +3,7 @@ Package adfs implements ADFS Auth (user credentials authentication)
 
 Amongst supported platform versions are:
 	- SharePoint Online (SPO)
-	- On-Prem: 2019, 2016, and 2013
+	- On-Premise: 2019, 2016, and 2013
 */
 package adfs
 
@@ -64,7 +64,7 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 	if err != nil {
 		return err
 	}
-	defer shut(jsonFile)
+	defer func() { _ = jsonFile.Close() }()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	if err := json.Unmarshal(byteValue, &c); err != nil {

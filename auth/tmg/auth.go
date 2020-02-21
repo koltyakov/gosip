@@ -4,7 +4,7 @@ Package tmg implements FBA authentication behind TMG (Microsoft Forefront Threat
 Currently is legacy but was a popular way of exposing SharePoint into external world back in the days.
 
 Amongst supported platform versions are:
-	- On-Prem: 2019, 2016, and 2013
+	- On-Premise: 2019, 2016, and 2013
 */
 package tmg
 
@@ -18,7 +18,7 @@ import (
 	"github.com/koltyakov/gosip/cpass"
 )
 
-// AuthCnfg - FBA bihind TMG auth config structure
+// AuthCnfg - FBA behind TMG auth config structure
 /* On-Premises config sample:
 {
   "siteUrl": "https://www.contoso.com/sites/test",
@@ -40,7 +40,7 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 	if err != nil {
 		return err
 	}
-	defer shut(jsonFile)
+	defer func() { _ = jsonFile.Close() }()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	if err := json.Unmarshal(byteValue, &c); err != nil {

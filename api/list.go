@@ -132,7 +132,7 @@ func (list *List) Recycle() error {
 }
 
 // Update updates Lists's metadata with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.List object
+// where `body` is byte array representation of JSON string payload relevant to SP.List object
 func (list *List) Update(body []byte) (ListResp, error) {
 	body = patchMetadataType(body, "SP.List")
 	client := NewHTTPClient(list.client)

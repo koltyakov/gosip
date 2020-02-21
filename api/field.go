@@ -78,7 +78,7 @@ func (field *Field) Get() (FieldResp, error) {
 }
 
 // Update updates Field's metadata with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.Field object
+// where `body` is byte array representation of JSON string payload relevant to SP.Field object
 func (field *Field) Update(body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.Field")
 	client := NewHTTPClient(field.client)

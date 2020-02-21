@@ -33,7 +33,7 @@ func CheckRequest(auth gosip.AuthCnfg, cnfgPath string) error {
 	if err != nil {
 		return fmt.Errorf("unable to request api: %v", err)
 	}
-	defer shut(resp.Body)
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

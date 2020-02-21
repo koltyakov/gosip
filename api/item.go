@@ -74,7 +74,7 @@ func (item *Item) Recycle() error {
 	return err
 }
 
-// Update updates item's metadata. `body` parameter is byte array representation of JSON string payload relevalt to item metadata object.
+// Update updates item's metadata. `body` parameter is byte array representation of JSON string payload relevant to item metadata object.
 func (item *Item) Update(body []byte) (ItemResp, error) {
 	body = patchMetadataTypeCB(body, func() string {
 		endpoint := getPriorEndpoint(item.endpoint, "/Items")

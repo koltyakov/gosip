@@ -107,7 +107,7 @@ func (profiles *Profiles) GetPropertiesFor(loginName string) (ProfilePropsResp, 
 	return client.Get(apiURL.String(), profiles.config)
 }
 
-// GetUserProfilePropertyFor gets specific properte of a specified user profile (by user login name)
+// GetUserProfilePropertyFor gets specific property of a specified user profile (by user login name)
 func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property string) (string, error) {
 	client := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint +

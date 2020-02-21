@@ -57,7 +57,7 @@ func (ct *ContentType) Get() (ContentTypeResp, error) {
 }
 
 // Update updates Content Types's metadata with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.ContentType object
+// where `body` is byte array representation of JSON string payload relevant to SP.ContentType object
 func (ct *ContentType) Update(body []byte) (ContentTypeResp, error) {
 	body = patchMetadataType(body, "SP.ContentType")
 	client := NewHTTPClient(ct.client)

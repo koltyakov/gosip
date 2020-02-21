@@ -86,7 +86,7 @@ func (records *Records) Undeclare() error {
 	return err
 }
 
-// csomItemRecordMethod conscructs CSOM API process query to cover missed REST API functionality
+// csomItemRecordMethod constructs CSOM API process query to cover missed REST API functionality
 func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time, config *RequestConfig) ([]byte, error) {
 	client := NewHTTPClient(item.client)
 	itemR, err := item.Select("Id").Get()

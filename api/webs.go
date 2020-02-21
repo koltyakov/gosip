@@ -43,7 +43,7 @@ func (webs *Webs) Get() (WebsResp, error) {
 	return client.Get(webs.ToURL(), webs.config)
 }
 
-// Add creates a subweb for a parent web with provided `title` and `url`.
+// Add creates a sub web for a parent web with provided `title` and `url`.
 // `url` stands for a system friendly URI (e.g. `finances`) while `title` is a human friendly name (e.g. `Financial Department`).
 // Along with title and url additional metadata can be provided in optional `metadata` string map object.
 // `metadata` props should correspond to `SP.WebCreationInformation` API type. Some props have defaults as Language (1033), WebTemplate (STS), etc.

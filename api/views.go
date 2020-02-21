@@ -43,7 +43,7 @@ func (views *Views) Get() (ViewsResp, error) {
 }
 
 // Add adds view with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.View object
+// where `body` is byte array representation of JSON string payload relevant to SP.View object
 func (views *Views) Add(body []byte) (ViewResp, error) {
 	body = patchMetadataType(body, "SP.View")
 	client := NewHTTPClient(views.client)

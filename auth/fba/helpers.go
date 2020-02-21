@@ -50,7 +50,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer shut(resp.Body)
+	defer func() { _ = resp.Body.Close() }()
 
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

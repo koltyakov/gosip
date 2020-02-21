@@ -61,7 +61,7 @@ func (group *Group) Get() (GroupResp, error) {
 }
 
 // Update updates Group's metadata with properties provided in `body` parameter
-// where `body` is byte array representation of JSON string payload relevalt to SP.Group object
+// where `body` is byte array representation of JSON string payload relevant to SP.Group object
 func (group *Group) Update(body []byte) (GroupResp, error) {
 	body = patchMetadataType(body, "SP.Group")
 	client := NewHTTPClient(group.client)

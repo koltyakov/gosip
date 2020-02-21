@@ -85,7 +85,7 @@ func apiCallTest(client *gosip.SPClient, siteURL string) {
 		fmt.Printf("Unable to request api: %v\n", err)
 		return
 	}
-	defer shut(resp.Body)
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

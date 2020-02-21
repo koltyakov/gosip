@@ -107,7 +107,7 @@ func r(auth gosip.AuthCnfg, cnfgPath string) (*gosip.SPClient, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to request the api: %v", err)
 	}
-	defer shut(resp.Body)
+	defer func() { _ = resp.Body.Close() }()
 
 	if _, err := ioutil.ReadAll(resp.Body); err != nil {
 		return nil, fmt.Errorf("unable to read api response: %v", err)

@@ -182,7 +182,7 @@ func (file *File) cancelUpload(uploadID string) error {
 	return err
 }
 
-// finishUpload finiches uploading a document using chunk API
+// finishUpload finishes uploading a document using chunk API
 func (file *File) finishUpload(uploadID string, fileOffset int, chunk []byte) (FileResp, error) {
 	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/FinishUpload(uploadId=guid'%s',fileOffset=%d)", file.endpoint, uploadID, fileOffset)
