@@ -9,6 +9,7 @@ import (
 )
 
 // CheckBasicPost : try creating an item
+//noinspection GoUnusedExportedFunction
 func CheckBasicPost(client *gosip.SPClient) (string, error) {
 	sp := api.NewHTTPClient(client)
 	endpoint := client.AuthCnfg.GetSiteURL() + "/_api/web/lists/getByTitle('Custom')/items"

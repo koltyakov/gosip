@@ -182,14 +182,10 @@ func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestC
 	}
 
 	resp, err := client.sp.Execute(req)
-	var headers map[string]string
-	if conf != nil {
-		headers = conf.Headers
-	}
-	if err != nil && headers != nil {
+	if err != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}
-	defer shut(resp.Body)
+  defer shut(resp.Body)
 
 	return ioutil.ReadAll(resp.Body)
 }
