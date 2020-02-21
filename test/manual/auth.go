@@ -77,10 +77,10 @@ func getTmgAuthTest() (*gosip.SPClient, error) {
 	return r(&tmg.AuthCnfg{}, "./config/private.onprem-tmg.json")
 }
 
-//// GetOnlineADFSTest : SPO ADFS auth test scenario
-//func GetOnlineADFSTest() (*gosip.SPClient, error) {
+// // GetOnlineADFSTest : SPO ADFS auth test scenario
+// func GetOnlineADFSTest() (*gosip.SPClient, error) {
 //	return r(&saml.AuthCnfg{}, "./config/private.spo-adfs.json")
-//}
+// }
 
 func r(auth gosip.AuthCnfg, cnfgPath string) (*gosip.SPClient, error) {
 	startAt := time.Now()
