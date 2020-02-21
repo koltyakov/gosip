@@ -48,6 +48,7 @@ func NewActionMethod(methodName string, parameters []string) Action {
 	`, methodName, trimMultiline(params)))
 }
 
+// String stringifies an action
 func (a *action) String() string {
 	a.err = nil
 
@@ -70,22 +71,17 @@ func (a *action) String() string {
 	return trimMultiline(tpl.String())
 }
 
-func (a *action) SetID(id int) {
-	a.id = id
-}
+// SetID sets action's ID
+func (a *action) SetID(id int) { a.id = id }
 
-func (a *action) GetID() int {
-	return a.id
-}
+// GetID gets action's ID
+func (a *action) GetID() int { return a.id }
 
-func (a *action) SetObjectID(objectID int) {
-	a.objectID = objectID
-}
+// SetObjectID sets action's object ID
+func (a *action) SetObjectID(objectID int) { a.objectID = objectID }
 
-func (a *action) GetObjectID() int {
-	return a.objectID
-}
+// GetObjectID gets action's object ID
+func (a *action) GetObjectID() int { return a.objectID }
 
-func (a *action) CheckErr() error {
-	return a.err
-}
+// CheckErr checks if an action contains errors
+func (a *action) CheckErr() error { return a.err }

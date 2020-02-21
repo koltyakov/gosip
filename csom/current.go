@@ -6,20 +6,19 @@ func (cw *current) String() string {
 	return `<StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" />`
 }
 
-//noinspection GoUnusedParameter
+// SetID sets ID
+// noinspection GoUnusedParameter
 func (cw *current) SetID(id int) {}
 
-func (cw *current) GetID() int {
-	return 0
-}
+// GetID sets ID
+func (cw *current) GetID() int { return 0 }
 
-//noinspection GoUnusedParameter
+// SetParentID sets parent ID
+// noinspection GoUnusedParameter
 func (cw *current) SetParentID(parentID int) {}
 
-func (cw *current) GetParentID() int {
-	return -1
-}
+// GetParentID gets parent ID
+func (cw *current) GetParentID() int { return -1 }
 
-func (cw *current) CheckErr() error {
-	return nil
-}
+// CheckErr checks errors
+func (cw *current) CheckErr() error { return nil }

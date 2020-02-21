@@ -8,7 +8,7 @@ import (
 )
 
 // ConfigReaderSpoAddinOnlyTest : test scenario
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func ConfigReaderSpoAddinOnlyTest() {
 	config := &addin.AuthCnfg{}
 	err := config.ReadConfig(u.ResolveCnfgPath("./config/private.addin.json"))

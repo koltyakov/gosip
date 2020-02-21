@@ -7,7 +7,7 @@ import (
 )
 
 // CpassDummyTest : test scenario
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func CpassDummyTest() {
 	c := cpass.Cpass("DUMMY_KEY")
 	myString := "secret"
@@ -18,7 +18,7 @@ func CpassDummyTest() {
 }
 
 // CpassAutoModeTest : test scenario
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func CpassAutoModeTest() {
 	c := cpass.Cpass("")
 	myString := "secret"

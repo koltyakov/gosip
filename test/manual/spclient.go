@@ -18,7 +18,7 @@ import (
 )
 
 // SPClientTest : api call test
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func SPClientTest() {
 	configs := [][]string{
 		{"../../config/private.adfs.json", "adfs"},

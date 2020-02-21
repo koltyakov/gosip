@@ -75,22 +75,17 @@ func (o *object) String() string {
 	return trimMultiline(tpl.String())
 }
 
-func (o *object) SetID(id int) {
-	o.id = id
-}
+// SetID sets ID
+func (o *object) SetID(id int) { o.id = id }
 
-func (o *object) GetID() int {
-	return o.id
-}
+// GetID gets ID
+func (o *object) GetID() int { return o.id }
 
-func (o *object) SetParentID(parentID int) {
-	o.parentID = parentID
-}
+// SetParentID sets parent ID
+func (o *object) SetParentID(parentID int) { o.parentID = parentID }
 
-func (o *object) GetParentID() int {
-	return o.parentID
-}
+// GetParentID gets parent ID
+func (o *object) GetParentID() int { return o.parentID }
 
-func (o *object) CheckErr() error {
-	return o.err
-}
+// CheckErr checks errors
+func (o *object) CheckErr() error { return o.err }
