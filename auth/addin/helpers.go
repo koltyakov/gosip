@@ -84,7 +84,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -131,7 +131,7 @@ func getAuthURL(realm string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -190,7 +190,7 @@ func getRealm(c *AuthCnfg) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	authHeader := resp.Header.Get("www-authenticate")
 

@@ -27,7 +27,7 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 	if err != nil {
 		return err
 	}
-	defer func() { _ = jsonFile.Close() }()
+	defer shut(jsonFile)
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	if err := json.Unmarshal(byteValue, &c); err != nil {

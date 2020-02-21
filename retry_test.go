@@ -40,7 +40,7 @@ func TestRetry(t *testing.T) {
 			return
 		}
 		if r.Body != nil {
-			defer func() { _ = r.Body.Close() }()
+			defer shut(r.Body)
 			data, _ := ioutil.ReadAll(r.Body)
 			if r.RequestURI == "/_api/post/keepbody" && r.Header.Get("X-Gosip-Retry") == "1" {
 				if fmt.Sprintf("%s", data) != "none-empty" {
@@ -62,7 +62,7 @@ func TestRetry(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() { _ = closer.Close() }()
+	defer shut(closer)
 
 	t.Run("GetRequest", func(t *testing.T) {
 		client := &SPClient{
@@ -79,7 +79,7 @@ func TestRetry(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		defer func() { _ = rsp.Body.Close() }()
+		defer shut(rsp.Body)
 
 		if rsp.StatusCode != 200 {
 			t.Error("can't retry a request")
@@ -101,7 +101,7 @@ func TestRetry(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		defer func() { _ = rsp.Body.Close() }()
+		defer shut(rsp.Body)
 
 		if rsp.StatusCode != 200 {
 			t.Error("can't retry a request")
@@ -123,7 +123,7 @@ func TestRetry(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		defer func() { _ = rsp.Body.Close() }()
+		defer shut(rsp.Body)
 
 		if rsp.StatusCode != 200 {
 			t.Error("can't retry a request")
@@ -142,7 +142,7 @@ func TestRetry(t *testing.T) {
 		}
 
 		rsp, _ := client.Execute(req)
-		defer func() { _ = rsp.Body.Close() }()
+		defer shut(rsp.Body)
 
 		if rsp.StatusCode != 503 {
 			t.Error("should receive 503")
@@ -162,7 +162,7 @@ func TestRetry(t *testing.T) {
 		req.Header.Add("X-Gosip-NoRetry", "true")
 
 		rsp, _ := client.Execute(req)
-		defer func() { _ = rsp.Body.Close() }()
+		defer shut(rsp.Body)
 
 		if rsp.StatusCode != 503 {
 			t.Error("should receive 503")

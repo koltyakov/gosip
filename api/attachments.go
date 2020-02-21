@@ -133,7 +133,7 @@ func (attachment *Attachment) Download() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = body.Close() }()
+	defer shut(body)
 
 	data, err := ioutil.ReadAll(body)
 	if err != nil {

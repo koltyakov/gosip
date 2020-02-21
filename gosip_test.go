@@ -26,7 +26,7 @@ func TestEdges(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() { _ = closer.Close() }()
+	defer shut(closer)
 
 	t.Run("EmptyURLShouldFail", func(t *testing.T) {
 		client := &SPClient{

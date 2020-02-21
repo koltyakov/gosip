@@ -61,7 +61,7 @@ func getSecurityToken(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -132,7 +132,7 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	xmlResponse, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -160,7 +160,7 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	// cookie := resp.Header.Get("Set-Cookie") // TODO: parse FedAuth and rtFa cookies only (?)
 	// fmt.Printf("Cookie: %s\n", cookie)
@@ -204,7 +204,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -264,7 +264,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	xmlResponse, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -304,7 +304,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	var authCookie string
 	for _, coo := range resp.Cookies() {

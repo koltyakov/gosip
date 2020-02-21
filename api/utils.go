@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/url"
 	"reflect"
 	"strings"
@@ -224,7 +225,7 @@ func getODataCollectionNextPageURL(payload []byte) string {
 	return ""
 }
 
-// normalizeMultiLookups normalizes verbose results for multilookup
+// normalizeMultiLookups normalizes verbose results for multi-lookup
 func normalizeMultiLookups(payload []byte) []byte {
 	item := map[string]interface{}{}
 	if err := json.Unmarshal(payload, &item); err != nil {
@@ -238,7 +239,7 @@ func normalizeMultiLookups(payload []byte) []byte {
 	return normalized
 }
 
-// normalizeMultiLookupsMap normalizes verbose results for multilookup
+// normalizeMultiLookupsMap normalizes verbose results for multi-lookup
 func normalizeMultiLookupsMap(item map[string]interface{}) map[string]interface{} {
 	for key, val := range item {
 		if val != nil && reflect.TypeOf(val).Kind().String() == "map" {
@@ -267,4 +268,12 @@ func fixDatesInResponse(data []byte, dateFields []string) []byte {
 	}
 	res, _ := json.Marshal(metadata)
 	return res
+}
+
+// For the use with defer to prevent static code
+func shut(closer io.Closer) {
+	if closer != nil {
+		_ = closer.Close()
+		// logs might be added here
+	}
 }

@@ -83,7 +83,7 @@ func (client *HTTPClient) Get(endpoint string, conf *RequestConfig) ([]byte, err
 	if err != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	return ioutil.ReadAll(resp.Body)
 }
@@ -116,7 +116,7 @@ func (client *HTTPClient) Post(endpoint string, body io.Reader, conf *RequestCon
 	if err != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	return ioutil.ReadAll(resp.Body)
 }
@@ -150,7 +150,7 @@ func (client *HTTPClient) Delete(endpoint string, conf *RequestConfig) ([]byte, 
 	if err != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	return ioutil.ReadAll(resp.Body)
 }
@@ -189,7 +189,7 @@ func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestC
 	if err != nil && headers != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	return ioutil.ReadAll(resp.Body)
 }
@@ -227,7 +227,7 @@ func (client *HTTPClient) ProcessQuery(endpoint string, body io.Reader, conf *Re
 	if err != nil {
 		return nil, fmt.Errorf("unable to request api: %v", err)
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

@@ -85,7 +85,7 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -170,7 +170,7 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	authCookie := resp.Header.Get("Set-Cookie") // FedAuth
 	authCookie = strings.Split(authCookie, ";")[0]
@@ -191,7 +191,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	// Response location with WAP login endpoint is used to send form auth request
 	redirect, err := resp.Location()
@@ -210,7 +210,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	// Request to redirect URL using MSISAuth
 	req, err := http.NewRequest("GET", redirectURL, nil)
@@ -231,7 +231,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	// Yet another redirect using JWT at this point (spUrl?authToken=JWT&client-request-id=)
 	redirect, err = resp.Location()
@@ -251,7 +251,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	// TODO: get expiry somehow
 	authCookie := resp.Header.Get("Set-Cookie") // EdgeAccessCookie
@@ -276,7 +276,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 			if err != nil {
 				return "", "", err
 			}
-			defer func() { _ = resp.Body.Close() }()
+			defer shut(resp.Body)
 
 			cc := *c
 			cc.RelyingParty = resp.Request.URL.Query().Get("wtrealm")

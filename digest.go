@@ -49,7 +49,7 @@ func GetDigest(context context.Context, client *SPClient) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer shut(resp.Body)
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

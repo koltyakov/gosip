@@ -34,7 +34,7 @@ func TestHooks(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() { _ = closer.Close() }()
+	defer shut(closer)
 
 	// Request counters
 	var requestCounters = struct {
@@ -111,7 +111,7 @@ func simpleCall(client *SPClient, uri string) error {
 	if err != nil {
 		return err
 	}
-	defer func() { _ = rsp.Body.Close() }()
+	defer shut(rsp.Body)
 
 	if rsp.StatusCode != 200 {
 		return fmt.Errorf("can't retry a request")
