@@ -38,6 +38,9 @@ func (c *SPClient) shouldRetry(req *http.Request, resp *http.Response, retries i
 		return false
 	}
 	retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
+	if resp == nil { // no response, e.g. no such host
+		return false
+	}
 	if retry < retries {
 		if resp.Body != nil {
 			_ = resp.Body.Close() // closing to reuse request

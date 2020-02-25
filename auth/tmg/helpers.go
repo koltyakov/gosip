@@ -61,7 +61,11 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer func() {
+		if resp != nil && resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+	}()
 
 	// fmt.Println(resp.StatusCode)
 	authCookie := resp.Header.Get("Set-Cookie") // TODO: parse TMG cookie only (?)
@@ -93,7 +97,11 @@ func detectCookieAuthURL(siteURL string) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = resp.Body.Close() }()
+	defer func() {
+		if resp != nil && resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+	}()
 
 	redirect, err := resp.Location()
 	if err != nil {
