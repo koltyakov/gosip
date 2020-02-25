@@ -57,7 +57,7 @@ func getAdfsAuthTest() (*gosip.SPClient, error) {
 	// return r(&adfs.AuthCnfg{}, "./config/private.onprem-adfs.json")
 }
 
-// getNtlmAuthTest : NTML auth test scenario
+// getNtlmAuthTest : NTLM auth test scenario
 func getNtlmAuthTest() (*gosip.SPClient, error) {
 	return r(&ntlm.AuthCnfg{}, "./config/private.onprem-ntlm.json")
 }

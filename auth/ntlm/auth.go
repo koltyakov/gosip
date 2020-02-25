@@ -22,7 +22,7 @@ import (
 	"github.com/koltyakov/gosip/cpass"
 )
 
-// AuthCnfg - NTML auth config structure
+// AuthCnfg - NTLM auth config structure
 /* On-Premises config sample:
 {
   "siteUrl": "https://www.contoso.com/sites/test",
@@ -113,7 +113,7 @@ func (c *AuthCnfg) GetStrategy() string {
 
 // SetAuth : authenticate request
 func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
-	// NTML + Negotiation
+	// NTLM + Negotiation
 
 	c.mux.Lock()
 	if c.transport.RoundTripper == nil {

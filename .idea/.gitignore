@@ -1,9 +1,5 @@
 # Default ignored files
 /workspace.xml
-# Project exclude paths
-/.
 
-# Project exclude paths
-/.
-
+# Ignore custom dictionaries
 dictionaries/*.xml
