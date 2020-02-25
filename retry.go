@@ -46,7 +46,7 @@ func (c *SPClient) shouldRetry(req *http.Request, resp *http.Response, retries i
 			_ = resp.Body.Close() // closing to reuse request
 		}
 		retryAfter := 0
-		if resp != nil && resp.StatusCode == 429 { // sometimes SPO is abusing Retry-After header on 503 errors
+		if resp.StatusCode == 429 { // sometimes SPO is abusing Retry-After header on 503 errors
 			retryAfter, _ = strconv.Atoi(resp.Header.Get("Retry-After"))
 		}
 		req.Header.Set("X-Gosip-Retry", strconv.Itoa(retry+1))
