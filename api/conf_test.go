@@ -46,9 +46,9 @@ func TestConf(t *testing.T) {
 		}
 	}
 
-	if len(withNoContMethod) > 0 {
-		t.Logf("the following constructors don't contain Conf method, but this is OK: %v\n", withNoContMethod)
-	}
+	// if len(withNoContMethod) > 0 {
+	// 	t.Logf("the following constructors don't contain Conf method, but this is OK: %v\n", withNoContMethod)
+	// }
 
 	var missedConstructors []string
 	for _, constructor := range getAstConstructors() {
@@ -125,9 +125,9 @@ func TestModifiers(t *testing.T) {
 
 	}
 
-	if len(withNoModsMethod) > 0 {
-		t.Logf("the following constructors don't contain OData modifiers methods, but this is OK: %v\n", withNoModsMethod)
-	}
+	// if len(withNoModsMethod) > 0 {
+	// 	t.Logf("the following constructors don't contain OData modifiers methods, but this is OK: %v\n", withNoModsMethod)
+	// }
 
 }
 
