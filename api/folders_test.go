@@ -47,12 +47,20 @@ func TestFolders(t *testing.T) {
 	})
 
 	t.Run("GetFolderByPath", func(t *testing.T) {
+		if envCode != "SPO" {
+			t.Skip("is not supported with legacy SP")
+		}
+
 		if _, err := web.GetFolderByPath(rootFolderURI).Get(); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("GetFolderByID", func(t *testing.T) {
+		if envCode != "SPO" {
+			t.Skip("is not supported with legacy SP")
+		}
+
 		data, err := web.GetFolder(rootFolderURI).Select("UniqueId").Get()
 		if err != nil {
 			t.Error(err)

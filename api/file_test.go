@@ -51,6 +51,10 @@ func TestFile(t *testing.T) {
 	})
 
 	t.Run("Properties", func(t *testing.T) {
+		if envCode == "2013" {
+			t.Skip("is not supported with SP 2013")
+		}
+
 		file := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt")
 		props, err := file.Props().Get()
 		if err != nil {

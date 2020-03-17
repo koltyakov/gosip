@@ -63,6 +63,10 @@ func TestFiles(t *testing.T) {
 	})
 
 	t.Run("GetFileByPath", func(t *testing.T) {
+		if envCode != "SPO" {
+			t.Skip("is not supported with legacy SP")
+		}
+
 		data, err := web.GetFileByPath(newFolderURI + "/File_2.txt").Get()
 		if err != nil {
 			t.Error(err)
@@ -73,6 +77,10 @@ func TestFiles(t *testing.T) {
 	})
 
 	t.Run("GetFileByID", func(t *testing.T) {
+		if envCode != "SPO" {
+			t.Skip("is not supported with legacy SP")
+		}
+
 		data, err := web.GetFile(newFolderURI + "/File_2.txt").Select("UniqueId").Get()
 		if err != nil {
 			t.Error(err)

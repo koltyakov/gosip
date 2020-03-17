@@ -56,6 +56,10 @@ func TestItems(t *testing.T) {
 	})
 
 	t.Run("AddValidate", func(t *testing.T) {
+		if envCode == "2013" {
+			t.Skip("is not supported with SP 2013")
+		}
+
 		options := &ValidateAddOptions{NewDocumentUpdate: true, CheckInComment: "test"}
 		data := map[string]string{"Title": "New item"}
 		if _, err := list.Items().AddValidate(data, options); err != nil {
@@ -64,6 +68,10 @@ func TestItems(t *testing.T) {
 	})
 
 	t.Run("AddValidateWithPath", func(t *testing.T) {
+		if envCode == "2013" {
+			t.Skip("is not supported with SP 2013")
+		}
+
 		if _, err := list.RootFolder().Folders().Add("subfolder"); err != nil {
 			t.Error(err)
 		}

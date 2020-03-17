@@ -69,6 +69,10 @@ func TestAttachments(t *testing.T) {
 	})
 
 	t.Run("Recycle", func(t *testing.T) {
+		if envCode == "2013" {
+			t.Skip("is not supported with SP 2013")
+		}
+
 		if err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_03.txt").Recycle(); err != nil {
 			t.Error(err)
 		}
