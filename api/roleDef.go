@@ -24,12 +24,6 @@ func NewRoleDefinitions(client *gosip.SPClient, endpoint string, config *Request
 	}
 }
 
-// BasePermissions - Low/High pair of base permissions
-type BasePermissions struct {
-	High int `json:"High,string"`
-	Low  int `json:"Low,string"`
-}
-
 // RoleDefInfo - permissions role definition API response payload structure
 type RoleDefInfo struct {
 	BasePermissions *BasePermissions `json:"BasePermissions"`
