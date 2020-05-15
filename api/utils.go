@@ -247,6 +247,17 @@ func normalizeMultiLookupsMap(item map[string]interface{}) map[string]interface{
 			if results != nil {
 				item[key] = results
 			}
+			// Recursive props normalization
+			if item[key] != nil && reflect.TypeOf(item[key]).Kind().String() == "map" {
+				item[key] = normalizeMultiLookupsMap(item[key].(map[string]interface{}))
+			}
+			if item[key] != nil && reflect.TypeOf(item[key]).Kind().String() == "slice" {
+				for i, s := range item[key].([]interface{}) {
+					if s != nil && reflect.TypeOf(s).Kind().String() == "map" {
+						item[key].([]interface{})[i] = normalizeMultiLookupsMap(s.(map[string]interface{}))
+					}
+				}
+			}
 		}
 	}
 	return item
