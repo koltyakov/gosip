@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -229,6 +230,9 @@ func (client *HTTPClient) ProcessQuery(endpoint string, body io.Reader, conf *Re
 	if err != nil {
 		return nil, err
 	}
+
+	// https://stackoverflow.com/questions/31398044/got-error-invalid-character-ï-looking-for-beginning-of-value-from-json-unmar
+	data = bytes.TrimPrefix(data, []byte("\xef\xbb\xbf")) // removing BOM
 
 	var arrRes []interface{}
 	if err := json.Unmarshal(data, &arrRes); err != nil {
