@@ -19,11 +19,11 @@ func TestPermissions(t *testing.T) {
 
 	t.Run("HasPermissions", func(t *testing.T) {
 
-		if has := HasPermissions(editPermissions, PermissionKinds.EditListItems); !has {
+		if has := HasPermissions(editPermissions, PermissionKind.EditListItems); !has {
 			t.Error("should have Edit permissions")
 		}
 
-		if has := HasPermissions(limitedPermissions, PermissionKinds.ViewListItems); has {
+		if has := HasPermissions(limitedPermissions, PermissionKind.ViewListItems); has {
 			t.Error("should not have View permissions")
 		}
 
