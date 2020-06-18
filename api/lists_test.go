@@ -94,7 +94,7 @@ func TestLists(t *testing.T) {
 
 func getAnyList() (*ListInfo, error) {
 	web := NewSP(spClient).Web()
-	data, err := web.Lists().Select("Id,Title").Top(1).Conf(headers.verbose).Get()
+	data, err := web.Lists().Select("Id,Title").OrderBy("Created", true).Top(1).Conf(headers.verbose).Get()
 	if err != nil {
 		return nil, err
 	}
