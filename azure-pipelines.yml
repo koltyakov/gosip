@@ -6,25 +6,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  # GOBIN:  '$(GOPATH)/bin' # Go binaries path
-  # GOROOT: '/usr/local/go1.13' # Go installation path
-  # GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
-  # modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
   GO111MODULE: 'on'
   SPAUTH_CI: 'true'
 
 steps:
-  # - script: |
-  #     mkdir -p '$(GOBIN)'
-  #     mkdir -p '$(GOPATH)/pkg'
-  #     mkdir -p '$(modulePath)'
-  #     shopt -s extglob
-  #     shopt -s dotglob
-  #     mv !(gopath) '$(modulePath)'
-  #     echo '##vso[task.prependpath]$(GOBIN)'
-  #     echo '##vso[task.prependpath]$(GOROOT)/bin'
-  #   displayName: 'Set up the Go workspace'
-
   - task: GoTool@0
     inputs:
       version: '1.13.5'
@@ -32,13 +17,11 @@ steps:
   - script: |
       go version
       go get ./...
-    # workingDirectory: '$(modulePath)'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     displayName: 'Get dependencies'
 
   - script: |
       go test ./auth/... -race -coverprofile=auth_coverage.out -covermode=atomic
-    # workingDirectory: '$(modulePath)'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     displayName: 'Run auth tests'
     env:
@@ -52,12 +35,11 @@ steps:
       go test ./ -v -count=1 -coverprofile=gosip_coverage.out -covermode=atomic && \
       go test ./cpass/... -v -race -count=1 -coverprofile=cpass_coverage.out -covermode=atomic && \
       go test ./csom/... -v -race -count=1 -coverprofile=csom_coverage.out -covermode=atomic
-    workingDirectory: '$(modulePath)'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
     displayName: 'Run util tests'
 
   - script: |
       go test ./api/... -v -race -count=1 -coverprofile=api_coverage.out -covermode=atomic
-    # workingDirectory: '$(modulePath)'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     displayName: 'Run API tests'
     env:
@@ -71,7 +53,6 @@ steps:
   - script: |
       bash ./test/scripts/cover-merge.sh
       bash <(curl -s https://codecov.io/bash)
-    # workingDirectory: '$(modulePath)'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     displayName: 'Publish code coverage'
     env:
