@@ -2,6 +2,14 @@ trigger:
   - master
   - dev
 
+schedules:
+  - cron: '0 12 * * 0'
+    displayName: Weekly Sunday run
+    branches:
+      include:
+      - master
+    always: true
+
 pool:
   vmImage: 'ubuntu-latest'
 
