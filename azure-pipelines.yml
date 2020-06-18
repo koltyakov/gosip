@@ -19,19 +19,20 @@ variables:
 
 steps:
   - task: GoTool@0
+    displayName: 'Install Go'
     inputs:
       version: '1.13.5'
 
   - script: |
       go version
       go get ./...
+    displayName: 'Restore dependencies'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
-    displayName: 'Get dependencies'
 
   - script: |
       go test ./auth/... -race -coverprofile=auth_coverage.out -covermode=atomic
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
     displayName: 'Run auth tests'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
     env:
       SPAUTH_SITEURL: $(ci.spo.siteurl)
       SPAUTH_USERNAME: $(ci.spo.username)
@@ -43,13 +44,13 @@ steps:
       go test ./ -v -count=1 -coverprofile=gosip_coverage.out -covermode=atomic && \
       go test ./cpass/... -v -race -count=1 -coverprofile=cpass_coverage.out -covermode=atomic && \
       go test ./csom/... -v -race -count=1 -coverprofile=csom_coverage.out -covermode=atomic
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
     displayName: 'Run util tests'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
 
   - script: |
       go test ./api/... -v -race -count=1 -coverprofile=api_coverage.out -covermode=atomic
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
     displayName: 'Run API tests'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
     env:
       SPAUTH_ENVCODE: spo
       SPAPI_HEAVY_TESTS: true
@@ -61,7 +62,7 @@ steps:
   - script: |
       bash ./test/scripts/cover-merge.sh
       bash <(curl -s https://codecov.io/bash)
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
     displayName: 'Publish code coverage'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
     env:
       CODECOV_TOKEN: $(ci.codecov.token)
