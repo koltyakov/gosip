@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"github.com/koltyakov/gosip"
+	"github.com/koltyakov/gosip/csom"
 )
 
 //go:generate ggen -ent Group -conf -mods Select,Expand -helpers Data,Normalized
@@ -101,11 +102,75 @@ func (group *Group) AddUserByID(userID int) error {
 	return group.AddUser(user.Data().LoginName)
 }
 
-// SetAsOwner sets a user as owner
-func (group *Group) SetAsOwner(userID int) error {
+// SetUserAsOwner sets a user as owner (available only in SPO)
+func (group *Group) SetUserAsOwner(userID int) error {
 	endpoint := fmt.Sprintf("%s/SetUserAsOwner(%d)", group.ToURL(), userID)
 	client := NewHTTPClient(group.client)
 	_, err := client.Post(endpoint, nil, group.config)
+	return err
+}
+
+// SetAsOwner sets a user or group as this group owner
+func (group *Group) SetAsOwner(ownerID int) error {
+	site := NewSite(
+		group.client,
+		fmt.Sprintf("%s/_api/Site", group.client.AuthCnfg.GetSiteURL()),
+		group.config,
+	)
+
+	s, err := site.Select("Id").Get()
+	if err != nil {
+		return err
+	}
+
+	g, err := group.Select("Id").Get()
+	if err != nil {
+		return err
+	}
+
+	var principal struct {
+		ContentType struct {
+			Name string
+		}
+	}
+
+	pType := "g"
+	pData, err := site.RootWeb().UserInfoList().Items().Expand("ContentType").Filter(fmt.Sprintf("Id eq %d", ownerID)).Get()
+	if err != nil {
+		return nil
+	}
+	if len(pData.Data()) > 0 {
+		if err := json.Unmarshal(pData.Data()[0].Normalized(), &principal); err != nil {
+			return err
+		}
+		if principal.ContentType.Name == "Person" {
+			pType = "u"
+		}
+	}
+
+	b := csom.NewBuilder()
+	g1i := csom.NewObjectIdentity(fmt.Sprintf("740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:%s:g:%d", s.Data().ID, g.Data().ID))
+	g2i := csom.NewObjectIdentity(fmt.Sprintf("740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:%s:%s:%d", s.Data().ID, pType, ownerID))
+	b.AddObject(g1i, nil)
+	b.AddObject(g2i, nil)
+	if _, err = b.Compile(); err != nil {
+		return err
+	}
+	b.AddAction(csom.NewAction(fmt.Sprintf(`
+		<SetProperty Id="{{.ID}}" ObjectPathId="%d" Name="Owner">
+			<Parameter ObjectPathId="%d" />
+		</SetProperty>
+	`, g1i.GetID(), g2i.GetID())), g1i)
+	b.AddAction(csom.NewAction(`<Method Name="Update" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`), g1i)
+
+	csomPkg, err := b.Compile()
+	if err != nil {
+		return err
+	}
+
+	client := NewHTTPClient(group.client)
+	_, err = client.ProcessQuery(group.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), group.config)
+
 	return err
 }
 
