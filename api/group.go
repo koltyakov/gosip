@@ -110,20 +110,15 @@ func (group *Group) SetUserAsOwner(userID int) error {
 	return err
 }
 
-// SetAsOwner sets a user or group as this group owner
-func (group *Group) SetAsOwner(ownerID int) error {
+// SetOwner sets a user or group as this group owner
+func (group *Group) SetOwner(ownerID int) error {
 	site := NewSite(
 		group.client,
 		fmt.Sprintf("%s/_api/Site", group.client.AuthCnfg.GetSiteURL()),
 		group.config,
 	)
 
-	s, err := site.Select("Id").Get()
-	if err != nil {
-		return err
-	}
-
-	g, err := group.Select("Id").Get()
+	cg, err := group.Select("Id").Get()
 	if err != nil {
 		return err
 	}
@@ -134,7 +129,7 @@ func (group *Group) SetAsOwner(ownerID int) error {
 		}
 	}
 
-	pType := "g"
+	pType := "group"
 	pData, err := site.RootWeb().UserInfoList().Items().Expand("ContentType").Filter(fmt.Sprintf("Id eq %d", ownerID)).Get()
 	if err != nil {
 		return nil
@@ -144,24 +139,30 @@ func (group *Group) SetAsOwner(ownerID int) error {
 			return err
 		}
 		if principal.ContentType.Name == "Person" {
-			pType = "u"
+			pType = "user"
 		}
 	}
 
 	b := csom.NewBuilder()
-	g1i := csom.NewObjectIdentity(fmt.Sprintf("740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:%s:g:%d", s.Data().ID, g.Data().ID))
-	g2i := csom.NewObjectIdentity(fmt.Sprintf("740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:%s:%s:%d", s.Data().ID, pType, ownerID))
-	b.AddObject(g1i, nil)
-	b.AddObject(g2i, nil)
-	if _, err = b.Compile(); err != nil {
-		return err
+	wo, _ := b.AddObject(csom.NewObjectProperty("Web"), nil)
+	sg, _ := b.AddObject(csom.NewObjectProperty("SiteGroups"), wo)
+	gr, _ := b.AddObject(csom.NewObjectMethod("GetById", []string{fmt.Sprintf(`<Parameter Type="Number">%d</Parameter>`, cg.Data().ID)}), sg)
+	owner := csom.NewObjectMethod("GetById", []string{fmt.Sprintf(`<Parameter Type="Number">%d</Parameter>`, ownerID)})
+
+	if pType == "group" {
+		owner, _ = b.AddObject(owner, sg)
+	} else {
+		su, _ := b.AddObject(csom.NewObjectProperty("SiteUsers"), wo)
+		owner, _ = b.AddObject(owner, su)
 	}
+	_, _ = b.Compile() // force object nodes IDs calc
+
 	b.AddAction(csom.NewAction(fmt.Sprintf(`
-		<SetProperty Id="{{.ID}}" ObjectPathId="%d" Name="Owner">
+		<SetProperty Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" Name="Owner">
 			<Parameter ObjectPathId="%d" />
 		</SetProperty>
-	`, g1i.GetID(), g2i.GetID())), g1i)
-	b.AddAction(csom.NewAction(`<Method Name="Update" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`), g1i)
+	`, owner.GetID())), gr)
+	b.AddAction(csom.NewAction(`<Method Name="Update" Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`), gr)
 
 	csomPkg, err := b.Compile()
 	if err != nil {

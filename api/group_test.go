@@ -90,7 +90,7 @@ func TestGroup(t *testing.T) {
 			return
 		}
 		g := web.SiteGroups().GetByID(group.ID)
-		if err := g.SetAsOwner(au.Data()[0].Data().ID); err != nil {
+		if err := g.SetOwner(au.Data()[0].Data().ID); err != nil {
 			t.Error(err)
 		}
 		o, err := g.Select("Owner/Id").Expand("Owner").Get()
@@ -112,7 +112,7 @@ func TestGroup(t *testing.T) {
 			t.Error(err)
 		}
 		g := web.SiteGroups().GetByID(group.ID)
-		if err := g.SetAsOwner(mg.Data().ID); err != nil {
+		if err := g.SetOwner(mg.Data().ID); err != nil {
 			t.Error(err)
 		}
 		o, err := g.Select("Owner/Id").Expand("Owner").Get()

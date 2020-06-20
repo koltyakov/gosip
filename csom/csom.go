@@ -37,6 +37,7 @@ func NewBuilder() Builder {
 }
 
 // AddObject adds ObjectPath node to CSOM XML package
+// returns added object instance link and parent object instance link
 func (b *builder) AddObject(object Object, parent Object) (Object, Object) {
 	if parent == nil && len(b.objects) > 0 {
 		parent = b.objects[len(b.objects)-1].Current
@@ -49,6 +50,7 @@ func (b *builder) AddObject(object Object, parent Object) (Object, Object) {
 }
 
 // AddAction adds Action node to CSOM XML package
+// returns added action instance link and parent object instance link
 func (b *builder) AddAction(action Action, object Object) (Action, Object) {
 	if object == nil && len(b.objects) > 0 {
 		object = b.objects[len(b.objects)-1].Current
