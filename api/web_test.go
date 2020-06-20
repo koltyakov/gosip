@@ -119,6 +119,12 @@ func TestWeb(t *testing.T) {
 		}
 	})
 
+	t.Run("UserInfoList", func(t *testing.T) {
+		if _, err := sp.Web().UserInfoList().Select("Id").Get(); err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("Roles", func(t *testing.T) {
 		if _, err := sp.Web().Roles().HasUniqueAssignments(); err != nil {
 			t.Error(err)
