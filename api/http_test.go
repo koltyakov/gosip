@@ -12,7 +12,7 @@ func TestHttp(t *testing.T) {
 	t.Run("CSOMErrorHandling", func(t *testing.T) {
 		client := NewHTTPClient(spClient)
 		body := []byte(TrimMultiline(`
-			<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
+			<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Gosip">
 				<Actions>
 					<Query Id="4" ObjectPathId="3">
 						<Query SelectAllProperties="true">

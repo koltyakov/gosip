@@ -102,7 +102,7 @@ func (b *builder) Compile() (string, error) {
 		}
 	}
 	csomPkg := trimMultiline(`
-		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Javascript Library">
+		<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Gosip">
 			<Actions>` + actions + `</Actions>
 			<ObjectPaths>` + objects + `</ObjectPaths>
 		</Request>
