@@ -232,6 +232,15 @@ func (web *Web) SiteGroups() *Groups {
 	)
 }
 
+// UserInfoList gets site UIL (User Information List) API instance
+func (web *Web) UserInfoList() *List {
+	return NewList(
+		web.client,
+		fmt.Sprintf("%s/SiteUserInfoList", web.endpoint),
+		web.config,
+	)
+}
+
 // SiteUsers gets Users API instance queryable collection for this Web (Site Users)
 func (web *Web) SiteUsers() *Users {
 	return NewUsers(
