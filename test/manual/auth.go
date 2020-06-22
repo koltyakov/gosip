@@ -52,8 +52,8 @@ func getAddinAuthTest() (*gosip.SPClient, error) {
 
 // getAdfsAuthTest : ADFS auth test scenario
 func getAdfsAuthTest() (*gosip.SPClient, error) {
-	return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap.json")
-	// return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap-adfs.json")
+	// return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap.json")
+	return r(&adfs.AuthCnfg{}, "./config/private.onprem-wap-adfs.json")
 	// return r(&adfs.AuthCnfg{}, "./config/private.onprem-adfs.json")
 }
 

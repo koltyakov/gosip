@@ -211,7 +211,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		return "", "", err
 	}
 
-	redirectURL := fmt.Sprintf("%s", redirect)
+	redirectURL := redirect.String()
 
 	params := url.Values{}
 	params.Set("UserName", c.Username)
@@ -258,7 +258,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	redirectURL = fmt.Sprintf("%s", redirect)
+	redirectURL = redirect.String()
 
 	req, err = http.NewRequest("GET", redirectURL, nil)
 	if err != nil {
@@ -285,8 +285,8 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 
 	// ADFS behind WAP scenario, similar to the ordinary ADFS but requires EdgeAccessCookie
 	if redirect, err := resp.Location(); err == nil {
-		if strings.Contains(fmt.Sprintf("%s", redirect), "/_layouts/15/Authenticate.aspx") {
-			redirectURL = fmt.Sprintf("%s", redirect)
+		if strings.Contains(redirect.String(), "/_layouts/15/Authenticate.aspx") {
+			redirectURL = redirect.String()
 			client := &http.Client{}
 
 			req, err = http.NewRequest("GET", redirectURL, nil)

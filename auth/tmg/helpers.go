@@ -30,11 +30,8 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// fmt.Printf("Redirect URL: %s\n", redirect)
 
 	endpoint := fmt.Sprintf("%s://%s/CookieAuth.dll?Logon", parsedURL.Scheme, parsedURL.Host)
-
-	// fmt.Printf("Endpoint: %s\n", endpoint)
 
 	params := url.Values{}
 
