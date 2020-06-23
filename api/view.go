@@ -47,6 +47,7 @@ type ViewInfo struct {
 	Title                     string `json:"Title"`
 	ViewQuery                 string `json:"ViewQuery"`
 	ViewType                  string `json:"ViewType"`
+	ViewData                  string `json:"ViewData"`
 }
 
 // ViewResp - list view response type with helper processor methods

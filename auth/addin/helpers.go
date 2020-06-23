@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -203,6 +204,8 @@ func getRealm(c *AuthCnfg) (string, error) {
 			_ = resp.Body.Close()
 		}
 	}()
+
+	io.Copy(ioutil.Discard, resp.Body)
 
 	authHeader := resp.Header.Get("www-authenticate")
 

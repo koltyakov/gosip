@@ -115,7 +115,7 @@ func r(auth gosip.AuthCnfg, cnfgPath string) (*gosip.SPClient, error) {
 
 	// fmt.Printf("response: %s\n", data)
 	fmt.Printf("connection established in %f seconds\n", time.Since(startAt).Seconds())
-	fmt.Printf("below is the results of manual tests\n\n")
+	// fmt.Printf("below is the results of manual tests\n\n")
 
 	return client, nil
 }

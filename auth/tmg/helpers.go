@@ -2,6 +2,8 @@ package tmg
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -64,6 +66,8 @@ func GetAuth(c *AuthCnfg) (string, error) {
 		}
 	}()
 
+	io.Copy(ioutil.Discard, resp.Body)
+
 	// fmt.Println(resp.StatusCode)
 	authCookie := resp.Header.Get("Set-Cookie") // TODO: parse TMG cookie only (?)
 
@@ -99,6 +103,8 @@ func detectCookieAuthURL(siteURL string) (*url.URL, error) {
 			_ = resp.Body.Close()
 		}
 	}()
+
+	io.Copy(ioutil.Discard, resp.Body)
 
 	redirect, err := resp.Location()
 	if err != nil {

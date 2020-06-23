@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -174,6 +175,8 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
+	io.Copy(ioutil.Discard, resp.Body)
+
 	// cookie := resp.Header.Get("Set-Cookie") // TODO: parse FedAuth and rtFa cookies only (?)
 	// fmt.Printf("Cookie: %s\n", cookie)
 	// fmt.Printf("Resp2, %v\n", resp.StatusCode)
@@ -329,6 +332,8 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 			_ = resp.Body.Close()
 		}
 	}()
+
+	io.Copy(ioutil.Discard, resp.Body)
 
 	var authCookie string
 	for _, coo := range resp.Cookies() {
