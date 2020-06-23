@@ -45,4 +45,5 @@ func runner(sp *api.SP) {
 		fmt.Println(err)
 	}
 	_ = r.Data().Title
+	fmt.Print(".")
 }
