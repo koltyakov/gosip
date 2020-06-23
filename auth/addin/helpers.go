@@ -20,6 +20,10 @@ var (
 
 // GetAuth : get auth
 func GetAuth(c *AuthCnfg) (string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
@@ -36,7 +40,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	}
 	c.Realm = realm
 
-	authURL, err := getAuthURL(c.Realm)
+	authURL, err := getAuthURL(c, c.Realm)
 	if err != nil {
 		return "", err
 	}
@@ -45,43 +49,14 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	resource := fmt.Sprintf("%s/%s@%s", servicePrincipal, parsedURL.Host, c.Realm)
 	fullClientID := fmt.Sprintf("%s@%s", c.ClientID, c.Realm)
 
-	// type getAuthForm struct {
-	// 	GrantType    string `json:"grant_type"`
-	// 	ClientID     string `json:"client_id"`
-	// 	ClientSecret string `json:"client_secret"`
-	// 	Resource     string `json:"resource"`
-	// }
-
-	// type getAuthRequest struct {
-	// 	JSON bool        `json:"json"`
-	// 	Form getAuthForm `json:"form"`
-	// }
-
-	// reqBody := &getAuthRequest{
-	// 	JSON: true,
-	// 	Form: getAuthForm{
-	// 		GrantType:    "client_credentials",
-	// 		ClientID:     fullClientID,
-	// 		ClientSecret: creds.ClientSecret,
-	// 		Resource:     resource,
-	// 	},
-	// }
-
 	params := url.Values{}
 	params.Set("grant_type", "client_credentials")
 	params.Set("client_id", fullClientID)
 	params.Set("client_secret", c.ClientSecret)
 	params.Set("resource", resource)
 
-	// reqBodyJSON, err := json.Marshal(reqBody)
-	// if err != nil {
-	// 	return "", err
-	// }
-
-	// proxyURL, _ := url.Parse("http://127.0.0.1:8888")
-	// http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyURL), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-
-	resp, err := http.Post(authURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode())) // bytes.NewBuffer(reqBodyJSON))
+	// resp, err := http.Post(authURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	resp, err := c.client.Post(authURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
 	if err != nil {
 		return "", err
 	}
@@ -124,7 +99,11 @@ func GetAuth(c *AuthCnfg) (string, error) {
 
 }
 
-func getAuthURL(realm string) (string, error) {
+func getAuthURL(c *AuthCnfg, realm string) (string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	endpoint := fmt.Sprintf("https://%s/metadata/json/1?realm=%s", "accounts.accesscontrol.windows.net", realm) // TODO: Add endpoint mapping
 
 	cacheKey := endpoint
@@ -132,7 +111,13 @@ func getAuthURL(realm string) (string, error) {
 		return authURL.(string), nil
 	}
 
-	resp, err := http.Get(endpoint)
+	req, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		return "", err
+	}
+
+	// resp, err := http.Get(endpoint)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", err
 	}
@@ -172,6 +157,10 @@ func getAuthURL(realm string) (string, error) {
 }
 
 func getRealm(c *AuthCnfg) (string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	if c.Realm != "" {
 		return c.Realm, nil
 	}
@@ -194,8 +183,8 @@ func getRealm(c *AuthCnfg) (string, error) {
 
 	req.Header.Set("Authorization", "Bearer ")
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	// client := &http.Client{}
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", err
 	}

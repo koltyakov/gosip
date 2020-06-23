@@ -24,6 +24,10 @@ var (
 
 // GetAuth : get auth
 func GetAuth(c *AuthCnfg) (string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
@@ -47,18 +51,23 @@ func GetAuth(c *AuthCnfg) (string, error) {
 }
 
 func getSecurityToken(c *AuthCnfg) (string, string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	endpoint := "https://login.microsoftonline.com/GetUserRealm.srf" // TODO: endpoints mapping
 
 	params := url.Values{}
 	params.Set("login", c.Username)
 
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
+	// client := &http.Client{
+	// 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	// 		return http.ErrUseLastResponse
+	// 	},
+	// }
+	c.client.CheckRedirect = doNotCheckRedirect
 
-	resp, err := client.Post(endpoint, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	resp, err := c.client.Post(endpoint, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
 	if err != nil {
 		return "", "", err
 	}
@@ -107,6 +116,10 @@ func getSecurityToken(c *AuthCnfg) (string, string, error) {
 }
 
 func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", "", err
@@ -127,13 +140,14 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 
 	req.Header.Set("Content-Type", "application/soap+xml;charset=utf-8")
 
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
+	// client := &http.Client{
+	// 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	// 		return http.ErrUseLastResponse
+	// 	},
+	// }
+	c.client.CheckRedirect = doNotCheckRedirect
 
-	resp, err := client.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -165,7 +179,7 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 
 	// fmt.Printf("BinaryToken, %s\n", result.Response.BinaryToken)
 
-	resp, err = client.Post(formsEndpoint, "application/x-www-form-urlencoded", strings.NewReader(result.Response.BinaryToken))
+	resp, err = c.client.Post(formsEndpoint, "application/x-www-form-urlencoded", strings.NewReader(result.Response.BinaryToken))
 	if err != nil {
 		return "", "", err
 	}
@@ -193,6 +207,10 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 
 // TODO: test the method, it possibly contains issues and extra complexity
 func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	parsedAdfsURL, err := url.Parse(adfsURL)
 	if err != nil {
 		return "", "", err
@@ -214,8 +232,9 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 
 	req.Header.Set("Content-Type", "application/soap+xml;charset=utf-8")
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	// client := &http.Client{}
+	c.client.CheckRedirect = doNotCheckRedirect
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -279,7 +298,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 
 	req.Header.Set("Content-Type", "application/soap+xml;charset=utf-8")
 
-	resp, err = client.Do(req)
+	resp, err = c.client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -316,14 +335,15 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 		return "", "", errors.New("can't extract binary token")
 	}
 
-	client = &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
+	// client = &http.Client{
+	// 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	// 		return http.ErrUseLastResponse
+	// 	},
+	// }
+	c.client.CheckRedirect = doNotCheckRedirect
 
 	formsEndpoint := fmt.Sprintf("%s://%s/_forms/default.aspx?wa=wsignin1.0", parsedURL.Scheme, parsedURL.Host)
-	resp, err = client.Post(formsEndpoint, "application/x-www-form-urlencoded", strings.NewReader(tokenResult.Response.BinaryToken))
+	resp, err = c.client.Post(formsEndpoint, "application/x-www-form-urlencoded", strings.NewReader(tokenResult.Response.BinaryToken))
 	if err != nil {
 		return "", "", err
 	}
@@ -343,4 +363,9 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 	}
 
 	return authCookie, tokenResult.Response.Lifetime.Expires, nil
+}
+
+// doNotCheckRedirect *http.Client CheckRedirect callback to ignore redirects
+func doNotCheckRedirect(req *http.Request, via []*http.Request) error {
+	return http.ErrUseLastResponse
 }

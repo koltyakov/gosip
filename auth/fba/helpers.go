@@ -21,6 +21,10 @@ var (
 
 // GetAuth : get auth
 func GetAuth(c *AuthCnfg) (string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
@@ -44,9 +48,8 @@ func GetAuth(c *AuthCnfg) (string, error) {
 
 	req.Header.Set("Content-Type", "text/xml;charset=utf-8")
 
-	client := &http.Client{}
-
-	resp, err := client.Do(req)
+	// client := &http.Client{}
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", err
 	}

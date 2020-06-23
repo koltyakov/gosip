@@ -33,6 +33,7 @@ type AuthCnfg struct {
 	Realm        string `json:"realm"`        // Your SharePoint Online tenant ID (optional)
 
 	masterKey string
+	client    *http.Client
 }
 
 // ReadConfig : reads private config with auth options

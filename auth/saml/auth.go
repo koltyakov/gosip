@@ -32,6 +32,7 @@ type AuthCnfg struct {
 	Password string `json:"password"` // User or App password
 
 	masterKey string
+	client    *http.Client
 }
 
 // ReadConfig : reads private config with auth options

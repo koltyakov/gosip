@@ -18,6 +18,10 @@ var (
 
 // GetAuth : get auth
 func GetAuth(c *AuthCnfg) (string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
@@ -28,7 +32,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 		return accessToken.(string), nil
 	}
 
-	redirect, err := detectCookieAuthURL(c.SiteURL)
+	redirect, err := detectCookieAuthURL(c, c.SiteURL)
 	if err != nil {
 		return "", err
 	}
@@ -50,13 +54,14 @@ func GetAuth(c *AuthCnfg) (string, error) {
 
 	// TODO: keepalive agent for https
 
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
+	// client := &http.Client{
+	// 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	// 		return http.ErrUseLastResponse
+	// 	},
+	// }
+	c.client.CheckRedirect = doNotCheckRedirect
 
-	resp, err := client.Post(endpoint, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	resp, err := c.client.Post(endpoint, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
 	if err != nil {
 		return "", err
 	}
@@ -78,12 +83,17 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	return authCookie, nil
 }
 
-func detectCookieAuthURL(siteURL string) (*url.URL, error) {
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
+func detectCookieAuthURL(c *AuthCnfg, siteURL string) (*url.URL, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
 	}
+
+	// client := &http.Client{
+	// 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	// 		return http.ErrUseLastResponse
+	// 	},
+	// }
+	c.client.CheckRedirect = doNotCheckRedirect
 
 	req, err := http.NewRequest("GET", siteURL, nil)
 	if err != nil {
@@ -94,7 +104,7 @@ func detectCookieAuthURL(siteURL string) (*url.URL, error) {
 	// req.Header.Set("Upgrade-Insecure-Requests", "1")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
 
-	resp, err := client.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -112,4 +122,9 @@ func detectCookieAuthURL(siteURL string) (*url.URL, error) {
 	}
 
 	return redirect, nil
+}
+
+// doNotCheckRedirect *http.Client CheckRedirect callback to ignore redirects
+func doNotCheckRedirect(req *http.Request, via []*http.Request) error {
+	return http.ErrUseLastResponse
 }

@@ -56,6 +56,7 @@ type AuthCnfg struct {
 	AdfsCookie   string `json:"adfsCookie"`
 
 	masterKey string
+	client    *http.Client
 }
 
 // ReadConfig : reads private config with auth options

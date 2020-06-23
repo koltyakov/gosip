@@ -23,6 +23,10 @@ var (
 
 // GetAuth : get auth
 func GetAuth(c *AuthCnfg) (string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
 		return "", err
@@ -60,6 +64,10 @@ func GetAuth(c *AuthCnfg) (string, error) {
 }
 
 func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
+	if c.client == nil {
+		c.client = &http.Client{}
+	}
+
 	parsedAdfsURL, err := url.Parse(c.AdfsURL)
 	if err != nil {
 		return "", "", err
@@ -81,8 +89,8 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 		req.Header.Set("Cookie", edgeCookie)
 	}
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	// client := &http.Client{}
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -155,11 +163,12 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 	// proxyURL, _ := url.Parse("http://127.0.0.1:8888")
 	// http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyURL), TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 
-	client = &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
+	// client = &http.Client{
+	// 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	// 		return http.ErrUseLastResponse
+	// 	},
+	// }
+	c.client.CheckRedirect = doNotCheckRedirect
 
 	req, err = http.NewRequest("POST", rootSiteURL+"/_trust/", strings.NewReader(params.Encode()))
 	if err != nil {
@@ -171,7 +180,7 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 		req.Header.Set("Cookie", edgeCookie)
 	}
 
-	resp, err = client.Do(req)
+	resp, err = c.client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -191,14 +200,19 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 
 // WAP auth flow - TODO: refactor
 func wapAuthFlow(c *AuthCnfg) (string, string, error) {
-	client := &http.Client{
-		// Disabling redirect so response 302 location can be resolved
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
+	if c.client == nil {
+		c.client = &http.Client{}
 	}
 
-	resp, err := client.Get(c.SiteURL)
+	// client := &http.Client{
+	// 	// Disabling redirect so response 302 location can be resolved
+	// 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	// 		return http.ErrUseLastResponse
+	// 	},
+	// }
+	c.client.CheckRedirect = doNotCheckRedirect
+
+	resp, err := c.client.Get(c.SiteURL)
 	if err != nil {
 		return "", "", err
 	}
@@ -223,7 +237,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	params.Set("Password", c.Password)
 	params.Set("AuthMethod", "FormsAuthentication")
 
-	resp, err = client.Post(redirectURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	resp, err = c.client.Post(redirectURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
 	if err != nil {
 		return "", "", err
 	}
@@ -250,7 +264,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
 	req.Header.Set("Cookie", msisAuthCookie)
 
-	resp, err = client.Do(req)
+	resp, err = c.client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -276,7 +290,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
 	// req.Header.Set("Cookie", msisAuthCookie) // brakes it all
 
-	resp, err = client.Do(req)
+	resp, err = c.client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -298,7 +312,8 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	if redirect, err := resp.Location(); err == nil {
 		if strings.Contains(redirect.String(), "/_layouts/15/Authenticate.aspx") {
 			redirectURL = redirect.String()
-			client := &http.Client{}
+			// client := &http.Client{}
+			c.client.CheckRedirect = nil
 
 			req, err = http.NewRequest("GET", redirectURL, nil)
 			if err != nil {
@@ -307,7 +322,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 			req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
 			req.Header.Set("Cookie", authCookie)
 
-			resp, err = client.Do(req)
+			resp, err = c.client.Do(req)
 			if err != nil {
 				return "", "", err
 			}
@@ -333,7 +348,10 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		}
 	}
 
-	// fmt.Printf(authCookie)
-
 	return authCookie, fedAuthExpire, nil
+}
+
+// doNotCheckRedirect *http.Client CheckRedirect callback to ignore redirects
+func doNotCheckRedirect(req *http.Request, via []*http.Request) error {
+	return http.ErrUseLastResponse
 }
