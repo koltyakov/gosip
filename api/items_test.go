@@ -23,7 +23,6 @@ func TestItems(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	// startedOn := time.Now()
 
 	t.Run("AddWithoutMetadataType", func(t *testing.T) {
 		body := []byte(`{"Title":"Item"}`)
@@ -71,13 +70,32 @@ func TestItems(t *testing.T) {
 		if envCode == "2013" {
 			t.Skip("is not supported with SP 2013")
 		}
+		// doesn't work anymore in SPO, an item can't be created in a folder which is not item-folder
+		// if _, err := list.RootFolder().Folders().Add("subfolder"); err != nil {
+		// 	t.Error(err)
+		// }
 
-		if _, err := list.RootFolder().Folders().Add("subfolder"); err != nil {
+		folderName := "subfolder"
+
+		if _, err := list.Update([]byte(`{ "EnableFolderCreation": true }`)); err != nil {
 			t.Error(err)
 		}
+		ff, err := list.Items().AddValidate(map[string]string{
+			"Title":         folderName,
+			"FileLeafRef":   folderName,
+			"ContentType":   "Folder",
+			"ContentTypeId": "0x0120",
+		}, nil)
+		if err != nil {
+			t.Error(err)
+		}
+		if _, err := list.Items().GetByID(ff.ID()).Update([]byte(`{ "FileLeafRef": "` + folderName + `" }`)); err != nil {
+			t.Error(err)
+		}
+
 		options := &ValidateAddOptions{NewDocumentUpdate: true, CheckInComment: "test"}
-		options.DecodedPath = "Lists/" + newListTitle + "/subfolder"
-		data := map[string]string{"Title": "New item"}
+		options.DecodedPath = "Lists/" + newListTitle + "/" + folderName
+		data := map[string]string{"Title": "New item in folder"}
 		if _, err := list.Items().AddValidate(data, options); err != nil {
 			t.Error(err)
 		}
@@ -137,12 +155,6 @@ func TestItems(t *testing.T) {
 		if item.Data().Title == "" {
 			t.Error("can't get item Title property properly")
 		}
-		// if item.Data().Created.Day() != startedOn.Day() {
-		// 	t.Error("can't get item Created property properly")
-		// }
-		// if item.Data().Modified.Day() != startedOn.Day() {
-		// 	t.Error("can't get item Modified property properly")
-		// }
 	})
 
 	t.Run("GetByCAML", func(t *testing.T) {
@@ -180,8 +192,8 @@ func TestItems(t *testing.T) {
 		}
 	})
 
-	if err := list.Delete(); err != nil {
-		t.Error(err)
-	}
+	// if err := list.Delete(); err != nil {
+	// 	t.Error(err)
+	// }
 
 }
