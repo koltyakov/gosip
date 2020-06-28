@@ -3,31 +3,31 @@
 package api
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (receivers *EventReceivers) Conf(config *RequestConfig) *EventReceivers {
-	receivers.config = config
-	return receivers
+func (eventReceivers *EventReceivers) Conf(config *RequestConfig) *EventReceivers {
+	eventReceivers.config = config
+	return eventReceivers
 }
 
 // Select adds $select OData modifier
-func (receivers *EventReceivers) Select(oDataSelect string) *EventReceivers {
-	receivers.modifiers.AddSelect(oDataSelect)
-	return receivers
+func (eventReceivers *EventReceivers) Select(oDataSelect string) *EventReceivers {
+	eventReceivers.modifiers.AddSelect(oDataSelect)
+	return eventReceivers
 }
 
 // Filter adds $filter OData modifier
-func (receivers *EventReceivers) Filter(oDataFilter string) *EventReceivers {
-	receivers.modifiers.AddFilter(oDataFilter)
-	return receivers
+func (eventReceivers *EventReceivers) Filter(oDataFilter string) *EventReceivers {
+	eventReceivers.modifiers.AddFilter(oDataFilter)
+	return eventReceivers
 }
 
 // Top adds $top OData modifier
-func (receivers *EventReceivers) Top(oDataTop int) *EventReceivers {
-	receivers.modifiers.AddTop(oDataTop)
-	return receivers
+func (eventReceivers *EventReceivers) Top(oDataTop int) *EventReceivers {
+	eventReceivers.modifiers.AddTop(oDataTop)
+	return eventReceivers
 }
 
 // OrderBy adds $orderby OData modifier
-func (receivers *EventReceivers) OrderBy(oDataOrderBy string, ascending bool) *EventReceivers {
-	receivers.modifiers.AddOrderBy(oDataOrderBy, ascending)
-	return receivers
+func (eventReceivers *EventReceivers) OrderBy(oDataOrderBy string, ascending bool) *EventReceivers {
+	eventReceivers.modifiers.AddOrderBy(oDataOrderBy, ascending)
+	return eventReceivers
 }

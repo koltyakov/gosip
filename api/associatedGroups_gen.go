@@ -3,7 +3,7 @@
 package api
 
 // Conf receives custom request config definition, e.g. custom headers, custom OData mod
-func (groups *AssociatedGroups) Conf(config *RequestConfig) *AssociatedGroups {
-	groups.config = config
-	return groups
+func (associatedGroups *AssociatedGroups) Conf(config *RequestConfig) *AssociatedGroups {
+	associatedGroups.config = config
+	return associatedGroups
 }
