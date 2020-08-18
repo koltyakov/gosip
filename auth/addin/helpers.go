@@ -170,7 +170,7 @@ func getRealm(c *AuthCnfg) (string, error) {
 		return "", err
 	}
 
-	cacheKey := parsedURL.Host + "@realm"
+	cacheKey := parsedURL.Host + "@realm" + "@addinonly@" + c.ClientID + "@" + c.ClientSecret
 	if realm, found := storage.Get(cacheKey); found {
 		return realm.(string), nil
 	}
