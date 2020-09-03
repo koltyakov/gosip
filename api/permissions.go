@@ -188,19 +188,21 @@ func HasPermissions(basePermissions BasePermissions, permissionsKind int64) bool
 		return true
 	}
 
-	if permissionsKind == PermissionKind.FullMask {
-		return (basePermissions.High&32767) == 32767 && basePermissions.Low == 65535
-	}
+	perm := uint64(permissionsKind - 1)
+	num := uint64(1)
+	low := uint64(basePermissions.Low)
+	high := uint64(basePermissions.High)
 
-	perm := permissionsKind - 1
-	num := int64(1)
+	if permissionsKind == PermissionKind.FullMask {
+		return (high&32767) == 32767 && low == 65535
+	}
 
 	if perm >= 0 && perm < 32 {
 		num = num << perm
-		return 0 != (basePermissions.Low & num)
+		return 0 != (low & num)
 	} else if perm >= 32 && perm < 64 {
 		num = num<<perm - 32
-		return 0 != (basePermissions.High & num)
+		return 0 != (high & num)
 	}
 
 	return false
