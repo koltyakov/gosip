@@ -38,6 +38,7 @@
   - Add-In only permissions
   - ADFS user credentials (automatically detects in SAML strategy)
   - On-Demand auth [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/ondemand)
+	- Azure Certificate (App Only) [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/azureenv)
   - Azure AD Device flow [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/device)
 
 ## Installation
