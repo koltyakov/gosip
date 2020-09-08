@@ -123,24 +123,29 @@ func (group *Group) SetOwner(ownerID int) error {
 		return err
 	}
 
-	var principal struct {
-		ContentType struct {
-			Name string
-		}
-	}
+	// var principal struct {
+	// 	ContentType struct {
+	// 		Name string
+	// 	}
+	// }
 
-	pType := "group"
-	pData, err := site.RootWeb().UserInfoList().Items().Expand("ContentType").Filter(fmt.Sprintf("Id eq %d", ownerID)).Get()
-	if err != nil {
-		return nil
-	}
-	if len(pData.Data()) > 0 {
-		if err := json.Unmarshal(pData.Data()[0].Normalized(), &principal); err != nil {
-			return err
-		}
-		if principal.ContentType.Name == "Person" {
-			pType = "user"
-		}
+	// pType := "group"
+	// pData, err := site.RootWeb().UserInfoList().Items().Expand("ContentType").Filter(fmt.Sprintf("Id eq %d", ownerID)).Get()
+	// if err != nil {
+	// 	return nil
+	// }
+	// if len(pData.Data()) > 0 {
+	// 	if err := json.Unmarshal(pData.Data()[0].Normalized(), &principal); err != nil {
+	// 		return err
+	// 	}
+	// 	if principal.ContentType.Name == "Person" {
+	// 		pType = "user"
+	// 	}
+	// }
+
+	pType := "user"
+	if _, err := site.RootWeb().SiteUsers().GetByID(ownerID).Select("Id").Get(); err != nil {
+		pType = "group"
 	}
 
 	b := csom.NewBuilder()
