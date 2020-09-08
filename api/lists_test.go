@@ -63,6 +63,10 @@ func TestLists(t *testing.T) {
 	})
 
 	t.Run("AddWithURI", func(t *testing.T) {
+		if envCode == "2013" {
+			t.Skip("is not supported with SP 2013")
+		}
+
 		listTitle := uuid.New().String()
 		listURI := uuid.New().String()
 		if _, err := web.Lists().AddWithURI(listTitle, listURI, nil); err != nil {
