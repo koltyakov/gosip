@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -68,13 +67,23 @@ func main() {
 	fmt.Printf("%s\n", res.Data().Title)
 
 	l := sp.Web().Lists().GetByTitle("Calendar01")
+	ii, err := l.Items().Select("Id,Title,Created,Editor/Title").Expand("Editor").Get()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, i := range ii.ToMap() {
+		fmt.Printf("%v#\n", i)
+	}
+
+	// l := sp.Web().Lists().GetByTitle("Calendar01")
 
 	// vd, err := l.Views().DefaultView().Get()
 	// if err != nil {
 	// 	fmt.Println(err)
 	// }
 
-	_ = l.Views().GetByTitle("Test_View_03").Delete()
+	// _ = l.Views().GetByTitle("Test_View_03").Delete()
 
 	// viewXML := vd.Data().ListViewXML
 	// cleanOut := []string{
@@ -92,25 +101,25 @@ func main() {
 
 	// fmt.Println(viewXML)
 
-	viewXML := `<View Name="{EC2C6A0E-1D06-4BF3-A9D5-D9003EF981CC}" MobileView="TRUE" Type="CALENDAR" TabularView="FALSE" Scope="Recursive" RecurrenceRowset="TRUE" DisplayName="Test_View_03" Url="/sites/ci/Lists/Calendar01/Test_View_03.aspx" Level="1" BaseViewID="2" ContentTypeID="0x" MobileUrl="_layouts/15/mobile/viewdaily.aspx" ImageUrl="/_layouts/15/images/events.png?rev=47" ><Query><Where><DateRangesOverlap><FieldRef Name="EventDate" /><FieldRef Name="EndDate" /><FieldRef Name="RecurrenceID" /><Value Type="DateTime"><Month /></Value></DateRangesOverlap></Where></Query><ViewFields><FieldRef Name="EventDate" /><FieldRef Name="EndDate" /><FieldRef Name="Title" /><FieldRef Name="fRecurrence" Explicit="TRUE" /></ViewFields><RowLimit>0</RowLimit><Aggregations Value="Off" /><CalendarViewStyles>&lt;CalendarViewStyle  Title='Day' Type='day' Template='CalendarViewdayChrome' Sequence='1' Default='FALSE' /&gt;&lt;CalendarViewStyle  Title='Week' Type='week' Template='CalendarViewweekChrome' Sequence='2' Default='FALSE' /&gt;&lt;CalendarViewStyle  Title='Month' Type='month' Template='CalendarViewmonthChrome' Sequence='3' Default='TRUE' /&gt;</CalendarViewStyles><ViewData><FieldRef Name="Title" Type="CalendarMonthTitle" /><FieldRef Name="Title" Type="CalendarWeekTitle" /><FieldRef Name="Location" Type="CalendarWeekLocation" /><FieldRef Name="Title" Type="CalendarDayTitle" /><FieldRef Name="Location" Type="CalendarDayLocation" /></ViewData><Toolbar Type="Standard"/></View>`
+	// viewXML := `<View Name="{EC2C6A0E-1D06-4BF3-A9D5-D9003EF981CC}" MobileView="TRUE" Type="CALENDAR" TabularView="FALSE" Scope="Recursive" RecurrenceRowset="TRUE" DisplayName="Test_View_03" Url="/sites/ci/Lists/Calendar01/Test_View_03.aspx" Level="1" BaseViewID="2" ContentTypeID="0x" MobileUrl="_layouts/15/mobile/viewdaily.aspx" ImageUrl="/_layouts/15/images/events.png?rev=47" ><Query><Where><DateRangesOverlap><FieldRef Name="EventDate" /><FieldRef Name="EndDate" /><FieldRef Name="RecurrenceID" /><Value Type="DateTime"><Month /></Value></DateRangesOverlap></Where></Query><ViewFields><FieldRef Name="EventDate" /><FieldRef Name="EndDate" /><FieldRef Name="Title" /><FieldRef Name="fRecurrence" Explicit="TRUE" /></ViewFields><RowLimit>0</RowLimit><Aggregations Value="Off" /><CalendarViewStyles>&lt;CalendarViewStyle  Title='Day' Type='day' Template='CalendarViewdayChrome' Sequence='1' Default='FALSE' /&gt;&lt;CalendarViewStyle  Title='Week' Type='week' Template='CalendarViewweekChrome' Sequence='2' Default='FALSE' /&gt;&lt;CalendarViewStyle  Title='Month' Type='month' Template='CalendarViewmonthChrome' Sequence='3' Default='TRUE' /&gt;</CalendarViewStyles><ViewData><FieldRef Name="Title" Type="CalendarMonthTitle" /><FieldRef Name="Title" Type="CalendarWeekTitle" /><FieldRef Name="Location" Type="CalendarWeekLocation" /><FieldRef Name="Title" Type="CalendarDayTitle" /><FieldRef Name="Location" Type="CalendarDayLocation" /></ViewData><Toolbar Type="Standard"/></View>`
 
-	meta := map[string]interface{}{
-		"Title":        "Test_View_03",
-		"ListViewXml":  viewXML,
-		"ViewData":     `<FieldRef Name="Title" Type="CalendarMonthTitle" /><FieldRef Name="Title" Type="CalendarWeekTitle" /><FieldRef Name="Location" Type="CalendarWeekLocation" /><FieldRef Name="Title" Type="CalendarDayTitle" /><FieldRef Name="Location" Type="CalendarDayLocation" />`,
-		"ViewQuery":    `<Where><DateRangesOverlap><FieldRef Name="EventDate" /><FieldRef Name="EndDate" /><FieldRef Name="RecurrenceID" /><Value Type="DateTime"><Month /></Value></DateRangesOverlap></Where>`,
-		"BaseViewId":   "2",
-		"ViewType":     "CALENDAR",
-		"ViewTypeKind": 524288 | 8193,
-		"baseViewId":   "2",
-		"TabularView":  false,
-		"Paged":        false,
-	}
-	body, _ := json.Marshal(meta)
+	// meta := map[string]interface{}{
+	// 	"Title":        "Test_View_03",
+	// 	"ListViewXml":  viewXML,
+	// 	"ViewData":     `<FieldRef Name="Title" Type="CalendarMonthTitle" /><FieldRef Name="Title" Type="CalendarWeekTitle" /><FieldRef Name="Location" Type="CalendarWeekLocation" /><FieldRef Name="Title" Type="CalendarDayTitle" /><FieldRef Name="Location" Type="CalendarDayLocation" />`,
+	// 	"ViewQuery":    `<Where><DateRangesOverlap><FieldRef Name="EventDate" /><FieldRef Name="EndDate" /><FieldRef Name="RecurrenceID" /><Value Type="DateTime"><Month /></Value></DateRangesOverlap></Where>`,
+	// 	"BaseViewId":   "2",
+	// 	"ViewType":     "CALENDAR",
+	// 	"ViewTypeKind": 524288 | 8193,
+	// 	"baseViewId":   "2",
+	// 	"TabularView":  false,
+	// 	"Paged":        false,
+	// }
+	// body, _ := json.Marshal(meta)
 
-	if _, err := l.Views().Add(body); err != nil {
-		fmt.Printf("error while adding a view: %s\n", err)
-	}
+	// if _, err := l.Views().Add(body); err != nil {
+	// 	fmt.Printf("error while adding a view: %s\n", err)
+	// }
 
 	// if _, err := sp.Web().Lists().GetByTitle("NotExisting").Get(); err != nil {
 	// 	log.Fatal(err)
