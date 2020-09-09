@@ -115,6 +115,12 @@ func TestItems(t *testing.T) {
 		if bytes.Compare(items, items.Normalized()) == -1 {
 			t.Error("wrong response normalization")
 		}
+		if len(items.ToMap()) == 0 {
+			t.Error("can't map items properly")
+		}
+		if items.ToMap()[0]["ID"] == 0 {
+			t.Error("can't map items properly")
+		}
 	})
 
 	t.Run("GetPaged", func(t *testing.T) {

@@ -69,16 +69,19 @@ func generate(c *apiGenCnfg) error {
 	code += fmt.Sprintf("package %s\n", pkg)
 
 	imports := map[string]bool{}
-	// if c.IsCollection && len(c.Helpers) > 0 {
-	// 	for _, helper := range c.Helpers {
-	// 		if helper == "Pagination" {
-	// 			imports["fmt"] = true
-	// 		}
-	// 	}
-	// }
+	if c.IsCollection && len(c.Helpers) > 0 {
+		for _, helper := range c.Helpers {
+			if helper == "ToMap" {
+				imports["encoding/json"] = true
+			}
+		}
+	}
 	if !c.IsCollection && len(c.Helpers) > 0 {
 		for _, helper := range c.Helpers {
 			if helper == "Data" {
+				imports["encoding/json"] = true
+			}
+			if helper == "ToMap" {
 				imports["encoding/json"] = true
 			}
 		}
@@ -211,6 +214,16 @@ func helpersGen(c *apiGenCnfg) string {
 						return normalized
 					}
 				`
+			case "ToMap":
+				code += `
+					// ToMap unmarshals response to generic map
+					func (` + ent + `Resp *` + Ent + `Resp) ToMap() []map[string]interface{} {
+						data, _ := NormalizeODataCollection(*` + ent + `Resp)
+						var res []map[string]interface{}
+						_ = json.Unmarshal(data, &res)
+						return res
+					}
+				`
 			}
 		}
 	}
@@ -232,6 +245,16 @@ func helpersGen(c *apiGenCnfg) string {
 					// Normalized returns normalized body
 					func (` + ent + `Resp *` + Ent + `Resp) Normalized() []byte {
 						return NormalizeODataItem(*` + ent + `Resp)
+					}
+				`
+			case "ToMap":
+				code += `
+					// ToMap unmarshals response to generic map
+					func (` + ent + `Resp *` + Ent + `Resp) ToMap() map[string]interface{} {
+						data := NormalizeODataItem(*` + ent + `Resp)
+						var res map[string]interface{}
+						_ = json.Unmarshal(data, &res)
+						return res
 					}
 				`
 			}

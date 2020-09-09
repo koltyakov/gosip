@@ -11,7 +11,7 @@ import (
 	"github.com/koltyakov/gosip"
 )
 
-//go:generate ggen -ent Items -item Item -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized
+//go:generate ggen -ent Items -item Item -conf -coll -mods Select,Expand,Filter,Top,Skip,OrderBy -helpers Data,Normalized,ToMap
 
 // Items represent SharePoint Lists & Document Libraries Items API queryable collection struct
 // Always use NewItems constructor instead of &Items{}

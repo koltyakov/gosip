@@ -54,6 +54,9 @@ func TestItem(t *testing.T) {
 		if bytes.Compare(item, item.Normalized()) == -1 {
 			t.Error("response normalization error")
 		}
+		if item.ToMap()["ID"] == 0 {
+			t.Error("can't map item properly")
+		}
 	})
 
 	t.Run("Update", func(t *testing.T) {
