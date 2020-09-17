@@ -355,3 +355,14 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 func doNotCheckRedirect(req *http.Request, via []*http.Request) error {
 	return http.ErrUseLastResponse
 }
+
+// CleanAuthCache removes auth cache
+func (c *AuthCnfg) CleanAuthCache() error {
+	parsedURL, err := url.Parse(c.SiteURL)
+	if err != nil {
+		return err
+	}
+	cacheKey := parsedURL.Host + "@adfs@" + c.Username + "@" + c.Password
+	storage.Delete(cacheKey)
+	return nil
+}
