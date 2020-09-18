@@ -71,7 +71,9 @@ func GetAuth(c *AuthCnfg) (string, error) {
 		}
 	}()
 
-	io.Copy(ioutil.Discard, resp.Body)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		return "", err
+	}
 
 	// fmt.Println(resp.StatusCode)
 	authCookie := resp.Header.Get("Set-Cookie") // TODO: parse TMG cookie only (?)
@@ -114,7 +116,9 @@ func detectCookieAuthURL(c *AuthCnfg, siteURL string) (*url.URL, error) {
 		}
 	}()
 
-	io.Copy(ioutil.Discard, resp.Body)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		return nil, err
+	}
 
 	redirect, err := resp.Location()
 	if err != nil {
@@ -125,6 +129,6 @@ func detectCookieAuthURL(c *AuthCnfg, siteURL string) (*url.URL, error) {
 }
 
 // doNotCheckRedirect *http.Client CheckRedirect callback to ignore redirects
-func doNotCheckRedirect(req *http.Request, via []*http.Request) error {
+func doNotCheckRedirect(_ *http.Request, _ []*http.Request) error {
 	return http.ErrUseLastResponse
 }

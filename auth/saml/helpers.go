@@ -189,7 +189,9 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	io.Copy(ioutil.Discard, resp.Body)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		return "", "", err
+	}
 
 	// cookie := resp.Header.Get("Set-Cookie") // TODO: parse FedAuth and rtFa cookies only (?)
 	// fmt.Printf("Cookie: %s\n", cookie)
@@ -353,7 +355,9 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 		}
 	}()
 
-	io.Copy(ioutil.Discard, resp.Body)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		return "", "", err
+	}
 
 	var authCookie string
 	for _, coo := range resp.Cookies() {
@@ -366,6 +370,6 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 }
 
 // doNotCheckRedirect *http.Client CheckRedirect callback to ignore redirects
-func doNotCheckRedirect(req *http.Request, via []*http.Request) error {
+func doNotCheckRedirect(_ *http.Request, _ []*http.Request) error {
 	return http.ErrUseLastResponse
 }

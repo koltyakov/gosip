@@ -26,28 +26,28 @@ func NewAssociatedGroups(client *gosip.SPClient, endpoint string, config *Reques
 }
 
 // Visitors gets web associated visitors group API object
-func (groups *AssociatedGroups) Visitors() *Group {
+func (associatedGroups *AssociatedGroups) Visitors() *Group {
 	return NewGroup(
-		groups.client,
-		fmt.Sprintf("%s/AssociatedVisitorGroup", groups.endpoint),
-		groups.config,
+		associatedGroups.client,
+		fmt.Sprintf("%s/AssociatedVisitorGroup", associatedGroups.endpoint),
+		associatedGroups.config,
 	)
 }
 
 // Members gets web associated members group API object
-func (groups *AssociatedGroups) Members() *Group {
+func (associatedGroups *AssociatedGroups) Members() *Group {
 	return NewGroup(
-		groups.client,
-		fmt.Sprintf("%s/AssociatedMemberGroup", groups.endpoint),
-		groups.config,
+		associatedGroups.client,
+		fmt.Sprintf("%s/AssociatedMemberGroup", associatedGroups.endpoint),
+		associatedGroups.config,
 	)
 }
 
 // Owners gets web associated owners group API object
-func (groups *AssociatedGroups) Owners() *Group {
+func (associatedGroups *AssociatedGroups) Owners() *Group {
 	return NewGroup(
-		groups.client,
-		fmt.Sprintf("%s/AssociatedOwnerGroup", groups.endpoint),
-		groups.config,
+		associatedGroups.client,
+		fmt.Sprintf("%s/AssociatedOwnerGroup", associatedGroups.endpoint),
+		associatedGroups.config,
 	)
 }

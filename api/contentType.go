@@ -46,36 +46,36 @@ func NewContentType(client *gosip.SPClient, endpoint string, config *RequestConf
 }
 
 // ToURL gets endpoint with modificators raw URL
-func (ct *ContentType) ToURL() string {
-	return toURL(ct.endpoint, ct.modifiers)
+func (contentType *ContentType) ToURL() string {
+	return toURL(contentType.endpoint, contentType.modifiers)
 }
 
 // Get gets content type data object
-func (ct *ContentType) Get() (ContentTypeResp, error) {
-	client := NewHTTPClient(ct.client)
-	return client.Get(ct.ToURL(), ct.config)
+func (contentType *ContentType) Get() (ContentTypeResp, error) {
+	client := NewHTTPClient(contentType.client)
+	return client.Get(contentType.ToURL(), contentType.config)
 }
 
 // Update updates Content Types's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.ContentType object
-func (ct *ContentType) Update(body []byte) (ContentTypeResp, error) {
+func (contentType *ContentType) Update(body []byte) (ContentTypeResp, error) {
 	body = patchMetadataType(body, "SP.ContentType")
-	client := NewHTTPClient(ct.client)
-	return client.Update(ct.endpoint, bytes.NewBuffer(body), ct.config)
+	client := NewHTTPClient(contentType.client)
+	return client.Update(contentType.endpoint, bytes.NewBuffer(body), contentType.config)
 }
 
 // Delete deletes a content type skipping recycle bin
-func (ct *ContentType) Delete() error {
-	client := NewHTTPClient(ct.client)
-	_, err := client.Delete(ct.endpoint, ct.config)
+func (contentType *ContentType) Delete() error {
+	client := NewHTTPClient(contentType.client)
+	_, err := client.Delete(contentType.endpoint, contentType.config)
 	return err
 }
 
 // FieldLinks gets FieldLinks API instance queryable collection
-func (ct *ContentType) FieldLinks() *FieldLinks {
+func (contentType *ContentType) FieldLinks() *FieldLinks {
 	return NewFieldLinks(
-		ct.client,
-		fmt.Sprintf("%s/FieldLinks", ct.endpoint),
-		ct.config,
+		contentType.client,
+		fmt.Sprintf("%s/FieldLinks", contentType.endpoint),
+		contentType.config,
 	)
 }

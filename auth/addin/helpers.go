@@ -194,7 +194,9 @@ func getRealm(c *AuthCnfg) (string, error) {
 		}
 	}()
 
-	io.Copy(ioutil.Discard, resp.Body)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		return "", err
+	}
 
 	authHeader := resp.Header.Get("www-authenticate")
 

@@ -190,7 +190,9 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 		}
 	}()
 
-	io.Copy(ioutil.Discard, resp.Body)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		return "", "", err
+	}
 
 	authCookie := resp.Header.Get("Set-Cookie") // FedAuth
 	authCookie = strings.Split(authCookie, ";")[0]
@@ -222,7 +224,9 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	io.Copy(ioutil.Discard, resp.Body)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		return "", "", err
+	}
 
 	// Response location with WAP login endpoint is used to send form auth request
 	redirect, err := resp.Location()
@@ -247,7 +251,9 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	io.Copy(ioutil.Discard, resp.Body)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		return "", "", err
+	}
 
 	// Request to redirect URL using MSISAuth
 	req, err := http.NewRequest("GET", redirectURL, nil)
@@ -274,7 +280,9 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	io.Copy(ioutil.Discard, resp.Body)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		return "", "", err
+	}
 
 	// Yet another redirect using JWT at this point (spUrl?authToken=JWT&client-request-id=)
 	redirect, err = resp.Location()
@@ -300,7 +308,9 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	io.Copy(ioutil.Discard, resp.Body)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		return "", "", err
+	}
 
 	// TODO: get expiry somehow
 	authCookie := resp.Header.Get("Set-Cookie") // EdgeAccessCookie
@@ -332,7 +342,9 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 				}
 			}()
 
-			io.Copy(ioutil.Discard, resp.Body)
+			if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+				return "", "", err
+			}
 
 			cc := *c
 			cc.RelyingParty = resp.Request.URL.Query().Get("wtrealm")
@@ -352,7 +364,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 }
 
 // doNotCheckRedirect *http.Client CheckRedirect callback to ignore redirects
-func doNotCheckRedirect(req *http.Request, via []*http.Request) error {
+func doNotCheckRedirect(_ *http.Request, _ []*http.Request) error {
 	return http.ErrUseLastResponse
 }
 
