@@ -106,6 +106,16 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 
 	// Wait and retry after a delay for error state responses, due to retry policies
 	if retries := c.getRetryPolicy(resp.StatusCode); retries > 0 {
+		// Register retry in OnError hook
+		// otherwise it only called in OnRetry after timeout right before the next call
+		if resp.StatusCode == 429 {
+			noRetry := req.Header.Get("X-Gosip-NoRetry")
+			retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
+			if retry < retries && noRetry != "true" {
+				c.onError(req, reqTime, resp.StatusCode, nil)
+			}
+		}
+
 		// When it should, shouldRetry not only checks but waits before a retry
 		if c.shouldRetry(req, resp, retries) {
 			c.onRetry(req, reqTime, resp.StatusCode, nil)
