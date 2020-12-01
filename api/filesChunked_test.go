@@ -53,13 +53,26 @@ func TestFilesChunked(t *testing.T) {
 		}
 	})
 
-	t.Run("AddChunked", func(t *testing.T) {
+	t.Run("AddChunkedNilFinishPackage", func(t *testing.T) {
 		fileName := fmt.Sprintf("ChunkedFile.txt")
 		content := "1234512345" // with combination of ChunkSize finishUpload package is nil
 		stream := strings.NewReader(content)
 		options := &AddChunkedOptions{
 			Overwrite: true,
 			ChunkSize: 5,
+		}
+		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("AddChunkedZeroSize", func(t *testing.T) {
+		fileName := fmt.Sprintf("ChunkedFile.txt")
+		content := "1234512345"
+		stream := strings.NewReader(content)
+		options := &AddChunkedOptions{
+			Overwrite: true,
+			ChunkSize: 0,
 		}
 		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options); err != nil {
 			t.Error(err)
@@ -78,6 +91,26 @@ func TestFilesChunked(t *testing.T) {
 					return false // cancel upload
 				}
 				return true
+			},
+		}
+		_, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options)
+		if err == nil {
+			t.Error("cancel upload was not handled")
+		}
+		if err != nil && err.Error() != "file upload was canceled" {
+			t.Error(err)
+		}
+	})
+
+	t.Run("AddChunkedImmediateCancel", func(t *testing.T) {
+		fileName := fmt.Sprintf("ChunkedFile.txt")
+		content := "Greater than a chunk content..."
+		stream := strings.NewReader(content)
+		options := &AddChunkedOptions{
+			Overwrite: true,
+			ChunkSize: 5,
+			Progress: func(data *FileUploadProgressData) bool {
+				return false // cancel upload immediately
 			},
 		}
 		_, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options)

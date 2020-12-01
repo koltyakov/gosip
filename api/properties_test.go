@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -62,6 +63,24 @@ func TestProperties(t *testing.T) {
 		}
 	})
 
+	t.Run("GetMultipleProps", func(t *testing.T) {
+		data, err := webProps.GetProps([]string{"vti_defaultlanguage", "vti_associategroups"})
+		if err != nil {
+			t.Error(err)
+		}
+
+		if len(data) != 2 {
+			t.Error("wrong props number")
+		}
+	})
+
+	t.Run("GetNonExistongProps", func(t *testing.T) {
+		_, err := webProps.GetProps([]string{"vti_defaultlanguage", "vti_associategroups_do_not_exist"})
+		if err != nil {
+			t.Error(err)
+		}
+	})
+
 	t.Run("Set", func(t *testing.T) {
 		if err := webProps.Set("test_gosip", time.Now().String()); err != nil {
 			// By default is denied on Modern SPO sites, so ignore in tests
@@ -87,6 +106,10 @@ func TestProperties(t *testing.T) {
 				t.Error(err)
 			}
 		}
+	})
+
+	t.Run("PrintNoScriptWarning", func(t *testing.T) {
+		printNoScriptWarning("https://contoso.sharepoint.com", fmt.Errorf("System.UnauthorizedAccessException"))
 	})
 
 }

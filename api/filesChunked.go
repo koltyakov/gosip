@@ -92,7 +92,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 		if progress.BlockNumber == 0 {
 			progress.Stage = "starting"
 			if !options.Progress(progress) {
-				return nil, cancelUpload(file, uploadID)
+				return nil, fmt.Errorf("file upload was canceled") // cancelUpload(file, uploadID)
 			}
 			fileResp, err := files.Add(name, nil, options.Overwrite)
 			if err != nil {

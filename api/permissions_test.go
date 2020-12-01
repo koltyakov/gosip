@@ -29,4 +29,20 @@ func TestPermissions(t *testing.T) {
 
 	})
 
+	t.Run("EmptyMask", func(t *testing.T) {
+
+		if has := HasPermissions(editPermissions, PermissionKind.EmptyMask); !has {
+			t.Error("should have permissions")
+		}
+
+	})
+
+	t.Run("FullMask", func(t *testing.T) {
+
+		if has := HasPermissions(editPermissions, PermissionKind.FullMask); has {
+			t.Error("should not have permissions")
+		}
+
+	})
+
 }
