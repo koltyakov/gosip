@@ -35,7 +35,7 @@ func TestCustomActions(t *testing.T) {
 	})
 
 	t.Run("Action/AddGetDelete", func(t *testing.T) {
-		info := &map[string]interface{}{
+		info := map[string]interface{}{
 			"Location":    "ScriptLink",
 			"Sequence":    100,
 			"ScriptBlock": "if (console) { console.log(1); }",

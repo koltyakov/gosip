@@ -179,7 +179,7 @@ func (c *SPClient) applyAuth(req *http.Request) (*http.Response, error) {
 // applyHeaders patches request readers for SP API defaults
 func (c *SPClient) applyHeaders(req *http.Request) error {
 	// Inject X-RequestDigest header when needed
-	digestIsRequired := req.Method == "POST" &&
+	digestIsRequired := (req.Method == "POST" || req.Method == "PATCH" || req.Method == "MERGE") &&
 		!strings.Contains(strings.ToLower(req.URL.Path), "/_api/contextinfo") &&
 		req.Header.Get("X-RequestDigest") == ""
 

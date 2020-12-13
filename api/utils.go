@@ -79,6 +79,7 @@ func getConfHeaders(config *RequestConfig) map[string]string {
 	return headers
 }
 
+// patchConfigHeaders patches config headers and returns a copy of config
 func patchConfigHeaders(config *RequestConfig, headers map[string]string) *RequestConfig {
 	conf := &RequestConfig{}
 	if config != nil {

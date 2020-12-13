@@ -2,9 +2,11 @@ package api
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"runtime"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -42,6 +44,8 @@ var requestCntrs = struct {
 }
 
 func init() {
+	readDotEnv()
+
 	ci = os.Getenv("SPAUTH_CI") == "true"
 	skip = os.Getenv("SPAPI_SKIP_TESTS") == "true"
 	heavyTests = os.Getenv("SPAPI_HEAVY_TESTS") == "true"
@@ -127,7 +131,6 @@ func init() {
 
 func resolveCnfgPath(relativePath string) string {
 	_, filename, _, _ := runtime.Caller(1)
-	fmt.Println(filename)
 	return path.Join(path.Dir(filename), "..", relativePath)
 }
 
@@ -144,4 +147,22 @@ func setHeadersPresets() {
 	headers.verbose = HeadersPresets.Verbose
 	headers.minimalmetadata = HeadersPresets.Minimalmetadata
 	headers.nometadata = HeadersPresets.Nometadata
+}
+
+func readDotEnv() {
+	envFilePath := resolveCnfgPath(".env")
+	envFile, err := os.Open(envFilePath)
+	if err != nil {
+		return
+	}
+	defer func() { _ = envFile.Close() }()
+
+	byteValue, _ := ioutil.ReadAll(envFile)
+	keyVals := strings.Split(fmt.Sprintf("%s", byteValue), "\n")
+	for _, keyVal := range keyVals {
+		kv := strings.SplitN(keyVal, "=", 2)
+		if len(kv) == 2 {
+			os.Setenv(kv[0], kv[1])
+		}
+	}
 }

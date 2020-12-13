@@ -58,6 +58,7 @@ steps:
       ENV_SPO_SITEURL: $(ci.spo.siteurl)
       ENV_SPO_USERNAME: $(ci.spo.username)
       ENV_SPO_PASSWORD: $(ci.spo.password)
+      GOSIP_TESTS_WEBHOOKS_URL: $(ci.spo.notificationsUrl)
 
   - script: |
       bash ./test/scripts/cover-merge.sh

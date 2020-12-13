@@ -157,6 +157,15 @@ func (list *List) ContentTypes() *ContentTypes {
 	)
 }
 
+// Subscriptions gets list's subscriptions API instance queryable collection
+func (list *List) Subscriptions() *Subscriptions {
+	return NewSubscriptions(
+		list.client,
+		fmt.Sprintf("%s/Subscriptions", list.endpoint),
+		list.config,
+	)
+}
+
 // Changes gets changes API scoped object
 func (list *List) Changes() *Changes {
 	return NewChanges(
