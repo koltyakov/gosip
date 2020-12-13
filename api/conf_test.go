@@ -170,6 +170,8 @@ func getAllConstructors(spClient *gosip.SPClient) map[string]interface{} {
 		"Roles":            NewRoles(spClient, "", nil),
 		"Search":           NewSearch(spClient, "", nil),
 		"Site":             NewSite(spClient, "", nil),
+		"Subscription":     NewSubscription(spClient, "", nil),
+		"Subscriptions":    NewSubscriptions(spClient, "", nil),
 		"User":             NewUser(spClient, "", nil),
 		"Users":            NewUsers(spClient, "", nil),
 		"Utility":          NewUtility(spClient, "", nil),

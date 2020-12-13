@@ -58,9 +58,9 @@ func NewSubscription(client *gosip.SPClient, endpoint string, config *RequestCon
 }
 
 // Get gets list subscriptions response collection
-func (ss *Subscriptions) Get() ([]*SubscriptionInfo, error) {
-	client := NewHTTPClient(ss.client)
-	resp, err := client.Get(ss.endpoint, ss.config)
+func (subscriptions *Subscriptions) Get() ([]*SubscriptionInfo, error) {
+	client := NewHTTPClient(subscriptions.client)
+	resp, err := client.Get(subscriptions.endpoint, subscriptions.config)
 	if err != nil {
 		return nil, err
 	}
@@ -73,31 +73,31 @@ func (ss *Subscriptions) Get() ([]*SubscriptionInfo, error) {
 }
 
 // GetByID gets list subscription by its ID (GUID)
-func (ss *Subscriptions) GetByID(subscriptionID string) *Subscription {
+func (subscriptions *Subscriptions) GetByID(subscriptionID string) *Subscription {
 	return NewSubscription(
-		ss.client,
-		fmt.Sprintf("%s('%s')", ss.endpoint, subscriptionID),
-		ss.config,
+		subscriptions.client,
+		fmt.Sprintf("%s('%s')", subscriptions.endpoint, subscriptionID),
+		subscriptions.config,
 	)
 }
 
 // Add adds/updates new subscription to a list
-func (ss *Subscriptions) Add(notificationURL string, expiration time.Time, clientState string) (*SubscriptionInfo, error) {
-	client := NewHTTPClient(ss.client)
+func (subscriptions *Subscriptions) Add(notificationURL string, expiration time.Time, clientState string) (*SubscriptionInfo, error) {
+	client := NewHTTPClient(subscriptions.client)
 	payload := map[string]interface{}{
 		"notificationUrl":    notificationURL,
 		"expirationDateTime": expiration,
-		"resource":           strings.Replace(ss.endpoint, getPriorEndpoint(ss.endpoint, "_api"), "", -1),
+		"resource":           strings.Replace(subscriptions.endpoint, getPriorEndpoint(subscriptions.endpoint, "_api"), "", -1),
 		"clientState":        clientState,
 	}
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
-	conf := patchConfigHeaders(ss.config, map[string]string{
+	conf := patchConfigHeaders(subscriptions.config, map[string]string{
 		"Content-Type": "application/json",
 	})
-	resp, err := client.Post(ss.endpoint, bytes.NewBuffer(body), conf)
+	resp, err := client.Post(subscriptions.endpoint, bytes.NewBuffer(body), conf)
 	if err != nil {
 		return nil, err
 	}
@@ -110,61 +110,61 @@ func (ss *Subscriptions) Add(notificationURL string, expiration time.Time, clien
 }
 
 // Get gets subscription info
-func (s *Subscription) Get() (*SubscriptionInfo, error) {
-	client := NewHTTPClient(s.client)
-	resp, err := client.Get(s.endpoint, s.config)
+func (subscription *Subscription) Get() (*SubscriptionInfo, error) {
+	client := NewHTTPClient(subscription.client)
+	resp, err := client.Get(subscription.endpoint, subscription.config)
 	if err != nil {
 		return nil, err
 	}
-	return s.parseResponse(resp)
+	return subscription.parseResponse(resp)
 }
 
 // Delete deletes a subscription by its ID (GUID)
-func (s *Subscription) Delete() error {
-	client := NewHTTPClient(s.client)
-	_, err := client.Delete(s.endpoint, s.config)
+func (subscription *Subscription) Delete() error {
+	client := NewHTTPClient(subscription.client)
+	_, err := client.Delete(subscription.endpoint, subscription.config)
 	return err
 }
 
 // Update updates a subscription
-func (s *Subscription) Update(metadata map[string]interface{}) (*SubscriptionInfo, error) {
-	client := NewHTTPClient(s.client)
+func (subscription *Subscription) Update(metadata map[string]interface{}) (*SubscriptionInfo, error) {
+	client := NewHTTPClient(subscription.client)
 	body, err := json.Marshal(metadata)
 	if err != nil {
 		return nil, err
 	}
-	conf := patchConfigHeaders(s.config, map[string]string{
+	conf := patchConfigHeaders(subscription.config, map[string]string{
 		"Content-Type": "application/json",
 	})
-	if _, err := client.Update(s.endpoint, bytes.NewBuffer(body), conf); err != nil {
+	if _, err := client.Update(subscription.endpoint, bytes.NewBuffer(body), conf); err != nil {
 		return nil, err
 	}
-	return s.Get()
+	return subscription.Get()
 }
 
 // SetExpiration sets new expiration datetime
-func (s *Subscription) SetExpiration(expiration time.Time) (*SubscriptionInfo, error) {
-	return s.Update(map[string]interface{}{
+func (subscription *Subscription) SetExpiration(expiration time.Time) (*SubscriptionInfo, error) {
+	return subscription.Update(map[string]interface{}{
 		"expirationDateTime": expiration,
 	})
 }
 
 // SetNotificationURL sets new notification URL state
-func (s *Subscription) SetNotificationURL(notificationURL string) (*SubscriptionInfo, error) {
-	return s.Update(map[string]interface{}{
+func (subscription *Subscription) SetNotificationURL(notificationURL string) (*SubscriptionInfo, error) {
+	return subscription.Update(map[string]interface{}{
 		"notificationUrl": notificationURL,
 	})
 }
 
 // SetClientState sets new client state
-func (s *Subscription) SetClientState(clientState string) (*SubscriptionInfo, error) {
-	return s.Update(map[string]interface{}{
+func (subscription *Subscription) SetClientState(clientState string) (*SubscriptionInfo, error) {
+	return subscription.Update(map[string]interface{}{
 		"clientState": clientState,
 	})
 }
 
 // parseResponse normalize and unmarshal subscription info response
-func (s *Subscription) parseResponse(bytes []byte) (*SubscriptionInfo, error) {
+func (subscription *Subscription) parseResponse(bytes []byte) (*SubscriptionInfo, error) {
 	data := NormalizeODataItem(bytes)
 	var sub *SubscriptionInfo
 	if err := json.Unmarshal(data, &sub); err != nil {

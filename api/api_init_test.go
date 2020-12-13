@@ -162,7 +162,7 @@ func readDotEnv() {
 	for _, keyVal := range keyVals {
 		kv := strings.SplitN(keyVal, "=", 2)
 		if len(kv) == 2 {
-			os.Setenv(kv[0], kv[1])
+			_ = os.Setenv(kv[0], kv[1])
 		}
 	}
 }

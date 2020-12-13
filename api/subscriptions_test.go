@@ -36,6 +36,20 @@ func TestSubscriptions(t *testing.T) {
 		subID = sub.ID
 	})
 
+	t.Run("Add#ExpirationInThePast", func(t *testing.T) {
+		expiration := time.Now().AddDate(0, 0, -1)
+		if _, err := list.Subscriptions().Add(notificationURL, expiration, ""); err == nil {
+			t.Error("should fail due to expiration limitation 'not in the past'")
+		}
+	})
+
+	t.Run("Add#MoreThan6Months", func(t *testing.T) {
+		expiration := time.Now().AddDate(0, 6, 10)
+		if _, err := list.Subscriptions().Add(notificationURL, expiration, ""); err == nil {
+			t.Error("should fail due to expiration limitation 'no more than 6 month'")
+		}
+	})
+
 	t.Run("GetByID", func(t *testing.T) {
 		sub, err := list.Subscriptions().GetByID(subID).Get()
 		if err != nil {
@@ -47,6 +61,12 @@ func TestSubscriptions(t *testing.T) {
 			return
 		}
 		subID = sub.ID
+	})
+
+	t.Run("GetByID#WrongID", func(t *testing.T) {
+		if _, err := list.Subscriptions().GetByID("WrongID").Get(); err == nil {
+			t.Error("should fail with wrong id")
+		}
 	})
 
 	t.Run("SetExpiration", func(t *testing.T) {
