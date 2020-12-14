@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -12,6 +11,8 @@ import (
 
 //go:generate ggen -ent Subscriptions -item Subscription -conf -coll
 //go:generate ggen -ent Subscription -conf
+
+// API reference: https://docs.microsoft.com/en-us/sharepoint/dev/apis/webhooks/lists/overview-sharepoint-list-webhooks
 
 // Subscriptions represent SharePoint lists Subscriptions API queryable collection struct
 // Always use NewSubscriptions constructor instead of &Subscriptions{}
@@ -31,12 +32,17 @@ type Subscription struct {
 
 // SubscriptionInfo list subscription info
 type SubscriptionInfo struct {
-	ID                 string    `json:"id"`
-	NotificationURL    string    `json:"notificationUrl"`
+	ID string `json:"id"`
+	// The service URL to send notifications to
+	NotificationURL string `json:"notificationUrl"`
+	// The date the notification will expire and be deleted
 	ExpirationDateTime time.Time `json:"expirationDateTime"`
-	Resource           string    `json:"resource"`
-	ClientState        string    `json:"clientState"`
-	ResourceData       string    `json:"resourceData"`
+	// The URL of the list to receive notifications from
+	Resource string `json:"resource"`
+	// Optional. Opaque string passed back to the client on all notifications.
+	// You can use this for validating notifications or tagging different subscriptions.
+	ClientState  string `json:"clientState"`
+	ResourceData string `json:"resourceData"`
 }
 
 // NewSubscriptions - Subscriptions struct constructor function
@@ -87,7 +93,7 @@ func (subscriptions *Subscriptions) Add(notificationURL string, expiration time.
 	payload := map[string]interface{}{
 		"notificationUrl":    notificationURL,
 		"expirationDateTime": expiration,
-		"resource":           strings.Replace(subscriptions.endpoint, getPriorEndpoint(subscriptions.endpoint, "_api"), "", -1),
+		"resource":           getPriorEndpoint(subscriptions.endpoint, "/subscriptions"),
 		"clientState":        clientState,
 	}
 	body, err := json.Marshal(payload)

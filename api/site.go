@@ -121,6 +121,16 @@ func (site *Site) OpenWebByID(webID string) (WebResp, error) {
 	return client.Post(endpoint, nil, site.config)
 }
 
+// WebByID gets a Web API object by its ID (GUID)
+func (site *Site) WebByID(webID string) (*Web, error) {
+	w, err := site.OpenWebByID(webID)
+	if err != nil {
+		return nil, err
+	}
+	endpoint := fmt.Sprintf("%s/_api/Web", w.Data().URL)
+	return NewWeb(site.client, endpoint, site.config), nil
+}
+
 // Features gets Features API instance queryable collection for this Site
 func (site *Site) Features() *Features {
 	endpoint := fmt.Sprintf("%s/Features", site.endpoint)

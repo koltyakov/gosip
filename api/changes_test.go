@@ -120,10 +120,23 @@ func TestChanges(t *testing.T) {
 		}
 	})
 
+	t.Run("GetChangeType#Add", func(t *testing.T) {
+		changeName := list.Changes().GetChangeType(1)
+		if changeName != "Add" {
+			t.Error("incorrect change type")
+		}
+	})
+
+	t.Run("GetChangeType#Unknown", func(t *testing.T) {
+		changeName := list.Changes().GetChangeType(41)
+		if changeName != "Unknown" {
+			t.Error("incorrect change type")
+		}
+	})
+
 	if err := list.Delete(); err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestChangesPagination(t *testing.T) {
@@ -174,11 +187,9 @@ func TestChangesPagination(t *testing.T) {
 		if changesFirstPage.Data()[0].ChangeToken.StringValue == changesSecondPage.Data()[0].ChangeToken.StringValue {
 			t.Error("should be different change tokens")
 		}
-
 	})
 
 	if err := list.Delete(); err != nil {
 		t.Error(err)
 	}
-
 }

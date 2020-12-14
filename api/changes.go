@@ -164,3 +164,34 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) (*ChangesResp, erro
 
 	return result, nil
 }
+
+// GetChangeType gets verbose change type
+// https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-csom/ee543793(v%3Doffice.15)
+func (changes *Changes) GetChangeType(changeType int) string {
+	changeTypes := map[int]string{
+		0:  "NoChange",         // Enumeration whose values indicate that no change has taken place. The value = 0.
+		1:  "Add",              // Enumeration whose values specify that an object has been added within the scope of a list, site, site collection, or content database. The value = 1.
+		2:  "Update",           // Enumeration whose values specify that an object has been modified within the scope of a list, site, site collection, or content database. The value = 2.
+		3:  "DeleteObject",     // Enumeration whose values specify that an object has been deleted within the scope of a list, site, site collection, or content database. The value = 3.
+		4:  "Rename",           // Enumeration whose values specify that the leaf in a URL has been renamed. The value = 4.
+		5:  "MoveAway",         // Enumeration whose values specify that a non-leaf section within a URL has been renamed. The object was moved away from the location within the site specified by the change. The value = 5.
+		6:  "MoveInto",         // Enumeration whose values specify that a non-leaf section within a URL has been renamed. The object was moved into the location within the site specified by the change. The value = 6.
+		7:  "Restore",          // Enumeration whose values specify that an object has restored from a backup or from the recycle bin. The value = 7.
+		8:  "RoleAdd",          // Enumeration whose values specify that a role definition has been added. The value = 8.
+		9:  "RoleDelete",       // Enumeration whose values specify that a role definition has been deleted. The value = 9.
+		10: "RoleUpdate",       // Enumeration whose values specify that a role definition has been updated. The value = 10.
+		11: "AssignmentAdd",    // Enumeration whose values specify that a user has been given permissions to a list. The value = 11. The list must have unique permissions enabled.
+		12: "AssignmentDelete", // Enumeration whose values specify that a user has lost permissions to a list. The value = 12. The list must have unique permissions enabled.
+		13: "MemberAdd",        // Enumeration whose values specify that a user has been added to a group. The value = 13.
+		14: "MemberDelete",     // Enumeration whose values specify that a user has been removed from a group. The value = 14.
+		15: "SystemUpdate",     // Enumeration whose values specify that a change has been made to an item using the SystemUpdate method. The value = 15.
+		16: "Navigation",       // Enumeration whose values specify that a change in the navigation structure of a site collection has been made. The value = 16.
+		17: "ScopeAdd",         // Enumeration whose values specify that a change in permissions scope has been made to break inheritance from an object’s parent. The value = 17.
+		18: "ScopeDelete",      // Enumeration whose values specify that a change in permissions scope has been made to revert back to inheriting permissions from an object’s parent. The value = 18.
+	}
+	changeName := changeTypes[changeType]
+	if len(changeName) == 0 {
+		changeName = "Unknown"
+	}
+	return changeName
+}

@@ -77,6 +77,28 @@ func TestSite(t *testing.T) {
 		}
 	})
 
+	t.Run("WebByID", func(t *testing.T) {
+		data0, err := site.RootWeb().Select("Id").Conf(headers.verbose).Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if data0.Data().ID == "" {
+			t.Error("can't get root web id property")
+		}
+
+		web, err := site.WebByID(data0.Data().ID)
+		if err != nil {
+			t.Error(err)
+		}
+		data, err := web.Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if data.Data().ID == "" {
+			t.Error("can't open web by id property")
+		}
+	})
+
 	t.Run("Owner", func(t *testing.T) {
 		if _, err := site.Owner().Get(); err != nil {
 			t.Error(err)
