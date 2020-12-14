@@ -14,7 +14,7 @@ func TestEventReceivers(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if receivers[0].ReceiverID == "" {
+		if receivers != nil && receivers[0].ReceiverID == "" {
 			t.Error("can't get event receivers")
 		}
 	})
@@ -24,7 +24,7 @@ func TestEventReceivers(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if receivers[0].ReceiverID == "" {
+		if receivers != nil && receivers[0].ReceiverID == "" {
 			t.Error("can't get event receivers")
 		}
 	})
