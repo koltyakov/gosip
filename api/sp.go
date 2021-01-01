@@ -67,6 +67,11 @@ func (sp *SP) Profiles() *Profiles {
 	)
 }
 
+// Taxonomy getter
+func (sp *SP) Taxonomy() *Taxonomy {
+	return NewTaxonomy(sp.client, sp.ToURL(), sp.config)
+}
+
 // ContextInfo gets current Context Info object data
 func (sp *SP) ContextInfo() (*ContextInfo, error) {
 	return NewContext(sp.client, sp.ToURL(), sp.config).Get()

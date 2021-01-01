@@ -48,6 +48,39 @@ func NewActionMethod(methodName string, parameters []string) Action {
 	`, methodName, trimMultiline(params)))
 }
 
+// NewQueryWithProps creates CSOM XML query node builder instance
+func NewQueryWithProps(properties []string) Action {
+	props := ""
+	for _, prop := range properties {
+		props += prop
+	}
+	return NewAction(fmt.Sprintf(`
+		<Query Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
+			<Query SelectAllProperties="true">
+				<Properties>%s</Properties>
+			</Query>
+		</Query>
+	`, trimMultiline(props)))
+}
+
+// NewQueryWithChildProps creates CSOM XML query node builder instance
+func NewQueryWithChildProps(properties []string) Action {
+	props := ""
+	for _, prop := range properties {
+		props += prop
+	}
+	return NewAction(fmt.Sprintf(`
+		<Query Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
+			<Query SelectAllProperties="true">
+				<Properties />
+			</Query>
+			<ChildItemQuery SelectAllProperties="true">
+				<Properties>%s</Properties>
+			</ChildItemQuery>
+		</Query>
+	`, trimMultiline(props)))
+}
+
 // String stringifies an action
 func (a *action) String() string {
 	a.err = nil

@@ -35,7 +35,28 @@ func TestSP(t *testing.T) {
 	t.Run("Utility", func(t *testing.T) {
 		sp := NewSP(spClient)
 		if sp.Utility() == nil {
-			t.Errorf("failed to get Site object")
+			t.Errorf("failed to get Utility object")
+		}
+	})
+
+	t.Run("Search", func(t *testing.T) {
+		sp := NewSP(spClient)
+		if sp.Search() == nil {
+			t.Errorf("failed to get Search object")
+		}
+	})
+
+	t.Run("Profiles", func(t *testing.T) {
+		sp := NewSP(spClient)
+		if sp.Profiles() == nil {
+			t.Errorf("failed to get Profiles object")
+		}
+	})
+
+	t.Run("Taxonomy", func(t *testing.T) {
+		sp := NewSP(spClient)
+		if sp.Taxonomy() == nil {
+			t.Errorf("failed to get Taxonomy object")
 		}
 	})
 

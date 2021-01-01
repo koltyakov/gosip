@@ -12,6 +12,7 @@ type Builder interface {
 	AddAction(action Action, parent Object) (Action, Object) // adds Action node to CSOM XML package
 	GetObjectID(object Object) (int, error)                  // gets provided object's ID, the object should be a pointer to already added ObjectPath node
 	Compile() (string, error)                                // compiles CSOM XML package
+	Clone() Builder                                          // returns object clone
 }
 
 type builder struct {
@@ -120,6 +121,18 @@ func (b *builder) Compile() (string, error) {
 		return csomPkg, fmt.Errorf(errStr)
 	}
 	return csomPkg, nil
+}
+
+// Clone clones CSOM builder object
+func (b *builder) Clone() Builder {
+	nb := &builder{}
+	for _, object := range b.objects {
+		nb.objects = append(nb.objects, object)
+	}
+	for _, action := range b.actions {
+		nb.actions = append(nb.actions, action)
+	}
+	return nb
 }
 
 // nextObjectID calculates the ID for the next object

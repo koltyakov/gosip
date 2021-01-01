@@ -80,3 +80,18 @@ func TestCSOMCompileError(t *testing.T) {
 		t.Error("should throw an error")
 	}
 }
+
+func TestCSOMClone(t *testing.T) {
+	b := NewBuilder().(*builder)
+
+	b.AddObject(NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
+	b.AddAction(NewAction(`<Query Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`), nil)
+
+	nb := b.Clone().(*builder)
+	b.AddObject(NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
+	b.AddAction(NewAction(`<Query Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`), nil)
+
+	if len(b.objects) == len(nb.objects) || len(b.actions) == len(nb.actions) {
+		t.Error("error cloning CSOM builder")
+	}
+}

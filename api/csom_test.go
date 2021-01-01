@@ -15,13 +15,7 @@ func TestCsomRequest(t *testing.T) {
 	b := csom.NewBuilder()
 
 	b.AddObject(csom.NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
-	b.AddAction(csom.NewAction(`
-		<Query Id="{{.ID}}" ObjectPathId="{{.ObjectID}}">
-			<Query SelectAllProperties="true">
-				<Properties />
-			</Query>
-		</Query>
-	`), nil)
+	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
 
 	csomXML, err := b.Compile()
 	if err != nil {
