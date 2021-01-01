@@ -122,7 +122,7 @@ func TestTaxonomy(t *testing.T) {
 		ts := tsData[0]
 
 		t.Run("ByID", func(t *testing.T) {
-			data, err := taxonomy.TermStore().GetTermSet(ts["Id"].(string)).Get()
+			data, err := taxonomy.TermStore().GetTermSet(ts["Id"].(string)).Select("Id").Get()
 			if err != nil {
 				t.Errorf("can't get term set by ID, %s\n", err)
 			}
@@ -132,7 +132,7 @@ func TestTaxonomy(t *testing.T) {
 		})
 
 		t.Run("Terms/GetAll", func(t *testing.T) {
-			_, err := taxonomy.TermStore().GetTermSet(ts["Id"].(string)).Terms().GetAll()
+			_, err := taxonomy.TermStore().GetTermSet(ts["Id"].(string)).Terms().Select("Id,Name").GetAll()
 			if err != nil {
 				t.Errorf("%s", err)
 			}

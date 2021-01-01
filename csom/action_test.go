@@ -75,4 +75,26 @@ func TestAction(t *testing.T) {
 		}
 	})
 
+	t.Run("NewQueryWithChildProps", func(t *testing.T) {
+		shouldBe := trimMultiline(`<Query Id="2" ObjectPathId="1">
+			<Query SelectAllProperties="true">
+				<Properties />
+			</Query>
+			<ChildItemQuery SelectAllProperties="true">
+				<Properties>
+					<Property />
+				</Properties>
+			</ChildItemQuery>
+		</Query>`)
+		o := NewQueryWithChildProps([]string{"<Property />"})
+		o.SetID(2)
+		o.SetObjectID(1)
+		if o.String() != shouldBe {
+			t.Error("wrong object property")
+		}
+		if err := o.CheckErr(); err != nil {
+			t.Error(err)
+		}
+	})
+
 }
