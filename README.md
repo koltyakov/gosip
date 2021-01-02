@@ -27,12 +27,6 @@
 
 ### Supported auth strategies
 
-- SharePoint On-Premises 2019/2016/2013:
-  - User credentials (NTLM)
-  - ADFS user credentials (ADFS, WAP -> Basic/NTLM, WAP -> ADFS)
-  - Behind a reverse proxy (Forefront TMG, WAP -> Basic/NTLM, WAP -> ADFS)
-  - Form-based authentication (FBA)
-  - On-Demand auth [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/ondemand)
 - SharePoint Online:
   - SAML based with user credentials
   - Add-In only permissions
@@ -40,7 +34,12 @@
   - On-Demand auth [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/ondemand)
   - Azure Certificate (App Only) [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/azureenv)
   - Azure AD Device flow [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/device)
-
+- SharePoint On-Premises 2019/2016/2013:
+  - User credentials (NTLM)
+  - ADFS user credentials (ADFS, WAP -> Basic/NTLM, WAP -> ADFS)
+  - Behind a reverse proxy (Forefront TMG, WAP -> Basic/NTLM, WAP -> ADFS)
+  - Form-based authentication (FBA)
+  - On-Demand auth [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/ondemand)
 ## Installation
 
 ```bash
@@ -243,14 +242,16 @@ Auth strategy should be selected corresponding to your SharePoint environment an
 
 Import path `strategy "github.com/koltyakov/gosip/auth/{strategy}"`. Where `/{strategy}` stands for a strategy auth package.
 
-`/{strategy}` | SPO     | On-Prem | Credentials sample(s)
---------------|---------|---------|-------------------
-`/saml`       | ✅      | ❌     | [sample](./config/samples/private.spo-user.json)
-`/addin`      | ✅      | ❌     | [sample](./config/samples/private.spo-addin.json)
-`/ntlm`       | ❌      | ✅     | [sample](./config/samples/private.onprem-ntlm.json)
-`/adfs`       | ✅      | ✅     | [spo](./config/samples/private.spo-adfs.json), [on-prem](./config/samples/private.onprem-adfs.json), [on-prem (wap)](./config/samples/private.onprem-wap.json)
-`/fba`        | ❌      | ✅     | [sample](./config/samples/private.onprem-fba.json)
-`/tmg`        | ❌      | ✅     | [sample](./config/samples/private.onprem-tmg.json)
+`/{strategy}`   | SPO     | On-Prem | Credentials sample(s)
+----------------|---------|---------|-------------------
+AAD `/azureenv` | ✅      | ❌       | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/azureenv)
+AAD `/device`   | ✅      | ❌       | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/device)
+`/saml`         | ✅      | ❌       | [sample](./config/samples/private.spo-user.json)
+`/addin`        | ✅      | ❌       | [sample](./config/samples/private.spo-addin.json)
+`/ntlm`         | ❌      | ✅       | [sample](./config/samples/private.onprem-ntlm.json)
+`/adfs`         | ✅      | ✅       | [spo](./config/samples/private.spo-adfs.json), [on-prem](./config/samples/private.onprem-adfs.json), [on-prem (wap)](./config/samples/private.onprem-wap.json)
+`/fba`          | ❌      | ✅       | [sample](./config/samples/private.onprem-fba.json)
+`/tmg`          | ❌      | ✅       | [sample](./config/samples/private.onprem-tmg.json)
 
 JSON and struct representations are different in terms of language notations. So credentials parameters names in `private.json` files and declared as structs initiators vary.
 
