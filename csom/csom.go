@@ -64,7 +64,7 @@ func (b *builder) AddAction(action Action, object Object) (Action, Object) {
 	return action, object
 }
 
-// GetObject gets CSOM builder objects array
+// GetObjects gets CSOM builder objects array
 func (b *builder) GetObjects() []Object {
 	var objects []Object
 	for _, edge := range b.objects {

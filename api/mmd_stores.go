@@ -14,7 +14,7 @@ type TermStores struct {
 	endpoint string
 }
 
-// DefaultStore gets default site collection term store object
+// Default gets default site collection term store object
 func (termStores *TermStores) Default() *TermStore {
 	return &TermStore{
 		client:   termStores.client,
@@ -28,7 +28,7 @@ func (termStores *TermStores) Default() *TermStore {
 	}
 }
 
-// StoreByID gets term store object by ID
+// GetByID gets term store object by ID
 func (termStores *TermStores) GetByID(storeGUID string) *TermStore {
 	return &TermStore{
 		client:   termStores.client,
@@ -42,7 +42,7 @@ func (termStores *TermStores) GetByID(storeGUID string) *TermStore {
 	}
 }
 
-// StoreByName gets term store object by Name
+// GetByName gets term store object by Name
 func (termStores *TermStores) GetByName(storeName string) *TermStore {
 	return &TermStore{
 		client:   termStores.client,
