@@ -11,5 +11,7 @@
   "files.exclude": {
     "**/*_test.go": false,
     "**/*_gen.go": true
-  }
+  },
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": false
 }

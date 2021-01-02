@@ -35,19 +35,6 @@ func NewActionIdentityQuery() Action {
 	return NewAction(`<ObjectIdentityQuery Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" />`)
 }
 
-// NewActionMethod creates CSOM XML action node builder instance
-func NewActionMethod(methodName string, parameters []string) Action {
-	params := ""
-	for _, param := range parameters {
-		params += param
-	}
-	return NewAction(fmt.Sprintf(`
-		<Method Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" Name="%s">
-			<Parameters>%s</Parameters>
-		</Method>
-	`, methodName, trimMultiline(params)))
-}
-
 // NewQueryWithProps creates CSOM XML query node builder instance
 func NewQueryWithProps(properties []string) Action {
 	props := ""
@@ -79,6 +66,19 @@ func NewQueryWithChildProps(properties []string) Action {
 			</ChildItemQuery>
 		</Query>
 	`, trimMultiline(props)))
+}
+
+// NewActionMethod creates CSOM XML action node builder instance
+func NewActionMethod(methodName string, parameters []string) Action {
+	params := ""
+	for _, param := range parameters {
+		params += param
+	}
+	return NewAction(fmt.Sprintf(`
+		<Method Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" Name="%s">
+			<Parameters>%s</Parameters>
+		</Method>
+	`, methodName, trimMultiline(params)))
 }
 
 // String stringifies an action
