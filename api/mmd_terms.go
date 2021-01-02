@@ -14,7 +14,6 @@ type Terms struct {
 	endpoint string
 
 	csomEntry   csom.Builder
-	termSet     *TermSet
 	selectProps []string
 }
 
@@ -41,7 +40,7 @@ func (terms *Terms) GetAll() ([]map[string]interface{}, error) {
 		props = append(props, propertyXML)
 	}
 
-	b := terms.termSet.csomBuilderEntry().Clone()
+	b := terms.csomBuilderEntry().Clone()
 	b.AddObject(csom.NewObjectMethod("GetAllTerms", []string{}), nil)
 	b.AddAction(csom.NewQueryWithChildProps(props), nil)
 
@@ -77,6 +76,19 @@ func (terms *Terms) GetByID(termGUID string) *Term {
 		csomEntry:   terms.csomEntry,
 		selectProps: []string{},
 	}
+}
+
+// Add creates new term
+func (terms *Terms) Add(name string, lang int, guid string) (map[string]interface{}, error) {
+	b := terms.csomBuilderEntry().Clone()
+	b.AddObject(csom.NewObjectMethod("CreateTerm", []string{
+		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, name),
+		fmt.Sprintf(`<Parameter Type="Number">%d</Parameter>`, lang),
+		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, guid),
+	}), nil)
+	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
+
+	return getCSOMResponse(terms.client, terms.endpoint, terms.config, b)
 }
 
 /* Term */
@@ -123,4 +135,30 @@ func (term *Term) Get() (map[string]interface{}, error) {
 	b.AddAction(csom.NewQueryWithProps(props), nil)
 
 	return getCSOMResponse(term.client, term.endpoint, term.config, b)
+}
+
+// Update sets term's properties
+func (term *Term) Update(properties map[string]interface{}) (map[string]interface{}, error) {
+	b := term.csomBuilderEntry().Clone()
+	objects := b.GetObjects() // get parent from all objects
+	termObject := objects[len(objects)-1]
+	var scalarProperties []string
+	for prop, value := range properties {
+		valueXML := fmt.Sprintf("%s", value)
+		if strings.Index(prop, "<") == -1 {
+			valueXML = fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, value)
+		}
+		b.AddAction(csom.NewSetProperty(prop, valueXML), termObject)
+		scalarProperties = append(scalarProperties, fmt.Sprintf(`<Property Name="%s" ScalarProperty="true" />`, prop))
+	}
+	b.AddAction(csom.NewQueryWithProps(scalarProperties), termObject)
+	return getCSOMResponse(term.client, term.endpoint, term.config, b)
+}
+
+// Delete deletes term object
+func (term *Term) Delete() error {
+	b := term.csomBuilderEntry().Clone()
+	b.AddAction(csom.NewActionMethod("DeleteObject", []string{}), nil)
+	_, err := getCSOMResponse(term.client, term.endpoint, term.config, b)
+	return err
 }

@@ -64,6 +64,17 @@ func TestCSOMGetObjectID(t *testing.T) {
 	}
 }
 
+func TestCSOMGetObjects(t *testing.T) {
+	b := NewBuilder()
+
+	b.AddObject(NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`), nil)
+	b.AddObject(NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Lists" />`), nil)
+
+	if len(b.GetObjects()) != 3 {
+		t.Error("wrong objects count")
+	}
+}
+
 func TestCSOMCompileError(t *testing.T) {
 	b := NewBuilder()
 

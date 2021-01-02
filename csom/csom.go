@@ -13,6 +13,7 @@ type Builder interface {
 	GetObjectID(object Object) (int, error)                  // gets provided object's ID, the object should be a pointer to already added ObjectPath node
 	Compile() (string, error)                                // compiles CSOM XML package
 	Clone() Builder                                          // returns object clone
+	GetObjects() []Object                                    // get CSOM objects array
 }
 
 type builder struct {
@@ -61,6 +62,15 @@ func (b *builder) AddAction(action Action, object Object) (Action, Object) {
 		Object: object,
 	})
 	return action, object
+}
+
+// GetObject gets CSOM builder objects array
+func (b *builder) GetObjects() []Object {
+	var objects []Object
+	for _, edge := range b.objects {
+		objects = append(objects, edge.Current)
+	}
+	return objects
 }
 
 // GetObjectID gets provided object's ID, the object should be a pointer to already added ObjectPath node

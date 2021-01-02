@@ -124,7 +124,6 @@ func (termSet *TermSet) Terms() *Terms {
 		config:   termSet.config,
 
 		csomEntry:   termSet.csomBuilderEntry().Clone(),
-		termSet:     termSet,
 		selectProps: []string{},
 	}
 }

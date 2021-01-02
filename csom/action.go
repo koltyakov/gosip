@@ -81,6 +81,12 @@ func NewActionMethod(methodName string, parameters []string) Action {
 	`, methodName, trimMultiline(params)))
 }
 
+// NewSetProperty creates CSOM XML set property action node builder instance
+func NewSetProperty(propertyName string, parameter string) Action {
+	// <Parameter Type="String">%s</Parameter>
+	return NewAction(fmt.Sprintf(`<SetProperty Id="{{.ID}}" ObjectPathId="{{.ObjectID}}" Name="%s">%s</SetProperty>`, propertyName, parameter))
+}
+
 // String stringifies an action
 func (a *action) String() string {
 	a.err = nil

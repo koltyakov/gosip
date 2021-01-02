@@ -97,4 +97,17 @@ func TestAction(t *testing.T) {
 		}
 	})
 
+	t.Run("NewSetProperty", func(t *testing.T) {
+		shouldBe := `<SetProperty Id="2" ObjectPathId="1" Name="Name"><Parameter Type="String">Test</Parameter></SetProperty>`
+		o := NewSetProperty("Name", `<Parameter Type="String">Test</Parameter>`)
+		o.SetID(2)
+		o.SetObjectID(1)
+		if o.String() != shouldBe {
+			t.Error("wrong object property")
+		}
+		if err := o.CheckErr(); err != nil {
+			t.Error(err)
+		}
+	})
+
 }

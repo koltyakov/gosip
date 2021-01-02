@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func TestTaxonomyStores(t *testing.T) {
@@ -171,6 +173,57 @@ func TestTaxonomyTerms(t *testing.T) {
 		if termGUID != termInfo["Id"].(string) {
 			t.Error("unexpected term ID")
 		}
+	})
+
+	t.Run("Terms/CRUD", func(t *testing.T) {
+		tsInfo, err := taxonomy.Stores().Default().Select("DefaultLanguage").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		lang := int(tsInfo["DefaultLanguage"].(float64))
+
+		newTermGUID := uuid.New().String()
+		newTermName := "Delete me " + newTermGUID
+
+		t.Run("Add", func(t *testing.T) {
+			termInfo, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Terms().Add(newTermName, lang, newTermGUID)
+			if err != nil {
+				t.Error(err)
+			}
+			if newTermGUID != trimTaxonomyGUID(termInfo["Id"].(string)) {
+				t.Error("unexpected term ID")
+			}
+		})
+
+		t.Run("Add#FailAddingADuplicate", func(t *testing.T) {
+			if _, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Terms().Add(newTermName, lang, newTermGUID); err == nil {
+				t.Error("should fail with duplicate error message")
+			}
+		})
+
+		t.Run("Get", func(t *testing.T) {
+			if _, err := taxonomy.Stores().Default().Terms().GetByID(newTermGUID).Get(); err != nil {
+				t.Error(err)
+			}
+		})
+
+		t.Run("Update", func(t *testing.T) {
+			updateTermName := newTermName + " (updated)"
+			props := map[string]interface{}{"Name": updateTermName}
+			termAfterUpdate, err := taxonomy.Stores().Default().Terms().GetByID(newTermGUID).Update(props)
+			if err != nil {
+				t.Error(err)
+			}
+			if termAfterUpdate["Name"].(string) != updateTermName {
+				t.Error("failed to update term name")
+			}
+		})
+
+		t.Run("Delete", func(t *testing.T) {
+			if err := taxonomy.Stores().Default().Terms().GetByID(newTermGUID).Delete(); err != nil {
+				t.Error(err)
+			}
+		})
 	})
 }
 
