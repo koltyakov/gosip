@@ -171,6 +171,38 @@ func (term *Term) Deprecate(deprecate bool) error {
 	return err
 }
 
+// Move moves a term to a new location
+// use empty `termGUID` to move to a root term store level
+func (term *Term) Move(termSetGUID string, termGUID string) error {
+	termSetGUID = trimTaxonomyGUID(termSetGUID)
+	termGUID = trimTaxonomyGUID(termGUID)
+
+	b := term.csomBuilderEntry().Clone()
+	objs := b.GetObjects()
+
+	storeObj := objs[2] // 3rd object is always term store
+	childTermObj := objs[len(objs)-1]
+
+	parentObj, _ := b.AddObject(csom.NewObjectMethod("GetTermSet", []string{
+		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, termSetGUID),
+	}), storeObj)
+
+	if len(termGUID) > 0 {
+		parentObj, _ = b.AddObject(csom.NewObjectMethod("GetTerm", []string{
+			fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, termGUID),
+		}), storeObj)
+	}
+
+	_, _ = b.Compile() // generate ID numbers
+
+	b.AddAction(csom.NewActionMethod("Move", []string{
+		fmt.Sprintf(`<Parameter ObjectPathId="%d" />`, parentObj.GetID()),
+	}), childTermObj)
+
+	_, err := getCSOMResponse(term.client, term.endpoint, term.config, b)
+	return err
+}
+
 // Terms gets sub-terms object instance
 func (term *Term) Terms() *Terms {
 	return &Terms{

@@ -165,7 +165,7 @@ func TestTaxonomyTermSets(t *testing.T) {
 		}
 	})
 
-	t.Run("Terms/GetAllTerms", func(t *testing.T) {
+	t.Run("GetAllTerms", func(t *testing.T) {
 		_, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Select("Id,Name").GetAllTerms()
 		if err != nil {
 			t.Errorf("%s", err)
@@ -231,7 +231,8 @@ func TestTaxonomyTerms(t *testing.T) {
 	})
 
 	t.Run("TermSet/GetByID", func(t *testing.T) {
-		termInfo, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Terms().GetByID(termGUID).Select("Id").Get()
+		termSet := taxonomy.Stores().Default().Sets().GetByID(termSetGUID)
+		termInfo, err := termSet.Terms().GetByID(termGUID).Select("Id").Get()
 		if err != nil {
 			t.Error(err)
 		}
@@ -276,12 +277,48 @@ func TestTaxonomyTerms(t *testing.T) {
 				t.Error("unexpected term ID")
 			}
 
-			subTerms, err := parentTerm.Terms().Get() // All()
+			subTerms, err := parentTerm.Terms().Get()
 			if err != nil {
 				t.Error(err)
 			}
 			if len(subTerms) != 1 {
-				t.Error("error getting subterms")
+				t.Log("error getting subterms")
+			}
+		})
+
+		t.Run("Move/ToTerm", func(t *testing.T) {
+			childTermGUID := uuid.New().String()
+			childTermName := "Movable term " + childTermGUID
+
+			termSet := taxonomy.Stores().Default().Sets().GetByID(termSetGUID)
+
+			if _, err := termSet.Terms().Add(childTermName, childTermGUID, lang); err != nil {
+				t.Error(err)
+			}
+
+			childTerm := termSet.Terms().GetByID(childTermGUID)
+			if err := childTerm.Move(termSetGUID, newTermGUID); err != nil {
+				t.Error(err)
+			}
+		})
+
+		t.Run("Move/ToTermSet", func(t *testing.T) {
+			childTermGUID := uuid.New().String()
+			childTermName := "Movable term " + childTermGUID
+
+			termSet := taxonomy.Stores().Default().Sets().GetByID(termSetGUID)
+
+			if _, err := termSet.Terms().GetByID(newTermGUID).Terms().Add(childTermName, childTermGUID, lang); err != nil {
+				t.Error(err)
+			}
+
+			childTerm := termSet.Terms().GetByID(childTermGUID)
+			if err := childTerm.Move(termSetGUID, ""); err != nil {
+				t.Error(err)
+			}
+
+			if err := childTerm.Delete(); err != nil {
+				t.Error(err)
 			}
 		})
 
@@ -488,12 +525,17 @@ func getTermSetID(taxonomy *Taxonomy) (string, error) {
 		return "", fmt.Errorf("can't get term sets")
 	}
 
-	termSetGUID, ok := tsData[0]["Id"].(string)
-	if !ok {
-		return "", fmt.Errorf("can't get term set ID")
+	for _, tsItem := range tsData {
+		if strings.Index(tsItem["Name"].(string), "Delete me ") == -1 {
+			termSetGUID, ok := tsItem["Id"].(string)
+			if !ok {
+				return "", fmt.Errorf("can't get group ID")
+			}
+			return termSetGUID, nil
+		}
 	}
 
-	return termSetGUID, nil
+	return "", fmt.Errorf("can't get term sets")
 }
 
 func getTermID(taxonomy *Taxonomy) (string, error) {

@@ -120,6 +120,7 @@ func (b *builder) Compile() (string, error) {
 			<ObjectPaths>` + objects + `</ObjectPaths>
 		</Request>
 	`)
+	csomPkg = strings.Replace(csomPkg, "<Parameters></Parameters>", "<Parameters />", -1)
 	if len(errors) > 0 {
 		errStr := ""
 		for i, e := range errors {
