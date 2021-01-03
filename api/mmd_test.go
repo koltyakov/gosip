@@ -75,12 +75,21 @@ func TestTaxonomyStores(t *testing.T) {
 			t.Error("should contain name property, cast error")
 		}
 	})
+
+	t.Run("UpdateCache", func(t *testing.T) {
+		if err := taxonomy.Stores().Default().UpdateCache(); err != nil {
+			t.Errorf("can't get term store info, %s\n", err)
+		}
+	})
 }
 
 func TestTaxonomyGroups(t *testing.T) {
 	checkClient(t)
 
 	taxonomy := NewSP(spClient).Taxonomy()
+
+	newGroupGUID := uuid.New().String()
+	newGroupName := "Delete me " + newGroupGUID
 
 	t.Run("Get", func(t *testing.T) {
 		gs, err := taxonomy.Stores().Default().Groups().Get()
@@ -110,6 +119,22 @@ func TestTaxonomyGroups(t *testing.T) {
 			t.Error("error getting group info")
 		}
 	})
+
+	t.Run("Add", func(t *testing.T) {
+		group, err := taxonomy.Stores().Default().Groups().Add(newGroupName, newGroupGUID)
+		if err != nil {
+			t.Error(err)
+		}
+		if group["Name"].(string) != newGroupName {
+			t.Error("error getting group info")
+		}
+	})
+
+	t.Run("Delete", func(t *testing.T) {
+		if err := taxonomy.Stores().Default().Groups().GetByID(newGroupGUID).Delete(); err != nil {
+			t.Error(err)
+		}
+	})
 }
 
 func TestTaxonomyTermSets(t *testing.T) {
@@ -117,10 +142,18 @@ func TestTaxonomyTermSets(t *testing.T) {
 
 	taxonomy := NewSP(spClient).Taxonomy()
 
+	termGroupID, err := getTermGroupID(taxonomy)
+	if err != nil {
+		t.Error(err)
+	}
+
 	termSetGUID, err := getTermSetID(taxonomy)
 	if err != nil {
 		t.Error(err)
 	}
+
+	newTermSetGUID := uuid.New().String()
+	newTermSetName := "Delete me " + newTermSetGUID
 
 	t.Run("GetByID", func(t *testing.T) {
 		data, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Select("Id").Get()
@@ -132,10 +165,42 @@ func TestTaxonomyTermSets(t *testing.T) {
 		}
 	})
 
-	t.Run("Terms/GetAll", func(t *testing.T) {
-		_, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Terms().Select("Id,Name").GetAll()
+	t.Run("Terms/GetAllTerms", func(t *testing.T) {
+		_, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Select("Id,Name").GetAllTerms()
 		if err != nil {
 			t.Errorf("%s", err)
+		}
+	})
+
+	t.Run("Terms/Get", func(t *testing.T) {
+		_, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Terms().Select("Id,Name").Get()
+		if err != nil {
+			t.Errorf("%s", err)
+		}
+	})
+
+	t.Run("Add", func(t *testing.T) {
+		store := taxonomy.Stores().Default()
+
+		tsInfo, err := store.Select("DefaultLanguage").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		lang := int(tsInfo["DefaultLanguage"].(float64))
+
+		termSet, err := store.Groups().GetByID(termGroupID).Sets().Add(newTermSetName, newTermSetGUID, lang)
+		if err != nil {
+			t.Error(err)
+		}
+		if termSet["Name"].(string) != newTermSetName {
+			t.Error("error getting term set info")
+		}
+	})
+
+	t.Run("Delete", func(t *testing.T) {
+		store := taxonomy.Stores().Default()
+		if err := store.Sets().GetByID(newTermSetGUID).Delete(); err != nil {
+			t.Error(err)
 		}
 	})
 }
@@ -186,7 +251,8 @@ func TestTaxonomyTerms(t *testing.T) {
 		newTermName := "Delete me " + newTermGUID
 
 		t.Run("Add", func(t *testing.T) {
-			termInfo, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Terms().Add(newTermName, lang, newTermGUID)
+			termSet := taxonomy.Stores().Default().Sets().GetByID(termSetGUID)
+			termInfo, err := termSet.Terms().Add(newTermName, newTermGUID, lang)
 			if err != nil {
 				t.Error(err)
 			}
@@ -195,14 +261,40 @@ func TestTaxonomyTerms(t *testing.T) {
 			}
 		})
 
+		t.Run("Add#ChildTerm", func(t *testing.T) {
+			subTermGUID := uuid.New().String()
+			subTermName := "Sub term " + subTermGUID
+
+			store := taxonomy.Stores().Default()
+			parentTerm := store.Terms().GetByID(newTermGUID)
+
+			termInfo, err := parentTerm.Terms().Add(subTermName, subTermGUID, lang)
+			if err != nil {
+				t.Error(err)
+			}
+			if subTermGUID != trimTaxonomyGUID(termInfo["Id"].(string)) {
+				t.Error("unexpected term ID")
+			}
+
+			subTerms, err := parentTerm.Terms().Get() // All()
+			if err != nil {
+				t.Error(err)
+			}
+			if len(subTerms) != 1 {
+				t.Error("error getting subterms")
+			}
+		})
+
 		t.Run("Add#FailAddingADuplicate", func(t *testing.T) {
-			if _, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Terms().Add(newTermName, lang, newTermGUID); err == nil {
+			termSet := taxonomy.Stores().Default().Sets().GetByID(termSetGUID)
+			if _, err := termSet.Terms().Add(newTermName, newTermGUID, lang); err == nil {
 				t.Error("should fail with duplicate error message")
 			}
 		})
 
 		t.Run("Get", func(t *testing.T) {
-			if _, err := taxonomy.Stores().Default().Terms().GetByID(newTermGUID).Get(); err != nil {
+			term := taxonomy.Stores().Default().Terms().GetByID(newTermGUID)
+			if _, err := term.Get(); err != nil {
 				t.Error(err)
 			}
 		})
@@ -210,7 +302,8 @@ func TestTaxonomyTerms(t *testing.T) {
 		t.Run("Update", func(t *testing.T) {
 			updateTermName := newTermName + " (updated)"
 			props := map[string]interface{}{"Name": updateTermName}
-			termAfterUpdate, err := taxonomy.Stores().Default().Terms().GetByID(newTermGUID).Update(props)
+			term := taxonomy.Stores().Default().Terms().GetByID(newTermGUID)
+			termAfterUpdate, err := term.Update(props)
 			if err != nil {
 				t.Error(err)
 			}
@@ -219,8 +312,47 @@ func TestTaxonomyTerms(t *testing.T) {
 			}
 		})
 
+		t.Run("Deprecate", func(t *testing.T) {
+			store := taxonomy.Stores().Default()
+			term := store.Terms().GetByID(newTermGUID)
+			if err := term.Deprecate(true); err != nil {
+				t.Error(err)
+			}
+			// if err := store.UpdateCache(); err != nil {
+			// 	t.Error(err)
+			// }
+			// data, err := term.Select("IsDeprecated").Get()
+			// if err != nil {
+			// 	t.Error(err)
+			// }
+			// if !data["IsDeprecated"].(bool) {
+			// 	// t.Error("failed to deprecate")
+			// 	t.Log("maybe failed to deprecate")
+			// }
+		})
+
+		t.Run("Activate", func(t *testing.T) {
+			store := taxonomy.Stores().Default()
+			term := store.Terms().GetByID(newTermGUID)
+			if err := term.Deprecate(false); err != nil {
+				t.Error(err)
+			}
+			// if err := store.UpdateCache(); err != nil {
+			// 	t.Error(err)
+			// }
+			// data, err := term.Select("IsDeprecated").Get()
+			// if err != nil {
+			// 	t.Error(err)
+			// }
+			// if data["IsDeprecated"].(bool) {
+			// 	// t.Error("failed to activate")
+			// 	t.Log("maybe failed to activate")
+			// }
+		})
+
 		t.Run("Delete", func(t *testing.T) {
-			if err := taxonomy.Stores().Default().Terms().GetByID(newTermGUID).Delete(); err != nil {
+			term := taxonomy.Stores().Default().Terms().GetByID(newTermGUID)
+			if err := term.Delete(); err != nil {
 				t.Error(err)
 			}
 		})
@@ -325,11 +457,16 @@ func getTermGroupID(taxonomy *Taxonomy) (string, error) {
 	if len(gs) == 0 {
 		return "", fmt.Errorf("can't get term store groups")
 	}
-	groupGUID, ok := gs[0]["Id"].(string)
-	if !ok {
-		return "", fmt.Errorf("can't get group ID")
+	for _, group := range gs {
+		if strings.Index(group["Name"].(string), "Delete me ") == -1 {
+			groupGUID, ok := group["Id"].(string)
+			if !ok {
+				return "", fmt.Errorf("can't get group ID")
+			}
+			return groupGUID, nil
+		}
 	}
-	return groupGUID, nil
+	return "", fmt.Errorf("can't get group ID")
 }
 
 func getTermSetID(taxonomy *Taxonomy) (string, error) {
@@ -365,7 +502,7 @@ func getTermID(taxonomy *Taxonomy) (string, error) {
 		return "", err
 	}
 
-	terms, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Terms().Select("Id").GetAll()
+	terms, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Select("Id").GetAllTerms()
 	if terms == nil {
 		return "", err
 	}

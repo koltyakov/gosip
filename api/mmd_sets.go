@@ -70,6 +70,18 @@ func (termSets *TermSets) GetByID(setGUID string) *TermSet {
 	}
 }
 
+// Add creates new term set
+func (termSets *TermSets) Add(name string, guid string, lang int) (map[string]interface{}, error) {
+	b := termSets.csomBuilderEntry().Clone()
+	b.AddObject(csom.NewObjectMethod("CreateTermSet", []string{
+		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, name),
+		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, guid),
+		fmt.Sprintf(`<Parameter Type="Number">%d</Parameter>`, lang),
+	}), nil)
+	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
+	return getCSOMResponse(termSets.client, termSets.endpoint, termSets.config, b)
+}
+
 /* Term Sets */
 
 // TermSet term set struct
@@ -116,6 +128,14 @@ func (termSet *TermSet) Get() (map[string]interface{}, error) {
 	return getCSOMResponse(termSet.client, termSet.endpoint, termSet.config, b)
 }
 
+// Delete deletes term set object
+func (termSet *TermSet) Delete() error {
+	b := termSet.csomBuilderEntry().Clone()
+	b.AddAction(csom.NewActionMethod("DeleteObject", []string{}), nil)
+	_, err := getCSOMResponse(termSet.client, termSet.endpoint, termSet.config, b)
+	return err
+}
+
 // Terms gets terms object instance
 func (termSet *TermSet) Terms() *Terms {
 	return &Terms{
@@ -126,4 +146,41 @@ func (termSet *TermSet) Terms() *Terms {
 		csomEntry:   termSet.csomBuilderEntry().Clone(),
 		selectProps: []string{},
 	}
+}
+
+// GetAllTerms gets all terms collection metadata
+func (termSet *TermSet) GetAllTerms() ([]map[string]interface{}, error) {
+	var props []string
+	for _, prop := range termSet.selectProps {
+		propertyXML := prop
+		if strings.Index(prop, "<") == -1 {
+			propertyXML = fmt.Sprintf(`<Property Name="%s" SelectAll="true" />`, prop)
+		}
+		props = append(props, propertyXML)
+	}
+
+	b := termSet.csomBuilderEntry().Clone()
+	b.AddObject(csom.NewObjectMethod("GetAllTerms", []string{}), nil)
+	b.AddAction(csom.NewQueryWithChildProps(props), nil)
+
+	termsResp, err := getCSOMResponse(termSet.client, termSet.endpoint, termSet.config, b)
+	if err != nil {
+		return nil, err
+	}
+
+	items, ok := termsResp["_Child_Items_"].([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("can't get child items from groups")
+	}
+
+	var resItems []map[string]interface{}
+	for _, item := range items {
+		resItem, ok := item.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("can't get item from groups")
+		}
+		resItems = append(resItems, resItem)
+	}
+
+	return resItems, nil
 }

@@ -116,6 +116,22 @@ func (termStore *TermStore) Get() (map[string]interface{}, error) {
 	return getCSOMResponse(termStore.client, termStore.endpoint, termStore.config, b)
 }
 
+// // CommitAll commits all changes
+// func (termStore *TermStore) CommitAll() error {
+// 	b := termStore.csomBuilderEntry().Clone()
+// 	b.AddAction(csom.NewActionMethod("CommitAll", []string{}), nil)
+// 	_, err := getCSOMResponse(termStore.client, termStore.endpoint, termStore.config, b)
+// 	return err
+// }
+
+// UpdateCache updates store cache
+func (termStore *TermStore) UpdateCache() error {
+	b := termStore.csomBuilderEntry().Clone()
+	b.AddAction(csom.NewActionMethod("UpdateCache", []string{}), nil)
+	_, err := getCSOMResponse(termStore.client, termStore.endpoint, termStore.config, b)
+	return err
+}
+
 // Groups gets term groups object
 func (termStore *TermStore) Groups() *TermGroups {
 	return &TermGroups{

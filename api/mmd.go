@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/koltyakov/gosip"
@@ -68,6 +69,24 @@ func getCSOMResponse(httpClient *HTTPClient, siteURL string, config *RequestConf
 
 	jsomResp, err := httpClient.ProcessQuery(siteURL, bytes.NewBuffer([]byte(csomPkg)), config)
 	if err != nil {
+		// Retry Terms update conflicts
+		if strings.Index(err.Error(), "Term update failed because of save conflict") != -1 {
+			if config == nil {
+				config = &RequestConfig{}
+			}
+			if config.Headers == nil {
+				config.Headers = map[string]string{}
+			}
+			retryStr, ok := config.Headers["X-Gosip-Retry"]
+			if !ok {
+				retryStr = "0"
+			}
+			retry, _ := strconv.Atoi(retryStr)
+			config.Headers["X-Gosip-Retry"] = strconv.Itoa(retry + 1)
+			if retry+1 <= 5 {
+				return getCSOMResponse(httpClient, siteURL, config, csomBuilder)
+			}
+		}
 		return nil, err
 	}
 

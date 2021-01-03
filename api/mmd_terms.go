@@ -29,36 +29,33 @@ func (terms *Terms) Select(props string) *Terms {
 	return terms
 }
 
-// GetAll gets all terms collection metadata
-func (terms *Terms) GetAll() ([]map[string]interface{}, error) {
-	var props []string
-	for _, prop := range terms.selectProps {
-		propertyXML := prop
-		if strings.Index(prop, "<") == -1 {
-			propertyXML = fmt.Sprintf(`<Property Name="%s" SelectAll="true" />`, prop)
-		}
-		props = append(props, propertyXML)
-	}
+// Get gets child terms
+func (terms *Terms) Get() ([]map[string]interface{}, error) {
+	b := terms.csomEntry.Clone()
+	b.AddAction(csom.NewQueryWithProps([]string{
+		`<Property Name="Terms" SelectAll="true" />`,
+	}), nil)
 
-	b := terms.csomBuilderEntry().Clone()
-	b.AddObject(csom.NewObjectMethod("GetAllTerms", []string{}), nil)
-	b.AddAction(csom.NewQueryWithChildProps(props), nil)
-
-	termsResp, err := getCSOMResponse(terms.client, terms.endpoint, terms.config, b)
+	csomResp, err := getCSOMResponse(terms.client, terms.endpoint, terms.config, b)
 	if err != nil {
 		return nil, err
 	}
 
-	items, ok := termsResp["_Child_Items_"].([]interface{})
+	groups, ok := csomResp["Terms"].(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("can't get child items from groups")
+		return nil, fmt.Errorf("can't get terms")
+	}
+
+	items, ok := groups["_Child_Items_"].([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("can't get child items from terms")
 	}
 
 	var resItems []map[string]interface{}
 	for _, item := range items {
 		resItem, ok := item.(map[string]interface{})
 		if !ok {
-			return nil, fmt.Errorf("can't get item from groups")
+			return nil, fmt.Errorf("can't get item from term")
 		}
 		resItems = append(resItems, resItem)
 	}
@@ -79,7 +76,7 @@ func (terms *Terms) GetByID(termGUID string) *Term {
 }
 
 // Add creates new term
-func (terms *Terms) Add(name string, lang int, guid string) (map[string]interface{}, error) {
+func (terms *Terms) Add(name string, guid string, lang int) (map[string]interface{}, error) {
 	b := terms.csomBuilderEntry().Clone()
 	b.AddObject(csom.NewObjectMethod("CreateTerm", []string{
 		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, name),
@@ -92,6 +89,7 @@ func (terms *Terms) Add(name string, lang int, guid string) (map[string]interfac
 }
 
 /* Term */
+// API Reference: https://docs.microsoft.com/en-us/dotnet/api/microsoft.sharepoint.taxonomy.term?view=sharepoint-server
 
 // Term struct
 type Term struct {
@@ -142,16 +140,16 @@ func (term *Term) Update(properties map[string]interface{}) (map[string]interfac
 	b := term.csomBuilderEntry().Clone()
 	objects := b.GetObjects() // get parent from all objects
 	termObject := objects[len(objects)-1]
-	var scalarProperties []string
+	// var scalarProperties []string
 	for prop, value := range properties {
 		valueXML := fmt.Sprintf("%s", value)
 		if strings.Index(prop, "<") == -1 {
 			valueXML = fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, value)
 		}
 		b.AddAction(csom.NewSetProperty(prop, valueXML), termObject)
-		scalarProperties = append(scalarProperties, fmt.Sprintf(`<Property Name="%s" ScalarProperty="true" />`, prop))
+		// scalarProperties = append(scalarProperties, fmt.Sprintf(`<Property Name="%s" ScalarProperty="true" />`, prop))
 	}
-	b.AddAction(csom.NewQueryWithProps(scalarProperties), termObject)
+	b.AddAction(csom.NewQueryWithProps([]string{}), termObject) // scalarProperties
 	return getCSOMResponse(term.client, term.endpoint, term.config, b)
 }
 
@@ -161,4 +159,26 @@ func (term *Term) Delete() error {
 	b.AddAction(csom.NewActionMethod("DeleteObject", []string{}), nil)
 	_, err := getCSOMResponse(term.client, term.endpoint, term.config, b)
 	return err
+}
+
+// Deprecate deprecates/activates a term
+func (term *Term) Deprecate(deprecate bool) error {
+	b := term.csomBuilderEntry().Clone()
+	b.AddAction(csom.NewActionMethod("Deprecate", []string{
+		fmt.Sprintf(`<Parameter Type="Boolean">%t</Parameter>`, deprecate),
+	}), nil)
+	_, err := getCSOMResponse(term.client, term.endpoint, term.config, b)
+	return err
+}
+
+// Terms gets sub-terms object instance
+func (term *Term) Terms() *Terms {
+	return &Terms{
+		client:   term.client,
+		endpoint: term.endpoint,
+		config:   term.config,
+
+		csomEntry:   term.csomBuilderEntry().Clone(),
+		selectProps: []string{},
+	}
 }

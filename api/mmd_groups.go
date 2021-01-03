@@ -63,6 +63,17 @@ func (termGroups *TermGroups) GetByID(groupGUID string) *TermGroup {
 	}
 }
 
+// Add creates new group
+func (termGroups *TermGroups) Add(name string, guid string) (map[string]interface{}, error) {
+	b := termGroups.csomEntry.Clone()
+	b.AddObject(csom.NewObjectMethod("CreateGroup", []string{
+		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, name),
+		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, guid),
+	}), nil)
+	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
+	return getCSOMResponse(termGroups.client, termGroups.endpoint, termGroups.config, b)
+}
+
 /* Term Group */
 
 // TermGroup term group struct
@@ -108,6 +119,14 @@ func (termGroup *TermGroup) Get() (map[string]interface{}, error) {
 	b.AddAction(csom.NewQueryWithProps(props), nil)
 
 	return getCSOMResponse(termGroup.client, termGroup.endpoint, termGroup.config, b)
+}
+
+// Delete deletes group object
+func (termGroup *TermGroup) Delete() error {
+	b := termGroup.csomBuilderEntry().Clone()
+	b.AddAction(csom.NewActionMethod("DeleteObject", []string{}), nil)
+	_, err := getCSOMResponse(termGroup.client, termGroup.endpoint, termGroup.config, b)
+	return err
 }
 
 // Sets gets term sets object for current term group
