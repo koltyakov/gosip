@@ -60,8 +60,13 @@ func (items *Items) GetAll() ([]ItemResp, error) {
 func (items *Items) Add(body []byte) (ItemResp, error) {
 	body = patchMetadataTypeCB(body, func() string {
 		endpoint := getPriorEndpoint(items.endpoint, "/Items")
+		cacheKey := strings.ToLower(endpoint + "@entitytype")
+		if oDataType, found := storage.Get(cacheKey); found {
+			return oDataType.(string)
+		}
 		list := NewList(items.client, endpoint, nil)
-		oDataType, _ := list.GetEntityType() // ToDo: add caching for Entity Types
+		oDataType, _ := list.GetEntityType()
+		storage.Set(cacheKey, oDataType, 0)
 		return oDataType
 	})
 	client := NewHTTPClient(items.client)

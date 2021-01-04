@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/koltyakov/gosip"
@@ -78,8 +79,13 @@ func (item *Item) Recycle() error {
 func (item *Item) Update(body []byte) (ItemResp, error) {
 	body = patchMetadataTypeCB(body, func() string {
 		endpoint := getPriorEndpoint(item.endpoint, "/Items")
+		cacheKey := strings.ToLower(endpoint + "@entitytype")
+		if oDataType, found := storage.Get(cacheKey); found {
+			return oDataType.(string)
+		}
 		list := NewList(item.client, endpoint, nil)
 		oDataType, _ := list.GetEntityType()
+		storage.Set(cacheKey, oDataType, 0)
 		return oDataType
 	})
 	client := NewHTTPClient(item.client)
