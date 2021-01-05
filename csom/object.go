@@ -9,6 +9,7 @@ import (
 // Object CSOM XML object path node builder interface
 type Object interface {
 	String() string
+	Template() string
 	SetID(id int)
 	GetID() int
 	SetParentID(parentID int)
@@ -74,6 +75,9 @@ func (o *object) String() string {
 
 	return trimMultiline(tpl.String())
 }
+
+// Template template property getter
+func (o *object) Template() string { return o.template }
 
 // SetID sets ID
 func (o *object) SetID(id int) { o.id = id }

@@ -4,7 +4,8 @@ import "testing"
 
 func TestObject(t *testing.T) {
 
-	o := NewObject(`<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`)
+	template := `<Property Id="{{.ID}}" ParentId="{{.ParentID}}" Name="Web" />`
+	o := NewObject(template)
 
 	t.Run("ID", func(t *testing.T) {
 		o.SetID(2)
@@ -25,6 +26,14 @@ func TestObject(t *testing.T) {
 		o.SetParentID(1)
 		if o.String() != `<Property Id="2" ParentId="1" Name="Web" />` {
 			t.Error("template compilation error")
+		}
+	})
+
+	t.Run("Template", func(t *testing.T) {
+		o.SetID(2)
+		o.SetParentID(1)
+		if o.Template() != template {
+			t.Error("error getting object's template")
 		}
 	})
 

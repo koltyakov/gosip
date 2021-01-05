@@ -2,9 +2,13 @@ package csom
 
 type current struct{}
 
-func (cw *current) String() string {
+// Template returns objetc's template
+func (cw *current) Template() string {
 	return `<StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" />`
 }
+
+// String returns object as string
+func (cw *current) String() string { return cw.Template() }
 
 // SetID sets ID
 // noinspection GoUnusedParameter
