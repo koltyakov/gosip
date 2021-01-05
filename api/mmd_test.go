@@ -81,6 +81,16 @@ func TestTaxonomyStores(t *testing.T) {
 			t.Errorf("can't get term store info, %s\n", err)
 		}
 	})
+
+	t.Run("Sets/GetByName", func(t *testing.T) {
+		sets, err := taxonomy.Stores().Default().Sets().GetByName("Department", 1033)
+		if err != nil {
+			t.Errorf("can't get term set by name, %s\n", err)
+		}
+		if len(sets) != 1 {
+			t.Log("maybe can't get term set by name")
+		}
+	})
 }
 
 func TestTaxonomyGroups(t *testing.T) {
@@ -133,6 +143,16 @@ func TestTaxonomyGroups(t *testing.T) {
 	t.Run("Delete", func(t *testing.T) {
 		if err := taxonomy.Stores().Default().Groups().GetByID(newGroupGUID).Delete(); err != nil {
 			t.Error(err)
+		}
+	})
+
+	t.Run("Sets/GetByName", func(t *testing.T) {
+		sets, err := taxonomy.Stores().Default().Groups().GetByID("any-id-should-work-here").Sets().GetByName("Department", 1033)
+		if err != nil {
+			t.Errorf("can't get term set by name, %s\n", err)
+		}
+		if len(sets) != 1 {
+			t.Log("maybe can't get term set by name")
 		}
 	})
 }

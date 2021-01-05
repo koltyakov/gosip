@@ -48,12 +48,20 @@ func (termSets *TermSets) GetByID(setGUID string) *TermSet {
 
 // GetByName gets term sets by a name and LCID, searches within term store
 func (termSets *TermSets) GetByName(termSetName string, lcid int) ([]map[string]interface{}, error) {
-	b := termSets.csomBuilderEntry().Clone()
+	b := csom.NewBuilder()
+	objs := termSets.csomBuilderEntry().GetObjects()
+
+	b.AddObject(csom.NewObject(objs[1].Template()), nil) // GetTaxonomySession
+	b.AddObject(csom.NewObject(objs[2].Template()), nil) // GetDefaultSiteCollectionTermStore or TermStores
+	if strings.Index(objs[2].Template(), "TermStores") != -1 {
+		b.AddObject(csom.NewObject(objs[3].Template()), nil) // GetById or GetByName
+	}
+
 	b.AddObject(csom.NewObjectMethod("GetTermSetsByName", []string{
 		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, termSetName),
 		fmt.Sprintf(`<Parameter Type="Number">%d</Parameter>`, lcid),
 	}), nil)
-	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
+	b.AddAction(csom.NewQueryWithChildProps([]string{}), nil)
 	return csomRespChildItems(termSets.client, termSets.endpoint, termSets.config, b)
 }
 
