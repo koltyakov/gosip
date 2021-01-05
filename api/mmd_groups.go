@@ -23,31 +23,7 @@ func (termGroups *TermGroups) Get() ([]map[string]interface{}, error) {
 		`<Property Name="Groups" SelectAll="true" />`,
 	}), nil)
 
-	csomResp, err := getCSOMResponse(termGroups.client, termGroups.endpoint, termGroups.config, b)
-	if err != nil {
-		return nil, err
-	}
-
-	groups, ok := csomResp["Groups"].(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("can't get groups from term store")
-	}
-
-	items, ok := groups["_Child_Items_"].([]interface{})
-	if !ok {
-		return nil, fmt.Errorf("can't get child items from groups")
-	}
-
-	var resItems []map[string]interface{}
-	for _, item := range items {
-		resItem, ok := item.(map[string]interface{})
-		if !ok {
-			return nil, fmt.Errorf("can't get item from groups")
-		}
-		resItems = append(resItems, resItem)
-	}
-
-	return resItems, nil
+	return csomRespChildItemsInProp(termGroups.client, termGroups.endpoint, termGroups.config, b, "Groups")
 }
 
 // GetByID gets term group object by its GUID
@@ -71,7 +47,7 @@ func (termGroups *TermGroups) Add(name string, guid string) (map[string]interfac
 		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, guid),
 	}), nil)
 	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
-	return getCSOMResponse(termGroups.client, termGroups.endpoint, termGroups.config, b)
+	return csomResponse(termGroups.client, termGroups.endpoint, termGroups.config, b)
 }
 
 /* Term Group */
@@ -118,14 +94,14 @@ func (termGroup *TermGroup) Get() (map[string]interface{}, error) {
 	b := termGroup.csomBuilderEntry()
 	b.AddAction(csom.NewQueryWithProps(props), nil)
 
-	return getCSOMResponse(termGroup.client, termGroup.endpoint, termGroup.config, b)
+	return csomResponse(termGroup.client, termGroup.endpoint, termGroup.config, b)
 }
 
 // Delete deletes group object
 func (termGroup *TermGroup) Delete() error {
 	b := termGroup.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewActionMethod("DeleteObject", []string{}), nil)
-	_, err := getCSOMResponse(termGroup.client, termGroup.endpoint, termGroup.config, b)
+	_, err := csomResponse(termGroup.client, termGroup.endpoint, termGroup.config, b)
 	return err
 }
 

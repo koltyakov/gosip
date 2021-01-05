@@ -29,31 +29,7 @@ func (termSets *TermSets) Get() ([]map[string]interface{}, error) {
 		`<Property Name="TermSets" SelectAll="true" />`,
 	}), nil)
 
-	csomResp, err := getCSOMResponse(termSets.client, termSets.endpoint, termSets.config, b)
-	if err != nil {
-		return nil, err
-	}
-
-	groups, ok := csomResp["TermSets"].(map[string]interface{})
-	if !ok {
-		return nil, fmt.Errorf("can't get term sets from term group")
-	}
-
-	items, ok := groups["_Child_Items_"].([]interface{})
-	if !ok {
-		return nil, fmt.Errorf("can't get child items from term sets")
-	}
-
-	var resItems []map[string]interface{}
-	for _, item := range items {
-		resItem, ok := item.(map[string]interface{})
-		if !ok {
-			return nil, fmt.Errorf("can't get item from term set")
-		}
-		resItems = append(resItems, resItem)
-	}
-
-	return resItems, nil
+	return csomRespChildItemsInProp(termSets.client, termSets.endpoint, termSets.config, b, "TermSets")
 }
 
 // GetByID gets term set object by its GUID
@@ -70,16 +46,27 @@ func (termSets *TermSets) GetByID(setGUID string) *TermSet {
 	}
 }
 
+// GetByName gets term sets by a name and LCID, searches within term store
+func (termSets *TermSets) GetByName(termSetName string, lcid int) ([]map[string]interface{}, error) {
+	b := termSets.csomBuilderEntry().Clone()
+	b.AddObject(csom.NewObjectMethod("GetTermSetsByName", []string{
+		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, termSetName),
+		fmt.Sprintf(`<Parameter Type="Number">%d</Parameter>`, lcid),
+	}), nil)
+	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
+	return csomRespChildItems(termSets.client, termSets.endpoint, termSets.config, b)
+}
+
 // Add creates new term set
-func (termSets *TermSets) Add(name string, guid string, lang int) (map[string]interface{}, error) {
+func (termSets *TermSets) Add(name string, guid string, lcid int) (map[string]interface{}, error) {
 	b := termSets.csomBuilderEntry().Clone()
 	b.AddObject(csom.NewObjectMethod("CreateTermSet", []string{
 		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, name),
 		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, guid),
-		fmt.Sprintf(`<Parameter Type="Number">%d</Parameter>`, lang),
+		fmt.Sprintf(`<Parameter Type="Number">%d</Parameter>`, lcid),
 	}), nil)
 	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
-	return getCSOMResponse(termSets.client, termSets.endpoint, termSets.config, b)
+	return csomResponse(termSets.client, termSets.endpoint, termSets.config, b)
 }
 
 /* Term Sets */
@@ -125,14 +112,14 @@ func (termSet *TermSet) Get() (map[string]interface{}, error) {
 	b := termSet.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewQueryWithProps(props), nil)
 
-	return getCSOMResponse(termSet.client, termSet.endpoint, termSet.config, b)
+	return csomResponse(termSet.client, termSet.endpoint, termSet.config, b)
 }
 
 // Delete deletes term set object
 func (termSet *TermSet) Delete() error {
 	b := termSet.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewActionMethod("DeleteObject", []string{}), nil)
-	_, err := getCSOMResponse(termSet.client, termSet.endpoint, termSet.config, b)
+	_, err := csomResponse(termSet.client, termSet.endpoint, termSet.config, b)
 	return err
 }
 
@@ -163,24 +150,5 @@ func (termSet *TermSet) GetAllTerms() ([]map[string]interface{}, error) {
 	b.AddObject(csom.NewObjectMethod("GetAllTerms", []string{}), nil)
 	b.AddAction(csom.NewQueryWithChildProps(props), nil)
 
-	termsResp, err := getCSOMResponse(termSet.client, termSet.endpoint, termSet.config, b)
-	if err != nil {
-		return nil, err
-	}
-
-	items, ok := termsResp["_Child_Items_"].([]interface{})
-	if !ok {
-		return nil, fmt.Errorf("can't get child items from groups")
-	}
-
-	var resItems []map[string]interface{}
-	for _, item := range items {
-		resItem, ok := item.(map[string]interface{})
-		if !ok {
-			return nil, fmt.Errorf("can't get item from groups")
-		}
-		resItems = append(resItems, resItem)
-	}
-
-	return resItems, nil
+	return csomRespChildItems(termSet.client, termSet.endpoint, termSet.config, b)
 }

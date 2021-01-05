@@ -61,7 +61,7 @@ func trimTaxonomyGUID(guid string) string {
 	return guid
 }
 
-func getCSOMResponse(httpClient *HTTPClient, siteURL string, config *RequestConfig, csomBuilder csom.Builder) (map[string]interface{}, error) {
+func csomResponse(httpClient *HTTPClient, siteURL string, config *RequestConfig, csomBuilder csom.Builder) (map[string]interface{}, error) {
 	csomPkg, err := csomBuilder.Compile()
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func getCSOMResponse(httpClient *HTTPClient, siteURL string, config *RequestConf
 			retry, _ := strconv.Atoi(retryStr)
 			config.Headers["X-Gosip-Retry"] = strconv.Itoa(retry + 1)
 			if retry+1 <= 5 {
-				return getCSOMResponse(httpClient, siteURL, config, csomBuilder)
+				return csomResponse(httpClient, siteURL, config, csomBuilder)
 			}
 		}
 		return nil, err
@@ -105,4 +105,55 @@ func getCSOMResponse(httpClient *HTTPClient, siteURL string, config *RequestConf
 	}
 
 	return res, nil
+}
+
+func csomRespChildItems(httpClient *HTTPClient, siteURL string, config *RequestConfig, csomBuilder csom.Builder) ([]map[string]interface{}, error) {
+	data, err := csomResponse(httpClient, siteURL, config, csomBuilder)
+	if err != nil {
+		return nil, err
+	}
+
+	items, ok := data["_Child_Items_"].([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("can't get child items")
+	}
+
+	var resItems []map[string]interface{}
+	for _, item := range items {
+		resItem, ok := item.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("can't get child item")
+		}
+		resItems = append(resItems, resItem)
+	}
+
+	return resItems, nil
+}
+
+func csomRespChildItemsInProp(httpClient *HTTPClient, siteURL string, config *RequestConfig, csomBuilder csom.Builder, prop string) ([]map[string]interface{}, error) {
+	data, err := csomResponse(httpClient, siteURL, config, csomBuilder)
+	if err != nil {
+		return nil, err
+	}
+
+	propData, ok := data[prop].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("can't get property data")
+	}
+
+	items, ok := propData["_Child_Items_"].([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("can't get child items")
+	}
+
+	var resItems []map[string]interface{}
+	for _, item := range items {
+		resItem, ok := item.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("can't get child item")
+		}
+		resItems = append(resItems, resItem)
+	}
+
+	return resItems, nil
 }
