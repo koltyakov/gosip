@@ -93,7 +93,7 @@ func TestAuthEdgeCases(t *testing.T) {
 
 	t.Run("GetAuth", func(t *testing.T) {
 		cnfg := &AuthCnfg{}
-		r, err := cnfg.GetAuth()
+		r, _, err := cnfg.GetAuth()
 		if err != nil {
 			t.Error(err)
 		}

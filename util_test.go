@@ -12,27 +12,23 @@ type AnonymousCnfg struct {
 	Strategy string
 }
 
-// ReadConfig : reads private config with auth options
+// ReadConfig reads private config with auth options
 // noinspection GoUnusedParameter
-func (c *AnonymousCnfg) ReadConfig(privateFile string) error {
-	return nil
-}
+func (c *AnonymousCnfg) ReadConfig(privateFile string) error { return nil }
+
+// ParseConfig parses credentials from a provided JSON byte array content
+// noinspection GoUnusedParameter
+func (c *AnonymousCnfg) ParseConfig(bytesValue []byte) error { return nil }
 
 // WriteConfig : writes private config with auth options
 // noinspection GoUnusedParameter
-func (c *AnonymousCnfg) WriteConfig(privateFile string) error {
-	return nil
-}
+func (c *AnonymousCnfg) WriteConfig(privateFile string) error { return nil }
 
 // GetAuth : authenticates, receives access token
-func (c *AnonymousCnfg) GetAuth() (string, error) {
-	return "", nil
-}
+func (c *AnonymousCnfg) GetAuth() (string, int64, error) { return "", 0, nil }
 
 // GetSiteURL : gets siteURL
-func (c *AnonymousCnfg) GetSiteURL() string {
-	return c.SiteURL
-}
+func (c *AnonymousCnfg) GetSiteURL() string { return c.SiteURL }
 
 // GetStrategy : gets auth strategy name
 func (c *AnonymousCnfg) GetStrategy() string {

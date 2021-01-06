@@ -18,31 +18,31 @@ var (
 	storage = cache.New(5*time.Minute, 10*time.Minute)
 )
 
-// GetAuth : get auth
-func GetAuth(c *AuthCnfg) (string, error) {
+// GetAuth gets authentication
+func GetAuth(c *AuthCnfg) (string, int64, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
 
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	cacheKey := parsedURL.Host + "@addinonly@" + c.ClientID + "@" + c.ClientSecret
-	if accessToken, found := storage.Get(cacheKey); found {
-		return accessToken.(string), nil
+	if accessToken, exp, found := storage.GetWithExpiration(cacheKey); found {
+		return accessToken.(string), exp.Unix(), nil
 	}
 
 	realm, err := getRealm(c)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 	c.Realm = realm
 
 	authURL, err := getAuthURL(c, c.Realm)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	servicePrincipal := "00000003-0000-0ff1-ce00-000000000000" // TODO: move to constants
@@ -58,7 +58,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	// resp, err := http.Post(authURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
 	resp, err := c.client.Post(authURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 	defer func() {
 		if resp != nil && resp.Body != nil {
@@ -68,7 +68,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	type getAuthResponse struct {
@@ -85,18 +85,19 @@ func GetAuth(c *AuthCnfg) (string, error) {
 
 	err = json.Unmarshal(data, &results)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	if results.Error != "" {
-		return "", fmt.Errorf("%s", results.Error)
+		return "", 0, fmt.Errorf("%s", results.Error)
 	}
 
 	expiry := (results.ExpiresIn - 60) * time.Second
+	exp := time.Now().Add(expiry).Unix()
+
 	storage.Set(cacheKey, results.AccessToken, expiry)
 
-	return results.AccessToken, nil
-
+	return results.AccessToken, exp, nil
 }
 
 func getAuthURL(c *AuthCnfg, realm string) (string, error) {

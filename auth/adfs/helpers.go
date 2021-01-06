@@ -21,20 +21,20 @@ var (
 	storage = cache.New(5*time.Minute, 10*time.Minute)
 )
 
-// GetAuth : get auth
-func GetAuth(c *AuthCnfg) (string, error) {
+// GetAuth gets authentication
+func GetAuth(c *AuthCnfg) (string, int64, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
 
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	cacheKey := parsedURL.Host + "@adfs@" + c.Username + "@" + c.Password
-	if authCookie, found := storage.Get(cacheKey); found {
-		return authCookie.(string), nil
+	if authCookie, exp, found := storage.GetWithExpiration(cacheKey); found {
+		return authCookie.(string), exp.Unix(), nil
 	}
 
 	var authCookie, expires string
@@ -44,7 +44,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	if c.AdfsCookie == "EdgeAccessCookie" {
 		authCookie, expires, err = wapAuthFlow(c)
 		if err != nil {
-			return "", err
+			return "", 0, err
 		}
 		if expires == "" {
 			expiry = 30 * time.Minute // ToDO: move to settings or dynamically get
@@ -52,15 +52,16 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	} else {
 		authCookie, expires, err = adfsAuthFlow(c, "")
 		if err != nil {
-			return "", err
+			return "", 0, err
 		}
 		expiresTime, _ := time.Parse(time.RFC3339, expires)
 		expiry = time.Until(expiresTime) - 60*time.Second
 	}
 
+	exp := time.Now().Add(expiry).Unix()
 	storage.Set(cacheKey, authCookie, expiry)
 
-	return authCookie, nil
+	return authCookie, exp, nil
 }
 
 func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {

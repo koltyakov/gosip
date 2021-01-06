@@ -16,25 +16,25 @@ var (
 	storage = cache.New(5*time.Minute, 10*time.Minute)
 )
 
-// GetAuth : get auth
-func GetAuth(c *AuthCnfg) (string, error) {
+// GetAuth gets authentication
+func GetAuth(c *AuthCnfg) (string, int64, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
 
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	cacheKey := parsedURL.Host + "@tmg@" + c.Username + "@" + c.Password
-	if accessToken, found := storage.Get(cacheKey); found {
-		return accessToken.(string), nil
+	if accessToken, exp, found := storage.GetWithExpiration(cacheKey); found {
+		return accessToken.(string), exp.Unix(), nil
 	}
 
 	redirect, err := detectCookieAuthURL(c, c.SiteURL)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	endpoint := fmt.Sprintf("%s://%s/CookieAuth.dll?Logon", parsedURL.Scheme, parsedURL.Host)
@@ -63,7 +63,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 
 	resp, err := c.client.Post(endpoint, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 	defer func() {
 		if resp != nil && resp.Body != nil {
@@ -72,7 +72,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	}()
 
 	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	// fmt.Println(resp.StatusCode)
@@ -80,9 +80,10 @@ func GetAuth(c *AuthCnfg) (string, error) {
 
 	// TODO: ttl detection
 	expiry := time.Hour
+	exp := time.Now().Add(expiry).Unix()
 	storage.Set(cacheKey, authCookie, expiry)
 
-	return authCookie, nil
+	return authCookie, exp, nil
 }
 
 func detectCookieAuthURL(c *AuthCnfg, siteURL string) (*url.URL, error) {

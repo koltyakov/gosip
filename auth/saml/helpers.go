@@ -22,32 +22,34 @@ var (
 	storage = cache.New(5*time.Minute, 10*time.Minute)
 )
 
-// GetAuth : get auth
-func GetAuth(c *AuthCnfg) (string, error) {
+// GetAuth gets authentication
+func GetAuth(c *AuthCnfg) (string, int64, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
 
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	cacheKey := parsedURL.Host + "@saml@" + c.Username + "@" + c.Password
-	if authToken, found := storage.Get(cacheKey); found {
-		return authToken.(string), nil
+	if authToken, exp, found := storage.GetWithExpiration(cacheKey); found {
+		return authToken.(string), exp.Unix(), nil
 	}
 
 	authCookie, notAfter, err := getSecurityToken(c)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	notAfterTime, _ := time.Parse(time.RFC3339, notAfter)
 	expiry := time.Until(notAfterTime) - 60*time.Second
+	exp := time.Now().Add(expiry).Unix()
+
 	storage.Set(cacheKey, authCookie, expiry)
 
-	return authCookie, nil
+	return authCookie, exp, nil
 }
 
 func getSecurityToken(c *AuthCnfg) (string, string, error) {

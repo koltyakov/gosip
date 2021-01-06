@@ -24,7 +24,7 @@ func CheckAuth(auth gosip.AuthCnfg, cnfgPath string, required []string) error {
 		return nil
 	}
 
-	token, err := auth.GetAuth()
+	token, _, err := auth.GetAuth()
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func CheckAuth(auth gosip.AuthCnfg, cnfgPath string, required []string) error {
 
 	// Second auth should involve caching and be instant
 	startAt := time.Now()
-	token, err = auth.GetAuth()
+	token, _, err = auth.GetAuth()
 	if err != nil {
 		return err
 	}

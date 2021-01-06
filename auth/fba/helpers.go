@@ -19,31 +19,31 @@ var (
 	storage = cache.New(5*time.Minute, 10*time.Minute)
 )
 
-// GetAuth : get auth
-func GetAuth(c *AuthCnfg) (string, error) {
+// GetAuth gets authentication
+func GetAuth(c *AuthCnfg) (string, int64, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
 
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	cacheKey := parsedURL.Host + "@fba@" + c.Username + "@" + c.Password
-	if authCookie, found := storage.Get(cacheKey); found {
-		return authCookie.(string), nil
+	if authCookie, exp, found := storage.GetWithExpiration(cacheKey); found {
+		return authCookie.(string), exp.Unix(), nil
 	}
 
 	endpoint := fmt.Sprintf("%s://%s/_vti_bin/authentication.asmx", parsedURL.Scheme, parsedURL.Host)
 	soapBody, err := templates.FbaWsTemplate(c.Username, c.Password)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer([]byte(soapBody)))
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	req.Header.Set("Content-Type", "text/xml;charset=utf-8")
@@ -51,7 +51,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	// client := &http.Client{}
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 	defer func() {
 		if resp != nil && resp.Body != nil {
@@ -61,7 +61,7 @@ func GetAuth(c *AuthCnfg) (string, error) {
 
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	// fmt.Printf("FBA: %s\n", string(res))
@@ -73,23 +73,24 @@ func GetAuth(c *AuthCnfg) (string, error) {
 	}
 	result := &fbaResponse{}
 	if err := xml.Unmarshal(res, &result); err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	if result.ErrorCode != "NoError" {
-		return "", errors.New(result.ErrorCode)
+		return "", 0, errors.New(result.ErrorCode)
 	}
 
 	if result.ErrorCode == "PasswordNotMatch" {
-		return "", errors.New("password doesn't not match")
+		return "", 0, errors.New("password doesn't not match")
 	}
 
 	// fmt.Printf("FBA: %s\n", string(result.CookieName))
 
 	authCookie := resp.Header.Get("Set-Cookie") // TODO: parse FBA cookie only (?)
 	expiry := (result.TimeoutSeconds - 60) * time.Second
+	exp := time.Now().Add(expiry).Unix()
 
 	storage.Set(cacheKey, authCookie, expiry)
 
-	return authCookie, nil
+	return authCookie, exp, nil
 }

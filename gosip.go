@@ -30,12 +30,15 @@ const version = "1.0.0"
 // AuthCnfg is an abstract auth config interface,
 // allows different authentications strategies' dependency injection
 type AuthCnfg interface {
+	GetAuth() (string, int64, error)                   // Authentication initializer (token/cookie/header, expiration, error)
 	SetAuth(req *http.Request, client *SPClient) error // Authentication middleware fabric
-	GetSiteURL() string                                // SiteURL getter method
-	GetStrategy() string                               // Strategy code getter (triggered on demand)
-	ReadConfig(configPath string) error                // Reads credentials from storage (triggered on demand)
-	WriteConfig(configPath string) error               // Writes credential to storage (triggered on demand)
-	GetAuth() (string, error)                          // Authentication initializer
+
+	GetSiteURL() string  // SiteURL getter method
+	GetStrategy() string // Strategy code getter (triggered on demand)
+
+	ParseConfig(jsonConf []byte) error   // Parses credentials from a provided JSON byte array content
+	ReadConfig(configPath string) error  // Reads credentials from storage (triggered on demand)
+	WriteConfig(configPath string) error // Writes credential to storage (triggered on demand)
 }
 
 // SPClient : SharePoint HTTP client struct

@@ -73,7 +73,7 @@ func init() {
 			}
 			client := &gosip.SPClient{AuthCnfg: auth}
 			// Pre-auth for tests not include auth timing involved
-			if _, err := client.AuthCnfg.GetAuth(); err != nil {
+			if _, _, err := client.AuthCnfg.GetAuth(); err != nil {
 				fmt.Printf("can't auth, %s\n", err)
 				// Force all test being skipped in case of auth issues
 				return nil
@@ -91,7 +91,7 @@ func init() {
 			}
 			client := &gosip.SPClient{AuthCnfg: auth}
 			// Pre-auth for tests not include auth timing involved
-			if _, err := client.AuthCnfg.GetAuth(); err != nil {
+			if _, _, err := client.AuthCnfg.GetAuth(); err != nil {
 				fmt.Printf("can't auth, %s\n", err)
 				// Force all test being skipped in case of auth issues
 				return nil
