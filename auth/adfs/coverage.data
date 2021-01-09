@@ -19,7 +19,7 @@ github.com/koltyakov/gosip/auth/adfs/auth.go:100.16,102.3 1 0
 github.com/koltyakov/gosip/auth/adfs/auth.go:117.51,117.78 1 1
 github.com/koltyakov/gosip/auth/adfs/auth.go:120.53,120.74 1 10
 github.com/koltyakov/gosip/auth/adfs/auth.go:123.40,123.60 1 12
-github.com/koltyakov/gosip/auth/adfs/auth.go:126.41,126.58 1 4
+github.com/koltyakov/gosip/auth/adfs/auth.go:126.41,126.58 1 16
 github.com/koltyakov/gosip/auth/adfs/auth.go:130.81,132.16 2 6
 github.com/koltyakov/gosip/auth/adfs/auth.go:135.2,136.12 2 6
 github.com/koltyakov/gosip/auth/adfs/auth.go:132.16,134.3 1 0

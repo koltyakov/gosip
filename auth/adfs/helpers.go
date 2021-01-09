@@ -32,7 +32,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 		return "", 0, err
 	}
 
-	cacheKey := parsedURL.Host + "@adfs@" + c.Username + "@" + c.Password
+	cacheKey := parsedURL.Host + "@" + c.GetStrategy() + "@" + c.Username + "@" + c.Password
 	if authCookie, exp, found := storage.GetWithExpiration(cacheKey); found {
 		return authCookie.(string), exp.Unix(), nil
 	}

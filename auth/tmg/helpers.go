@@ -27,7 +27,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 		return "", 0, err
 	}
 
-	cacheKey := parsedURL.Host + "@tmg@" + c.Username + "@" + c.Password
+	cacheKey := parsedURL.Host + "@" + c.GetStrategy() + "@" + c.Username + "@" + c.Password
 	if accessToken, exp, found := storage.GetWithExpiration(cacheKey); found {
 		return accessToken.(string), exp.Unix(), nil
 	}

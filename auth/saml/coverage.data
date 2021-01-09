@@ -15,7 +15,7 @@ github.com/koltyakov/gosip/auth/saml/auth.go:69.16,71.3 1 0
 github.com/koltyakov/gosip/auth/saml/auth.go:82.51,82.78 1 1
 github.com/koltyakov/gosip/auth/saml/auth.go:85.53,85.74 1 4
 github.com/koltyakov/gosip/auth/saml/auth.go:88.40,88.60 1 4
-github.com/koltyakov/gosip/auth/saml/auth.go:91.41,91.58 1 2
+github.com/koltyakov/gosip/auth/saml/auth.go:91.41,91.58 1 7
 github.com/koltyakov/gosip/auth/saml/auth.go:95.81,97.16 2 2
 github.com/koltyakov/gosip/auth/saml/auth.go:100.2,101.12 2 2
 github.com/koltyakov/gosip/auth/saml/auth.go:97.16,99.3 1 0
