@@ -2,11 +2,14 @@
 Package gosip is pure Go library for dealing with SharePoint unattended authentication and API consumption.
 
 It supports a variety of different authentication strategies such as:
+  - SAML based with user credentials
+  - Add-in only permissions
+  - Azure AD auth strategies (via extensions https://go.spflow.com/auth/custom-auth)
   - ADFS user credentials
+  - NTLM/NTLM v2 windows auth
   - Auth to SharePoint behind a reverse proxy (TMG, WAP)
   - Form-based authentication (FBA)
-  - Add-in only permissions
-  - SAML based with user credentials
+  - Web login/On-Demand auth (via extension https://go.spflow.com/auth/custom-auth/on-demand)
 
 Amongst supported platform versions are:
   - SharePoint Online (SPO)
@@ -30,15 +33,22 @@ const version = "1.0.0"
 // AuthCnfg is an abstract auth config interface,
 // allows different authentications strategies' dependency injection
 type AuthCnfg interface {
-	GetAuth() (string, int64, error)                   // Authentication initializer (token/cookie/header, expiration, error)
-	SetAuth(req *http.Request, client *SPClient) error // Authentication middleware fabric
+	// Authentication initializer (token/cookie/header, expiration, error)
+	// to support cabability for exposing tokens for external tools
+	// e.g. as of this sample project https://github.com/koltyakov/spvault
+	GetAuth() (string, int64, error)
+
+	// Authentication middleware fabric
+	// applyes round tripper or enriches requests with authentication and metadata
+	SetAuth(req *http.Request, client *SPClient) error
+
+	ParseConfig(jsonConf []byte) error  // Parses credentials from a provided JSON byte array content
+	ReadConfig(configPath string) error // Reads credentials from storage
 
 	GetSiteURL() string  // SiteURL getter method
-	GetStrategy() string // Strategy code getter (triggered on demand)
+	GetStrategy() string // Strategy code getter
 
-	ParseConfig(jsonConf []byte) error   // Parses credentials from a provided JSON byte array content
-	ReadConfig(configPath string) error  // Reads credentials from storage (triggered on demand)
-	WriteConfig(configPath string) error // Writes credential to storage (triggered on demand)
+	// WriteConfig(configPath string) error // Writes credential to storage // considering remove the method from interface
 }
 
 // SPClient : SharePoint HTTP client struct
@@ -52,8 +62,7 @@ type SPClient struct {
 }
 
 // Execute : SharePoint HTTP client
-// is a wrapper for standard http.Client' `Do` method,
-// injects authorization tokens, etc.
+// is a wrapper for standard http.Client' `Do` method, injects authorization tokens, etc.
 func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	reqTime := time.Now()
 
