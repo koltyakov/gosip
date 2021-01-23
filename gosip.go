@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -93,7 +92,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		var buf bytes.Buffer
 		tee := io.TeeReader(req.Body, &buf)
 		bodyBackup = &buf
-		req.Body = ioutil.NopCloser(tee)
+		req.Body = io.NopCloser(tee)
 	}
 
 	// Sending actual request to SharePoint API/resource
@@ -108,7 +107,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 			c.onRetry(req, reqTime, statusCode, nil)
 			// Reset body reader closer
 			if bodyBackup != nil {
-				req.Body = ioutil.NopCloser(bodyBackup)
+				req.Body = io.NopCloser(bodyBackup)
 			}
 			return c.Execute(req)
 		}
@@ -133,7 +132,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 			c.onRetry(req, reqTime, resp.StatusCode, nil)
 			// Reset body reader closer
 			if bodyBackup != nil {
-				req.Body = ioutil.NopCloser(bodyBackup)
+				req.Body = io.NopCloser(bodyBackup)
 			}
 			return c.Execute(req)
 		}
@@ -143,13 +142,13 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	if !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
 		var buf bytes.Buffer
 		tee := io.TeeReader(resp.Body, &buf)
-		details, _ := ioutil.ReadAll(tee)
+		details, _ := io.ReadAll(tee)
 		err = fmt.Errorf("%s :: %s", resp.Status, details)
 		// Unescape unicode-escaped error messages for non Latin languages
 		if unescaped, e := strconv.Unquote(`"` + strings.Replace(fmt.Sprintf("%s", details), `"`, `\"`, -1) + `"`); e == nil {
 			err = fmt.Errorf("%s :: %s", resp.Status, unescaped)
 		}
-		resp.Body = ioutil.NopCloser(&buf)
+		resp.Body = io.NopCloser(&buf)
 		c.onError(req, reqTime, resp.StatusCode, err)
 	}
 

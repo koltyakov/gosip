@@ -3,7 +3,7 @@ package helpers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/koltyakov/gosip"
@@ -35,7 +35,7 @@ func CheckRequest(auth gosip.AuthCnfg, cnfgPath string) error {
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("unable to read a response: %v", err)
 	}

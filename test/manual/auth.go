@@ -2,7 +2,7 @@ package manual
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -109,7 +109,7 @@ func r(auth gosip.AuthCnfg, cnfgPath string) (*gosip.SPClient, error) {
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	if _, err := ioutil.ReadAll(resp.Body); err != nil {
+	if _, err := io.ReadAll(resp.Body); err != nil {
 		return nil, fmt.Errorf("unable to read api response: %v", err)
 	}
 

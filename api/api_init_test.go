@@ -2,7 +2,7 @@ package api
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 	"runtime"
@@ -157,7 +157,7 @@ func readDotEnv() {
 	}
 	defer func() { _ = envFile.Close() }()
 
-	byteValue, _ := ioutil.ReadAll(envFile)
+	byteValue, _ := io.ReadAll(envFile)
 	keyVals := strings.Split(fmt.Sprintf("%s", byteValue), "\n")
 	for _, keyVal := range keyVals {
 		kv := strings.SplitN(keyVal, "=", 2)
