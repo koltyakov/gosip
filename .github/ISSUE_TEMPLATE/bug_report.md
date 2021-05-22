@@ -15,7 +15,7 @@ SharePoint version, e.g. SharePoint Online, SharePoint 2016, etc.
 Library version with the timestamp.
 
 **To Reproduce**
-Steps to reproduce the behavior. Code sample or a clonable temp repository link with scaffolding instructions.
+Steps to reproduce the behavior. Code sample, or a clonable temp repository link with scaffolding instructions.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.

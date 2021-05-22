@@ -33,13 +33,13 @@ const version = "1.0.0"
 // AuthCnfg is an abstract auth config interface,
 // allows different authentications strategies' dependency injection
 type AuthCnfg interface {
-	// Authentication initializer (token/cookie/header, expiration, error)
-	// to support cabability for exposing tokens for external tools
+	// GetAuth Authentication initializer (token/cookie/header, expiration, error)
+	// to support capability for exposing tokens for external tools
 	// e.g. as of this sample project https://github.com/koltyakov/spvault
 	GetAuth() (string, int64, error)
 
-	// Authentication middleware fabric
-	// applyes round tripper or enriches requests with authentication and metadata
+	// SetAuth Authentication middleware fabric
+	// applies round tripper or enriches requests with authentication and metadata
 	SetAuth(req *http.Request, client *SPClient) error
 
 	ParseConfig(jsonConf []byte) error  // Parses credentials from a provided JSON byte array content
@@ -99,7 +99,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 	// Sending actual request to SharePoint API/resource
 	resp, err := c.Do(req)
 	if err != nil {
-		// Retry only for NTML
+		// Retry only for NTLM
 		if c.AuthCnfg.GetStrategy() == "ntlm" && c.shouldRetry(req, resp, 5) {
 			statusCode := 400
 			if resp != nil {
@@ -159,7 +159,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 
 // applyAuth applies authentication flow
 func (c *SPClient) applyAuth(req *http.Request) (*http.Response, error) {
-	// Read stored creds and config
+	// Read stored credentials and config
 	if c.ConfigPath != "" && c.AuthCnfg.GetSiteURL() == "" {
 		_ = c.AuthCnfg.ReadConfig(c.ConfigPath)
 	}

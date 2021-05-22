@@ -2,7 +2,7 @@ package csom
 
 type current struct{}
 
-// Template returns objetc's template
+// Template returns object's template
 func (cw *current) Template() string {
 	return `<StaticProperty Id="0" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" />`
 }

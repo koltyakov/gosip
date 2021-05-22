@@ -6,7 +6,7 @@ type BasePermissions struct {
 	Low  int64 `json:"Low,string"`
 }
 
-// RoleAssigment role asigments model
+// RoleAssigment role assignments model
 type RoleAssigment struct {
 	Member *struct {
 		LoginName     string
@@ -57,7 +57,7 @@ var PermissionKind = struct {
 	ViewFormPages int64
 
 	/**
-	* Make content of a list or document library retrieveable for anonymous users through SharePoint search.
+	* Make content of a list or document library retrievable for anonymous users through SharePoint search.
 	* The list permissions in the site do not change.
 	 */
 	AnonymousSearchAccessList int64
@@ -116,7 +116,7 @@ var PermissionKind = struct {
 	ManageWeb int64
 
 	/**
-	* Content of lists and document libraries in the Web site will be retrieveable for anonymous users through
+	* Content of lists and document libraries in the Web site will be retrievable for anonymous users through
 	* SharePoint search if the list or document library has AnonymousSearchAccessList set
 	 */
 	AnonymousSearchAccessWebLists int64

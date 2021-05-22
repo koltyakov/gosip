@@ -131,7 +131,7 @@ func (list *List) Recycle() error {
 	return err
 }
 
-// Update updates Lists's metadata with properties provided in `body` parameter
+// Update updates List's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.List object
 func (list *List) Update(body []byte) (ListResp, error) {
 	body = patchMetadataType(body, "SP.List")
@@ -203,7 +203,7 @@ func (list *List) ParentWeb() *Web {
 	)
 }
 
-// RootFolder gets lists's root folder object
+// RootFolder gets list's root folder object
 func (list *List) RootFolder() *Folder {
 	return NewFolder(
 		list.client,

@@ -1,6 +1,6 @@
 # Contributing
 
-First of all, thank you for considering contributing to the project! We really appreciate any activity around it. There are no small contributions and any investment can't be underestimated. You can contribute with feedback, finding and posting an issue, docs suggestion, code commit, or a star ⭐️. All of these encourage us supporting this and other our Open Source projects on a high level.
+First, thank you for considering contributing to the project! We really appreciate any activity around it. There are no small contributions and any investment can't be underestimated. You can contribute with feedback, finding and posting an issue, docs suggestion, code commit, or a star ⭐️. All of these encourage us supporting this and other our Open Source projects on a high level.
 
 ## Code contributing guidance
 

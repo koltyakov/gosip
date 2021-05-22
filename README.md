@@ -28,6 +28,7 @@
 ### Supported auth strategies
 
 - SharePoint Online:
+
   - Azure Certificate (App Only) [🔗](https://go.spflow.com/auth/custom-auth/azure-certificate-auth)
   - Azure Username/Password [🔗](https://go.spflow.com/auth/custom-auth/azure-creds-auth)
   - SAML based with user credentials
@@ -245,17 +246,17 @@ Auth strategy should be selected corresponding to your SharePoint environment an
 
 Import path `strategy "github.com/koltyakov/gosip/auth/{strategy}"`. Where `/{strategy}` stands for a strategy auth package.
 
-`/{strategy}`     | SPO     | On-Prem | Credentials sample(s)
-------------------|---------|---------|-------------------
-AAD `/azurecert`  | ✅      | ❌       | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/azurecert)
-AAD `/azurecreds` | ✅      | ❌       | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/azurecreds)
-AAD `/device`     | ✅      | ❌       | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/device)
-`/saml`           | ✅      | ❌       | [sample](./config/samples/private.spo-user.json)
-`/addin`          | ✅      | ❌       | [sample](./config/samples/private.spo-addin.json)
-`/ntlm`           | ❌      | ✅       | [sample](./config/samples/private.onprem-ntlm.json)
-`/adfs`           | ✅      | ✅       | [spo](./config/samples/private.spo-adfs.json), [on-prem](./config/samples/private.onprem-adfs.json), [on-prem (wap)](./config/samples/private.onprem-wap.json)
-`/fba`            | ❌      | ✅       | [sample](./config/samples/private.onprem-fba.json)
-`/tmg`            | ❌      | ✅       | [sample](./config/samples/private.onprem-tmg.json)
+| `/{strategy}`     | SPO | On-Prem | Credentials sample(s)                                                                                                                                          |
+| ----------------- | --- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AAD `/azurecert`  | ✅  | ❌      | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/azurecert)                                                                         |
+| AAD `/azurecreds` | ✅  | ❌      | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/azurecreds)                                                                        |
+| AAD `/device`     | ✅  | ❌      | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/device)                                                                            |
+| `/saml`           | ✅  | ❌      | [sample](./config/samples/private.spo-user.json)                                                                                                               |
+| `/addin`          | ✅  | ❌      | [sample](./config/samples/private.spo-addin.json)                                                                                                              |
+| `/ntlm`           | ❌  | ✅      | [sample](./config/samples/private.onprem-ntlm.json)                                                                                                            |
+| `/adfs`           | ✅  | ✅      | [spo](./config/samples/private.spo-adfs.json), [on-prem](./config/samples/private.onprem-adfs.json), [on-prem (wap)](./config/samples/private.onprem-wap.json) |
+| `/fba`            | ❌  | ✅      | [sample](./config/samples/private.onprem-fba.json)                                                                                                             |
+| `/tmg`            | ❌  | ✅      | [sample](./config/samples/private.onprem-tmg.json)                                                                                                             |
 
 JSON and struct representations are different in terms of language notations. So credentials parameters names in `private.json` files and declared as structs initiators vary.
 
@@ -302,7 +303,7 @@ See more details of [AddIn Configuration and Permissions](https://github.com/s-k
 This type of authentication uses an HTTP NTLM handshake to obtain an authentication header.
 
 ```golang
-// AuthCnfg - NTML auth config structure
+// AuthCnfg - NTLM auth config structure
 type AuthCnfg struct {
 	// SPSite or SPWeb URL, which is the context target for the API calls
 	SiteURL  string `json:"siteUrl"`
@@ -333,7 +334,7 @@ type AuthCnfg struct {
 
 See more details [ADFS user credentials authentication](https://github.com/s-kainet/node-sp-auth/wiki/ADFS-user-credentials-authentication).
 
-Gosip's ADFS also supports a scenario of ADFS or NTML behind WAP (Web Application Proxy) which adds additional auth flow and `EdgeAccessCookie` involved into play.
+Gosip's ADFS also supports a scenario of ADFS or NTLM behind WAP (Web Application Proxy) which adds additional auth flow and `EdgeAccessCookie` involved into play.
 
 ### FBA/TMG Auth (Form-based authentication)
 

@@ -98,7 +98,7 @@ func TestAuthEdgeCases(t *testing.T) {
 			t.Error(err)
 		}
 		if r != "" {
-			t.Error("ntml's t.GetAuth should not return anything")
+			t.Error("ntlm's t.GetAuth should not return anything")
 		}
 	})
 
