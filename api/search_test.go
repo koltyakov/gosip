@@ -31,9 +31,6 @@ func TestSearch(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		// if res.Data().ElapsedTime == 0 {
-		// 	t.Error("incorrect response")
-		// }
 		if len(res.Data().PrimaryQueryResult.RelevantResults.Table.Rows) == 0 {
 			t.Error("incorrect response")
 		}
