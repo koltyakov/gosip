@@ -15,7 +15,14 @@ import (
 )
 
 var (
-	storage = cache.New(5*time.Minute, 10*time.Minute)
+	storage      = cache.New(5*time.Minute, 10*time.Minute)
+	accEndpoints = map[spoEnv]string{
+		spoProd:   "accounts.accesscontrol.windows.net",
+		spoGerman: "login.microsoftonline.de",
+		spoChina:  "accounts.accesscontrol.chinacloudapi.cn",
+		spoUSGov:  "accounts.accesscontrol.windows.net",
+		spoUSDef:  "accounts.accesscontrol.windows.net",
+	}
 )
 
 // GetAuth gets authentication
@@ -105,7 +112,8 @@ func getAuthURL(c *AuthCnfg, realm string) (string, error) {
 		c.client = &http.Client{}
 	}
 
-	endpoint := fmt.Sprintf("https://%s/metadata/json/1?realm=%s", "accounts.accesscontrol.windows.net", realm) // TODO: Add endpoint mapping
+	accEndpoint := accEndpoints[resolveSPOEnv(c.SiteURL)] // "accounts.accesscontrol.windows.net"
+	endpoint := fmt.Sprintf("https://%s/metadata/json/1?realm=%s", accEndpoint, realm)
 
 	cacheKey := endpoint
 	if authURL, found := storage.Get(cacheKey); found {

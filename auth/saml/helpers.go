@@ -19,7 +19,14 @@ import (
 )
 
 var (
-	storage = cache.New(5*time.Minute, 10*time.Minute)
+	storage        = cache.New(5*time.Minute, 10*time.Minute)
+	loginEndpoints = map[spoEnv]string{
+		spoProd:   "login.microsoftonline.com",
+		spoGerman: "login.microsoftonline.de",
+		spoChina:  "login.chinacloudapi.cn",
+		spoUSGov:  "login-us.microsoftonline.com",
+		spoUSDef:  "login-us.microsoftonline.com",
+	}
 )
 
 // GetAuth gets authentication
@@ -57,7 +64,8 @@ func getSecurityToken(c *AuthCnfg) (string, string, error) {
 		c.client = &http.Client{}
 	}
 
-	endpoint := "https://login.microsoftonline.com/GetUserRealm.srf" // TODO: endpoints mapping
+	loginEndpoint := loginEndpoints[resolveSPOEnv(c.SiteURL)]
+	endpoint := fmt.Sprintf("https://%s/GetUserRealm.srf", loginEndpoint)
 
 	params := url.Values{}
 	params.Set("login", c.Username)
@@ -133,7 +141,8 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 		return "", "", err
 	}
 
-	stsEndpoint := "https://login.microsoftonline.com/extSTS.srf" // TODO: add mapping for diff SPOs
+	loginEndpoint := loginEndpoints[resolveSPOEnv(c.SiteURL)]
+	stsEndpoint := fmt.Sprintf("https://%s/extSTS.srf", loginEndpoint)
 
 	req, err := http.NewRequest("POST", stsEndpoint, bytes.NewBuffer([]byte(samlBody)))
 	if err != nil {
