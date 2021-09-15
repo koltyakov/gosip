@@ -36,20 +36,20 @@ func TestHooks(t *testing.T) {
 	}
 	defer func() { _ = closer.Close() }()
 
-	// Request counters
-	var requestCounters = struct {
-		Errors    int32
-		Responses int32
-		Retries   int32
-		Requests  int32
-	}{
-		Errors:    0,
-		Responses: 0,
-		Retries:   0,
-		Requests:  0,
-	}
-
 	t.Run("Hooks", func(t *testing.T) {
+		// Request counters
+		var requestCounters = struct {
+			Errors    int32
+			Responses int32
+			Retries   int32
+			Requests  int32
+		}{
+			Errors:    0,
+			Responses: 0,
+			Retries:   0,
+			Requests:  0,
+		}
+
 		client := &SPClient{
 			AuthCnfg:      &AnonymousCnfg{SiteURL: siteURL},
 			RetryPolicies: map[int]int{503: 3},
@@ -69,11 +69,11 @@ func TestHooks(t *testing.T) {
 			},
 		}
 
-		if err := simpleCall(client, "/_api/get"); err != nil {
+		if err := simpleCall(client, "/_api/get", nil); err != nil {
 			t.Error(err)
 		}
 
-		if err := simpleCall(client, "/_api/error"); err == nil {
+		if err := simpleCall(client, "/_api/error", nil); err == nil {
 			t.Error("should be an error response")
 		}
 
@@ -96,15 +96,82 @@ func TestHooks(t *testing.T) {
 		if requestCounters.Errors != 1 {
 			t.Error("wrong number of errors")
 		}
+	})
 
+	t.Run("HooksOptout", func(t *testing.T) {
+		// Request counters
+		var requestCounters = struct {
+			Errors    int32
+			Responses int32
+			Retries   int32
+			Requests  int32
+		}{
+			Errors:    0,
+			Responses: 0,
+			Retries:   0,
+			Requests:  0,
+		}
+
+		client := &SPClient{
+			AuthCnfg:      &AnonymousCnfg{SiteURL: siteURL},
+			RetryPolicies: map[int]int{503: 3},
+			Hooks: &HookHandlers{
+				OnError: func(e *HookEvent) {
+					atomic.AddInt32(&requestCounters.Errors, 1)
+				},
+				OnResponse: func(e *HookEvent) {
+					atomic.AddInt32(&requestCounters.Responses, 1)
+				},
+				OnRetry: func(e *HookEvent) {
+					atomic.AddInt32(&requestCounters.Retries, 1)
+				},
+				OnRequest: func(e *HookEvent) {
+					atomic.AddInt32(&requestCounters.Requests, 1)
+				},
+			},
+		}
+
+		if err := simpleCall(client, "/_api/get", map[string]string{
+			"X-Gosip-NoHooks": "true",
+		}); err != nil {
+			t.Error(err)
+		}
+
+		if err := simpleCall(client, "/_api/error", map[string]string{
+			"X-Gosip-NoHooks": "true",
+		}); err == nil {
+			t.Error("should be an error response")
+		}
+
+		if requestCounters.Requests != 0 {
+			t.Error("wrong number of requests")
+		}
+
+		if requestCounters.Retries != 0 {
+			t.Error("wrong number of retries")
+		}
+
+		if requestCounters.Responses != 0 {
+			t.Error("wrong number of responses")
+		}
+
+		if requestCounters.Errors != 0 {
+			t.Error("wrong number of errors")
+		}
 	})
 
 }
 
-func simpleCall(client *SPClient, uri string) error {
+func simpleCall(client *SPClient, uri string, headers map[string]string) error {
 	req, err := http.NewRequest("GET", client.AuthCnfg.GetSiteURL()+uri, nil)
 	if err != nil {
 		return err
+	}
+
+	if headers != nil {
+		for h, v := range headers {
+			req.Header.Add(h, v)
+		}
 	}
 
 	resp, err := client.Execute(req)
