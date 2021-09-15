@@ -23,6 +23,10 @@ type HookEvent struct {
 
 // onError on error hook handler
 func (c *SPClient) onError(req *http.Request, startAt time.Time, statusCode int, err error) {
+	if req.Header.Get("X-Gosip-NoHooks") == "true" {
+		return
+	}
+
 	if c.Hooks != nil && c.Hooks.OnError != nil {
 		c.Hooks.OnError(&HookEvent{
 			Request:    req,
@@ -35,6 +39,10 @@ func (c *SPClient) onError(req *http.Request, startAt time.Time, statusCode int,
 
 // onRetry on retry hook handler
 func (c *SPClient) onRetry(req *http.Request, startAt time.Time, statusCode int, err error) {
+	if req.Header.Get("X-Gosip-NoHooks") == "true" {
+		return
+	}
+
 	if c.Hooks != nil && c.Hooks.OnRetry != nil {
 		c.Hooks.OnRetry(&HookEvent{
 			Request:    req,
@@ -47,6 +55,10 @@ func (c *SPClient) onRetry(req *http.Request, startAt time.Time, statusCode int,
 
 // onResponse on response hook handler
 func (c *SPClient) onResponse(req *http.Request, startAt time.Time, statusCode int, err error) {
+	if req.Header.Get("X-Gosip-NoHooks") == "true" {
+		return
+	}
+
 	if c.Hooks != nil && c.Hooks.OnResponse != nil {
 		c.Hooks.OnResponse(&HookEvent{
 			Request:    req,
@@ -59,6 +71,10 @@ func (c *SPClient) onResponse(req *http.Request, startAt time.Time, statusCode i
 
 // onRequest on response hook handler
 func (c *SPClient) onRequest(req *http.Request, startAt time.Time, statusCode int, err error) {
+	if req.Header.Get("X-Gosip-NoHooks") == "true" {
+		return
+	}
+
 	if c.Hooks != nil && c.Hooks.OnRequest != nil {
 		c.Hooks.OnRequest(&HookEvent{
 			Request:    req,

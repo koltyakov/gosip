@@ -182,6 +182,7 @@ func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string)
 		headers[key] = val
 	}
 	headers["X-Gosip-NoRetry"] = "true"
+	headers["X-Gosip-NoHooks"] = "true"
 	conf := &RequestConfig{
 		Headers: headers,
 	}
