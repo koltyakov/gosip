@@ -17,7 +17,7 @@ func CheckBasicPost(client *gosip.SPClient) (string, error) {
 
 	data, err := sp.Post(endpoint, strings.NewReader(body), nil)
 	if err != nil {
-		return "", fmt.Errorf("unable to read a response: %v", err)
+		return "", fmt.Errorf("unable to read a response: %w", err)
 	}
 
 	return string(data), nil

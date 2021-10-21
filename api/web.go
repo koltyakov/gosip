@@ -217,7 +217,7 @@ func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
 	}{}
 
 	if err := json.Unmarshal(data, &res); err != nil {
-		return nil, fmt.Errorf("unable to parse the response: %v", err)
+		return nil, fmt.Errorf("unable to parse the response: %w", err)
 	}
 
 	return res.User, nil

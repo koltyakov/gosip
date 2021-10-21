@@ -88,7 +88,7 @@ func r(auth gosip.AuthCnfg, cnfgPath string) (*gosip.SPClient, error) {
 	configPath := u.ResolveCnfgPath(cnfgPath)
 	err := auth.ReadConfig(configPath)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get config: %v", err)
+		return nil, fmt.Errorf("unable to get config: %w", err)
 	}
 
 	fmt.Printf("Site Url: %s\n", auth.GetSiteURL())
@@ -98,19 +98,19 @@ func r(auth gosip.AuthCnfg, cnfgPath string) (*gosip.SPClient, error) {
 	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create a request: %v", err)
+		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
 	req.Header.Set("Accept", "application/json;odata=verbose")
 
 	resp, err := client.Execute(req)
 	if err != nil {
-		return nil, fmt.Errorf("unable to request the api: %v", err)
+		return nil, fmt.Errorf("unable to request the api: %w", err)
 	}
 	defer func() { _ = resp.Body.Close() }()
 
 	if _, err := ioutil.ReadAll(resp.Body); err != nil {
-		return nil, fmt.Errorf("unable to read api response: %v", err)
+		return nil, fmt.Errorf("unable to read api response: %w", err)
 	}
 
 	// fmt.Printf("response: %s\n", data)
