@@ -62,7 +62,7 @@ func NewHTTPClient(spClient *gosip.SPClient) *HTTPClient {
 func (client *HTTPClient) Get(endpoint string, conf *RequestConfig) ([]byte, error) {
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create a request: %v", err)
+		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
 	// Apply context
@@ -82,7 +82,7 @@ func (client *HTTPClient) Get(endpoint string, conf *RequestConfig) ([]byte, err
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
-		return nil, fmt.Errorf("unable to request api: %v", err)
+		return nil, fmt.Errorf("unable to request api: %w", err)
 	}
 	defer shut(resp.Body)
 
@@ -94,7 +94,7 @@ func (client *HTTPClient) Post(endpoint string, body io.Reader, conf *RequestCon
 	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
 	req, err := http.NewRequest("POST", endpoint, body)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create a request: %v", err)
+		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
 	// Apply context
@@ -115,7 +115,7 @@ func (client *HTTPClient) Post(endpoint string, body io.Reader, conf *RequestCon
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
-		return nil, fmt.Errorf("unable to request api: %v", err)
+		return nil, fmt.Errorf("unable to request api: %w", err)
 	}
 	defer shut(resp.Body)
 
@@ -126,7 +126,7 @@ func (client *HTTPClient) Post(endpoint string, body io.Reader, conf *RequestCon
 func (client *HTTPClient) Delete(endpoint string, conf *RequestConfig) ([]byte, error) {
 	req, err := http.NewRequest("POST", endpoint, nil)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create a request: %v", err)
+		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
 	// Apply context
@@ -149,7 +149,7 @@ func (client *HTTPClient) Delete(endpoint string, conf *RequestConfig) ([]byte, 
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
-		return nil, fmt.Errorf("unable to request api: %v", err)
+		return nil, fmt.Errorf("unable to request api: %w", err)
 	}
 	defer shut(resp.Body)
 
@@ -161,7 +161,7 @@ func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestC
 	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
 	req, err := http.NewRequest("POST", endpoint, body)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create a request: %v", err)
+		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
 	// Apply context
@@ -184,7 +184,7 @@ func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestC
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
-		return nil, fmt.Errorf("unable to request api: %v", err)
+		return nil, fmt.Errorf("unable to request api: %w", err)
 	}
 	defer shut(resp.Body)
 
@@ -200,7 +200,7 @@ func (client *HTTPClient) ProcessQuery(endpoint string, body io.Reader, conf *Re
 	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
 	req, err := http.NewRequest("POST", endpoint, body)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create a request: %v", err)
+		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
 	// Apply context
@@ -222,7 +222,7 @@ func (client *HTTPClient) ProcessQuery(endpoint string, body io.Reader, conf *Re
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
-		return nil, fmt.Errorf("unable to request api: %v", err)
+		return nil, fmt.Errorf("unable to request api: %w", err)
 	}
 	defer shut(resp.Body)
 

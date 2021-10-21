@@ -21,7 +21,7 @@ func CheckDigest(auth gosip.AuthCnfg, cnfgPath string) error {
 
 	digest, err := gosip.GetDigest(context.Background(), client)
 	if err != nil {
-		return fmt.Errorf("unable to get digest: %v", err)
+		return fmt.Errorf("unable to get digest: %w", err)
 	}
 
 	if digest == "" {
@@ -29,7 +29,7 @@ func CheckDigest(auth gosip.AuthCnfg, cnfgPath string) error {
 	}
 
 	if _, err := gosip.GetDigest(context.Background(), client); err != nil {
-		return fmt.Errorf("unable to get cached digest: %v", err)
+		return fmt.Errorf("unable to get cached digest: %w", err)
 	}
 
 	// if digest != cachedDigest {

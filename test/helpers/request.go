@@ -24,20 +24,20 @@ func CheckRequest(auth gosip.AuthCnfg, cnfgPath string) error {
 	endpoint := auth.GetSiteURL() + "/_api/web?$select=Title"
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
-		return fmt.Errorf("unable to create a request: %v", err)
+		return fmt.Errorf("unable to create a request: %w", err)
 	}
 
 	req.Header.Set("Accept", "application/json;odata=verbose")
 
 	resp, err := client.Execute(req)
 	if err != nil {
-		return fmt.Errorf("unable to request api: %v", err)
+		return fmt.Errorf("unable to request api: %w", err)
 	}
 	defer func() { _ = resp.Body.Close() }()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("unable to read a response: %v", err)
+		return fmt.Errorf("unable to read a response: %w", err)
 	}
 
 	type apiResponse struct {
@@ -54,7 +54,7 @@ func CheckRequest(auth gosip.AuthCnfg, cnfgPath string) error {
 
 	err = json.Unmarshal(data, &results)
 	if err != nil {
-		return fmt.Errorf("unable to parse a response: %v", err)
+		return fmt.Errorf("unable to parse a response: %w", err)
 	}
 
 	if results.Error.Message.Value != "" {
