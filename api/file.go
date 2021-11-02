@@ -176,6 +176,28 @@ func (file *File) UndoCheckOut() ([]byte, error) {
 	return client.Post(endpoint, nil, file.config)
 }
 
+// Publish publishes a file
+func (file *File) Publish(comment string) ([]byte, error) {
+	endpoint := fmt.Sprintf(
+		"%s/Publish(comment='%s')",
+		file.endpoint,
+		comment,
+	)
+	client := NewHTTPClient(file.client)
+	return client.Post(endpoint, nil, file.config)
+}
+
+// UnPublish un-publishes a file
+func (file *File) UnPublish(comment string) ([]byte, error) {
+	endpoint := fmt.Sprintf(
+		"%s/Publish(comment='%s')",
+		file.endpoint,
+		comment,
+	)
+	client := NewHTTPClient(file.client)
+	return client.Post(endpoint, nil, file.config)
+}
+
 // GetReader gets file io.ReadCloser
 func (file *File) GetReader() (io.ReadCloser, error) {
 	endpoint := fmt.Sprintf("%s/$value", file.endpoint)
