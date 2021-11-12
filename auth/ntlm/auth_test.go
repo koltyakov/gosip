@@ -57,7 +57,6 @@ func TestCheckRequest(t *testing.T) {
 }
 
 func TestAuthEdgeCases(t *testing.T) {
-
 	t.Run("ReadConfig/MissedConfig", func(t *testing.T) {
 		cnfg := &AuthCnfg{}
 		if err := cnfg.ReadConfig("wrong_path.json"); err == nil {
@@ -101,5 +100,14 @@ func TestAuthEdgeCases(t *testing.T) {
 			t.Error("ntlm's t.GetAuth should not return anything")
 		}
 	})
+}
 
+func TestCheckTransport(t *testing.T) {
+	if !h.ConfigExists(cnfgPath) {
+		t.Skip("No auth config provided")
+	}
+	err := h.CheckTransport(&AuthCnfg{}, cnfgPath)
+	if err != nil {
+		t.Error(err)
+	}
 }

@@ -57,7 +57,6 @@ func TestCheckRequest(t *testing.T) {
 }
 
 func TestAuthEdgeCases(t *testing.T) {
-
 	t.Run("ReadConfig/MissedConfig", func(t *testing.T) {
 		cnfg := &AuthCnfg{}
 		if err := cnfg.ReadConfig("wrong_path.json"); err == nil {
@@ -90,5 +89,21 @@ func TestAuthEdgeCases(t *testing.T) {
 			t.Error("unable to set master key")
 		}
 	})
+}
 
+func TestCheckTransport(t *testing.T) {
+	configsChecked := 0
+	for _, cnfgPath := range cnfgPaths {
+		if !h.ConfigExists(cnfgPath) {
+			continue
+		}
+		configsChecked++
+		err := h.CheckTransport(&AuthCnfg{}, cnfgPath)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+	if configsChecked == 0 {
+		t.Skip("No auth config(s) provided")
+	}
 }
