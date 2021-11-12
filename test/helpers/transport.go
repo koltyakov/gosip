@@ -1,13 +1,13 @@
 package helpers
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/Azure/go-ntlmssp"
 	"github.com/koltyakov/gosip"
-	"github.com/koltyakov/gosip/api"
 	u "github.com/koltyakov/gosip/test/utils"
 )
 
@@ -24,10 +24,14 @@ func CheckTransport(auth gosip.AuthCnfg, cnfgPath string) error {
 		},
 	}
 
-	sp := api.NewSP(client)
-	if _, err := sp.ContextInfo(); err != nil {
-		return fmt.Errorf("can't get SP context: %s", err)
+	if _, err := gosip.GetDigest(context.Background(), client); err != nil {
+		return fmt.Errorf("unable to get digest: %w", err)
 	}
+
+	// sp := api.NewSP(client) // import cycle not allowed
+	// if _, err := sp.ContextInfo(); err != nil {
+	// 	return fmt.Errorf("can't get SP context: %s", err)
+	// }
 
 	if auth.GetStrategy() == "ntlm" {
 		n, ok := client.Transport.(ntlmssp.Negotiator)

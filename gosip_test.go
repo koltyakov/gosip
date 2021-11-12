@@ -3,7 +3,6 @@ package gosip
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"testing"
 	"time"
 )
@@ -103,9 +102,8 @@ func TestEdges(t *testing.T) {
 		}
 
 		_, err = client.Execute(req) // should fail after a timeout
-		if err != nil && strings.Index(err.Error(), "context deadline exceeded") == -1 {
+		if err == nil {
 			t.Error("request canceling failed")
 		}
 	})
-
 }
