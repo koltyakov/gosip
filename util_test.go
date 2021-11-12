@@ -62,9 +62,6 @@ func startFakeServer(addr string, handler http.Handler) (io.Closer, error) {
 
 	go func() {
 		_ = srv.Serve(listener.(*net.TCPListener))
-		// if err != nil {
-		// 	log.Println("HTTP Server Error - ", err)
-		// }
 	}()
 
 	return listener, nil
