@@ -28,11 +28,6 @@ func CheckTransport(auth gosip.AuthCnfg, cnfgPath string) error {
 		return fmt.Errorf("unable to get digest: %w", err)
 	}
 
-	// sp := api.NewSP(client) // import cycle not allowed
-	// if _, err := sp.ContextInfo(); err != nil {
-	// 	return fmt.Errorf("can't get SP context: %s", err)
-	// }
-
 	if auth.GetStrategy() == "ntlm" {
 		n, ok := client.Transport.(ntlmssp.Negotiator)
 		if !ok {

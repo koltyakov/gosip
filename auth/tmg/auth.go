@@ -93,6 +93,9 @@ func (c *AuthCnfg) GetStrategy() string { return "tmg" }
 // SetAuth authenticate request
 // noinspection GoUnusedParameter
 func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
+	if c.client == nil {
+		c.client = &httpClient.Client
+	}
 	authCookie, _, err := c.GetAuth()
 	if err != nil {
 		return err
