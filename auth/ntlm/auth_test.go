@@ -12,6 +12,17 @@ var (
 	cnfgPath = "./config/private.onprem-ntlm.json"
 )
 
+// ToDo: Check why tests fails when is called after another
+func TestCheckTransport(t *testing.T) {
+	if !h.ConfigExists(cnfgPath) {
+		t.Skip("No auth config provided")
+	}
+	err := h.CheckTransport(&AuthCnfg{}, cnfgPath)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestGettingAuth(t *testing.T) {
 	if !h.ConfigExists(cnfgPath) {
 		t.Skip("No config found, skipping...")
@@ -100,14 +111,4 @@ func TestAuthEdgeCases(t *testing.T) {
 			t.Error("ntlm's t.GetAuth should not return anything")
 		}
 	})
-}
-
-func TestCheckTransport(t *testing.T) {
-	if !h.ConfigExists(cnfgPath) {
-		t.Skip("No auth config provided")
-	}
-	err := h.CheckTransport(&AuthCnfg{}, cnfgPath)
-	if err != nil {
-		t.Error(err)
-	}
 }
