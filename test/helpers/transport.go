@@ -28,6 +28,10 @@ func CheckTransport(auth gosip.AuthCnfg, cnfgPath string) error {
 		return fmt.Errorf("unable to get digest: %w", err)
 	}
 
+	if _, _, err := client.AuthCnfg.GetAuth(); err != nil {
+		return err
+	}
+
 	if auth.GetStrategy() == "ntlm" {
 		n, ok := client.Transport.(ntlmssp.Negotiator)
 		if !ok {
