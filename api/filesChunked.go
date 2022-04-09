@@ -145,12 +145,17 @@ func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 		return res, nil
 	}
 	res := &struct {
-		StartUpload int `json:"StartUpload,string"`
+		StartUpload int `json:"StartUpload,string"` // With OData=verbose
+		Value       int `json:"value,string"`       // With OData=minimanmetadata or nometadata
 	}{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return 0, err
 	}
-	return res.StartUpload, nil
+	offset := res.StartUpload
+	if offset == 0 {
+		offset = res.Value
+	}
+	return offset, nil
 }
 
 // continueUpload continues uploading a document using chunk API
@@ -166,12 +171,17 @@ func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) 
 		return res, nil
 	}
 	res := &struct {
-		ContinueUpload int `json:"ContinueUpload,string"`
+		ContinueUpload int `json:"ContinueUpload,string"` // With OData=verbose
+		Value          int `json:"value,string"`          // With OData=minimanmetadata or nometadata
 	}{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		return 0, err
 	}
-	return res.ContinueUpload, nil
+	offset := res.ContinueUpload
+	if offset == 0 {
+		offset = res.Value
+	}
+	return offset, nil
 }
 
 // cancelUpload cancels document upload using chunk API
