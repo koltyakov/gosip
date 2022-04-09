@@ -53,6 +53,33 @@ func TestFilesChunked(t *testing.T) {
 		}
 	})
 
+	t.Run("AddChunkedNotEmtyOffset", func(t *testing.T) {
+		fileName := fmt.Sprintf("ChunkedFile.txt")
+		content := "Greater than a chunk content..."
+		stream := strings.NewReader(content)
+		for _, reqConfig := range []*RequestConfig{HeadersPresets.Minimalmetadata, HeadersPresets.Nometadata} {
+			var offset int
+			options := &AddChunkedOptions{
+				Overwrite: true,
+				ChunkSize: 5,
+				Progress: func(progress *FileUploadProgressData) bool {
+					if progress.BlockNumber == 0 {
+						return true
+					}
+					offset = progress.FileOffset
+					return false
+				},
+			}
+			_, _ = web.GetFolder(newFolderURI).Files().
+				Conf(reqConfig).
+				AddChunked(fileName, stream, options)
+
+			if offset == 0 {
+				t.Error("wrong offset value")
+			}
+		}
+	})
+
 	t.Run("AddChunkedNilFinishPackage", func(t *testing.T) {
 		fileName := fmt.Sprintf("ChunkedFile.txt")
 		content := "1234512345" // with combination of ChunkSize finishUpload package is nil
