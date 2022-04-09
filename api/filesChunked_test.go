@@ -54,7 +54,7 @@ func TestFilesChunked(t *testing.T) {
 	})
 
 	t.Run("AddChunkedNotEmtyOffset", func(t *testing.T) {
-		fileName := fmt.Sprintf("ChunkedFile.txt")
+		fileName := fmt.Sprintf("ChunkedFile1.txt")
 		content := "Greater than a chunk content..."
 		stream := strings.NewReader(content)
 		for _, reqConfig := range []*RequestConfig{HeadersPresets.Minimalmetadata, HeadersPresets.Nometadata} {
