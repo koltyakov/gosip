@@ -117,6 +117,12 @@ func init() {
 
 	if envCode != "" && envResolver[envCode] != nil {
 		spClient = envResolver[envCode]()
+		if spClient == nil {
+			skip = true
+			fmt.Printf("Warning: can't resolve auth context for %s\n", envCode)
+			return
+		}
+
 		spClient.Hooks = handlers
 
 		spClient.RetryPolicies = map[int]int{
