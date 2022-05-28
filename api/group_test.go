@@ -82,7 +82,7 @@ func TestGroup(t *testing.T) {
 	})
 
 	t.Run("SetAsOwner/User", func(t *testing.T) {
-		au, err := web.SiteUsers().Select("Id").Filter(fmt.Sprintf("Id ne %d", user.Data().ID)).Top(1).Get()
+		au, err := web.SiteUsers().Select("Id").Filter(fmt.Sprintf("Id ne %d and PrincipalType eq 1", user.Data().ID)).Top(1).Get()
 		if err != nil {
 			t.Error(err)
 		}
