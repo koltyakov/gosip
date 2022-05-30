@@ -35,14 +35,6 @@ func TestItem(t *testing.T) {
 		}
 	})
 
-	t.Run("UpdateValidate", func(t *testing.T) {
-		options := &ValidateUpdateOptions{NewDocumentUpdate: true, CheckInComment: "test"}
-		data := map[string]string{"Title": "New item"}
-		if _, err := list.Items().GetByID(3).UpdateValidate(data, options); err != nil {
-			t.Error(err)
-		}
-	})
-
 	t.Run("Get", func(t *testing.T) {
 		item, err := list.Items().GetByID(1).Conf(HeadersPresets.Verbose).Get()
 		if err != nil {

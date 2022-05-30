@@ -28,3 +28,4 @@ coverage.txt
 
 .DS_store
 .env
+.vscode/*.log

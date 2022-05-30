@@ -17,6 +17,16 @@ type ValidateAddOptions struct {
 	CheckInComment    string
 }
 
+// AddValidateFieldResult field result struct
+type AddValidateFieldResult struct {
+	ErrorCode    int
+	ErrorMessage string
+	FieldName    string
+	FieldValue   string
+	HasException bool
+	ItemID       int `json:"ItemId"`
+}
+
 // AddValidate adds new item in this list using AddValidateUpdateItemUsingPath method.
 // formValues fingerprints https://github.com/koltyakov/sp-sig-20180705-demo/blob/master/src/03-pnp/FieldTypes.md#field-data-types-fingerprints-sample
 func (items *Items) AddValidate(formValues map[string]string, options *ValidateAddOptions) (AddValidateResp, error) {
@@ -48,21 +58,40 @@ func (items *Items) AddValidate(formValues map[string]string, options *ValidateA
 		}
 	}
 	body, _ := json.Marshal(payload)
-	return client.Post(endpoint, bytes.NewBuffer(body), items.config)
+
+	var res AddValidateResp
+	var err error
+
+	res, err = client.Post(endpoint, bytes.NewBuffer(body), items.config)
+	if err != nil {
+		return res, err
+	}
+
+	var errs []error
+	for _, f := range res.Data() {
+		if f.HasException {
+			errs = append(errs, fmt.Errorf("%s: %s", f.FieldName, f.ErrorMessage))
+		}
+	}
+	if len(errs) > 0 {
+		return res, fmt.Errorf("%v", errs)
+	}
+
+	return res, nil
 }
 
 /* AddValidate response helpers */
 
 // Data unmarshals AddValidate response
-func (avResp *AddValidateResp) Data() []map[string]interface{} {
-	var d []map[string]interface{}
+func (avResp *AddValidateResp) Data() []AddValidateFieldResult {
+	var d []AddValidateFieldResult
 	r := &struct {
 		D struct {
 			AddValidateUpdateItemUsingPath struct {
-				Results []map[string]interface{} `json:"results"`
+				Results []AddValidateFieldResult `json:"results"`
 			} `json:"AddValidateUpdateItemUsingPath"`
 		} `json:"d"`
-		Value []map[string]interface{} `json:"value"`
+		Value []AddValidateFieldResult `json:"value"`
 	}{}
 	_ = json.Unmarshal(*avResp, &r)
 	if r.Value != nil {
@@ -74,14 +103,20 @@ func (avResp *AddValidateResp) Data() []map[string]interface{} {
 	return d
 }
 
-// ID gets created item's ID from the response
-func (avResp *AddValidateResp) ID() int {
+// Value gets created item's value from the response
+func (avResp *AddValidateResp) Value(fieldName string) string {
 	dd := avResp.Data()
 	for _, d := range dd {
-		if d["FieldName"] == "Id" {
-			d, _ := strconv.Atoi(d["FieldValue"].(string))
-			return d
+		if d.FieldName == fieldName {
+			return d.FieldValue
 		}
 	}
-	return 0
+	return ""
+}
+
+// ID gets created item's ID from the response
+func (avResp *AddValidateResp) ID() int {
+	v := avResp.Value("Id")
+	d, _ := strconv.Atoi(v)
+	return d
 }
