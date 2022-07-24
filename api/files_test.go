@@ -63,7 +63,7 @@ func TestFiles(t *testing.T) {
 	})
 
 	t.Run("GetFileByPath", func(t *testing.T) {
-		if envCode != "SPO" {
+		if envCode != "spo" {
 			t.Skip("is not supported with legacy SP")
 		}
 
@@ -77,7 +77,7 @@ func TestFiles(t *testing.T) {
 	})
 
 	t.Run("GetFileByID", func(t *testing.T) {
-		if envCode != "SPO" {
+		if envCode != "spo" {
 			t.Skip("is not supported with legacy SP")
 		}
 

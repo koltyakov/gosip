@@ -47,7 +47,7 @@ func TestFolders(t *testing.T) {
 	})
 
 	t.Run("GetFolderByPath", func(t *testing.T) {
-		if envCode != "SPO" {
+		if envCode != "spo" {
 			t.Skip("is not supported with legacy SP")
 		}
 
@@ -57,7 +57,7 @@ func TestFolders(t *testing.T) {
 	})
 
 	t.Run("GetFolderByID", func(t *testing.T) {
-		if envCode != "SPO" {
+		if envCode != "spo" {
 			t.Skip("is not supported with legacy SP")
 		}
 

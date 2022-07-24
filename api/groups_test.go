@@ -111,7 +111,7 @@ func TestGroups(t *testing.T) {
 			t.Error(err)
 		}
 
-		if envCode != "SPO" {
+		if envCode != "spo" {
 			t.Skip("is not supported with legacy SP")
 		}
 		if err := groups.GetByName(newGroupName).SetOwner(u.Data().ID); err != nil {
