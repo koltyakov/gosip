@@ -29,13 +29,13 @@
 
 - SharePoint Online:
 
-  - Azure Certificate (App Only) [🔗](https://go.spflow.com/auth/custom-auth/azure-certificate-auth)
-  - Azure Username/Password [🔗](https://go.spflow.com/auth/custom-auth/azure-creds-auth)
+  - Azure Certificate (App Only) [🔗](https://go.spflow.com/auth/strategies/azure-certificate-auth)
+  - Azure Username/Password [🔗](https://go.spflow.com/auth/strategies/azure-creds-auth)
+  - Azure Device Flow [🔗](https://go.spflow.com/auth/strategies/azure-device-flow)
   - SAML based with user credentials
   - Add-In only permissions
   - ADFS user credentials (automatically detects in SAML strategy)
   - On-Demand auth [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/ondemand)
-  - Azure AD Device flow [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/device)
 
 - SharePoint On-Premises 2019/2016/2013:
   - User credentials (NTLM)
