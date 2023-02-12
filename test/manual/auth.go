@@ -2,13 +2,17 @@ package manual
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/auth/addin"
 	"github.com/koltyakov/gosip/auth/adfs"
+	"github.com/koltyakov/gosip/auth/azurecert"
+	"github.com/koltyakov/gosip/auth/azurecreds"
+	"github.com/koltyakov/gosip/auth/azureenv"
+	"github.com/koltyakov/gosip/auth/device"
 	"github.com/koltyakov/gosip/auth/fba"
 	"github.com/koltyakov/gosip/auth/ntlm"
 	"github.com/koltyakov/gosip/auth/saml"
@@ -21,28 +25,50 @@ func GetTestClient(strategy string) (*gosip.SPClient, error) {
 	var client *gosip.SPClient
 	var err error
 	switch strategy {
+	case "azurecert":
+		client, err = getAzurecertAuthTest()
+	case "azurecreds":
+		client, err = getAzurecredsAuthTest()
+	case "azureenv":
+		client, err = getAzureenvAuthTest()
+	case "device":
+		client, err = getDeviceAuthTest()
 	case "addin":
 		client, err = getAddinAuthTest()
-		break
 	case "adfs":
 		client, err = getAdfsAuthTest()
-		break
 	case "fba":
 		client, err = getFbaAuthTest()
-		break
 	case "ntlm":
 		client, err = getNtlmAuthTest()
-		break
 	case "saml":
 		client, err = getSamlAuthTest()
-		break
 	case "tmg":
 		client, err = getTmgAuthTest()
-		break
 	default:
 		return nil, fmt.Errorf("can't resolve the strategy: %s", strategy)
 	}
 	return client, err
+}
+
+// getAzurecertAuthTest : Azure Cert auth test scenario
+func getAzurecertAuthTest() (*gosip.SPClient, error) {
+	return r(&azurecert.AuthCnfg{}, "./config/private.spo-azurecert.json")
+}
+
+// getAzurecredsAuthTest : Azure Creds auth test scenario
+func getAzurecredsAuthTest() (*gosip.SPClient, error) {
+	return r(&azurecreds.AuthCnfg{}, "./config/private.spo-azurecreds.json")
+}
+
+// getAzureenvAuthTest : Azure Evv auth test scenario
+func getAzureenvAuthTest() (*gosip.SPClient, error) {
+	return r(&azureenv.AuthCnfg{}, "./config/private.spo-azureenv.json")
+}
+
+// getDeviceAuthTest : Device auth test scenario
+func getDeviceAuthTest() (*gosip.SPClient, error) {
+	return r(&device.AuthCnfg{}, "./config/private.spo-device.json")
 }
 
 // getAddinAuthTest : Addin auth test scenario
@@ -109,7 +135,7 @@ func r(auth gosip.AuthCnfg, cnfgPath string) (*gosip.SPClient, error) {
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	if _, err := ioutil.ReadAll(resp.Body); err != nil {
+	if _, err := io.ReadAll(resp.Body); err != nil {
 		return nil, fmt.Errorf("unable to read api response: %w", err)
 	}
 

@@ -9,13 +9,23 @@ import (
 	u "github.com/koltyakov/gosip/test/utils"
 )
 
-var cnfgPath = "./config/private.device.json"
+var cnfgPath = "./config/private.spo-device.json"
 
 func TestGettingAuthToken(t *testing.T) {
 	if !h.ConfigExists(cnfgPath) {
 		t.Skip("No auth config provided")
 	}
 	err := h.CheckAuth(
+		&AuthCnfg{},
+		cnfgPath,
+		[]string{"SiteURL", "ClientID", "TenantID"},
+	)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Connect for a second time to check chache
+	err = h.CheckAuth(
 		&AuthCnfg{},
 		cnfgPath,
 		[]string{"SiteURL", "ClientID", "TenantID"},
@@ -43,6 +53,12 @@ func TestRequest(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+}
+
+func TestCleanAuthToken(t *testing.T) {
+	c := &AuthCnfg{}
+	c.ReadConfig(cnfgPath)
+	c.CleanTokenCache()
 }
 
 func TestAuthEdgeCases(t *testing.T) {

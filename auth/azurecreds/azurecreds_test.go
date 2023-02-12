@@ -9,7 +9,7 @@ import (
 	u "github.com/koltyakov/gosip/test/utils"
 )
 
-var cnfgPath = "./config/private.azurecreds.json"
+var cnfgPath = "./config/private.spo-azurecreds.json"
 
 func TestGettingAuthToken(t *testing.T) {
 	if !h.ConfigExists(cnfgPath) {
