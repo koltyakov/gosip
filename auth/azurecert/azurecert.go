@@ -1,10 +1,10 @@
-// Package azure implements AAD Certificate Auth Flow
+// Package azurecert implements AAD Certificate Auth Flow
 // See more:
 //   - https://docs.microsoft.com/en-us/azure/developer/go/azure-sdk-authorization#use-file-based-authentication
 //
 // Amongst supported platform versions are:
 //   - SharePoint Online + Azure
-package azure
+package azurecert
 
 import (
 	"encoding/base64"

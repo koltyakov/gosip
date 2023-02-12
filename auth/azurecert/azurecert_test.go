@@ -1,4 +1,4 @@
-package azure
+package azurecert
 
 import (
 	"io/ioutil"
@@ -9,7 +9,7 @@ import (
 	u "github.com/koltyakov/gosip/test/utils"
 )
 
-var cnfgPath = "./config/private.azure.json"
+var cnfgPath = "./config/private.azurecert.json"
 
 func TestGettingAuthToken(t *testing.T) {
 	if !h.ConfigExists(cnfgPath) {
