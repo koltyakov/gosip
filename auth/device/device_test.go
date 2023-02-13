@@ -56,12 +56,15 @@ func TestRequest(t *testing.T) {
 }
 
 func TestCleanAuthToken(t *testing.T) {
+	if !h.ConfigExists(cnfgPath) {
+		t.Skip("No auth config provided")
+	}
 	c := &AuthCnfg{}
-	if err := c.ReadConfig(cnfgPath); err != nil {
-		t.Error("can't read config")
+	if err := c.ReadConfig(u.ResolveCnfgPath(cnfgPath)); err != nil {
+		t.Error(err)
 	}
 	if err := c.CleanTokenCache(); err != nil {
-		t.Error("can't clean token cache")
+		t.Error(err)
 	}
 }
 
