@@ -248,12 +248,12 @@ Import path `strategy "github.com/koltyakov/gosip/auth/{strategy}"`. Where `/{st
 
 Azure AD based strategies (recommended production use with SharePoint Online):
 
-| `/{strategy}` | Credentials sample(s)                                                   |
-| ------------- | ----------------------------------------------------------------------- |
-| `/azurecert`  | [details](https://go.spflow.com/auth/strategies/azure-certificate-auth) |
-| `/azurecreds` | [details](https://go.spflow.com/auth/strategies/azure-creds-auth)       |
-| `/azureenv`   | [details](https://go.spflow.com/auth/strategies/azure-environment-auth) |
-| `/device`     | [details](https://go.spflow.com/auth/strategies/azure-device-flow)      |
+| `/{strategy}` | Description                                       | Credentials sample(s)                                                   |
+| ------------- | ------------------------------------------------- | ----------------------------------------------------------------------- |
+| `/azurecert`  | Azure AD Certificate authentication               | [details](https://go.spflow.com/auth/strategies/azure-certificate-auth) |
+| `/azurecreds` | Azure AD authorization with username and password | [details](https://go.spflow.com/auth/strategies/azure-creds-auth)       |
+| `/azureenv`   | Azure AD environment-based authentication         | [details](https://go.spflow.com/auth/strategies/azure-environment-auth) |
+| `/device`     | Azure AD Device Token authentication              | [details](https://go.spflow.com/auth/strategies/azure-device-flow)      |
 
 Other strategies:
 
