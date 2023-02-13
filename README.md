@@ -246,17 +246,26 @@ Auth strategy should be selected corresponding to your SharePoint environment an
 
 Import path `strategy "github.com/koltyakov/gosip/auth/{strategy}"`. Where `/{strategy}` stands for a strategy auth package.
 
-| `/{strategy}`     | SPO | On-Prem | Credentials sample(s)                                                                                                                                          |
-| ----------------- | --- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AAD `/azurecert`  | ✅  | ❌      | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/azurecert)                                                                         |
-| AAD `/azurecreds` | ✅  | ❌      | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/azurecreds)                                                                        |
-| AAD `/device`     | ✅  | ❌      | [details](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/device)                                                                            |
-| `/saml`           | ✅  | ❌      | [sample](./config/samples/private.spo-user.json)                                                                                                               |
-| `/addin`          | ✅  | ❌      | [sample](./config/samples/private.spo-addin.json)                                                                                                              |
-| `/ntlm`           | ❌  | ✅      | [sample](./config/samples/private.onprem-ntlm.json)                                                                                                            |
-| `/adfs`           | ✅  | ✅      | [spo](./config/samples/private.spo-adfs.json), [on-prem](./config/samples/private.onprem-adfs.json), [on-prem (wap)](./config/samples/private.onprem-wap.json) |
-| `/fba`            | ❌  | ✅      | [sample](./config/samples/private.onprem-fba.json)                                                                                                             |
-| `/tmg`            | ❌  | ✅      | [sample](./config/samples/private.onprem-tmg.json)                                                                                                             |
+Azure AD based strategies (recommended production use with SharePoint Online):
+
+| `/{strategy}` | Credentials sample(s)                                                   |
+| ------------- | ----------------------------------------------------------------------- |
+| `/azurecert`  | [details](https://go.spflow.com/auth/strategies/azure-certificate-auth) |
+| `/azurecreds` | [details](https://go.spflow.com/auth/strategies/azure-creds-auth)       |
+| `/azureenv`   | [details](https://go.spflow.com/auth/strategies/azure-environment-auth) |
+| `/device`     | [details](https://go.spflow.com/auth/strategies/azure-device-flow)      |
+
+Other strategies:
+
+| `/{strategy}` | SPO | On-Prem | Credentials sample(s)                                                                                                                                          |
+| ------------- | --- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/saml`       | ✅  | ❌      | [sample](./config/samples/private.spo-user.json)                                                                                                               |
+| `/addin`      | ✅  | ❌      | [sample](./config/samples/private.spo-addin.json)                                                                                                              |
+| `/ntlm`       | ❌  | ✅      | [sample](./config/samples/private.onprem-ntlm.json)                                                                                                            |
+| `/adfs`       | ✅  | ✅      | [spo](./config/samples/private.spo-adfs.json), [on-prem](./config/samples/private.onprem-adfs.json), [on-prem (wap)](./config/samples/private.onprem-wap.json) |
+| `/fba`        | ❌  | ✅      | [sample](./config/samples/private.onprem-fba.json)                                                                                                             |
+| `/tmg`        | ❌  | ✅      | [sample](./config/samples/private.onprem-tmg.json)                                                                                                             |
+| `/ondemand`   | ✅  | ✅ \*   | [details](https://go.spflow.com/auth/custom-auth/on-demand)                                                                                                    |
 
 JSON and struct representations are different in terms of language notations. So credentials parameters names in `private.json` files and declared as structs initiators vary.
 
