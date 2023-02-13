@@ -197,7 +197,8 @@ func HasPermissions(basePermissions BasePermissions, permissionsKind int64) bool
 		return (high&32767) == 32767 && low == 65535
 	}
 
-	if perm >= 0 && perm < 32 {
+	// if perm >= 0 && perm < 32 {
+	if perm < 32 {
 		num = num << perm
 		return 0 != (low & num)
 	} else if perm >= 32 && perm < 64 {

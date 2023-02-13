@@ -2,7 +2,6 @@ package api
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -25,7 +24,7 @@ func TestFilesChunked(t *testing.T) {
 	}
 
 	t.Run("AddChunkedMicro", func(t *testing.T) {
-		fileName := fmt.Sprintf("TinyFile.txt")
+		fileName := "TinyFile.txt"
 		stream := strings.NewReader("Less than a chunk content")
 		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, nil); err != nil {
 			t.Error(err)
@@ -33,7 +32,7 @@ func TestFilesChunked(t *testing.T) {
 	})
 
 	t.Run("AddChunked", func(t *testing.T) {
-		fileName := fmt.Sprintf("ChunkedFile.txt")
+		fileName := "ChunkedFile.txt"
 		content := "Greater than a chunk content..."
 		stream := strings.NewReader(content)
 		options := &AddChunkedOptions{
@@ -48,13 +47,13 @@ func TestFilesChunked(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if bytes.Compare([]byte(content), data) != 0 {
+		if !bytes.Equal([]byte(content), data) {
 			t.Error("wrong file content after chunked upload")
 		}
 	})
 
 	t.Run("AddChunkedNotEmtyOffset", func(t *testing.T) {
-		fileName := fmt.Sprintf("ChunkedFile1.txt")
+		fileName := "ChunkedFile1.txt"
 		content := "Greater than a chunk content..."
 		stream := strings.NewReader(content)
 		for _, reqConfig := range []*RequestConfig{HeadersPresets.Minimalmetadata, HeadersPresets.Nometadata} {
@@ -81,7 +80,7 @@ func TestFilesChunked(t *testing.T) {
 	})
 
 	t.Run("AddChunkedNilFinishPackage", func(t *testing.T) {
-		fileName := fmt.Sprintf("ChunkedFile.txt")
+		fileName := "ChunkedFile.txt"
 		content := "1234512345" // with combination of ChunkSize finishUpload package is nil
 		stream := strings.NewReader(content)
 		options := &AddChunkedOptions{
@@ -94,7 +93,7 @@ func TestFilesChunked(t *testing.T) {
 	})
 
 	t.Run("AddChunkedZeroSize", func(t *testing.T) {
-		fileName := fmt.Sprintf("ChunkedFile.txt")
+		fileName := "ChunkedFile.txt"
 		content := "1234512345"
 		stream := strings.NewReader(content)
 		options := &AddChunkedOptions{
@@ -107,17 +106,14 @@ func TestFilesChunked(t *testing.T) {
 	})
 
 	t.Run("AddChunkedCancel", func(t *testing.T) {
-		fileName := fmt.Sprintf("ChunkedFile.txt")
+		fileName := "ChunkedFile.txt"
 		content := "Greater than a chunk content..."
 		stream := strings.NewReader(content)
 		options := &AddChunkedOptions{
 			Overwrite: true,
 			ChunkSize: 5,
 			Progress: func(data *FileUploadProgressData) bool {
-				if data.BlockNumber > 0 {
-					return false // cancel upload
-				}
-				return true
+				return data.BlockNumber <= 0 // cancel upload after first chunk
 			},
 		}
 		_, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options)
@@ -130,7 +126,7 @@ func TestFilesChunked(t *testing.T) {
 	})
 
 	t.Run("AddChunkedImmediateCancel", func(t *testing.T) {
-		fileName := fmt.Sprintf("ChunkedFile.txt")
+		fileName := "ChunkedFile.txt"
 		content := "Greater than a chunk content..."
 		stream := strings.NewReader(content)
 		options := &AddChunkedOptions{

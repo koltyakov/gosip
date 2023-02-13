@@ -70,7 +70,7 @@ func csomResponse(httpClient *HTTPClient, siteURL string, config *RequestConfig,
 	jsomResp, err := httpClient.ProcessQuery(siteURL, bytes.NewBuffer([]byte(csomPkg)), config)
 	if err != nil {
 		// Retry Terms update conflicts
-		if strings.Index(err.Error(), "Term update failed because of save conflict") != -1 {
+		if strings.Contains(err.Error(), "Term update failed because of save conflict") {
 			if config == nil {
 				config = &RequestConfig{}
 			}

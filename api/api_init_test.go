@@ -164,7 +164,7 @@ func readDotEnv() {
 	defer func() { _ = envFile.Close() }()
 
 	byteValue, _ := ioutil.ReadAll(envFile)
-	keyVals := strings.Split(fmt.Sprintf("%s", byteValue), "\n")
+	keyVals := strings.Split(string(byteValue), "\n")
 	for _, keyVal := range keyVals {
 		kv := strings.SplitN(keyVal, "=", 2)
 		if len(kv) == 2 {

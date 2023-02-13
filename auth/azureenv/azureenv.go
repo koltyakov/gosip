@@ -3,8 +3,10 @@
 //   - https://docs.microsoft.com/en-us/azure/developer/go/azure-sdk-authorization#use-environment-based-authentication
 //   - https://docs.microsoft.com/en-us/sharepoint/dev/solution-guidance/security-apponly-azuread
 //   - https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal
+//
 // Amongst supported platform versions are:
 //   - SharePoint Online + Azure
+//
 // Azure Environment-Based supported strategies:
 //   - Client credentials (might not work with SharePoint but require a Certificate-based auth)
 //   - Certificate

@@ -231,7 +231,7 @@ func printNoScriptWarning(endpoint string, err error) {
 		siteURL := getPriorEndpoint(endpoint, "/_api")
 		if strings.Contains(strings.ToLower(siteURL), ".sharepoint.com") {
 			noScriptSiteDisable := fmt.Sprintf("spo site classic set --url %s --noScriptSite false", siteURL)
-			err = fmt.Errorf(
+			fmt.Printf(
 				"%s. You probably have \"noScriptSite\" enabled on your site. "+
 					"You can enable it using PnP Office 365 CLI by running \"%s\". "+
 					"See more: https://pnp.github.io/office365-cli",

@@ -4,7 +4,7 @@ Package ntlm implements NTLM Auth (NTLM handshake)
 This type of authentication uses HTTP NTLM handshake in order to obtain authentication header.
 
 Amongst supported platform versions are:
-	- On-Premise: 2019, 2016, and 2013
+  - On-Premise: 2019, 2016, and 2013
 */
 package ntlm
 

@@ -141,7 +141,7 @@ func getIncludeEndpoints(endpoint string, parts []string) string {
 
 // containsMetadataType checks is byte array payload contains SP OData __metadata prop
 func containsMetadataType(payload []byte) bool {
-	return strings.Index(fmt.Sprintf("%s", payload), `"__metadata"`) != -1
+	return strings.Contains(string(payload), `"__metadata"`)
 }
 
 // patchMetadataType patches SP OData __metadata

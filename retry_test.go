@@ -43,7 +43,7 @@ func TestRetry(t *testing.T) {
 			defer func() { _ = r.Body.Close() }()
 			data, _ := ioutil.ReadAll(r.Body)
 			if r.RequestURI == "/_api/post/keepbody" && r.Header.Get("X-Gosip-Retry") == "1" {
-				if fmt.Sprintf("%s", data) != "none-empty" {
+				if string(data) != "none-empty" {
 					w.WriteHeader(http.StatusInternalServerError)
 					_, _ = w.Write([]byte(`{ "error": "Body is not backed off" }`))
 					return
@@ -184,7 +184,7 @@ func TestRetry(t *testing.T) {
 			t.Error(err)
 		}
 
-		dur := time.Now().Sub(beforeReq)
+		dur := time.Since(beforeReq)
 		if dur < 1*time.Second {
 			t.Error("retry after is ignored")
 		}
@@ -223,6 +223,7 @@ func TestRetry(t *testing.T) {
 		beforeReq := time.Now()
 
 		go func() {
+			// nolint:gosimple
 			select {
 			case <-time.After(900 * time.Millisecond):
 				cancel()
@@ -231,7 +232,7 @@ func TestRetry(t *testing.T) {
 
 		_, _ = client.Execute(req) // should be canceled with a context after 900 milliseconds
 
-		dur := time.Now().Sub(beforeReq)
+		dur := time.Since(beforeReq)
 		if dur > 1*time.Second {
 			t.Error("context canceling failed")
 		}
@@ -253,7 +254,7 @@ func TestRetry(t *testing.T) {
 
 		_, err = client.Execute(req) // should be prevented due to already closed context
 
-		if err != nil && strings.Index(err.Error(), "context canceled") == -1 {
+		if err != nil && !strings.Contains(err.Error(), "context canceled") {
 			t.Error("context canceling failed")
 		}
 	})

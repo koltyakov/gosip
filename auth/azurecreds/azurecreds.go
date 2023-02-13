@@ -1,6 +1,7 @@
 // Package azurecreds implements AAD Username/Password Auth Flow
 // See more:
 //   - https://docs.microsoft.com/en-us/azure/developer/go/azure-sdk-authorization#use-file-based-authentication
+//
 // Amongst supported platform versions are:
 //   - SharePoint Online + Azure
 package azurecreds

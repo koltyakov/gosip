@@ -84,13 +84,13 @@ func TestProperties(t *testing.T) {
 	t.Run("Set", func(t *testing.T) {
 		if err := webProps.Set("test_gosip", time.Now().String()); err != nil {
 			// By default is denied on Modern SPO sites, so ignore in tests
-			if strings.Index(err.Error(), "System.UnauthorizedAccessException") == -1 {
+			if !strings.Contains(err.Error(), "System.UnauthorizedAccessException") {
 				t.Error(err)
 			}
 		}
 		if err := web.RootFolder().Props().Set("test_gosip", time.Now().String()); err != nil {
 			// By default is denied on Modern SPO sites, so ignore in tests
-			if strings.Index(err.Error(), "System.UnauthorizedAccessException") == -1 {
+			if !strings.Contains(err.Error(), "System.UnauthorizedAccessException") {
 				t.Error(err)
 			}
 		}
@@ -102,7 +102,7 @@ func TestProperties(t *testing.T) {
 			"test_gosip_prop2": time.Now().String(),
 		}); err != nil {
 			// By default is denied on Modern SPO sites, so ignore in tests
-			if strings.Index(err.Error(), "System.UnauthorizedAccessException") == -1 {
+			if !strings.Contains(err.Error(), "System.UnauthorizedAccessException") {
 				t.Error(err)
 			}
 		}

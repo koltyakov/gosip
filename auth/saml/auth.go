@@ -4,7 +4,7 @@ Package saml implements SAML Auth (SharePoint Online user credentials authentica
 This authentication option uses Microsoft Online Security Token Service `https://login.microsoftonline.com/extSTS.srf` and SAML tokens in order to obtain authentication cookie.
 
 Amongst supported platform versions are:
-	- SharePoint Online (SPO)
+  - SharePoint Online (SPO)
 */
 package saml
 

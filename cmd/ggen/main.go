@@ -189,7 +189,7 @@ func helpersGen(c *apiGenCnfg) string {
 		return ""
 	}
 	if len(c.Helpers) > 0 {
-		code += fmt.Sprintf("\n/* Response helpers */\n")
+		code += "\n/* Response helpers */\n"
 	}
 	if c.IsCollection {
 		for _, mod := range c.Helpers {

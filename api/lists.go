@@ -87,7 +87,7 @@ func (lists *Lists) Add(title string, metadata map[string]interface{}) (ListResp
 	}
 
 	parameters, _ := json.Marshal(metadata)
-	body := fmt.Sprintf("%s", parameters)
+	body := string(parameters)
 
 	client := NewHTTPClient(lists.client)
 	headers := getConfHeaders(lists.config)

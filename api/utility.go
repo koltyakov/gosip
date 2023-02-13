@@ -60,7 +60,7 @@ func (utility *Utility) SendEmail(options *EmailProps) error {
 		properties["BCC"] = map[string][]string{"results": options.BCC}
 	}
 	props, _ := json.Marshal(properties)
-	JSONProps := fmt.Sprintf("%s", props)
+	JSONProps := string(props)
 	body := []byte(TrimMultiline(`{ "properties": ` + JSONProps + `}`))
 
 	_, err := client.Post(endpoint, bytes.NewBuffer(body), utility.config)

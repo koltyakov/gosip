@@ -231,7 +231,7 @@ func (list *List) ReserveListItemID() (int, error) {
 		return 0, err
 	}
 	data = NormalizeODataItem(data)
-	if res, err := strconv.Atoi(fmt.Sprintf("%s", data)); err == nil {
+	if res, err := strconv.Atoi(string(data)); err == nil {
 		return res, nil
 	}
 	res := &struct {

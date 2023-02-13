@@ -98,7 +98,7 @@ func (term *Term) Get() (map[string]interface{}, error) {
 	var props []string
 	for _, prop := range term.selectProps {
 		propertyXML := prop
-		if strings.Index(prop, "<") == -1 {
+		if !strings.Contains(prop, "<") {
 			propertyXML = fmt.Sprintf(`<Property Name="%s" SelectAll="true" />`, prop)
 		}
 		props = append(props, propertyXML)
@@ -118,7 +118,7 @@ func (term *Term) Update(properties map[string]interface{}) (map[string]interfac
 	// var scalarProperties []string
 	for prop, value := range properties {
 		valueXML := fmt.Sprintf("%s", value)
-		if strings.Index(prop, "<") == -1 {
+		if !strings.Contains(prop, "<") {
 			valueXML = fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, value)
 		}
 		b.AddAction(csom.NewSetProperty(prop, valueXML), termObject)

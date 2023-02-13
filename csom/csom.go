@@ -137,12 +137,8 @@ func (b *builder) Compile() (string, error) {
 // Clone clones CSOM builder object
 func (b *builder) Clone() Builder {
 	nb := &builder{}
-	for _, object := range b.objects {
-		nb.objects = append(nb.objects, object)
-	}
-	for _, action := range b.actions {
-		nb.actions = append(nb.actions, action)
-	}
+	nb.objects = append(nb.objects, b.objects...)
+	nb.actions = append(nb.actions, b.actions...)
 	return nb
 }
 

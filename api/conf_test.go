@@ -42,6 +42,7 @@ func TestConf(t *testing.T) {
 				}
 			})
 		} else {
+			// nolint:staticcheck
 			withNoContMethod = append(withNoContMethod, key)
 		}
 	}
@@ -92,6 +93,7 @@ func TestModifiers(t *testing.T) {
 		}
 
 		if len(mods) == 0 {
+			// nolint:staticcheck
 			withNoModsMethod = append(withNoModsMethod, key)
 			continue
 		}

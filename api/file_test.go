@@ -119,7 +119,7 @@ func TestFile(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if bytes.Compare(fileContent, content) != 0 {
+		if !bytes.Equal(fileContent, content) {
 			t.Error("incorrect file body")
 		}
 	})

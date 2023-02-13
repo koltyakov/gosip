@@ -21,6 +21,9 @@ test-api-p:
 format:
 	gofmt -s -w .
 
+lint:
+	golangci-lint run
+
 generate:
 	go install ./cmd/ggen/...
 	go generate ./api/...

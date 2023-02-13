@@ -177,7 +177,7 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 		return "", err
 	}
 	rgx := regexp.MustCompile(`:fl:(.*?)"`)
-	rs := rgx.FindStringSubmatch(fmt.Sprintf("%s", resp))
+	rs := rgx.FindStringSubmatch(string(resp))
 	fieldLinkID := rs[1]
 
 	return fieldLinkID, nil

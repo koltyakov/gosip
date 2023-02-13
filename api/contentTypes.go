@@ -131,6 +131,6 @@ func (contentTypes *ContentTypes) Create(contentTypeInfo *ContentTypeCreationInf
 		return "", nil
 	}
 	rgx := regexp.MustCompile(`:contenttype:(.*?)"`)
-	rs := rgx.FindStringSubmatch(fmt.Sprintf("%s", resp))
+	rs := rgx.FindStringSubmatch(string(resp))
 	return rs[1], nil
 }

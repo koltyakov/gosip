@@ -8,6 +8,8 @@
   "go.testFlags": ["-count=1", "-v"],
   "go.formatFlags": ["-s", "-w"],
   "go.lintOnSave": "file",
+  "go.lintTool": "golangci-lint",
+  "go.lintFlags": ["--fast", "--auto-fix"],
   "files.exclude": {
     "**/*_test.go": false,
     "**/*_gen.go": true

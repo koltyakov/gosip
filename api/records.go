@@ -43,7 +43,7 @@ func (records *Records) IsRecord() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if fmt.Sprintf("%s", date) == "0001-01-01 00:00:00 +0000 UTC" {
+	if date.String() == "0001-01-01 00:00:00 +0000 UTC" {
 		return false, nil
 	}
 	return true, nil
@@ -53,7 +53,7 @@ func (records *Records) IsRecord() (bool, error) {
 func (records *Records) RecordDate() (time.Time, error) {
 	data, err := records.item.Select("OData__vti_ItemDeclaredRecord").Get()
 	if err != nil {
-		if strings.Index(err.Error(), "OData__vti_ItemDeclaredRecord") != -1 {
+		if strings.Contains(err.Error(), "OData__vti_ItemDeclaredRecord") {
 			return time.Time{}, nil // in place records is not configured in a list
 		}
 		return time.Time{}, err

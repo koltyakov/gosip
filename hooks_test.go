@@ -168,10 +168,8 @@ func simpleCall(client *SPClient, uri string, headers map[string]string) error {
 		return err
 	}
 
-	if headers != nil {
-		for h, v := range headers {
-			req.Header.Add(h, v)
-		}
+	for h, v := range headers {
+		req.Header.Add(h, v)
 	}
 
 	resp, err := client.Execute(req)

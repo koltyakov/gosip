@@ -146,7 +146,7 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		details, _ := ioutil.ReadAll(tee)
 		err = fmt.Errorf("%s :: %s", resp.Status, details)
 		// Unescape unicode-escaped error messages for non Latin languages
-		if unescaped, e := strconv.Unquote(`"` + strings.Replace(fmt.Sprintf("%s", details), `"`, `\"`, -1) + `"`); e == nil {
+		if unescaped, e := strconv.Unquote(`"` + strings.Replace(string(details), `"`, `\"`, -1) + `"`); e == nil {
 			err = fmt.Errorf("%s :: %s", resp.Status, unescaped)
 		}
 		resp.Body = ioutil.NopCloser(&buf)

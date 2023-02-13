@@ -57,8 +57,12 @@ func TestRequest(t *testing.T) {
 
 func TestCleanAuthToken(t *testing.T) {
 	c := &AuthCnfg{}
-	c.ReadConfig(cnfgPath)
-	c.CleanTokenCache()
+	if err := c.ReadConfig(cnfgPath); err != nil {
+		t.Error("can't read config")
+	}
+	if err := c.CleanTokenCache(); err != nil {
+		t.Error("can't clean token cache")
+	}
 }
 
 func TestAuthEdgeCases(t *testing.T) {

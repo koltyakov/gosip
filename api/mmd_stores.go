@@ -104,7 +104,7 @@ func (termStore *TermStore) Get() (map[string]interface{}, error) {
 	var props []string
 	for _, prop := range termStore.selectProps {
 		propertyXML := prop
-		if strings.Index(prop, "<") == -1 {
+		if !strings.Contains(prop, "<") {
 			propertyXML = fmt.Sprintf(`<Property Name="%s" SelectAll="true" />`, prop)
 		}
 		props = append(props, propertyXML)

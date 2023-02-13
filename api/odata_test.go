@@ -88,7 +88,7 @@ func TestOData(t *testing.T) {
 	t.Run("toURL", func(t *testing.T) {
 		modifiers := &ODataMods{}
 		modifiers.AddSelect("Select").AddExpand("Expand").AddTop(5)
-		if fmt.Sprintf("%s", toURL("https://contoso/_api/Web", modifiers)) != "https://contoso/_api/Web?%24expand=Expand&%24select=Select&%24top=5" {
+		if toURL("https://contoso/_api/Web", modifiers) != "https://contoso/_api/Web?%24expand=Expand&%24select=Select&%24top=5" {
 			t.Error("incorrect add mixed modifiers result")
 		}
 	})

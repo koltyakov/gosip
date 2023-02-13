@@ -72,7 +72,7 @@ func TestRecords(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if fmt.Sprintf("%s", recDate) != "0001-01-01 00:00:00 +0000 UTC" {
+		if recDate.String() != "0001-01-01 00:00:00 +0000 UTC" {
 			t.Error("something wrong")
 		}
 	})

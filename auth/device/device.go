@@ -146,7 +146,7 @@ func (c *AuthCnfg) cacheTokenToDisk(token *adal.ServicePrincipalToken) error {
 	if err != nil {
 		return err
 	}
-	tokenCacheE, _ := crypter.Encode(fmt.Sprintf("%s", tokenCache))
+	tokenCacheE, _ := crypter.Encode(string(tokenCache))
 	tokenCache = []byte(tokenCacheE)
 
 	_ = os.MkdirAll(tmpDir, os.ModePerm)
@@ -164,7 +164,7 @@ func (c *AuthCnfg) getTokenDiskCache() (*adal.ServicePrincipalToken, error) {
 	if err != nil {
 		return nil, err
 	}
-	tokenCacheD, _ := crypter.Decode(fmt.Sprintf("%s", tokenCache))
+	tokenCacheD, _ := crypter.Decode(string(tokenCache))
 	tokenCache = []byte(tokenCacheD)
 
 	token := &adal.ServicePrincipalToken{}

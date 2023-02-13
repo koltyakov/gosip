@@ -77,7 +77,7 @@ func (webs *Webs) Add(title string, url string, metadata map[string]interface{})
 	parameters, _ := json.Marshal(metadata)
 
 	body := TrimMultiline(`{
-		"parameters": ` + fmt.Sprintf("%s", parameters) + `
+		"parameters": ` + string(parameters) + `
 	}`)
 
 	client := NewHTTPClient(webs.client)

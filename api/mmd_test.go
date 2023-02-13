@@ -427,7 +427,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 		if err == nil {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
-		if err != nil && strings.Index(err.Error(), "Guid should contain 32 digits with 4 dashes") == -1 {
+		if err != nil && !strings.Contains(err.Error(), "Guid should contain 32 digits with 4 dashes") {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
 
@@ -435,7 +435,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 		if err == nil {
 			t.Error("should fail with object not found message")
 		}
-		if err != nil && strings.Index(err.Error(), "object not found") == -1 {
+		if err != nil && !strings.Contains(err.Error(), "object not found") {
 			t.Error("should fail with object not found message")
 		}
 	})
@@ -445,7 +445,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 		if err == nil {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
-		if err != nil && strings.Index(err.Error(), "Guid should contain 32 digits with 4 dashes") == -1 {
+		if err != nil && !strings.Contains(err.Error(), "Guid should contain 32 digits with 4 dashes") {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
 
@@ -453,7 +453,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 		if err == nil {
 			t.Error("should fail with object not found message")
 		}
-		if err != nil && strings.Index(err.Error(), "object not found") == -1 {
+		if err != nil && !strings.Contains(err.Error(), "object not found") {
 			t.Error("should fail with object not found message")
 		}
 	})
@@ -463,7 +463,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 		if err == nil {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
-		if err != nil && strings.Index(err.Error(), "Guid should contain 32 digits with 4 dashes") == -1 {
+		if err != nil && !strings.Contains(err.Error(), "Guid should contain 32 digits with 4 dashes") {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
 
@@ -471,7 +471,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 		if err == nil {
 			t.Error("should fail with object not found message")
 		}
-		if err != nil && strings.Index(err.Error(), "object not found") == -1 {
+		if err != nil && !strings.Contains(err.Error(), "object not found") {
 			t.Error("should fail with object not found message")
 		}
 	})
@@ -515,7 +515,7 @@ func getTermGroupID(taxonomy *Taxonomy) (string, error) {
 		return "", fmt.Errorf("can't get term store groups")
 	}
 	for _, group := range gs {
-		if strings.Index(group["Name"].(string), "Delete me ") == -1 {
+		if !strings.Contains(group["Name"].(string), "Delete me ") {
 			groupGUID, ok := group["Id"].(string)
 			if !ok {
 				return "", fmt.Errorf("can't get group ID")
@@ -546,7 +546,7 @@ func getTermSetID(taxonomy *Taxonomy) (string, error) {
 	}
 
 	for _, tsItem := range tsData {
-		if strings.Index(tsItem["Name"].(string), "Delete me ") == -1 {
+		if !strings.Contains(tsItem["Name"].(string), "Delete me ") {
 			termSetGUID, ok := tsItem["Id"].(string)
 			if !ok {
 				return "", fmt.Errorf("can't get group ID")

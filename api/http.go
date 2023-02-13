@@ -193,7 +193,7 @@ func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestC
 
 // ProcessQuery - CSOM requests helper
 func (client *HTTPClient) ProcessQuery(endpoint string, body io.Reader, conf *RequestConfig) ([]byte, error) {
-	if strings.Index(strings.ToLower(endpoint), strings.ToLower("/_vti_bin/client.svc/ProcessQuery")) == -1 {
+	if !strings.Contains(strings.ToLower(endpoint), strings.ToLower("/_vti_bin/client.svc/ProcessQuery")) {
 		endpoint = fmt.Sprintf("%s/_vti_bin/client.svc/ProcessQuery", getPriorEndpoint(endpoint, "/_api"))
 	}
 

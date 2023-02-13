@@ -53,7 +53,7 @@ func (termSets *TermSets) GetByName(termSetName string, lcid int) ([]map[string]
 
 	b.AddObject(csom.NewObject(objs[1].Template()), nil) // GetTaxonomySession
 	b.AddObject(csom.NewObject(objs[2].Template()), nil) // GetDefaultSiteCollectionTermStore or TermStores
-	if strings.Index(objs[2].Template(), "TermStores") != -1 {
+	if strings.Contains(objs[2].Template(), "TermStores") {
 		b.AddObject(csom.NewObject(objs[3].Template()), nil) // GetById or GetByName
 	}
 
@@ -111,7 +111,7 @@ func (termSet *TermSet) Get() (map[string]interface{}, error) {
 	var props []string
 	for _, prop := range termSet.selectProps {
 		propertyXML := prop
-		if strings.Index(prop, "<") == -1 {
+		if !strings.Contains(prop, "<") {
 			propertyXML = fmt.Sprintf(`<Property Name="%s" SelectAll="true" />`, prop)
 		}
 		props = append(props, propertyXML)
@@ -148,7 +148,7 @@ func (termSet *TermSet) GetAllTerms() ([]map[string]interface{}, error) {
 	var props []string
 	for _, prop := range termSet.selectProps {
 		propertyXML := prop
-		if strings.Index(prop, "<") == -1 {
+		if !strings.Contains(prop, "<") {
 			propertyXML = fmt.Sprintf(`<Property Name="%s" SelectAll="true" />`, prop)
 		}
 		props = append(props, propertyXML)

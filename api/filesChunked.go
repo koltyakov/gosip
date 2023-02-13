@@ -141,7 +141,7 @@ func (file *File) startUpload(uploadID string, chunk []byte) (int, error) {
 		return 0, err
 	}
 	data = NormalizeODataItem(data)
-	if res, err := strconv.Atoi(fmt.Sprintf("%s", data)); err == nil {
+	if res, err := strconv.Atoi(string(data)); err == nil {
 		return res, nil
 	}
 	res := &struct {
@@ -167,7 +167,7 @@ func (file *File) continueUpload(uploadID string, fileOffset int, chunk []byte) 
 		return 0, err
 	}
 	data = NormalizeODataItem(data)
-	if res, err := strconv.Atoi(fmt.Sprintf("%s", data)); err == nil {
+	if res, err := strconv.Atoi(string(data)); err == nil {
 		return res, nil
 	}
 	res := &struct {

@@ -2,7 +2,7 @@
 Package fba implements FBA (Form-based authentication)
 
 Amongst supported platform versions are:
-	- On-Premise: 2019, 2016, and 2013
+  - On-Premise: 2019, 2016, and 2013
 */
 package fba
 

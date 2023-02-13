@@ -84,7 +84,7 @@ func TestAttachments(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if bytes.Compare(content, expectedContent) != 0 {
+		if !bytes.Equal(content, expectedContent) {
 			t.Error("wrong attachment content")
 		}
 	})

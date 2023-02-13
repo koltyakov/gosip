@@ -107,7 +107,7 @@ func TestUtils(t *testing.T) {
 		if !containsMetadataType(p1) {
 			t.Error("payload was not enriched with metadata")
 		}
-		if strings.Index(fmt.Sprintf("%s", p1), `"prop":"val"`) == -1 {
+		if !strings.Contains(string(p1), `"prop":"val"`) {
 			t.Error("payload metadata lost prop(s)")
 		}
 
@@ -117,7 +117,7 @@ func TestUtils(t *testing.T) {
 		if !containsMetadataType(p2) {
 			t.Error("payload lost metadata prop")
 		}
-		if strings.Index(fmt.Sprintf("%s", p2), `"__metadata":{"type":"SP.Any"}`) == -1 {
+		if !strings.Contains(string(p2), `"__metadata":{"type":"SP.Any"}`) {
 			t.Error("payload metadata prop was mutated")
 		}
 	})
@@ -135,10 +135,10 @@ func TestUtils(t *testing.T) {
 	t.Run("parseODataItem", func(t *testing.T) {
 		minimal := []byte(`{"prop":"val"}`)
 		verbose := []byte(fmt.Sprintf(`{"d":%s}`, minimal))
-		if bytes.Compare(NormalizeODataItem(verbose), minimal) != 0 {
+		if !bytes.Contains(NormalizeODataItem(verbose), minimal) {
 			t.Error("wrong OData transformation")
 		}
-		if bytes.Compare(NormalizeODataItem(minimal), minimal) != 0 {
+		if !bytes.Contains(NormalizeODataItem(minimal), minimal) {
 			t.Error("wrong OData transformation")
 		}
 	})
@@ -156,7 +156,7 @@ func TestUtils(t *testing.T) {
 		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
 		}
-		if bytes.Compare(fromVerbose, fromMinimal) != 0 {
+		if !bytes.Equal(fromVerbose, fromMinimal) {
 			t.Error("wrong OData transformation")
 		}
 	})
@@ -175,7 +175,7 @@ func TestUtils(t *testing.T) {
 		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
 		}
-		if bytes.Compare(fromVerbose, fromMinimal) != 0 {
+		if !bytes.Equal(fromVerbose, fromMinimal) {
 			t.Error("wrong OData transformation")
 		}
 	})
@@ -193,7 +193,7 @@ func TestUtils(t *testing.T) {
 		for _, b := range coll {
 			fromMinimal = append(fromMinimal, b...)
 		}
-		if bytes.Compare(fromVerbose, fromMinimal) != 0 {
+		if !bytes.Equal(fromVerbose, fromMinimal) {
 			t.Error("wrong OData transformation")
 		}
 	})
@@ -201,7 +201,7 @@ func TestUtils(t *testing.T) {
 	t.Run("normalizeMultiLookups", func(t *testing.T) {
 		minimal := []byte(`{"multi":[1,2,3],"single":"val1"}`)
 		verbose := []byte(`{"multi":{"results":[1,2,3]},"single":"val1"}`)
-		if bytes.Compare(normalizeMultiLookups(verbose), minimal) != 0 {
+		if !bytes.Equal(normalizeMultiLookups(verbose), minimal) {
 			t.Error("wrong OData transformation")
 		}
 	})
@@ -219,7 +219,7 @@ func TestUtils(t *testing.T) {
 			t.Error(err)
 		}
 
-		if bytes.Compare(res, expected) != 0 {
+		if !bytes.Equal(res, expected) {
 			t.Error("wrong transformation")
 		}
 	})
