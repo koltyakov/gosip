@@ -269,6 +269,16 @@ Other strategies:
 
 JSON and struct representations are different in terms of language notations. So credentials parameters names in `private.json` files and declared as structs initiators vary.
 
+### Azure AD application authentication
+
+Azure AD application authentication is a recommended way for production use with SharePoint Online. It's based on OAuth 2.0 protocol and uses AAD application credentials for authentication.
+
+Depending on an application type, there are different authentication strategies:
+
+- Azure AD Certificate authentication: for headless applications, which are not able to provide user interaction, like a background service or a daemon. It uses a certificate to authenticate an application.
+- Azure AD authorization with username and password: for applications which are able to provide user interaction, like a desktop application or CLI with credentials prompt. It uses a username and password to authenticate a user.
+- Azure AD device token authentication: for applications which are able to provide user interaction, like a desktop application or CLI. It uses a device code to authenticate a user. It also supports multi-factor authentication.
+
 ### SAML Auth (SharePoint Online user credentials authentication)
 
 This authentication option uses Microsoft Online Security Token Service `https://login.microsoftonline.com/extSTS.srf` and SAML tokens in order to obtain an authentication cookie.
