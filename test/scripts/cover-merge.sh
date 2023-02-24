@@ -43,6 +43,13 @@ if [ -f csom_coverage.out ]; then
   rm csom_coverage.out
 fi
 
+if [ -f dynauth_coverage.out ]; then
+  cat dynauth_coverage.out \
+    | egrep -v '^mode.*' \
+    >> coverage.txt
+  rm dynauth_coverage.out
+fi
+
 if [ -f gosip_coverage.out ]; then
   cat gosip_coverage.out \
     | egrep -v '^mode.*' \

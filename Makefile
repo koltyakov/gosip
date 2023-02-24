@@ -9,6 +9,7 @@ test-utils:
 	mkdir -p tmp
 	SPAUTH_ENVCODE=spo go test ./csom -v -race -count=1 -coverprofile=./tmp/csom_coverage.out
 	SPAUTH_ENVCODE=spo go test ./cpass -v -race -count=1 -coverprofile=./tmp/cpass_coverage.out
+	SPAUTH_ENVCODE=spo go test ./auth -v -race -count=1 -coverprofile=./tmp/dynauth_coverage.out
 
 test-api:
 	mkdir -p tmp
