@@ -15,8 +15,8 @@ import (
 	"github.com/koltyakov/gosip/auth/tmg"
 )
 
-// NewAuthCnfg resolves AuthCnfg object based on strategy name and credentials
-func NewAuthCnfg(strategy string, jsonCreds []byte) (gosip.AuthCnfg, error) {
+// NewDynAuthCnfg resolves AuthCnfg object based on strategy name
+func NewDynAuthCnfg(strategy string) (gosip.AuthCnfg, error) {
 	var auth gosip.AuthCnfg
 
 	switch strategy {
@@ -49,10 +49,6 @@ func NewAuthCnfg(strategy string, jsonCreds []byte) (gosip.AuthCnfg, error) {
 		break
 	default:
 		return nil, fmt.Errorf("can't resolve the strategy: %s", strategy)
-	}
-
-	if err := auth.ParseConfig(jsonCreds); err != nil {
-		return nil, fmt.Errorf("can't parse credentials: %s", err)
 	}
 
 	return auth, nil

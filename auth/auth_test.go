@@ -19,7 +19,7 @@ func TestAuthResolver(t *testing.T) {
 
 	for _, strategy := range strategies {
 		t.Run(strategy, func(t *testing.T) {
-			cnfg, err := NewAuthCnfg(strategy, []byte("{}"))
+			cnfg, err := NewDynAuthCnfg(strategy)
 			if err != nil {
 				t.Error(err)
 			}
