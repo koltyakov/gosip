@@ -1,7 +1,10 @@
 package auth
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
 
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/auth/addin"
@@ -15,8 +18,8 @@ import (
 	"github.com/koltyakov/gosip/auth/tmg"
 )
 
-// NewDynAuthCnfg resolves AuthCnfg object based on strategy name
-func NewDynAuthCnfg(strategy string) (gosip.AuthCnfg, error) {
+// NewAuthByStrategy resolves AuthCnfg object based on strategy name
+func NewAuthByStrategy(strategy string) (gosip.AuthCnfg, error) {
 	var auth gosip.AuthCnfg
 
 	switch strategy {
@@ -49,6 +52,39 @@ func NewDynAuthCnfg(strategy string) (gosip.AuthCnfg, error) {
 		break
 	default:
 		return nil, fmt.Errorf("can't resolve the strategy: %s", strategy)
+	}
+
+	return auth, nil
+}
+
+// NewAuthFromFile resolves AuthCnfg object based on private file
+// private.json must contain "strategy" property along with strategy-specific properties
+func NewAuthFromFile(privateFile string) (gosip.AuthCnfg, error) {
+	jsonFile, err := os.Open(privateFile)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = jsonFile.Close() }()
+
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return nil, err
+	}
+
+	var cnfg struct {
+		Strategy string `json:"strategy"`
+	}
+	if err := json.Unmarshal(byteValue, &cnfg); err != nil {
+		return nil, err
+	}
+
+	auth, err := NewAuthByStrategy(cnfg.Strategy)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := auth.ParseConfig(byteValue); err != nil {
+		return nil, err
 	}
 
 	return auth, nil
