@@ -1,4 +1,6 @@
-# Gosip - SharePoint authentication, HTTP client & fluent API wrapper for Go (Golang)
+# Gosip - SharePoint SDK for Go (Golang)
+
+> Authentication, HTTP client & fluent API wrapper
 
 ![Build Status](https://koltyakov.visualstudio.com/SPNode/_apis/build/status/gosip?branchName=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/koltyakov/gosip)](https://goreportcard.com/report/github.com/koltyakov/gosip)
