@@ -251,25 +251,27 @@ Import path `strategy "github.com/koltyakov/gosip/auth/{strategy}"`. Where `/{st
 Azure AD based strategies (recommended production use with SharePoint Online):
 
 | `/{strategy}` | Description                                       | Credentials sample(s)                                                   |
-| ------------- | ------------------------------------------------- | ----------------------------------------------------------------------- |
+| ------------- | ------------------------------------------------- | ------------------------ |
 | `/azurecert`  | Azure AD Certificate authentication               | [details](https://go.spflow.com/auth/strategies/azure-certificate-auth) |
-| `/azurecreds` | Azure AD authorization with username and password | [details](https://go.spflow.com/auth/strategies/azure-creds-auth)       |
+| `/azurecreds` | Azure AD authorization with username and password | [details](https://go.spflow.com/auth/strategies/azure-creds-auth) |
 | `/azureenv`   | Azure AD environment-based authentication         | [details](https://go.spflow.com/auth/strategies/azure-environment-auth) |
-| `/device`     | Azure AD Device Token authentication              | [details](https://go.spflow.com/auth/strategies/azure-device-flow)      |
+| `/device`     | Azure AD Device Token authentication              | [details](https://go.spflow.com/auth/strategies/azure-device-flow) |
 
 Other strategies:
 
 | `/{strategy}` | SPO | On-Prem | Credentials sample(s)                                                                                                                                          |
-| ------------- | --- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/saml`       | ✅  | ❌      | [sample](./config/samples/private.spo-user.json)                                                                                                               |
-| `/addin`      | ✅  | ❌      | [sample](./config/samples/private.spo-addin.json)                                                                                                              |
-| `/ntlm`       | ❌  | ✅      | [sample](./config/samples/private.onprem-ntlm.json)                                                                                                            |
-| `/adfs`       | ✅  | ✅      | [spo](./config/samples/private.spo-adfs.json), [on-prem](./config/samples/private.onprem-adfs.json), [on-prem (wap)](./config/samples/private.onprem-wap.json) |
-| `/fba`        | ❌  | ✅      | [sample](./config/samples/private.onprem-fba.json)                                                                                                             |
-| `/tmg`        | ❌  | ✅      | [sample](./config/samples/private.onprem-tmg.json)                                                                                                             |
-| `/ondemand`   | ✅  | ✅ \*   | [details](https://go.spflow.com/auth/custom-auth/on-demand)                                                                                                    |
+| ------------- | --- | ------- | ------------------ |
+| `/saml`       | ✅  | ❌      | [details](https://go.spflow.com/auth/strategies/saml) |
+| `/addin`      | ✅  | ❌      | [details](https://go.spflow.com/auth/strategies/addin) |
+| `/ntlm`       | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/ntlm) |
+| `/adfs`       | ✅  | ✅      | [details](https://go.spflow.com/auth/strategies/adfs) |
+| `/fba`        | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/fba) |
+| `/tmg`        | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/tmg) |
+| `/ondemand`   | ✅  | ✅      | [details](https://go.spflow.com/auth/custom-auth/on-demand) |
 
-JSON and struct representations are different in terms of language notations. So credentials parameters names in `private.json` files and declared as structs initiators vary.
+Environment should configured for a specific auth strategy. E.g. you won't succeed with `adfs` in SPO if it has not setup properly.
+
+Below are the most commonly authentication methods in more details:
 
 ### Azure AD application authentication
 
@@ -335,46 +337,6 @@ type AuthCnfg struct {
 ```
 
 Gosip uses `github.com/Azure/go-ntlmssp` NTLM negotiator, however, a custom one also can be [provided](https://github.com/koltyakov/gosip/issues/14) in case of demand.
-
-### ADFS Auth (user credentials authentication)
-
-```golang
-// AuthCnfg - ADFS auth config structure
-type AuthCnfg struct {
-	// SPSite or SPWeb URL, which is the context target for the API calls
-	SiteURL      string `json:"siteUrl"`
-	Username     string `json:"username"`
-	Password     string `json:"password"`
-	// Following are not required for SPO
-	Domain       string `json:"domain"`
-	RelyingParty string `json:"relyingParty"`
-	AdfsURL      string `json:"adfsUrl"`
-	AdfsCookie   string `json:"adfsCookie"`
-}
-```
-
-See more details [ADFS user credentials authentication](https://github.com/s-kainet/node-sp-auth/wiki/ADFS-user-credentials-authentication).
-
-Gosip's ADFS also supports a scenario of ADFS or NTLM behind WAP (Web Application Proxy) which adds additional auth flow and `EdgeAccessCookie` involved into play.
-
-### FBA/TMG Auth (Form-based authentication)
-
-FBA - Form-based authentication for SharePoint On-Premises.
-
-TMG - Microsoft Forefront Threat Management Gateway, currently is legacy but was a popular way of exposing SharePoint into the external world back in the days.
-
-```golang
-// AuthCnfg - FBA/TMG auth config structure
-type AuthCnfg struct {
-	// SPSite or SPWeb URL, which is the context target for the API calls
-	SiteURL string `json:"siteUrl"`
-	// Username for SharePoint On-Prem, format depends in FBA/TMG settings,
-	// can include domain or doesn't
-	Username string `json:"username"`
-	// User password
-	Password string `json:"password"`
-}
-```
 
 ## Secrets encoding
 
