@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -101,7 +100,7 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 		}
 	}()
 
-	res, err := ioutil.ReadAll(resp.Body)
+	res, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", "", err
 	}
@@ -191,7 +190,7 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 		}
 	}()
 
-	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 		return "", "", err
 	}
 
@@ -225,7 +224,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 		return "", "", err
 	}
 
@@ -252,7 +251,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 		return "", "", err
 	}
 
@@ -281,7 +280,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 		return "", "", err
 	}
 
@@ -309,7 +308,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 		return "", "", err
 	}
 
@@ -343,7 +342,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 				}
 			}()
 
-			if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+			if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 				return "", "", err
 			}
 
