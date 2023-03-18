@@ -8,7 +8,7 @@ package fba
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 
@@ -41,7 +41,7 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 	}
 	defer func() { _ = jsonFile.Close() }()
 
-	byteValue, _ := ioutil.ReadAll(jsonFile)
+	byteValue, _ := io.ReadAll(jsonFile)
 	return c.ParseConfig(byteValue)
 }
 
@@ -73,7 +73,7 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 		Password: pass,
 	}
 	file, _ := json.MarshalIndent(config, "", "  ")
-	return ioutil.WriteFile(privateFile, file, 0644)
+	return os.WriteFile(privateFile, file, 0644)
 }
 
 // SetMasterkey defines custom masterkey

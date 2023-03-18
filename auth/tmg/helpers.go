@@ -3,7 +3,6 @@ package tmg
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -71,7 +70,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 		}
 	}()
 
-	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 		return "", 0, err
 	}
 
@@ -117,7 +116,7 @@ func detectCookieAuthURL(c *AuthCnfg, siteURL string) (*url.URL, error) {
 		}
 	}()
 
-	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 		return nil, err
 	}
 

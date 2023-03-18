@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"testing"
@@ -41,7 +41,7 @@ func TestRetry(t *testing.T) {
 		}
 		if r.Body != nil {
 			defer func() { _ = r.Body.Close() }()
-			data, _ := ioutil.ReadAll(r.Body)
+			data, _ := io.ReadAll(r.Body)
 			if r.RequestURI == "/_api/post/keepbody" && r.Header.Get("X-Gosip-Retry") == "1" {
 				if string(data) != "none-empty" {
 					w.WriteHeader(http.StatusInternalServerError)

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -86,7 +85,7 @@ func (client *HTTPClient) Get(endpoint string, conf *RequestConfig) ([]byte, err
 	}
 	defer shut(resp.Body)
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 // Post - generic POST request wrapper
@@ -119,7 +118,7 @@ func (client *HTTPClient) Post(endpoint string, body io.Reader, conf *RequestCon
 	}
 	defer shut(resp.Body)
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 // Delete - generic DELETE request wrapper
@@ -153,7 +152,7 @@ func (client *HTTPClient) Delete(endpoint string, conf *RequestConfig) ([]byte, 
 	}
 	defer shut(resp.Body)
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 // Update - generic MERGE request wrapper
@@ -188,7 +187,7 @@ func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestC
 	}
 	defer shut(resp.Body)
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 // ProcessQuery - CSOM requests helper
@@ -226,7 +225,7 @@ func (client *HTTPClient) ProcessQuery(endpoint string, body io.Reader, conf *Re
 	}
 	defer shut(resp.Body)
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

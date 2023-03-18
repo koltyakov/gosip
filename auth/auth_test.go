@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 )
@@ -42,7 +41,7 @@ func TestAuthResolverError(t *testing.T) {
 
 func TestAuthFileResolver(t *testing.T) {
 	// Create temp file with auth config
-	file, err := ioutil.TempFile("", "private.json")
+	file, err := os.CreateTemp("", "private.json")
 	if err != nil {
 		t.Error(err)
 	}

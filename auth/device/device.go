@@ -7,7 +7,7 @@ package device
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -45,7 +45,7 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 		return err
 	}
 	defer func() { _ = f.Close() }()
-	byteValue, _ := ioutil.ReadAll(f)
+	byteValue, _ := io.ReadAll(f)
 	return c.ParseConfig(byteValue)
 }
 
@@ -62,7 +62,7 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 		TenantID: c.TenantID,
 	}
 	file, _ := json.MarshalIndent(config, "", "  ")
-	return ioutil.WriteFile(privateFile, file, 0644)
+	return os.WriteFile(privateFile, file, 0644)
 }
 
 // GetAuth authenticates, receives access token
@@ -150,7 +150,7 @@ func (c *AuthCnfg) cacheTokenToDisk(token *adal.ServicePrincipalToken) error {
 	tokenCache = []byte(tokenCacheE)
 
 	_ = os.MkdirAll(tmpDir, os.ModePerm)
-	if err := ioutil.WriteFile(tokenCachePath, tokenCache, 0644); err != nil {
+	if err := os.WriteFile(tokenCachePath, tokenCache, 0644); err != nil {
 		return err
 	}
 	return nil
@@ -160,7 +160,7 @@ func (c *AuthCnfg) cacheTokenToDisk(token *adal.ServicePrincipalToken) error {
 func (c *AuthCnfg) getTokenDiskCache() (*adal.ServicePrincipalToken, error) {
 	tokenCachePath := c.getTokenCachePath()
 
-	tokenCache, err := ioutil.ReadFile(tokenCachePath)
+	tokenCache, err := os.ReadFile(tokenCachePath)
 	if err != nil {
 		return nil, err
 	}

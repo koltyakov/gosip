@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/koltyakov/gosip"
@@ -135,7 +134,7 @@ func (attachment *Attachment) Download() ([]byte, error) {
 	}
 	defer shut(body)
 
-	data, err := ioutil.ReadAll(body)
+	data, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}

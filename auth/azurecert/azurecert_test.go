@@ -1,7 +1,6 @@
 package azurecert
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -58,7 +57,7 @@ func TestAuthEdgeCases(t *testing.T) {
 		folderPath := u.ResolveCnfgPath("./tmp")
 		filePath := u.ResolveCnfgPath("./tmp/private.azurecert.malformed.json")
 		_ = os.MkdirAll(folderPath, os.ModePerm)
-		_ = ioutil.WriteFile(filePath, []byte("not a json"), 0644)
+		_ = os.WriteFile(filePath, []byte("not a json"), 0644)
 		if err := cnfg.ReadConfig(filePath); err == nil {
 			t.Error("malformed config should not pass")
 		}

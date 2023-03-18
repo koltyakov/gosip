@@ -3,7 +3,7 @@ package manual
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path"
 	"runtime"
@@ -87,7 +87,7 @@ func apiCallTest(client *gosip.SPClient, siteURL string) {
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Printf("Unable to read a response: %v\n", err)
 		return

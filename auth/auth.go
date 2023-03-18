@@ -3,7 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/koltyakov/gosip"
@@ -66,7 +66,7 @@ func NewAuthFromFile(privateFile string) (gosip.AuthCnfg, error) {
 	}
 	defer func() { _ = jsonFile.Close() }()
 
-	byteValue, err := ioutil.ReadAll(jsonFile)
+	byteValue, err := io.ReadAll(jsonFile)
 	if err != nil {
 		return nil, err
 	}

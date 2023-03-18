@@ -10,7 +10,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -59,7 +59,7 @@ func (c *AuthCnfg) ReadConfig(privateFile string) error {
 		return err
 	}
 	defer func() { _ = f.Close() }()
-	byteValue, _ := ioutil.ReadAll(f)
+	byteValue, _ := io.ReadAll(f)
 	return c.ParseConfig(byteValue)
 }
 
@@ -92,7 +92,7 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 		CertPass: secret,
 	}
 	file, _ := json.MarshalIndent(config, "", "  ")
-	return ioutil.WriteFile(privateFile, file, 0644)
+	return os.WriteFile(privateFile, file, 0644)
 }
 
 // SetMasterkey defines custom masterkey

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -87,7 +86,7 @@ func getSecurityToken(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", "", err
 	}
@@ -168,7 +167,7 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	xmlResponse, err := ioutil.ReadAll(resp.Body)
+	xmlResponse, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", "", err
 	}
@@ -200,7 +199,7 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 		}
 	}()
 
-	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 		return "", "", err
 	}
 
@@ -257,7 +256,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 		}
 	}()
 
-	res, err := ioutil.ReadAll(resp.Body)
+	res, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", "", err
 	}
@@ -321,7 +320,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 		}
 	}()
 
-	xmlResponse, err := ioutil.ReadAll(resp.Body)
+	xmlResponse, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", "", err
 	}
@@ -366,7 +365,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 		}
 	}()
 
-	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+	if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 		return "", "", err
 	}
 
