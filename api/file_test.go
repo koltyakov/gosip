@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"testing"
 
 	"github.com/google/uuid"
@@ -131,6 +132,25 @@ func TestFile(t *testing.T) {
 		}
 		if data.Data().ID == 0 {
 			t.Error("can't get file's item")
+		}
+	})
+
+	t.Run("GetReader", func(t *testing.T) {
+		fileContent := []byte("file content")
+		if _, err := web.GetFolder(newFolderURI).Files().Add("reader.txt", fileContent, true); err != nil {
+			t.Error(err)
+		}
+		reader, err := web.GetFile(newFolderURI + "/reader.txt").GetReader()
+		if err != nil {
+			t.Error(err)
+		}
+		defer reader.Close()
+		content, err := io.ReadAll(reader)
+		if err != nil {
+			t.Error(err)
+		}
+		if !bytes.Equal(fileContent, content) {
+			t.Error("incorrect file body")
 		}
 	})
 
