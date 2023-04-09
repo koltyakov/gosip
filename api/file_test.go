@@ -20,6 +20,15 @@ func TestFile(t *testing.T) {
 		t.Error(err)
 	}
 
+	// Create a temporary document library with minor versioning enabled
+	tempDocLibName := uuid.New().String()
+	if _, err := web.Lists().Add(tempDocLibName, map[string]interface{}{
+		"BaseTemplate":        101,
+		"EnableMinorVersions": true,
+	}); err != nil {
+		t.Error(err)
+	}
+
 	t.Run("AddSeries", func(t *testing.T) {
 		for i := 1; i <= 5; i++ {
 			fileName := fmt.Sprintf("File_%d.txt", i)
@@ -47,6 +56,20 @@ func TestFile(t *testing.T) {
 			t.Error(err)
 		}
 		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").CheckIn("test", CheckInTypes.Major); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("PubUnPub", func(t *testing.T) {
+		// Using temporary document library with minor versioning enabled
+		lib := web.Lists().GetByTitle(tempDocLibName)
+		if _, err := lib.RootFolder().Files().Add("File_1.txt", []byte("File 1 data"), true); err != nil {
+			t.Error(err)
+		}
+		if _, err := lib.RootFolder().Files().GetByName("File_1.txt").Publish("test"); err != nil {
+			t.Error(err)
+		}
+		if _, err := lib.RootFolder().Files().GetByName("File_1.txt").UnPublish("test"); err != nil {
 			t.Error(err)
 		}
 	})
@@ -186,7 +209,11 @@ func TestFile(t *testing.T) {
 		}
 	})
 
+	// Clean up
 	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
+		t.Error(err)
+	}
+	if err := web.Lists().GetByTitle(tempDocLibName).Delete(); err != nil {
 		t.Error(err)
 	}
 }
