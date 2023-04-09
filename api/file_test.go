@@ -90,6 +90,36 @@ func TestFile(t *testing.T) {
 		}
 	})
 
+	t.Run("GetFileByID", func(t *testing.T) {
+		data, err := web.GetFile(newFolderURI + "/File_3.txt").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		d, err := web.GetFileByID(data.Data().UniqueID).Get()
+		if err != nil {
+			t.Error(err)
+		}
+
+		if data.Data().ServerRelativeURL != d.Data().ServerRelativeURL {
+			t.Error("can't get file by ID")
+		}
+	})
+
+	t.Run("GetFileByPath", func(t *testing.T) {
+		data, err := web.GetFile(newFolderURI + "/File_3.txt").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		d, err := web.GetFileByPath(data.Data().ServerRelativeURL).Get()
+		if err != nil {
+			t.Error(err)
+		}
+
+		if data.Data().ServerRelativeURL != d.Data().ServerRelativeURL {
+			t.Error("can't get file by ID")
+		}
+	})
+
 	t.Run("GetItem", func(t *testing.T) {
 		item, err := web.GetFile(newFolderURI + "/File_3.txt").GetItem()
 		if err != nil {
