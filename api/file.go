@@ -199,7 +199,8 @@ func (file *File) UnPublish(comment string) ([]byte, error) {
 
 // GetReader gets file io.ReadCloser
 func (file *File) GetReader() (io.ReadCloser, error) {
-	endpoint := fmt.Sprintf("%s/$value", file.endpoint)
+	siteURL := file.client.AuthCnfg.GetSiteURL()
+	endpoint := fmt.Sprintf("%s/_api/web/%s/$value", siteURL, file.endpoint)
 
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {

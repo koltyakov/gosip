@@ -352,7 +352,7 @@ func (web *Web) GetFileByPath(serverRelativeURL string) *File {
 func (web *Web) GetFileByID(uniqueID string) *File {
 	return NewFile(
 		web.client,
-		fmt.Sprintf("%s/GetFileByID('%s')", web.endpoint, uniqueID),
+		fmt.Sprintf("GetFileByID('%s')", uniqueID),
 		web.config,
 	)
 }

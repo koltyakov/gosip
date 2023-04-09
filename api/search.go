@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strconv"
 
 	"github.com/koltyakov/gosip"
 )
@@ -150,6 +151,21 @@ func NewSearch(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 		config:    config,
 		modifiers: NewODataMods(),
 	}
+}
+
+func (search *Search) GetQuery(query *SearchQuery) (SearchResp, error) {
+	sortList := query.SortList[0].Property + ":" + strconv.Itoa(query.SortList[0].Direction)
+	endpoint := fmt.Sprintf("%s/query?querytext='%s'&sortlist='%s'&enabledsorting=true&rowlimit=%d",
+		search.endpoint, query.QueryText, sortList, query.RowLimit)
+
+	client := NewHTTPClient(search.client)
+
+	headers := map[string]string{
+		"Accept":       "application/json",
+		"Content-Type": "application/json;odata=verbose;charset=utf-8",
+	}
+
+	return client.Get(endpoint, patchConfigHeaders(search.config, headers))
 }
 
 // PostQuery gets search results based on a `query`
