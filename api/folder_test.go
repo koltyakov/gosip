@@ -30,6 +30,34 @@ func TestFolder(t *testing.T) {
 		}
 	})
 
+	t.Run("GetFolderByID", func(t *testing.T) {
+		data, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get()
+		if err != nil {
+			t.Error(err)
+		}
+		d, err := web.GetFolderByID(data.Data().UniqueID).Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if d.Data().ServerRelativeURL != data.Data().ServerRelativeURL {
+			t.Error("can't get folder by ID")
+		}
+	})
+
+	t.Run("GetFolderByPath", func(t *testing.T) {
+		data, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get()
+		if err != nil {
+			t.Error(err)
+		}
+		d, err := web.GetFolderByPath(data.Data().ServerRelativeURL).Get()
+		if err != nil {
+			t.Error(err)
+		}
+		if d.Data().ServerRelativeURL != data.Data().ServerRelativeURL {
+			t.Error("can't get folder by ID")
+		}
+	})
+
 	t.Run("ContextInfo", func(t *testing.T) {
 		if _, err := web.GetFolder(rootFolderURI + "/" + newFolderName).ContextInfo(); err != nil {
 			t.Error(err)
