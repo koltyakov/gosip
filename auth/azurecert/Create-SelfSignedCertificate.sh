@@ -21,7 +21,7 @@ fi
 
 openssl req -newkey rsa:4096 -nodes -keyout "$name.key" -out "$name.csr" -subj "/CN=localhost"
 openssl x509 -signkey "$name.key" -in "$name.csr" -req -days $exp -out "$name.cer"
-openssl pkcs12 -export -out "$name.pfx" -inkey "$name.key" -in "$name.cer" -password pass:$pass
+openssl pkcs12 -certpbe PBE-SHA1-3DES -keypbe PBE-SHA1-3DES -export -macalg sha1 -out "$name.pfx" -inkey "$name.key" -in "$name.cer" -password pass:$pass
 
 echo $pass > $name.txt
 
