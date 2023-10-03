@@ -176,7 +176,9 @@ func (folder *Folder) ContextInfo() (*ContextInfo, error) {
 // ToDo:
 // StorageMetrics
 
-func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string) ([]byte, error) {
+// ensureFolder ensures folder existence by its server relative URL
+// mode: modern (SP 2016 and newer), legacy (SP 2013)
+func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string, mode string) ([]byte, error) {
 	headers := map[string]string{}
 	for key, val := range getConfHeaders(web.config) {
 		headers[key] = val
@@ -186,7 +188,17 @@ func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string)
 	conf := &RequestConfig{
 		Headers: headers,
 	}
-	data, err := web.GetFolder(currentRelativeURL).Conf(conf).Get()
+
+	getFolder := func(serverRelativeURL string) *Folder {
+		serverRelativeURL = url.PathEscape(serverRelativeURL)
+		return web.GetFolderByPath(serverRelativeURL)
+	}
+	if mode == "legacy" {
+		// Get folder is used in
+		getFolder = web.GetFolder
+	}
+
+	data, err := getFolder(currentRelativeURL).Conf(conf).Get()
 	if err != nil {
 		splitted := strings.Split(currentRelativeURL, "/")
 		if len(splitted) == 1 {
@@ -194,7 +206,7 @@ func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string)
 		}
 		splitted = splitted[0 : len(splitted)-1]
 		currentRelativeURL = strings.Join(splitted, "/")
-		return ensureFolder(web, serverRelativeURL, currentRelativeURL)
+		return ensureFolder(web, serverRelativeURL, currentRelativeURL, mode)
 	}
 
 	curFolders := strings.Split(currentRelativeURL, "/")
@@ -206,7 +218,7 @@ func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string)
 
 	createFolders := expFolders[len(curFolders):]
 	for _, folder := range createFolders {
-		data, err = web.GetFolder(currentRelativeURL).Folders().Add(folder)
+		data, err = getFolder(currentRelativeURL).Folders().Add(url.PathEscape(folder))
 		if err != nil {
 			return nil, err
 		}

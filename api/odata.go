@@ -97,7 +97,10 @@ func (oData *ODataMods) AddOrderBy(orderBy string, ascending bool) *ODataMods {
 
 // Endpoint with OData modifiers toURL helper method
 func toURL(endpoint string, modifiers *ODataMods) string {
-	apiURL, _ := url.Parse(endpoint)
+	apiURL, err := url.Parse(endpoint)
+	if err != nil {
+		return endpoint
+	}
 	query := apiURL.Query() // url.Values{}
 	for k, v := range modifiers.Get() {
 		query.Set(k, TrimMultiline(v))
