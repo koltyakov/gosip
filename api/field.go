@@ -35,6 +35,9 @@ type FieldInfo struct {
 	Indexed              bool   `json:"Indexed"`
 	InternalName         string `json:"InternalName"`
 	JSLink               string `json:"JSLink"`
+	LookupField          string `json:"LookupField"`
+	LookupList           string `json:"LookupList"`
+	LookupWebID          string `json:"LookupWebId"`
 	ReadOnlyField        bool   `json:"ReadOnlyField"`
 	Required             bool   `json:"Required"`
 	SchemaXML            string `json:"SchemaXml"`

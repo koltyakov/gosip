@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"testing"
 
 	"github.com/google/uuid"
@@ -16,6 +17,15 @@ func TestFile(t *testing.T) {
 	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 	newFolderURI := rootFolderURI + "/" + newFolderName
 	if _, err := web.GetFolder(rootFolderURI).Folders().Add(newFolderName); err != nil {
+		t.Error(err)
+	}
+
+	// Create a temporary document library with minor versioning enabled
+	tempDocLibName := uuid.New().String()
+	if _, err := web.Lists().Add(tempDocLibName, map[string]interface{}{
+		"BaseTemplate":        101,
+		"EnableMinorVersions": true,
+	}); err != nil {
 		t.Error(err)
 	}
 
@@ -46,6 +56,20 @@ func TestFile(t *testing.T) {
 			t.Error(err)
 		}
 		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").CheckIn("test", CheckInTypes.Major); err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("PubUnPub", func(t *testing.T) {
+		// Using temporary document library with minor versioning enabled
+		lib := web.Lists().GetByTitle(tempDocLibName)
+		if _, err := lib.RootFolder().Files().Add("File_1.txt", []byte("File 1 data"), true); err != nil {
+			t.Error(err)
+		}
+		if _, err := lib.RootFolder().Files().GetByName("File_1.txt").Publish("test"); err != nil {
+			t.Error(err)
+		}
+		if _, err := lib.RootFolder().Files().GetByName("File_1.txt").UnPublish("test"); err != nil {
 			t.Error(err)
 		}
 	})
@@ -90,6 +114,36 @@ func TestFile(t *testing.T) {
 		}
 	})
 
+	t.Run("GetFileByID", func(t *testing.T) {
+		data, err := web.GetFile(newFolderURI + "/File_3.txt").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		d, err := web.GetFileByID(data.Data().UniqueID).Get()
+		if err != nil {
+			t.Error(err)
+		}
+
+		if data.Data().ServerRelativeURL != d.Data().ServerRelativeURL {
+			t.Error("can't get file by ID")
+		}
+	})
+
+	t.Run("GetFileByPath", func(t *testing.T) {
+		data, err := web.GetFile(newFolderURI + "/File_3.txt").Get()
+		if err != nil {
+			t.Error(err)
+		}
+		d, err := web.GetFileByPath(data.Data().ServerRelativeURL).Get()
+		if err != nil {
+			t.Error(err)
+		}
+
+		if data.Data().ServerRelativeURL != d.Data().ServerRelativeURL {
+			t.Error("can't get file by ID")
+		}
+	})
+
 	t.Run("GetItem", func(t *testing.T) {
 		item, err := web.GetFile(newFolderURI + "/File_3.txt").GetItem()
 		if err != nil {
@@ -101,6 +155,25 @@ func TestFile(t *testing.T) {
 		}
 		if data.Data().ID == 0 {
 			t.Error("can't get file's item")
+		}
+	})
+
+	t.Run("GetReader", func(t *testing.T) {
+		fileContent := []byte("file content")
+		if _, err := web.GetFolder(newFolderURI).Files().Add("reader.txt", fileContent, true); err != nil {
+			t.Error(err)
+		}
+		reader, err := web.GetFile(newFolderURI + "/reader.txt").GetReader()
+		if err != nil {
+			t.Error(err)
+		}
+		defer reader.Close()
+		content, err := io.ReadAll(reader)
+		if err != nil {
+			t.Error(err)
+		}
+		if !bytes.Equal(fileContent, content) {
+			t.Error("incorrect file body")
 		}
 	})
 
@@ -136,7 +209,11 @@ func TestFile(t *testing.T) {
 		}
 	})
 
+	// Clean up
 	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
+		t.Error(err)
+	}
+	if err := web.Lists().GetByTitle(tempDocLibName).Delete(); err != nil {
 		t.Error(err)
 	}
 }

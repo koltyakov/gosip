@@ -311,7 +311,12 @@ func (web *Web) GetFolderByID(uniqueID string) *Folder {
 
 // EnsureFolder is a helper to ensure a folder by its relevant URI, when there was no folder it's created
 func (web *Web) EnsureFolder(serverRelativeURL string) ([]byte, error) {
-	return ensureFolder(web, serverRelativeURL, serverRelativeURL)
+	return ensureFolder(web, serverRelativeURL, serverRelativeURL, "legacy")
+}
+
+// EnsureFolderByPath is a helper to ensure a folder by its relevant URI, when there was no folder it's created
+func (web *Web) EnsureFolderByPath(serverRelativeURL string) ([]byte, error) {
+	return ensureFolder(web, serverRelativeURL, serverRelativeURL, "modern")
 }
 
 // GetFile gets File API instance object by its relevant URI
