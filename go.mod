@@ -21,8 +21,8 @@ require (
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	golang.org/x/crypto v0.7.0 // indirect
-	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
 )
 
 // replace github.com/koltyakov/gosip => ./
