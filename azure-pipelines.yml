@@ -21,7 +21,7 @@ steps:
   - task: GoTool@0
     displayName: "Install Go"
     inputs:
-      version: "1.18"
+      version: "1.19"
 
   - script: |
       go version
