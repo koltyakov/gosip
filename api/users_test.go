@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 )
 
@@ -15,7 +16,7 @@ func TestUsers(t *testing.T) {
 
 	t.Run("Constructor", func(t *testing.T) {
 		u := NewUsers(spClient, endpoint, nil)
-		if _, err := u.Select("Id").Get(); err != nil {
+		if _, err := u.Select("Id").Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -31,7 +32,7 @@ func TestUsers(t *testing.T) {
 	})
 
 	t.Run("GetUsers", func(t *testing.T) {
-		data, err := users.Select("Id").Top(5).Get()
+		data, err := users.Select("Id").Top(5).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -46,7 +47,7 @@ func TestUsers(t *testing.T) {
 	})
 
 	t.Run("GetUser", func(t *testing.T) {
-		data, err := NewSP(spClient).Web().CurrentUser().Get()
+		data, err := NewSP(spClient).Web().CurrentUser().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -58,7 +59,7 @@ func TestUsers(t *testing.T) {
 			t.Skip("no user ID to use in the test")
 		}
 
-		data, err := users.GetByID(user.ID).Select("Id").Get()
+		data, err := users.GetByID(user.ID).Select("Id").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -80,7 +81,7 @@ func TestUsers(t *testing.T) {
 			t.Skip("no user LoginName to use in the test")
 		}
 
-		data, err := users.GetByLoginName(user.LoginName).Select("LoginName").Get()
+		data, err := users.GetByLoginName(user.LoginName).Select("LoginName").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -99,7 +100,7 @@ func TestUsers(t *testing.T) {
 			t.Skip("no user Email to use in the test")
 		}
 
-		data, err := users.GetByEmail(user.Email).Select("Email").Get()
+		data, err := users.GetByEmail(user.Email).Select("Email").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}

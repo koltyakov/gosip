@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -15,25 +16,25 @@ func TestItems(t *testing.T) {
 
 	web := NewSP(spClient).Web()
 	newListTitle := strings.Replace(uuid.New().String(), "-", "", -1)
-	if _, err := web.Lists().Add(newListTitle, nil); err != nil {
+	if _, err := web.Lists().Add(context.Background(), newListTitle, nil); err != nil {
 		t.Error(err)
 	}
 	list := web.Lists().GetByTitle(newListTitle)
-	entType, err := list.GetEntityType()
+	entType, err := list.GetEntityType(context.Background())
 	if err != nil {
 		t.Error(err)
 	}
 
 	t.Run("AddWithoutMetadataType", func(t *testing.T) {
 		body := []byte(`{"Title":"Item"}`)
-		if _, err := list.Items().Add(body); err != nil {
+		if _, err := list.Items().Add(context.Background(), body); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("AddResponse", func(t *testing.T) {
 		body := []byte(`{"Title":"Item"}`)
-		item, err := list.Items().Add(body)
+		item, err := list.Items().Add(context.Background(), body)
 		if err != nil {
 			t.Error(err)
 		}
@@ -48,14 +49,14 @@ func TestItems(t *testing.T) {
 			metadata["__metadata"] = map[string]string{"type": entType}
 			metadata["Title"] = fmt.Sprintf("Item %d", i)
 			body, _ := json.Marshal(metadata)
-			if _, err := list.Items().Add(body); err != nil {
+			if _, err := list.Items().Add(context.Background(), body); err != nil {
 				t.Error(err)
 			}
 		}
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		items, err := list.Items().Top(100).OrderBy("Title", false).Get()
+		items, err := list.Items().Top(100).OrderBy("Title", false).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -77,7 +78,7 @@ func TestItems(t *testing.T) {
 	})
 
 	t.Run("GetPaged", func(t *testing.T) {
-		paged, err := list.Items().Top(5).GetPaged()
+		paged, err := list.Items().Top(5).GetPaged(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -94,7 +95,7 @@ func TestItems(t *testing.T) {
 	})
 
 	t.Run("GetByID", func(t *testing.T) {
-		item, err := list.Items().GetByID(1).Get()
+		item, err := list.Items().GetByID(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -104,7 +105,7 @@ func TestItems(t *testing.T) {
 	})
 
 	t.Run("Get/Unmarshal", func(t *testing.T) {
-		item, err := list.Items().GetByID(1).Get()
+		item, err := list.Items().GetByID(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -129,7 +130,7 @@ func TestItems(t *testing.T) {
 				</Query>
 			</View>
 		`
-		data, err := list.Items().Select("Id").GetByCAML(caml)
+		data, err := list.Items().Select("Id").GetByCAML(context.Background(), caml)
 		if err != nil {
 			t.Error(err)
 		}
@@ -142,16 +143,16 @@ func TestItems(t *testing.T) {
 	})
 
 	t.Run("GetByCAMLAdvanced", func(t *testing.T) {
-		viewResp, err := list.Views().DefaultView().Select("ListViewXml").Get()
+		viewResp, err := list.Views().DefaultView().Select("ListViewXml").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := list.Items().GetByCAML(viewResp.Data().ListViewXML); err != nil {
+		if _, err := list.Items().GetByCAML(context.Background(), viewResp.Data().ListViewXML); err != nil {
 			t.Error(err)
 		}
 	})
 
-	if err := list.Delete(); err != nil {
+	if err := list.Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
 

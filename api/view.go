@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -69,28 +70,28 @@ func (view *View) ToURL() string {
 }
 
 // Get gets this View data response
-func (view *View) Get() (ViewResp, error) {
+func (view *View) Get(ctx context.Context) (ViewResp, error) {
 	client := NewHTTPClient(view.client)
-	return client.Get(view.ToURL(), view.config)
+	return client.Get(ctx, view.ToURL(), view.config)
 }
 
 // Update updates View's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.View object
-func (view *View) Update(body []byte) (ViewResp, error) {
+func (view *View) Update(ctx context.Context, body []byte) (ViewResp, error) {
 	body = patchMetadataType(body, "SP.View")
 	client := NewHTTPClient(view.client)
-	return client.Update(view.endpoint, bytes.NewBuffer(body), view.config)
+	return client.Update(ctx, view.endpoint, bytes.NewBuffer(body), view.config)
 }
 
 // Delete deletes this View (can't be restored from a recycle bin)
-func (view *View) Delete() error {
+func (view *View) Delete(ctx context.Context) error {
 	client := NewHTTPClient(view.client)
-	_, err := client.Delete(view.endpoint, view.config)
+	_, err := client.Delete(ctx, view.endpoint, view.config)
 	return err
 }
 
 // SetViewXML updates view XML
-func (view *View) SetViewXML(viewXML string) (ViewResp, error) {
+func (view *View) SetViewXML(ctx context.Context, viewXML string) (ViewResp, error) {
 	endpoint := fmt.Sprintf("%s/SetViewXml()", view.endpoint)
 	payload, err := json.Marshal(&struct {
 		ViewXML string `json:"viewXml"`
@@ -101,5 +102,5 @@ func (view *View) SetViewXML(viewXML string) (ViewResp, error) {
 		return nil, err
 	}
 	client := NewHTTPClient(view.client)
-	return client.Post(endpoint, bytes.NewBuffer(payload), view.config)
+	return client.Post(ctx, endpoint, bytes.NewBuffer(payload), view.config)
 }

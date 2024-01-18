@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -38,14 +39,14 @@ func (groups *Groups) ToURL() string {
 }
 
 // Get gets site Groups response - a collection of GroupInfo
-func (groups *Groups) Get() (GroupsResp, error) {
+func (groups *Groups) Get(ctx context.Context) (GroupsResp, error) {
 	client := NewHTTPClient(groups.client)
-	return client.Get(groups.ToURL(), groups.config)
+	return client.Get(ctx, groups.ToURL(), groups.config)
 }
 
 // Add creates new group with a specified name. Additional metadata can optionally be provided as string map object.
 // `metadata` should correspond to SP.Group type.
-func (groups *Groups) Add(title string, metadata map[string]interface{}) (GroupResp, error) {
+func (groups *Groups) Add(ctx context.Context, title string, metadata map[string]interface{}) (GroupResp, error) {
 	if metadata == nil {
 		metadata = make(map[string]interface{})
 	}
@@ -55,7 +56,7 @@ func (groups *Groups) Add(title string, metadata map[string]interface{}) (GroupR
 	metadata["Title"] = title
 	body, _ := json.Marshal(metadata)
 	client := NewHTTPClient(groups.client)
-	return client.Post(groups.endpoint, bytes.NewBuffer(body), groups.config)
+	return client.Post(ctx, groups.endpoint, bytes.NewBuffer(body), groups.config)
 }
 
 // GetByID gets a group object by its ID
@@ -77,21 +78,21 @@ func (groups *Groups) GetByName(groupName string) *Group {
 }
 
 // RemoveByID deletes a group object by its ID
-func (groups *Groups) RemoveByID(groupID int) error {
+func (groups *Groups) RemoveByID(ctx context.Context, groupID int) error {
 	endpoint := fmt.Sprintf("%s/RemoveById(%d)", groups.ToURL(), groupID)
 	client := NewHTTPClient(groups.client)
-	_, err := client.Post(endpoint, nil, groups.config)
+	_, err := client.Post(ctx, endpoint, nil, groups.config)
 	return err
 }
 
 // RemoveByLoginName deletes a group object by its login name
-func (groups *Groups) RemoveByLoginName(loginName string) error {
+func (groups *Groups) RemoveByLoginName(ctx context.Context, loginName string) error {
 	endpoint := fmt.Sprintf(
 		"%s/RemoveByLoginName('%s')",
 		groups.endpoint,
 		loginName, // url.QueryEscape(loginName),
 	)
 	client := NewHTTPClient(groups.client)
-	_, err := client.Post(endpoint, nil, groups.config)
+	_, err := client.Post(ctx, endpoint, nil, groups.config)
 	return err
 }

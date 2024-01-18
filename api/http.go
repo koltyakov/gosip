@@ -58,8 +58,8 @@ func NewHTTPClient(spClient *gosip.SPClient) *HTTPClient {
 }
 
 // Get - generic GET request wrapper
-func (client *HTTPClient) Get(endpoint string, conf *RequestConfig) ([]byte, error) {
-	req, err := http.NewRequest("GET", endpoint, nil)
+func (client *HTTPClient) Get(ctx context.Context, endpoint string, conf *RequestConfig) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
@@ -89,9 +89,9 @@ func (client *HTTPClient) Get(endpoint string, conf *RequestConfig) ([]byte, err
 }
 
 // Post - generic POST request wrapper
-func (client *HTTPClient) Post(endpoint string, body io.Reader, conf *RequestConfig) ([]byte, error) {
+func (client *HTTPClient) Post(ctx context.Context, endpoint string, body io.Reader, conf *RequestConfig) ([]byte, error) {
 	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
-	req, err := http.NewRequest("POST", endpoint, body)
+	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
@@ -122,8 +122,8 @@ func (client *HTTPClient) Post(endpoint string, body io.Reader, conf *RequestCon
 }
 
 // Delete - generic DELETE request wrapper
-func (client *HTTPClient) Delete(endpoint string, conf *RequestConfig) ([]byte, error) {
-	req, err := http.NewRequest("POST", endpoint, nil)
+func (client *HTTPClient) Delete(ctx context.Context, endpoint string, conf *RequestConfig) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
@@ -156,9 +156,9 @@ func (client *HTTPClient) Delete(endpoint string, conf *RequestConfig) ([]byte, 
 }
 
 // Update - generic MERGE request wrapper
-func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestConfig) ([]byte, error) {
+func (client *HTTPClient) Update(ctx context.Context, endpoint string, body io.Reader, conf *RequestConfig) ([]byte, error) {
 	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
-	req, err := http.NewRequest("POST", endpoint, body)
+	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
@@ -191,13 +191,13 @@ func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestC
 }
 
 // ProcessQuery - CSOM requests helper
-func (client *HTTPClient) ProcessQuery(endpoint string, body io.Reader, conf *RequestConfig) ([]byte, error) {
+func (client *HTTPClient) ProcessQuery(ctx context.Context, endpoint string, body io.Reader, conf *RequestConfig) ([]byte, error) {
 	if !strings.Contains(strings.ToLower(endpoint), strings.ToLower("/_vti_bin/client.svc/ProcessQuery")) {
 		endpoint = fmt.Sprintf("%s/_vti_bin/client.svc/ProcessQuery", getPriorEndpoint(endpoint, "/_api"))
 	}
 
 	// req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
-	req, err := http.NewRequest("POST", endpoint, body)
+	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}

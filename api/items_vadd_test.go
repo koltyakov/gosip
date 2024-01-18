@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"strings"
 	"testing"
 
@@ -12,7 +13,7 @@ func TestItemsVAdd(t *testing.T) {
 
 	web := NewSP(spClient).Web()
 	newListTitle := strings.Replace(uuid.New().String(), "-", "", -1)
-	if _, err := web.Lists().Add(newListTitle, nil); err != nil {
+	if _, err := web.Lists().Add(context.Background(), newListTitle, nil); err != nil {
 		t.Error(err)
 	}
 	list := web.Lists().GetByTitle(newListTitle)
@@ -24,7 +25,7 @@ func TestItemsVAdd(t *testing.T) {
 
 		options := &ValidateAddOptions{NewDocumentUpdate: true, CheckInComment: "test"}
 		data := map[string]string{"Title": "New item"}
-		res, err := list.Items().AddValidate(data, options)
+		res, err := list.Items().AddValidate(context.Background(), data, options)
 		if err != nil {
 			t.Error(err)
 		}
@@ -45,7 +46,7 @@ func TestItemsVAdd(t *testing.T) {
 
 		options := &ValidateAddOptions{NewDocumentUpdate: true, CheckInComment: "test"}
 		data := map[string]string{"Modified": "wrong"}
-		if _, err := list.Items().AddValidate(data, options); err == nil {
+		if _, err := list.Items().AddValidate(context.Background(), data, options); err == nil {
 			t.Error("failed to detect wrong payload")
 		}
 	})
@@ -61,10 +62,10 @@ func TestItemsVAdd(t *testing.T) {
 
 		folderName := "subfolder"
 
-		if _, err := list.Update([]byte(`{ "EnableFolderCreation": true }`)); err != nil {
+		if _, err := list.Update(context.Background(), []byte(`{ "EnableFolderCreation": true }`)); err != nil {
 			t.Error(err)
 		}
-		ff, err := list.Items().AddValidate(map[string]string{
+		ff, err := list.Items().AddValidate(context.Background(), map[string]string{
 			"Title":         folderName,
 			"FileLeafRef":   folderName,
 			"ContentType":   "Folder",
@@ -73,19 +74,19 @@ func TestItemsVAdd(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := list.Items().GetByID(ff.ID()).Update([]byte(`{ "FileLeafRef": "` + folderName + `" }`)); err != nil {
+		if _, err := list.Items().GetByID(ff.ID()).Update(context.Background(), []byte(`{ "FileLeafRef": "`+folderName+`" }`)); err != nil {
 			t.Error(err)
 		}
 
 		options := &ValidateAddOptions{NewDocumentUpdate: true, CheckInComment: "test"}
 		options.DecodedPath = "Lists/" + newListTitle + "/" + folderName
 		data := map[string]string{"Title": "New item in folder"}
-		if _, err := list.Items().AddValidate(data, options); err != nil {
+		if _, err := list.Items().AddValidate(context.Background(), data, options); err != nil {
 			t.Error(err)
 		}
 	})
 
-	if err := list.Delete(); err != nil {
+	if err := list.Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
 

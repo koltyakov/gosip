@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/koltyakov/gosip"
@@ -45,9 +46,9 @@ func (eventReceivers *EventReceivers) ToURL() string {
 }
 
 // Get gets event receivers collection
-func (eventReceivers *EventReceivers) Get() ([]*EventReceiverInfo, error) {
+func (eventReceivers *EventReceivers) Get(ctx context.Context) ([]*EventReceiverInfo, error) {
 	client := NewHTTPClient(eventReceivers.client)
-	data, err := client.Get(eventReceivers.ToURL(), eventReceivers.config)
+	data, err := client.Get(ctx, eventReceivers.ToURL(), eventReceivers.config)
 	if err != nil {
 		return nil, err
 	}

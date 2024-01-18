@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -153,7 +154,7 @@ func NewSearch(client *gosip.SPClient, endpoint string, config *RequestConfig) *
 }
 
 // PostQuery gets search results based on a `query`
-func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
+func (search *Search) PostQuery(ctx context.Context, query *SearchQuery) (SearchResp, error) {
 	endpoint := fmt.Sprintf("%s/PostQuery", search.endpoint)
 	client := NewHTTPClient(search.client)
 
@@ -198,7 +199,7 @@ func (search *Search) PostQuery(query *SearchQuery) (SearchResp, error) {
 		"Content-Type": "application/json;odata=verbose;charset=utf-8",
 	}
 
-	return client.Post(endpoint, bytes.NewBuffer(body), patchConfigHeaders(search.config, headers))
+	return client.Post(ctx, endpoint, bytes.NewBuffer(body), patchConfigHeaders(search.config, headers))
 }
 
 // ToDo:

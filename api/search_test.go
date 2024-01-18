@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 )
 
@@ -10,7 +11,7 @@ func TestSearch(t *testing.T) {
 
 	t.Run("Basic", func(t *testing.T) {
 		sp := NewSP(spClient)
-		data, err := sp.Search().PostQuery(&SearchQuery{
+		data, err := sp.Search().PostQuery(context.Background(), &SearchQuery{
 			QueryText: "*",
 			RowLimit:  10,
 		})
@@ -24,7 +25,7 @@ func TestSearch(t *testing.T) {
 
 	t.Run("Unmarshal", func(t *testing.T) {
 		sp := NewSP(spClient)
-		res, err := sp.Search().PostQuery(&SearchQuery{
+		res, err := sp.Search().PostQuery(context.Background(), &SearchQuery{
 			QueryText: "*",
 			RowLimit:  10,
 		})
@@ -38,7 +39,7 @@ func TestSearch(t *testing.T) {
 
 	t.Run("Results", func(t *testing.T) {
 		sp := NewSP(spClient)
-		res, err := sp.Search().PostQuery(&SearchQuery{
+		res, err := sp.Search().PostQuery(context.Background(), &SearchQuery{
 			QueryText: "*",
 			RowLimit:  10,
 		})

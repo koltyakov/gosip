@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -23,7 +24,7 @@ func NewRecords(item *Item) *Records {
 }
 
 // IsRecord checks is current item is declared as a record
-func (records *Records) IsRecord() (bool, error) {
+func (records *Records) IsRecord(ctx context.Context) (bool, error) {
 	// // It is better using REST and OData__vti_ItemDeclaredRecord field value
 	// jsomResp, err := csomItemRecordMethod(records.item, "IsRecord", nil)
 	// if err != nil {
@@ -39,7 +40,7 @@ func (records *Records) IsRecord() (bool, error) {
 	// }
 
 	// return arrRes[2].(bool), nil
-	date, err := records.RecordDate()
+	date, err := records.RecordDate(ctx)
 	if err != nil {
 		return false, err
 	}
@@ -50,8 +51,8 @@ func (records *Records) IsRecord() (bool, error) {
 }
 
 // RecordDate checks record declaration date of this item
-func (records *Records) RecordDate() (time.Time, error) {
-	data, err := records.item.Select("OData__vti_ItemDeclaredRecord").Get()
+func (records *Records) RecordDate(ctx context.Context) (time.Time, error) {
+	data, err := records.item.Select("OData__vti_ItemDeclaredRecord").Get(ctx)
 	if err != nil {
 		if strings.Contains(err.Error(), "OData__vti_ItemDeclaredRecord") {
 			return time.Time{}, nil // in place records is not configured in a list
@@ -69,32 +70,32 @@ func (records *Records) RecordDate() (time.Time, error) {
 }
 
 // Declare declares this item as a record (CSOM helper)
-func (records *Records) Declare() error {
-	_, err := csomItemRecordMethod(records.item, "DeclareItemAsRecord", nil, records.item.config)
+func (records *Records) Declare(ctx context.Context) error {
+	_, err := csomItemRecordMethod(ctx, records.item, "DeclareItemAsRecord", nil, records.item.config)
 	return err
 }
 
 // DeclareWithDate declares this item as a record with record declaration date (CSOM helper)
-func (records *Records) DeclareWithDate(date time.Time) error {
-	_, err := csomItemRecordMethod(records.item, "DeclareItemAsRecordWithDeclarationDate", &date, records.item.config)
+func (records *Records) DeclareWithDate(ctx context.Context, date time.Time) error {
+	_, err := csomItemRecordMethod(ctx, records.item, "DeclareItemAsRecordWithDeclarationDate", &date, records.item.config)
 	return err
 }
 
 // Undeclare undeclared this item as a record (the item is not a record after an action is done) (CSOM helper)
-func (records *Records) Undeclare() error {
-	_, err := csomItemRecordMethod(records.item, "UndeclareItemAsRecord", nil, records.item.config)
+func (records *Records) Undeclare(ctx context.Context) error {
+	_, err := csomItemRecordMethod(ctx, records.item, "UndeclareItemAsRecord", nil, records.item.config)
 	return err
 }
 
 // csomItemRecordMethod constructs CSOM API process query to cover missed REST API functionality
-func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time, config *RequestConfig) ([]byte, error) {
+func csomItemRecordMethod(ctx context.Context, item *Item, csomStaticMethod string, date *time.Time, config *RequestConfig) ([]byte, error) {
 	client := NewHTTPClient(item.client)
-	itemR, err := item.Select("Id").Get()
+	itemR, err := item.Select("Id").Get(ctx)
 	if err != nil {
 		return nil, err
 	}
 	list := item.ParentList()
-	listR, err := list.Select("Id").Get()
+	listR, err := list.Select("Id").Get(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +124,7 @@ func csomItemRecordMethod(item *Item, csomStaticMethod string, date *time.Time, 
 		return nil, err
 	}
 
-	jsomResp, err := client.ProcessQuery(item.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), config)
+	jsomResp, err := client.ProcessQuery(ctx, item.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), config)
 	if err != nil {
 		return nil, err
 	}

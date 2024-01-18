@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 )
 
@@ -10,13 +11,13 @@ func TestProfiles(t *testing.T) {
 
 	sp := NewSP(spClient)
 	profiles := sp.Profiles()
-	user, err := sp.Web().CurrentUser().Get()
+	user, err := sp.Web().CurrentUser().Get(context.Background())
 	if err != nil {
 		t.Error(err)
 	}
 
 	t.Run("GetMyProperties", func(t *testing.T) {
-		profile, err := profiles.GetMyProperties()
+		profile, err := profiles.GetMyProperties(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -26,7 +27,7 @@ func TestProfiles(t *testing.T) {
 	})
 
 	t.Run("GetPropertiesFor", func(t *testing.T) {
-		props, err := profiles.GetPropertiesFor(user.Data().LoginName)
+		props, err := profiles.GetPropertiesFor(context.Background(), user.Data().LoginName)
 		if err != nil {
 			t.Error(err)
 		}
@@ -40,7 +41,7 @@ func TestProfiles(t *testing.T) {
 
 	t.Run("GetUserProfilePropertyFor", func(t *testing.T) {
 		accountName, err := sp.Profiles().Conf(headers.verbose).
-			GetUserProfilePropertyFor(user.Data().LoginName, "AccountName")
+			GetUserProfilePropertyFor(context.Background(), user.Data().LoginName, "AccountName")
 		if err != nil {
 			t.Error(err)
 		}
@@ -49,7 +50,7 @@ func TestProfiles(t *testing.T) {
 		}
 		if envCode != "2013" {
 			accountName, err = sp.Profiles().Conf(headers.minimalmetadata).
-				GetUserProfilePropertyFor(user.Data().LoginName, "AccountName")
+				GetUserProfilePropertyFor(context.Background(), user.Data().LoginName, "AccountName")
 			if err != nil {
 				t.Error(err)
 			}
@@ -57,7 +58,7 @@ func TestProfiles(t *testing.T) {
 				t.Error("wrong property value")
 			}
 			accountName, err = sp.Profiles().Conf(headers.nometadata).
-				GetUserProfilePropertyFor(user.Data().LoginName, "AccountName")
+				GetUserProfilePropertyFor(context.Background(), user.Data().LoginName, "AccountName")
 			if err != nil {
 				t.Error(err)
 			}
@@ -68,7 +69,7 @@ func TestProfiles(t *testing.T) {
 	})
 
 	t.Run("GetOwnerUserProfile", func(t *testing.T) {
-		profile, err := profiles.GetOwnerUserProfile()
+		profile, err := profiles.GetOwnerUserProfile(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -78,7 +79,7 @@ func TestProfiles(t *testing.T) {
 	})
 
 	t.Run("UserProfile", func(t *testing.T) {
-		profile, err := profiles.UserProfile()
+		profile, err := profiles.UserProfile(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -91,24 +92,24 @@ func TestProfiles(t *testing.T) {
 	})
 
 	t.Run("UserProfile", func(t *testing.T) {
-		profile, err := profiles.UserProfile()
+		profile, err := profiles.UserProfile(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := sp.Profiles().HideSuggestion(profile.Data().AccountName); err != nil {
+		if _, err := sp.Profiles().HideSuggestion(context.Background(), profile.Data().AccountName); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("SetSingleValueProfileProperty", func(t *testing.T) {
-		if err := profiles.SetSingleValueProfileProperty(user.Data().LoginName, "AboutMe", "Updated from Gosip"); err != nil {
+		if err := profiles.SetSingleValueProfileProperty(context.Background(), user.Data().LoginName, "AboutMe", "Updated from Gosip"); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("SetMultiValuedProfileProperty", func(t *testing.T) {
 		tags := []string{"#ci", "#demo", "#test"}
-		if err := profiles.SetMultiValuedProfileProperty(user.Data().LoginName, "SPS-HashTags", tags); err != nil {
+		if err := profiles.SetMultiValuedProfileProperty(context.Background(), user.Data().LoginName, "SPS-HashTags", tags); err != nil {
 			t.Error(err)
 		}
 	})

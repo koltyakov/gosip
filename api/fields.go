@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -40,23 +41,23 @@ func (fields *Fields) ToURL() string {
 }
 
 // Get gets fields response collection
-func (fields *Fields) Get() (FieldsResp, error) {
+func (fields *Fields) Get(ctx context.Context) (FieldsResp, error) {
 	client := NewHTTPClient(fields.client)
-	return client.Get(fields.ToURL(), fields.config)
+	return client.Get(ctx, fields.ToURL(), fields.config)
 }
 
 // Add adds field with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.Field object
-func (fields *Fields) Add(body []byte) (FieldResp, error) {
+func (fields *Fields) Add(ctx context.Context, body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.Field")
 	client := NewHTTPClient(fields.client)
-	return client.Post(fields.endpoint, bytes.NewBuffer(body), fields.config)
+	return client.Post(ctx, fields.endpoint, bytes.NewBuffer(body), fields.config)
 }
 
 // CreateFieldAsXML creates a field using XML schema definition
 // `options` parameter (https://github.com/pnp/pnpjs/blob/version-2/packages/sp/fields/types.ts#L553)
 // is only relevant for adding fields in list instances
-func (fields *Fields) CreateFieldAsXML(schemaXML string, options int) (FieldResp, error) {
+func (fields *Fields) CreateFieldAsXML(ctx context.Context,  schemaXML string, options int) (FieldResp, error) {
 	endpoint := fmt.Sprintf("%s/CreateFieldAsXml", fields.endpoint)
 	info := map[string]map[string]interface{}{
 		"parameters": {
@@ -74,7 +75,7 @@ func (fields *Fields) CreateFieldAsXML(schemaXML string, options int) (FieldResp
 		return nil, err
 	}
 	client := NewHTTPClient(fields.client)
-	return client.Post(endpoint, bytes.NewBuffer(payload), fields.config)
+	return client.Post(ctx, endpoint, bytes.NewBuffer(payload), fields.config)
 }
 
 // GetByID gets a field by its ID (GUID)

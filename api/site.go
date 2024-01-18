@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strings"
 
@@ -88,23 +89,23 @@ func (site *Site) FromURL(url string) *Site {
 }
 
 // Get gets this Site data object
-func (site *Site) Get() (SiteResp, error) {
+func (site *Site) Get(ctx context.Context) (SiteResp, error) {
 	client := NewHTTPClient(site.client)
-	return client.Get(site.ToURL(), site.config)
+	return client.Get(ctx, site.ToURL(), site.config)
 }
 
 // Update updates Site's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.Site object
-func (site *Site) Update(body []byte) (SiteResp, error) {
+func (site *Site) Update(ctx context.Context, body []byte) (SiteResp, error) {
 	body = patchMetadataType(body, "SP.Site")
 	client := NewHTTPClient(site.client)
-	return client.Update(site.endpoint, bytes.NewBuffer(body), site.config)
+	return client.Update(ctx, site.endpoint, bytes.NewBuffer(body), site.config)
 }
 
 // Delete deletes current site (can't be restored from a recycle bin)
-func (site *Site) Delete() error {
+func (site *Site) Delete(ctx context.Context) error {
 	client := NewHTTPClient(site.client)
-	_, err := client.Delete(site.endpoint, site.config)
+	_, err := client.Delete(ctx, site.endpoint, site.config)
 	return err
 }
 
@@ -115,15 +116,15 @@ func (site *Site) RootWeb() *Web {
 }
 
 // OpenWebByID gets a Web data object by its ID (GUID)
-func (site *Site) OpenWebByID(webID string) (WebResp, error) {
+func (site *Site) OpenWebByID(ctx context.Context, webID string) (WebResp, error) {
 	endpoint := fmt.Sprintf("%s/OpenWebById('%s')", site.endpoint, webID)
 	client := NewHTTPClient(site.client)
-	return client.Post(endpoint, nil, site.config)
+	return client.Post(ctx, endpoint, nil, site.config)
 }
 
 // WebByID gets a Web API object by its ID (GUID)
-func (site *Site) WebByID(webID string) (*Web, error) {
-	w, err := site.OpenWebByID(webID)
+func (site *Site) WebByID(ctx context.Context, webID string) (*Web, error) {
+	w, err := site.OpenWebByID(ctx, webID)
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"strings"
 	"testing"
 
@@ -13,15 +14,15 @@ func TestList(t *testing.T) {
 
 	web := NewSP(spClient).Web()
 	listTitle := strings.Replace(uuid.New().String(), "-", "", -1)
-	listInfo, err := web.Lists().Add(listTitle, nil)
+	listInfo, err := web.Lists().Add(context.Background(), listTitle, nil)
 	if err != nil {
 		t.Error(err)
 	}
 	list := web.Lists().GetByID(listInfo.Data().ID)
-	defer func() { _ = list.Delete() }()
+	defer func() { _ = list.Delete(context.Background()) }()
 
 	t.Run("GetEntityType", func(t *testing.T) {
-		entType, err := list.GetEntityType()
+		entType, err := list.GetEntityType(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -31,7 +32,7 @@ func TestList(t *testing.T) {
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		l, err := list.Get() // .Select("*")
+		l, err := list.Get(context.Background()) // .Select("*")
 		if err != nil {
 			t.Error(err)
 		}
@@ -44,19 +45,19 @@ func TestList(t *testing.T) {
 	})
 
 	t.Run("Items", func(t *testing.T) {
-		if _, err := list.Items().Select("Id").Top(1).Get(); err != nil {
+		if _, err := list.Items().Select("Id").Top(1).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("ParentWeb", func(t *testing.T) {
-		if _, err := list.ParentWeb().Get(); err != nil {
+		if _, err := list.ParentWeb().Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("ReserveListItemID", func(t *testing.T) {
-		nextID, err := list.ReserveListItemID()
+		nextID, err := list.ReserveListItemID(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -66,7 +67,7 @@ func TestList(t *testing.T) {
 	})
 
 	t.Run("RenderListData", func(t *testing.T) {
-		listData, err := list.RenderListData(`<View></View>`)
+		listData, err := list.RenderListData(context.Background(), `<View></View>`)
 		if err != nil {
 			t.Error(err)
 		}
@@ -76,18 +77,18 @@ func TestList(t *testing.T) {
 	})
 
 	t.Run("RootFolder", func(t *testing.T) {
-		if _, err := list.RootFolder().Get(); err != nil {
+		if _, err := list.RootFolder().Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Recycle", func(t *testing.T) {
 		guid := uuid.New().String()
-		lr, err := web.Lists().Add(guid, nil)
+		lr, err := web.Lists().Add(context.Background(), guid, nil)
 		if err != nil {
 			t.Error(err)
 		}
-		if err := web.Lists().GetByID(lr.Data().ID).Recycle(); err != nil {
+		if err := web.Lists().GetByID(lr.Data().ID).Recycle(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})

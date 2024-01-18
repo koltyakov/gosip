@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -38,9 +39,9 @@ func (lists *Lists) ToURL() string {
 }
 
 // Get gets Lists API queryable collection
-func (lists *Lists) Get() (ListsResp, error) {
+func (lists *Lists) Get(ctx context.Context) (ListsResp, error) {
 	client := NewHTTPClient(lists.client)
-	return client.Get(lists.ToURL(), lists.config)
+	return client.Get(ctx, lists.ToURL(), lists.config)
 }
 
 // GetByTitle gets a list by its Display Name (Title)
@@ -66,7 +67,7 @@ func (lists *Lists) GetByID(listGUID string) *List {
 // Add creates new list on this web with a provided `title`.
 // Along with title additional metadata can be provided in optional `metadata` string map object.
 // `metadata` props should correspond to `SP.List` API type. Some props have defaults as BaseTemplate (100), AllowContentTypes (false), etc.
-func (lists *Lists) Add(title string, metadata map[string]interface{}) (ListResp, error) {
+func (lists *Lists) Add(ctx context.Context, title string, metadata map[string]interface{}) (ListResp, error) {
 	if metadata == nil {
 		metadata = make(map[string]interface{})
 	}
@@ -95,15 +96,19 @@ func (lists *Lists) Add(title string, metadata map[string]interface{}) (ListResp
 	headers["Accept"] = "application/json;odata=verbose"
 	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
 
-	return client.Post(lists.endpoint, bytes.NewBuffer([]byte(body)), patchConfigHeaders(lists.config, headers))
+	return client.Post(
+		ctx,
+		lists.endpoint,
+		bytes.NewBuffer([]byte(body)),
+		patchConfigHeaders(lists.config, headers))
 }
 
 // AddWithURI creates new list on this web with a provided `title` and `uri`.
 // `url` stands for a system friendly URI (e.g. `custom-list`) while `title` is a human friendly name (e.g. `Custom List`).
 // Along with uri and title additional metadata can be provided in optional `metadata` string map object.
 // `metadata` props should correspond to `SP.List` API type. Some props have defaults as BaseTemplate (100), AllowContentTypes (false), etc.
-func (lists *Lists) AddWithURI(title string, uri string, metadata map[string]interface{}) ([]byte, error) {
-	data, err := lists.Conf(HeadersPresets.Verbose).Add(uri, metadata)
+func (lists *Lists) AddWithURI(ctx context.Context, title string, uri string, metadata map[string]interface{}) ([]byte, error) {
+	data, err := lists.Conf(HeadersPresets.Verbose).Add(ctx, uri, metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -113,5 +118,5 @@ func (lists *Lists) AddWithURI(title string, uri string, metadata map[string]int
 	metadata["Title"] = title
 	body, _ := json.Marshal(metadata)
 
-	return lists.GetByID(data.Data().ID).Update(body)
+	return lists.GetByID(data.Data().ID).Update(ctx, body)
 }

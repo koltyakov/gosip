@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 
 	"github.com/koltyakov/gosip/csom"
@@ -22,7 +23,7 @@ func TestCsomRequest(t *testing.T) {
 		t.Error(err)
 	}
 
-	if _, err := client.ProcessQuery(spClient.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomXML)), nil); err != nil {
+	if _, err := client.ProcessQuery(context.Background(), spClient.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomXML)), nil); err != nil {
 		t.Error(err)
 	}
 }

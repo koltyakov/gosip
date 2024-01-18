@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/url"
 
@@ -81,7 +82,7 @@ func NewProfiles(client *gosip.SPClient, endpoint string, config *RequestConfig)
 }
 
 // GetMyProperties gets current context user profile properties
-func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {
+func (profiles *Profiles) GetMyProperties(ctx context.Context) (ProfilePropsResp, error) {
 	client := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(profiles.endpoint + "/GetMyProperties")
 	query := apiURL.Query()
@@ -89,11 +90,11 @@ func (profiles *Profiles) GetMyProperties() (ProfilePropsResp, error) {
 		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
-	return client.Post(apiURL.String(), nil, profiles.config)
+	return client.Post(ctx, apiURL.String(), nil, profiles.config)
 }
 
 // GetPropertiesFor gets properties of a specified user profile (by user login name)
-func (profiles *Profiles) GetPropertiesFor(loginName string) (ProfilePropsResp, error) {
+func (profiles *Profiles) GetPropertiesFor(ctx context.Context, loginName string) (ProfilePropsResp, error) {
 	client := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
 		profiles.endpoint +
@@ -104,17 +105,17 @@ func (profiles *Profiles) GetPropertiesFor(loginName string) (ProfilePropsResp, 
 		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
-	return client.Get(apiURL.String(), profiles.config)
+	return client.Get(ctx, apiURL.String(), profiles.config)
 }
 
 // GetUserProfilePropertyFor gets specific property of a specified user profile (by user login name)
-func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property string) (string, error) {
+func (profiles *Profiles) GetUserProfilePropertyFor(ctx context.Context, loginName string, property string) (string, error) {
 	client := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint +
 		"/GetUserProfilePropertyFor(" +
 		"accountname='" + url.QueryEscape(loginName) + "'," +
 		"propertyname='" + url.QueryEscape(property) + "')"
-	data, err := client.Get(endpoint, profiles.config)
+	data, err := client.Get(ctx, endpoint, profiles.config)
 	if err != nil {
 		return "", err
 	}
@@ -134,7 +135,7 @@ func (profiles *Profiles) GetUserProfilePropertyFor(loginName string, property s
 }
 
 // GetOwnerUserProfile gets owner's user profile
-func (profiles *Profiles) GetOwnerUserProfile() (ProfileResp, error) {
+func (profiles *Profiles) GetOwnerUserProfile(ctx context.Context) (ProfileResp, error) {
 	client := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
 		getPriorEndpoint(profiles.endpoint, "/_api") +
@@ -145,11 +146,11 @@ func (profiles *Profiles) GetOwnerUserProfile() (ProfileResp, error) {
 		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
-	return client.Post(apiURL.String(), nil, profiles.config)
+	return client.Post(ctx, apiURL.String(), nil, profiles.config)
 }
 
 // UserProfile gets current context user profile object
-func (profiles *Profiles) UserProfile() (ProfileResp, error) {
+func (profiles *Profiles) UserProfile(ctx context.Context) (ProfileResp, error) {
 	client := NewHTTPClient(profiles.client)
 	apiURL, _ := url.Parse(
 		getPriorEndpoint(profiles.endpoint, "/_api") +
@@ -160,11 +161,11 @@ func (profiles *Profiles) UserProfile() (ProfileResp, error) {
 		query.Set(k, TrimMultiline(v))
 	}
 	apiURL.RawQuery = query.Encode()
-	return client.Post(apiURL.String(), nil, profiles.config)
+	return client.Post(ctx, apiURL.String(), nil, profiles.config)
 }
 
 // SetSingleValueProfileProperty sets a single value property for the profile by its email
-func (profiles *Profiles) SetSingleValueProfileProperty(loginName string, property string, value string) error {
+func (profiles *Profiles) SetSingleValueProfileProperty(ctx context.Context, loginName string, property string, value string) error {
 	client := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint + "/SetSingleValueProfileProperty"
 	prop := map[string]string{}
@@ -172,12 +173,12 @@ func (profiles *Profiles) SetSingleValueProfileProperty(loginName string, proper
 	prop["propertyName"] = property
 	prop["propertyValue"] = value
 	body, _ := json.Marshal(prop)
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), profiles.config)
+	_, err := client.Post(ctx, endpoint, bytes.NewBuffer(body), profiles.config)
 	return err
 }
 
 // SetMultiValuedProfileProperty sets a multi value property for the profile by its email
-func (profiles *Profiles) SetMultiValuedProfileProperty(loginName string, property string, values []string) error {
+func (profiles *Profiles) SetMultiValuedProfileProperty(ctx context.Context, loginName string, property string, values []string) error {
 	client := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint + "/SetMultiValuedProfileProperty"
 	prop := map[string]interface{}{}
@@ -185,15 +186,15 @@ func (profiles *Profiles) SetMultiValuedProfileProperty(loginName string, proper
 	prop["propertyName"] = property
 	prop["propertyValues"] = values
 	body, _ := json.Marshal(prop)
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), profiles.config)
+	_, err := client.Post(ctx, endpoint, bytes.NewBuffer(body), profiles.config)
 	return err
 }
 
 // HideSuggestion removes the specified user from the user's list of suggested people to follow
-func (profiles *Profiles) HideSuggestion(loginName string) ([]byte, error) {
+func (profiles *Profiles) HideSuggestion(ctx context.Context, loginName string) ([]byte, error) {
 	client := NewHTTPClient(profiles.client)
 	endpoint := profiles.endpoint + "/HideSuggestion('" + url.QueryEscape(loginName) + "')"
-	return client.Post(endpoint, nil, profiles.config)
+	return client.Post(ctx, endpoint, nil, profiles.config)
 }
 
 // /* Response helpers */

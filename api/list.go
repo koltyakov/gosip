@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -111,32 +112,32 @@ func (list *List) ToURL() string {
 }
 
 // Get gets list's data object
-func (list *List) Get() (ListResp, error) {
+func (list *List) Get(ctx context.Context) (ListResp, error) {
 	client := NewHTTPClient(list.client)
-	return client.Get(list.ToURL(), list.config)
+	return client.Get(ctx, list.ToURL(), list.config)
 }
 
 // Delete deletes a list (can't be restored from a recycle bin)
-func (list *List) Delete() error {
+func (list *List) Delete(ctx context.Context) error {
 	client := NewHTTPClient(list.client)
-	_, err := client.Delete(list.endpoint, list.config)
+	_, err := client.Delete(ctx, list.endpoint, list.config)
 	return err
 }
 
 // Recycle moves this list to the recycle bin
-func (list *List) Recycle() error {
+func (list *List) Recycle(ctx context.Context) error {
 	endpoint := fmt.Sprintf("%s/Recycle", list.endpoint)
 	client := NewHTTPClient(list.client)
-	_, err := client.Post(endpoint, nil, list.config)
+	_, err := client.Post(ctx, endpoint, nil, list.config)
 	return err
 }
 
 // Update updates List's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.List object
-func (list *List) Update(body []byte) (ListResp, error) {
+func (list *List) Update(ctx context.Context, body []byte) (ListResp, error) {
 	body = patchMetadataType(body, "SP.List")
 	client := NewHTTPClient(list.client)
-	return client.Update(list.endpoint, bytes.NewBuffer(body), list.config)
+	return client.Update(ctx, list.endpoint, bytes.NewBuffer(body), list.config)
 }
 
 // Items gets Items API instance queryable collection
@@ -213,9 +214,9 @@ func (list *List) RootFolder() *Folder {
 }
 
 // GetEntityType gets list's ListItemEntityTypeFullName
-func (list *List) GetEntityType() (string, error) {
+func (list *List) GetEntityType(ctx context.Context) (string, error) {
 	scoped := NewList(list.client, list.endpoint, list.config)
-	data, err := scoped.Select("ListItemEntityTypeFullName").Get()
+	data, err := scoped.Select("ListItemEntityTypeFullName").Get(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -223,10 +224,10 @@ func (list *List) GetEntityType() (string, error) {
 }
 
 // ReserveListItemID reserves item's ID in this list
-func (list *List) ReserveListItemID() (int, error) {
+func (list *List) ReserveListItemID(ctx context.Context) (int, error) {
 	client := NewHTTPClient(list.client)
 	endpoint := fmt.Sprintf("%s/ReserveListItemId", list.endpoint)
-	data, err := client.Post(endpoint, nil, list.config)
+	data, err := client.Post(ctx, endpoint, nil, list.config)
 	if err != nil {
 		return 0, err
 	}
@@ -244,13 +245,13 @@ func (list *List) ReserveListItemID() (int, error) {
 }
 
 // RenderListData renders lists content using CAML
-func (list *List) RenderListData(viewXML string) (RenderListDataResp, error) {
+func (list *List) RenderListData(ctx context.Context, viewXML string) (RenderListDataResp, error) {
 	client := NewHTTPClient(list.client)
 	apiURL, _ := url.Parse(fmt.Sprintf("%s/RenderListData(@viewXml)", list.endpoint))
 	query := apiURL.Query()
 	query.Set("@viewXml", `'`+TrimMultiline(viewXML)+`'`)
 	apiURL.RawQuery = query.Encode()
-	data, err := client.Post(apiURL.String(), nil, list.config)
+	data, err := client.Post(ctx, apiURL.String(), nil, list.config)
 	if err != nil {
 		return nil, err
 	}
@@ -280,8 +281,8 @@ func (list *List) Roles() *Roles {
 }
 
 // ContextInfo gets context info for a web of current list
-func (list *List) ContextInfo() (*ContextInfo, error) {
-	return NewContext(list.client, list.ToURL(), list.config).Get()
+func (list *List) ContextInfo(ctx context.Context) (*ContextInfo, error) {
+	return NewContext(list.client, list.ToURL(), list.config).Get(ctx)
 }
 
 /* Response helpers */

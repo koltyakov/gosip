@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -94,24 +95,24 @@ func (web *Web) FromURL(url string) *Web {
 }
 
 // Get gets this Web info
-func (web *Web) Get() (WebResp, error) {
+func (web *Web) Get(ctx context.Context) (WebResp, error) {
 	client := NewHTTPClient(web.client)
-	return client.Get(web.ToURL(), web.config)
+	return client.Get(ctx, web.ToURL(), web.config)
 }
 
 // Delete deletes this Web
-func (web *Web) Delete() error {
+func (web *Web) Delete(ctx context.Context) error {
 	client := NewHTTPClient(web.client)
-	_, err := client.Delete(web.endpoint, web.config)
+	_, err := client.Delete(ctx, web.endpoint, web.config)
 	return err
 }
 
 // Update updates Web's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.Web object
-func (web *Web) Update(body []byte) (WebResp, error) {
+func (web *Web) Update(ctx context.Context, body []byte) (WebResp, error) {
 	body = patchMetadataType(body, "SP.Web")
 	client := NewHTTPClient(web.client)
-	return client.Update(web.endpoint, bytes.NewBuffer(body), web.config)
+	return client.Update(ctx, web.endpoint, bytes.NewBuffer(body), web.config)
 }
 
 // Lists gets Lists API instance object
@@ -198,7 +199,7 @@ func (web *Web) GetList(listURI string) *List {
 }
 
 // EnsureUser ensures a user by a `loginName` parameter and returns UserInfo
-func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
+func (web *Web) EnsureUser(ctx context.Context, loginName string) (*UserInfo, error) {
 	client := NewHTTPClient(web.client)
 	endpoint := fmt.Sprintf("%s/EnsureUser", web.endpoint)
 
@@ -207,7 +208,7 @@ func (web *Web) EnsureUser(loginName string) (*UserInfo, error) {
 
 	body := fmt.Sprintf(`{"logonName": "%s"}`, loginName)
 
-	data, err := client.Post(endpoint, bytes.NewBuffer([]byte(body)), patchConfigHeaders(web.config, headers))
+	data, err := client.Post(ctx, endpoint, bytes.NewBuffer([]byte(body)), patchConfigHeaders(web.config, headers))
 	if err != nil {
 		return nil, err
 	}
@@ -310,13 +311,13 @@ func (web *Web) GetFolderByID(uniqueID string) *Folder {
 }
 
 // EnsureFolder is a helper to ensure a folder by its relevant URI, when there was no folder it's created
-func (web *Web) EnsureFolder(serverRelativeURL string) ([]byte, error) {
-	return ensureFolder(web, serverRelativeURL, serverRelativeURL, "legacy")
+func (web *Web) EnsureFolder(ctx context.Context, serverRelativeURL string) ([]byte, error) {
+	return ensureFolder(ctx, web, serverRelativeURL, serverRelativeURL, "legacy")
 }
 
 // EnsureFolderByPath is a helper to ensure a folder by its relevant URI, when there was no folder it's created
-func (web *Web) EnsureFolderByPath(serverRelativeURL string) ([]byte, error) {
-	return ensureFolder(web, serverRelativeURL, serverRelativeURL, "modern")
+func (web *Web) EnsureFolderByPath(ctx context.Context, serverRelativeURL string) ([]byte, error) {
+	return ensureFolder(ctx, web, serverRelativeURL, serverRelativeURL, "modern")
 }
 
 // GetFile gets File API instance object by its relevant URI
@@ -407,6 +408,6 @@ func (web *Web) RecycleBin() *RecycleBin {
 }
 
 // ContextInfo gets Context info object for this Web
-func (web *Web) ContextInfo() (*ContextInfo, error) {
-	return NewContext(web.client, web.ToURL(), web.config).Get()
+func (web *Web) ContextInfo(ctx context.Context) (*ContextInfo, error) {
+	return NewContext(web.client, web.ToURL(), web.config).Get(ctx)
 }

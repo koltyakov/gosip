@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 )
@@ -27,7 +28,7 @@ type UpdateValidateFieldResult struct {
 
 // UpdateValidate updates an item in this list using ValidateUpdateListItem method.
 // formValues fingerprints https://github.com/koltyakov/sp-sig-20180705-demo/blob/master/src/03-pnp/FieldTypes.md#field-data-types-fingerprints-sample
-func (item *Item) UpdateValidate(formValues map[string]string, options *ValidateUpdateOptions) (UpdateValidateResp, error) {
+func (item *Item) UpdateValidate(ctx context.Context, formValues map[string]string, options *ValidateUpdateOptions) (UpdateValidateResp, error) {
 	endpoint := fmt.Sprintf("%s/ValidateUpdateListItem", item.endpoint)
 	client := NewHTTPClient(item.client)
 	type formValue struct {
@@ -51,7 +52,7 @@ func (item *Item) UpdateValidate(formValues map[string]string, options *Validate
 	var res UpdateValidateResp
 	var err error
 
-	res, err = client.Post(endpoint, bytes.NewBuffer(body), item.config)
+	res, err = client.Post(ctx, endpoint, bytes.NewBuffer(body), item.config)
 	if err != nil {
 		return res, err
 	}

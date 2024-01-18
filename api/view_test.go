@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -15,7 +16,7 @@ func TestView(t *testing.T) {
 	listURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 
 	t.Run("Get", func(t *testing.T) {
-		data, err := web.GetList(listURI).Views().DefaultView().Get()
+		data, err := web.GetList(listURI).Views().DefaultView().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -34,15 +35,15 @@ func TestView(t *testing.T) {
 			"PersonalView": true,
 		}
 		data, _ := json.Marshal(meta)
-		vr, err := web.GetList(listURI).Views().Add(data)
+		vr, err := web.GetList(listURI).Views().Add(context.Background(), data)
 		if err != nil {
 			t.Error(err)
 		}
 		if _, err := web.GetList(listURI).Views().GetByID(vr.Data().ID).
-			SetViewXML(vr.Data().ListViewXML); err != nil {
+			SetViewXML(context.Background(), vr.Data().ListViewXML); err != nil {
 			t.Error(err)
 		}
-		if err := web.GetList(listURI).Views().GetByID(vr.Data().ID).Delete(); err != nil {
+		if err := web.GetList(listURI).Views().GetByID(vr.Data().ID).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -54,15 +55,15 @@ func TestView(t *testing.T) {
 			"PersonalView": true,
 		}
 		data, _ := json.Marshal(meta)
-		vr, err := web.GetList(listURI).Views().Add(data)
+		vr, err := web.GetList(listURI).Views().Add(context.Background(), data)
 		if err != nil {
 			t.Error(err)
 		}
 		if _, err := web.GetList(listURI).Views().GetByID(vr.Data().ID).
-			Update([]byte(`{"PersonalView":false}`)); err != nil {
+			Update(context.Background(), []byte(`{"PersonalView":false}`)); err != nil {
 			t.Error(err)
 		}
-		if err := web.GetList(listURI).Views().GetByID(vr.Data().ID).Delete(); err != nil {
+		if err := web.GetList(listURI).Views().GetByID(vr.Data().ID).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})

@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -55,28 +56,28 @@ func (item *Item) ToURL() string {
 }
 
 // Get gets this Item info
-func (item *Item) Get() (ItemResp, error) {
+func (item *Item) Get(ctx context.Context) (ItemResp, error) {
 	client := NewHTTPClient(item.client)
-	return client.Get(item.ToURL(), item.config)
+	return client.Get(ctx, item.ToURL(), item.config)
 }
 
 // Delete deletes this Item (can't be restored from a recycle bin)
-func (item *Item) Delete() error {
+func (item *Item) Delete(ctx context.Context) error {
 	client := NewHTTPClient(item.client)
-	_, err := client.Delete(item.endpoint, item.config)
+	_, err := client.Delete(ctx, item.endpoint, item.config)
 	return err
 }
 
 // Recycle moves this item to the recycle bin
-func (item *Item) Recycle() error {
+func (item *Item) Recycle(ctx context.Context) error {
 	endpoint := fmt.Sprintf("%s/Recycle", item.endpoint)
 	client := NewHTTPClient(item.client)
-	_, err := client.Post(endpoint, nil, item.config)
+	_, err := client.Post(ctx, endpoint, nil, item.config)
 	return err
 }
 
 // Update updates item's metadata. `body` parameter is byte array representation of JSON string payload relevant to item metadata object.
-func (item *Item) Update(body []byte) (ItemResp, error) {
+func (item *Item) Update(ctx context.Context, body []byte) (ItemResp, error) {
 	body = patchMetadataTypeCB(body, func() string {
 		endpoint := getPriorEndpoint(item.endpoint, "/Items")
 		cacheKey := strings.ToLower(endpoint + "@entitytype")
@@ -84,12 +85,12 @@ func (item *Item) Update(body []byte) (ItemResp, error) {
 			return oDataType.(string)
 		}
 		list := NewList(item.client, endpoint, nil)
-		oDataType, _ := list.GetEntityType()
+		oDataType, _ := list.GetEntityType(ctx)
 		storage.Set(cacheKey, oDataType, 0)
 		return oDataType
 	})
 	client := NewHTTPClient(item.client)
-	return client.Update(item.endpoint, bytes.NewBuffer(body), item.config)
+	return client.Update(ctx, item.endpoint, bytes.NewBuffer(body), item.config)
 }
 
 // Roles gets Roles API instance queryable collection for this Item
@@ -121,8 +122,8 @@ func (item *Item) Records() *Records {
 }
 
 // ContextInfo gets current context information
-func (item *Item) ContextInfo() (*ContextInfo, error) {
-	return NewContext(item.client, item.ToURL(), item.config).Get()
+func (item *Item) ContextInfo(ctx context.Context) (*ContextInfo, error) {
+	return NewContext(item.client, item.ToURL(), item.config).Get(ctx)
 }
 
 /* Response helpers */

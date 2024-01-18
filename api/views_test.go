@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 )
 
@@ -16,7 +17,7 @@ func TestViews(t *testing.T) {
 	}
 
 	t.Run("Get", func(t *testing.T) {
-		data, err := web.GetList(listURI).Views().Get()
+		data, err := web.GetList(listURI).Views().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -29,19 +30,19 @@ func TestViews(t *testing.T) {
 	})
 
 	t.Run("GetByID", func(t *testing.T) {
-		if _, err := web.GetList(listURI).Views().GetByID(view.ID).Get(); err != nil {
+		if _, err := web.GetList(listURI).Views().GetByID(view.ID).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("DefaultView", func(t *testing.T) {
-		if _, err := web.GetList(listURI).Views().DefaultView().Get(); err != nil {
+		if _, err := web.GetList(listURI).Views().DefaultView().Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("GetByTitle", func(t *testing.T) {
-		if _, err := web.GetList(listURI).Views().GetByTitle(view.Title).Get(); err != nil {
+		if _, err := web.GetList(listURI).Views().GetByTitle(view.Title).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -54,7 +55,7 @@ func TestViews(t *testing.T) {
 func getAnyView() (*ViewInfo, error) {
 	web := NewSP(spClient).Web()
 	listURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
-	data, err := web.GetList(listURI).Views().Top(1).Get()
+	data, err := web.GetList(listURI).Views().Top(1).Get(context.Background())
 	if err != nil {
 		return nil, err
 	}

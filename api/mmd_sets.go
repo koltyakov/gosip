@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -23,13 +24,13 @@ func (termSets *TermSets) csomBuilderEntry() csom.Builder {
 }
 
 // Get gets term sets metadata
-func (termSets *TermSets) Get() ([]map[string]interface{}, error) {
+func (termSets *TermSets) Get(ctx context.Context) ([]map[string]interface{}, error) {
 	b := termSets.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewQueryWithProps([]string{
 		`<Property Name="TermSets" SelectAll="true" />`,
 	}), nil)
 
-	return csomRespChildItemsInProp(termSets.client, termSets.endpoint, termSets.config, b, "TermSets")
+	return csomRespChildItemsInProp(ctx, termSets.client, termSets.endpoint, termSets.config, b, "TermSets")
 }
 
 // GetByID gets term set object by its GUID
@@ -47,7 +48,7 @@ func (termSets *TermSets) GetByID(setGUID string) *TermSet {
 }
 
 // GetByName gets term sets by a name and LCID, searches within term store
-func (termSets *TermSets) GetByName(termSetName string, lcid int) ([]map[string]interface{}, error) {
+func (termSets *TermSets) GetByName(ctx context.Context, termSetName string, lcid int) ([]map[string]interface{}, error) {
 	b := csom.NewBuilder()
 	objs := termSets.csomBuilderEntry().GetObjects()
 
@@ -62,11 +63,11 @@ func (termSets *TermSets) GetByName(termSetName string, lcid int) ([]map[string]
 		fmt.Sprintf(`<Parameter Type="Number">%d</Parameter>`, lcid),
 	}), nil)
 	b.AddAction(csom.NewQueryWithChildProps([]string{}), nil)
-	return csomRespChildItems(termSets.client, termSets.endpoint, termSets.config, b)
+	return csomRespChildItems(ctx, termSets.client, termSets.endpoint, termSets.config, b)
 }
 
 // Add creates new term set
-func (termSets *TermSets) Add(name string, guid string, lcid int) (map[string]interface{}, error) {
+func (termSets *TermSets) Add(ctx context.Context, name string, guid string, lcid int) (map[string]interface{}, error) {
 	b := termSets.csomBuilderEntry().Clone()
 	b.AddObject(csom.NewObjectMethod("CreateTermSet", []string{
 		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, name),
@@ -74,7 +75,7 @@ func (termSets *TermSets) Add(name string, guid string, lcid int) (map[string]in
 		fmt.Sprintf(`<Parameter Type="Number">%d</Parameter>`, lcid),
 	}), nil)
 	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
-	return csomResponse(termSets.client, termSets.endpoint, termSets.config, b)
+	return csomResponse(ctx, termSets.client, termSets.endpoint, termSets.config, b)
 }
 
 /* Term Sets */
@@ -107,7 +108,7 @@ func (termSet *TermSet) Select(props string) *TermSet {
 }
 
 // Get gets term set metadata
-func (termSet *TermSet) Get() (map[string]interface{}, error) {
+func (termSet *TermSet) Get(ctx context.Context) (map[string]interface{}, error) {
 	var props []string
 	for _, prop := range termSet.selectProps {
 		propertyXML := prop
@@ -120,14 +121,14 @@ func (termSet *TermSet) Get() (map[string]interface{}, error) {
 	b := termSet.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewQueryWithProps(props), nil)
 
-	return csomResponse(termSet.client, termSet.endpoint, termSet.config, b)
+	return csomResponse(ctx, termSet.client, termSet.endpoint, termSet.config, b)
 }
 
 // Delete deletes term set object
-func (termSet *TermSet) Delete() error {
+func (termSet *TermSet) Delete(ctx context.Context) error {
 	b := termSet.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewActionMethod("DeleteObject", []string{}), nil)
-	_, err := csomResponse(termSet.client, termSet.endpoint, termSet.config, b)
+	_, err := csomResponse(ctx, termSet.client, termSet.endpoint, termSet.config, b)
 	return err
 }
 
@@ -144,7 +145,7 @@ func (termSet *TermSet) Terms() *Terms {
 }
 
 // GetAllTerms gets all terms collection metadata
-func (termSet *TermSet) GetAllTerms() ([]map[string]interface{}, error) {
+func (termSet *TermSet) GetAllTerms(ctx context.Context) ([]map[string]interface{}, error) {
 	var props []string
 	for _, prop := range termSet.selectProps {
 		propertyXML := prop
@@ -158,5 +159,5 @@ func (termSet *TermSet) GetAllTerms() ([]map[string]interface{}, error) {
 	b.AddObject(csom.NewObjectMethod("GetAllTerms", []string{}), nil)
 	b.AddAction(csom.NewQueryWithChildProps(props), nil)
 
-	return csomRespChildItems(termSet.client, termSet.endpoint, termSet.config, b)
+	return csomRespChildItems(ctx, termSet.client, termSet.endpoint, termSet.config, b)
 }

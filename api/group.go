@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -56,17 +57,17 @@ func (group *Group) ToURL() string {
 }
 
 // Get gets group data object
-func (group *Group) Get() (GroupResp, error) {
+func (group *Group) Get(ctx context.Context) (GroupResp, error) {
 	client := NewHTTPClient(group.client)
-	return client.Get(group.ToURL(), group.config)
+	return client.Get(ctx, group.ToURL(), group.config)
 }
 
 // Update updates Group's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.Group object
-func (group *Group) Update(body []byte) (GroupResp, error) {
+func (group *Group) Update(ctx context.Context, body []byte) (GroupResp, error) {
 	body = patchMetadataType(body, "SP.Group")
 	client := NewHTTPClient(group.client)
-	return client.Update(group.endpoint, bytes.NewBuffer(body), group.config)
+	return client.Update(ctx, group.endpoint, bytes.NewBuffer(body), group.config)
 }
 
 // Users gets Users API queryable collection
@@ -79,7 +80,7 @@ func (group *Group) Users() *Users {
 }
 
 // AddUser adds a user by login name to this group
-func (group *Group) AddUser(loginName string) error {
+func (group *Group) AddUser(ctx context.Context, loginName string) error {
 	endpoint := fmt.Sprintf("%s/Users", group.ToURL())
 	client := NewHTTPClient(group.client)
 	metadata := make(map[string]interface{})
@@ -88,37 +89,37 @@ func (group *Group) AddUser(loginName string) error {
 	}
 	metadata["LoginName"] = loginName
 	body, _ := json.Marshal(metadata)
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), group.config)
+	_, err := client.Post(ctx, endpoint, bytes.NewBuffer(body), group.config)
 	return err
 }
 
 // AddUserByID adds a user by ID to this group
-func (group *Group) AddUserByID(userID int) error {
+func (group *Group) AddUserByID(ctx context.Context, userID int) error {
 	sp := NewSP(group.client)
-	user, err := sp.Web().SiteUsers().Select("LoginName").GetByID(userID).Get()
+	user, err := sp.Web().SiteUsers().Select("LoginName").GetByID(userID).Get(ctx)
 	if err != nil {
 		return err
 	}
-	return group.AddUser(user.Data().LoginName)
+	return group.AddUser(ctx, user.Data().LoginName)
 }
 
 // SetUserAsOwner sets a user as owner (available only in SPO)
-func (group *Group) SetUserAsOwner(userID int) error {
+func (group *Group) SetUserAsOwner(ctx context.Context, userID int) error {
 	endpoint := fmt.Sprintf("%s/SetUserAsOwner(%d)", group.ToURL(), userID)
 	client := NewHTTPClient(group.client)
-	_, err := client.Post(endpoint, nil, group.config)
+	_, err := client.Post(ctx, endpoint, nil, group.config)
 	return err
 }
 
 // SetOwner sets a user or group as this group owner
-func (group *Group) SetOwner(ownerID int) error {
+func (group *Group) SetOwner(ctx context.Context, ownerID int) error {
 	site := NewSite(
 		group.client,
 		fmt.Sprintf("%s/_api/Site", group.client.AuthCnfg.GetSiteURL()),
 		group.config,
 	)
 
-	cg, err := group.Select("Id").Get()
+	cg, err := group.Select("Id").Get(ctx)
 	if err != nil {
 		return err
 	}
@@ -130,7 +131,7 @@ func (group *Group) SetOwner(ownerID int) error {
 	}
 
 	pType := "group"
-	pData, err := site.RootWeb().UserInfoList().Items().Expand("ContentType").Filter(fmt.Sprintf("Id eq %d", ownerID)).Get()
+	pData, err := site.RootWeb().UserInfoList().Items().Expand("ContentType").Filter(fmt.Sprintf("Id eq %d", ownerID)).Get(ctx)
 	if err != nil {
 		return nil
 	}
@@ -170,27 +171,27 @@ func (group *Group) SetOwner(ownerID int) error {
 	}
 
 	client := NewHTTPClient(group.client)
-	_, err = client.ProcessQuery(group.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), group.config)
+	_, err = client.ProcessQuery(ctx, group.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), group.config)
 
 	return err
 }
 
 // RemoveUser removes a user from group
-func (group *Group) RemoveUser(loginName string) error {
+func (group *Group) RemoveUser(ctx context.Context, loginName string) error {
 	endpoint := fmt.Sprintf(
 		"%s/Users/RemoveByLoginName(@v)?@v='%s'",
 		group.ToURL(),
 		url.QueryEscape(loginName),
 	)
 	client := NewHTTPClient(group.client)
-	_, err := client.Post(endpoint, nil, group.config)
+	_, err := client.Post(ctx, endpoint, nil, group.config)
 	return err
 }
 
 // RemoveUserByID removes a user from group
-func (group *Group) RemoveUserByID(userID int) error {
+func (group *Group) RemoveUserByID(ctx context.Context, userID int) error {
 	endpoint := fmt.Sprintf("%s/Users/RemoveById(%d)", group.ToURL(), userID)
 	client := NewHTTPClient(group.client)
-	_, err := client.Post(endpoint, nil, group.config)
+	_, err := client.Post(ctx, endpoint, nil, group.config)
 	return err
 }

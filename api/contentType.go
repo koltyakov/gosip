@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -51,23 +52,23 @@ func (contentType *ContentType) ToURL() string {
 }
 
 // Get gets content type data object
-func (contentType *ContentType) Get() (ContentTypeResp, error) {
+func (contentType *ContentType) Get(ctx context.Context) (ContentTypeResp, error) {
 	client := NewHTTPClient(contentType.client)
-	return client.Get(contentType.ToURL(), contentType.config)
+	return client.Get(ctx, contentType.ToURL(), contentType.config)
 }
 
 // Update updates Content Types's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.ContentType object
-func (contentType *ContentType) Update(body []byte) (ContentTypeResp, error) {
+func (contentType *ContentType) Update(ctx context.Context, body []byte) (ContentTypeResp, error) {
 	body = patchMetadataType(body, "SP.ContentType")
 	client := NewHTTPClient(contentType.client)
-	return client.Update(contentType.endpoint, bytes.NewBuffer(body), contentType.config)
+	return client.Update(ctx, contentType.endpoint, bytes.NewBuffer(body), contentType.config)
 }
 
 // Delete deletes a content type skipping recycle bin
-func (contentType *ContentType) Delete() error {
+func (contentType *ContentType) Delete(ctx context.Context) error {
 	client := NewHTTPClient(contentType.client)
-	_, err := client.Delete(contentType.endpoint, contentType.config)
+	_, err := client.Delete(ctx, contentType.endpoint, contentType.config)
 	return err
 }
 

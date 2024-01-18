@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strings"
 	"testing"
@@ -16,7 +17,7 @@ func TestLists(t *testing.T) {
 	newListTitle := uuid.New().String()
 
 	t.Run("Get", func(t *testing.T) {
-		data, err := web.Lists().Select("Id,Title").Conf(headers.verbose).Get()
+		data, err := web.Lists().Select("Id,Title").Conf(headers.verbose).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -29,7 +30,7 @@ func TestLists(t *testing.T) {
 	})
 
 	t.Run("Add", func(t *testing.T) {
-		if _, err := web.Lists().Add(newListTitle, nil); err != nil {
+		if _, err := web.Lists().Add(context.Background(), newListTitle, nil); err != nil {
 			t.Error(err)
 		}
 	})
@@ -39,7 +40,7 @@ func TestLists(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := web.Lists().GetByID(listInfo.ID).Get(); err != nil {
+		if _, err := web.Lists().GetByID(listInfo.ID).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -49,7 +50,7 @@ func TestLists(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := web.Lists().GetByTitle(listInfo.Title).Get(); err != nil {
+		if _, err := web.Lists().GetByTitle(listInfo.Title).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -57,7 +58,7 @@ func TestLists(t *testing.T) {
 	t.Run("GetListByURI", func(t *testing.T) {
 		listURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) +
 			"/Lists/" + strings.Replace(newListTitle, "-", "", -1)
-		if _, err := web.GetList(listURI).Get(); err != nil {
+		if _, err := web.GetList(listURI).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -69,10 +70,10 @@ func TestLists(t *testing.T) {
 
 		listTitle := uuid.New().String()
 		listURI := uuid.New().String()
-		if _, err := web.Lists().AddWithURI(listTitle, listURI, nil); err != nil {
+		if _, err := web.Lists().AddWithURI(context.Background(), listTitle, listURI, nil); err != nil {
 			t.Error(err)
 		}
-		if err := web.Lists().GetByTitle(listTitle).Delete(); err != nil {
+		if err := web.Lists().GetByTitle(listTitle).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -80,16 +81,16 @@ func TestLists(t *testing.T) {
 	t.Run("CreateFieldAsXML", func(t *testing.T) {
 		title := strings.Replace(uuid.New().String(), "-", "", -1)
 		schemaXML := `<Field Type="Text" DisplayName="` + title + `" MaxLength="255" Name="` + title + `" Title="` + title + `"></Field>`
-		if _, err := web.Lists().GetByTitle(newListTitle).Fields().CreateFieldAsXML(schemaXML, 12); err != nil {
+		if _, err := web.Lists().GetByTitle(newListTitle).Fields().CreateFieldAsXML(context.Background(), schemaXML, 12); err != nil {
 			t.Error(err)
 		}
-		if err := web.Lists().GetByTitle(newListTitle).Fields().GetByInternalNameOrTitle(title).Delete(); err != nil {
+		if err := web.Lists().GetByTitle(newListTitle).Fields().GetByInternalNameOrTitle(title).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		if err := web.Lists().GetByTitle(newListTitle).Delete(); err != nil {
+		if err := web.Lists().GetByTitle(newListTitle).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -98,7 +99,7 @@ func TestLists(t *testing.T) {
 
 func getAnyList() (*ListInfo, error) {
 	web := NewSP(spClient).Web()
-	data, err := web.Lists().Select("Id,Title").OrderBy("Created", true).Top(1).Conf(headers.verbose).Get()
+	data, err := web.Lists().Select("Id,Title").OrderBy("Created", true).Top(1).Conf(headers.verbose).Get(context.Background())
 	if err != nil {
 		return nil, err
 	}

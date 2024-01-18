@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -29,7 +30,7 @@ type AddValidateFieldResult struct {
 
 // AddValidate adds new item in this list using AddValidateUpdateItemUsingPath method.
 // formValues fingerprints https://github.com/koltyakov/sp-sig-20180705-demo/blob/master/src/03-pnp/FieldTypes.md#field-data-types-fingerprints-sample
-func (items *Items) AddValidate(formValues map[string]string, options *ValidateAddOptions) (AddValidateResp, error) {
+func (items *Items) AddValidate(ctx context.Context, formValues map[string]string, options *ValidateAddOptions) (AddValidateResp, error) {
 	endpoint := fmt.Sprintf("%s/AddValidateUpdateItemUsingPath()", getPriorEndpoint(items.endpoint, "/items"))
 	client := NewHTTPClient(items.client)
 	type formValue struct {
@@ -62,7 +63,7 @@ func (items *Items) AddValidate(formValues map[string]string, options *ValidateA
 	var res AddValidateResp
 	var err error
 
-	res, err = client.Post(endpoint, bytes.NewBuffer(body), items.config)
+	res, err = client.Post(ctx, endpoint, bytes.NewBuffer(body), items.config)
 	if err != nil {
 		return res, err
 	}

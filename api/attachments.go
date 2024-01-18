@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -58,16 +59,16 @@ func NewAttachment(client *gosip.SPClient, endpoint string, config *RequestConfi
 }
 
 // Get gets attachments collection response
-func (attachments *Attachments) Get() (AttachmentsResp, error) {
+func (attachments *Attachments) Get(ctx context.Context) (AttachmentsResp, error) {
 	client := NewHTTPClient(attachments.client)
-	return client.Get(attachments.endpoint, attachments.config)
+	return client.Get(ctx, attachments.endpoint, attachments.config)
 }
 
 // Add uploads new attachment to the item
-func (attachments *Attachments) Add(name string, content io.Reader) (AttachmentResp, error) {
+func (attachments *Attachments) Add(ctx context.Context, name string, content io.Reader) (AttachmentResp, error) {
 	client := NewHTTPClient(attachments.client)
 	endpoint := fmt.Sprintf("%s/Add(FileName='%s')", attachments.endpoint, name)
-	return client.Post(endpoint, content, attachments.config)
+	return client.Post(ctx, endpoint, content, attachments.config)
 }
 
 // GetByName gets an attachment by its name
@@ -80,31 +81,31 @@ func (attachments *Attachments) GetByName(fileName string) *Attachment {
 }
 
 // Get gets attachment data object
-func (attachment *Attachment) Get() (AttachmentResp, error) {
+func (attachment *Attachment) Get(ctx context.Context) (AttachmentResp, error) {
 	client := NewHTTPClient(attachment.client)
-	return client.Get(attachment.endpoint, attachment.config)
+	return client.Get(ctx, attachment.endpoint, attachment.config)
 }
 
 // Delete delete an attachment skipping recycle bin
-func (attachment *Attachment) Delete() error {
+func (attachment *Attachment) Delete(ctx context.Context) error {
 	client := NewHTTPClient(attachment.client)
-	_, err := client.Delete(attachment.endpoint, attachment.config)
+	_, err := client.Delete(ctx, attachment.endpoint, attachment.config)
 	return err
 }
 
 // Recycle moves an attachment to the recycle bin
-func (attachment *Attachment) Recycle() error {
+func (attachment *Attachment) Recycle(ctx context.Context) error {
 	client := NewHTTPClient(attachment.client)
 	endpoint := fmt.Sprintf("%s/RecycleObject", attachment.endpoint)
-	_, err := client.Post(endpoint, nil, attachment.config)
+	_, err := client.Post(ctx, endpoint, nil, attachment.config)
 	return err
 }
 
 // GetReader gets attachment body data reader
-func (attachment *Attachment) GetReader() (io.ReadCloser, error) {
+func (attachment *Attachment) GetReader(ctx context.Context) (io.ReadCloser, error) {
 	endpoint := fmt.Sprintf("%s/$value", attachment.endpoint)
 
-	req, err := http.NewRequest("GET", endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +128,8 @@ func (attachment *Attachment) GetReader() (io.ReadCloser, error) {
 }
 
 // Download downloads attachment's as byte array
-func (attachment *Attachment) Download() ([]byte, error) {
-	body, err := attachment.GetReader()
+func (attachment *Attachment) Download(ctx context.Context) ([]byte, error) {
+	body, err := attachment.GetReader(ctx)
 	if err != nil {
 		return nil, err
 	}

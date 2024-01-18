@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 
 	"github.com/koltyakov/gosip"
 )
@@ -71,9 +72,9 @@ func (field *Field) ToURL() string {
 }
 
 // Get gets field data object
-func (field *Field) Get() (FieldResp, error) {
+func (field *Field) Get(ctx context.Context) (FieldResp, error) {
 	client := NewHTTPClient(field.client)
-	data, err := client.Get(field.ToURL(), field.config)
+	data, err := client.Get(ctx, field.ToURL(), field.config)
 	if err != nil {
 		return nil, err
 	}
@@ -82,15 +83,15 @@ func (field *Field) Get() (FieldResp, error) {
 
 // Update updates Field's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.Field object
-func (field *Field) Update(body []byte) (FieldResp, error) {
+func (field *Field) Update(ctx context.Context, body []byte) (FieldResp, error) {
 	body = patchMetadataType(body, "SP.Field")
 	client := NewHTTPClient(field.client)
-	return client.Update(field.endpoint, bytes.NewBuffer(body), field.config)
+	return client.Update(ctx, field.endpoint, bytes.NewBuffer(body), field.config)
 }
 
 // Delete deletes a field skipping recycle bin
-func (field *Field) Delete() error {
+func (field *Field) Delete(ctx context.Context) error {
 	client := NewHTTPClient(field.client)
-	_, err := client.Delete(field.endpoint, field.config)
+	_, err := client.Delete(ctx, field.endpoint, field.config)
 	return err
 }

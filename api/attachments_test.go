@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -13,11 +14,11 @@ func TestAttachments(t *testing.T) {
 	web := NewSP(spClient).Web()
 	listTitle := uuid.New().String()
 
-	if _, err := web.Lists().Add(listTitle, nil); err != nil {
+	if _, err := web.Lists().Add(context.Background(), listTitle, nil); err != nil {
 		t.Error(err)
 	}
 	list := web.Lists().GetByTitle(listTitle)
-	item, err := list.Items().Add([]byte(`{"Title":"Attachment test"}`))
+	item, err := list.Items().Add(context.Background(), []byte(`{"Title":"Attachment test"}`))
 	if err != nil {
 		t.Error(err)
 	}
@@ -30,14 +31,14 @@ func TestAttachments(t *testing.T) {
 			"att_04.txt": []byte("attachment 04"),
 		}
 		for fileName, content := range attachments {
-			if _, err := list.Items().GetByID(item.Data().ID).Attachments().Add(fileName, bytes.NewBuffer(content)); err != nil {
+			if _, err := list.Items().GetByID(item.Data().ID).Attachments().Add(context.Background(), fileName, bytes.NewBuffer(content)); err != nil {
 				t.Error(err)
 			}
 		}
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		data, err := list.Items().GetByID(item.Data().ID).Attachments().Get()
+		data, err := list.Items().GetByID(item.Data().ID).Attachments().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -50,7 +51,7 @@ func TestAttachments(t *testing.T) {
 	})
 
 	t.Run("GetByName", func(t *testing.T) {
-		data, err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_01.txt").Get()
+		data, err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_01.txt").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -63,7 +64,7 @@ func TestAttachments(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		if err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_02.txt").Delete(); err != nil {
+		if err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_02.txt").Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -73,14 +74,14 @@ func TestAttachments(t *testing.T) {
 			t.Skip("is not supported with SP 2013")
 		}
 
-		if err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_03.txt").Recycle(); err != nil {
+		if err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_03.txt").Recycle(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Download", func(t *testing.T) {
 		expectedContent := []byte("attachment 04")
-		content, err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_04.txt").Download()
+		content, err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_04.txt").Download(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -89,7 +90,7 @@ func TestAttachments(t *testing.T) {
 		}
 	})
 
-	if err := list.Delete(); err != nil {
+	if err := list.Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
 

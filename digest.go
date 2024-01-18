@@ -34,7 +34,7 @@ func GetDigest(context context.Context, client *SPClient) (string, error) {
 	}
 
 	contextInfoURL := siteURL + "/_api/ContextInfo"
-	req, err := http.NewRequest("POST", contextInfoURL, nil)
+	req, err := http.NewRequestWithContext(context, "POST", contextInfoURL, nil)
 	if err != nil {
 		return "", err
 	}

@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strings"
 	"testing"
@@ -20,7 +21,7 @@ func TestFields(t *testing.T) {
 	}
 
 	t.Run("GetFromWeb", func(t *testing.T) {
-		data, err := web.Fields().Top(1).Get()
+		data, err := web.Fields().Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -30,7 +31,7 @@ func TestFields(t *testing.T) {
 	})
 
 	t.Run("GetFromList", func(t *testing.T) {
-		if _, err := web.GetList(listURI).Fields().Top(1).Get(); err != nil {
+		if _, err := web.GetList(listURI).Fields().Top(1).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -46,22 +47,22 @@ func TestFields(t *testing.T) {
 	// })
 
 	t.Run("GetByID", func(t *testing.T) {
-		if _, err := web.Fields().GetByID(field.ID).Get(); err != nil {
+		if _, err := web.Fields().GetByID(field.ID).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("GetByTitle", func(t *testing.T) {
-		if _, err := web.Fields().GetByTitle(field.Title).Get(); err != nil {
+		if _, err := web.Fields().GetByTitle(field.Title).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("GetByInternalNameOrTitle", func(t *testing.T) {
-		if _, err := web.Fields().GetByInternalNameOrTitle(field.InternalName).Get(); err != nil {
+		if _, err := web.Fields().GetByInternalNameOrTitle(field.InternalName).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
-		if _, err := web.Fields().GetByInternalNameOrTitle(field.Title).Get(); err != nil {
+		if _, err := web.Fields().GetByInternalNameOrTitle(field.Title).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -69,10 +70,10 @@ func TestFields(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
 		title := strings.Replace(uuid.New().String(), "-", "", -1)
 		fm := []byte(`{"__metadata":{"type":"SP.FieldText"},"Title":"` + title + `","FieldTypeKind":2,"MaxLength":255}`)
-		if _, err := web.Fields().Add(fm); err != nil {
+		if _, err := web.Fields().Add(context.Background(), fm); err != nil {
 			t.Error(err)
 		}
-		if err := web.Fields().GetByInternalNameOrTitle(title).Delete(); err != nil {
+		if err := web.Fields().GetByInternalNameOrTitle(title).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -84,7 +85,7 @@ func TestFields(t *testing.T) {
 
 func getAnyField() (*FieldInfo, error) {
 	web := NewSP(spClient).Web()
-	data, err := web.Fields().Top(1).Get()
+	data, err := web.Fields().Top(1).Get(context.Background())
 	if err != nil {
 		return nil, err
 	}
