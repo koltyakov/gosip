@@ -2,6 +2,7 @@ package adfs
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -21,7 +22,7 @@ var (
 )
 
 // GetAuth gets authentication
-func GetAuth(c *AuthCnfg) (string, int64, error) {
+func GetAuth(ctx context.Context, c *AuthCnfg) (string, int64, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -41,7 +42,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 
 	// In case of WAP
 	if c.AdfsCookie == "EdgeAccessCookie" {
-		authCookie, expires, err = wapAuthFlow(c)
+		authCookie, expires, err = wapAuthFlow(ctx, c)
 		if err != nil {
 			return "", 0, err
 		}
@@ -49,7 +50,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 			expiry = 30 * time.Minute // ToDO: move to settings or dynamically get
 		}
 	} else {
-		authCookie, expires, err = adfsAuthFlow(c, "")
+		authCookie, expires, err = adfsAuthFlow(ctx, c, "")
 		if err != nil {
 			return "", 0, err
 		}
@@ -63,7 +64,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 	return authCookie, exp, nil
 }
 
-func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
+func adfsAuthFlow(ctx context.Context, c *AuthCnfg, edgeCookie string) (string, string, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -79,7 +80,7 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 		return "", "", err
 	}
 
-	req, err := http.NewRequest("POST", usernameMixedURL, bytes.NewBuffer([]byte(samlBody)))
+	req, err := http.NewRequestWithContext(ctx, "POST", usernameMixedURL, bytes.NewBuffer([]byte(samlBody)))
 	if err != nil {
 		return "", "", err
 	}
@@ -170,7 +171,7 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 	// }
 	c.client.CheckRedirect = doNotCheckRedirect
 
-	req, err = http.NewRequest("POST", rootSiteURL+"/_trust/", strings.NewReader(params.Encode()))
+	req, err = http.NewRequestWithContext(ctx, "POST", rootSiteURL+"/_trust/", strings.NewReader(params.Encode()))
 	if err != nil {
 		return "", "", err
 	}
@@ -201,7 +202,7 @@ func adfsAuthFlow(c *AuthCnfg, edgeCookie string) (string, string, error) {
 }
 
 // WAP auth flow - TODO: refactor
-func wapAuthFlow(c *AuthCnfg) (string, string, error) {
+func wapAuthFlow(ctx context.Context, c *AuthCnfg) (string, string, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -213,8 +214,11 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	// 	},
 	// }
 	c.client.CheckRedirect = doNotCheckRedirect
-
-	resp, err := c.client.Get(c.SiteURL)
+	req, err := http.NewRequestWithContext(ctx, "GET", c.SiteURL, nil)
+	if err != nil {
+		return "", "", err
+	}
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -241,7 +245,12 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	params.Set("Password", c.Password)
 	params.Set("AuthMethod", "FormsAuthentication")
 
-	resp, err = c.client.Post(redirectURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	redirectReq, err := http.NewRequestWithContext(ctx, "POST", redirectURL, strings.NewReader(params.Encode()))
+	if err != nil {
+		return "", "", err
+	}
+	redirectReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err = c.client.Do(redirectReq)
 	if err != nil {
 		return "", "", err
 	}
@@ -256,7 +265,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	}
 
 	// Request to redirect URL using MSISAuth
-	req, err := http.NewRequest("GET", redirectURL, nil)
+	msisAuthReq, err := http.NewRequestWithContext(ctx, "GET", redirectURL, nil)
 	if err != nil {
 		return "", "", err
 	}
@@ -267,10 +276,10 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 		return "", "", err
 	}
 
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
-	req.Header.Set("Cookie", msisAuthCookie)
+	msisAuthReq.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+	msisAuthReq.Header.Set("Cookie", msisAuthCookie)
 
-	resp, err = c.client.Do(req)
+	resp, err = c.client.Do(msisAuthReq)
 	if err != nil {
 		return "", "", err
 	}
@@ -291,7 +300,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 	}
 	redirectURL = redirect.String()
 
-	req, err = http.NewRequest("GET", redirectURL, nil)
+	req, err = http.NewRequestWithContext(ctx, "GET", redirectURL, nil)
 	if err != nil {
 		return "", "", err
 	}
@@ -325,7 +334,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 			// client := &http.Client{}
 			c.client.CheckRedirect = nil
 
-			req, err = http.NewRequest("GET", redirectURL, nil)
+			req, err = http.NewRequestWithContext(ctx, "GET", redirectURL, nil)
 			if err != nil {
 				return "", "", err
 			}
@@ -350,7 +359,7 @@ func wapAuthFlow(c *AuthCnfg) (string, string, error) {
 			cc.RelyingParty = resp.Request.URL.Query().Get("wtrealm")
 			cc.AdfsCookie = "FedAuth"
 
-			fedAuthCookie, expire, err := adfsAuthFlow(&cc, authCookie)
+			fedAuthCookie, expire, err := adfsAuthFlow(ctx, &cc, authCookie)
 			if err != nil {
 				return "", "", err
 			}

@@ -1,6 +1,7 @@
 package addin
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -25,7 +26,7 @@ var (
 )
 
 // GetAuth gets authentication
-func GetAuth(c *AuthCnfg) (string, int64, error) {
+func GetAuth(ctx context.Context, c *AuthCnfg) (string, int64, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -40,13 +41,13 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 		return accessToken.(string), exp.Unix(), nil
 	}
 
-	realm, err := getRealm(c)
+	realm, err := getRealm(ctx, c)
 	if err != nil {
 		return "", 0, err
 	}
 	c.Realm = realm
 
-	authURL, err := getAuthURL(c, c.Realm)
+	authURL, err := getAuthURL(ctx, c, c.Realm)
 	if err != nil {
 		return "", 0, err
 	}
@@ -62,7 +63,12 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 	params.Set("resource", resource)
 
 	// resp, err := http.Post(authURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
-	resp, err := c.client.Post(authURL, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	req, err := http.NewRequestWithContext(ctx, "POST", authURL, strings.NewReader(params.Encode()))
+	if err != nil {
+		return "", 0, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", 0, err
 	}
@@ -106,7 +112,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 	return results.AccessToken, exp, nil
 }
 
-func getAuthURL(c *AuthCnfg, realm string) (string, error) {
+func getAuthURL(ctx context.Context, c *AuthCnfg, realm string) (string, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -119,7 +125,7 @@ func getAuthURL(c *AuthCnfg, realm string) (string, error) {
 		return authURL.(string), nil
 	}
 
-	req, err := http.NewRequest("GET", endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", endpoint, nil)
 	if err != nil {
 		return "", err
 	}
@@ -164,7 +170,7 @@ func getAuthURL(c *AuthCnfg, realm string) (string, error) {
 	return "", errors.New("no OAuth2 protocol location found")
 }
 
-func getRealm(c *AuthCnfg) (string, error) {
+func getRealm(ctx context.Context, c *AuthCnfg) (string, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -184,7 +190,7 @@ func getRealm(c *AuthCnfg) (string, error) {
 	}
 
 	endpoint := c.SiteURL + "/_vti_bin/client.svc"
-	req, err := http.NewRequest("POST", endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, nil)
 	if err != nil {
 		return "", err
 	}

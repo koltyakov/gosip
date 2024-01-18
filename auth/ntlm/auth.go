@@ -9,6 +9,7 @@ Amongst supported platform versions are:
 package ntlm
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -100,7 +101,7 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 func (c *AuthCnfg) SetMasterkey(masterKey string) { c.masterKey = masterKey }
 
 // GetAuth authenticates, receives access token
-func (c *AuthCnfg) GetAuth() (string, int64, error) { return "", 0, nil }
+func (c *AuthCnfg) GetAuth(ctx context.Context) (string, int64, error) { return "", 0, nil }
 
 // GetSiteURL gets siteURL
 func (c *AuthCnfg) GetSiteURL() string { return c.SiteURL }

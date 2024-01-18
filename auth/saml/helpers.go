@@ -2,6 +2,7 @@ package saml
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
@@ -29,7 +30,7 @@ var (
 )
 
 // GetAuth gets authentication
-func GetAuth(c *AuthCnfg) (string, int64, error) {
+func GetAuth(ctx context.Context, c *AuthCnfg) (string, int64, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -44,7 +45,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 		return authToken.(string), exp.Unix(), nil
 	}
 
-	authCookie, notAfter, err := getSecurityToken(c)
+	authCookie, notAfter, err := getSecurityToken(ctx, c)
 	if err != nil {
 		return "", 0, err
 	}
@@ -58,7 +59,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 	return authCookie, exp, nil
 }
 
-func getSecurityToken(c *AuthCnfg) (string, string, error) {
+func getSecurityToken(ctx context.Context, c *AuthCnfg) (string, string, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -76,7 +77,12 @@ func getSecurityToken(c *AuthCnfg) (string, string, error) {
 	// }
 	c.client.CheckRedirect = doNotCheckRedirect
 
-	resp, err := c.client.Post(endpoint, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, strings.NewReader(params.Encode()))
+	if err != nil {
+		return "", "", err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -114,17 +120,17 @@ func getSecurityToken(c *AuthCnfg) (string, string, error) {
 	}
 
 	if userRealm.NameSpaceType == "Managed" {
-		return getSecurityTokenWithOnline(c)
+		return getSecurityTokenWithOnline(ctx, c)
 	}
 
 	if userRealm.NameSpaceType == "Federated" {
-		return getSecurityTokenWithAdfs(userRealm.AuthURL, c)
+		return getSecurityTokenWithAdfs(ctx, userRealm.AuthURL, c)
 	}
 
 	return "", "", fmt.Errorf("unable to resolve namespace authentiation type. Type received: %s", userRealm.NameSpaceType)
 }
 
-func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
+func getSecurityTokenWithOnline(ctx context.Context, c *AuthCnfg) (string, string, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -143,7 +149,7 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 	loginEndpoint := loginEndpoints[resolveSPOEnv(c.SiteURL)]
 	stsEndpoint := fmt.Sprintf("https://%s/extSTS.srf", loginEndpoint)
 
-	req, err := http.NewRequest("POST", stsEndpoint, bytes.NewBuffer([]byte(samlBody)))
+	req, err := http.NewRequestWithContext(ctx, "POST", stsEndpoint, bytes.NewBuffer([]byte(samlBody)))
 	if err != nil {
 		return "", "", err
 	}
@@ -218,7 +224,7 @@ func getSecurityTokenWithOnline(c *AuthCnfg) (string, string, error) {
 }
 
 // TODO: test the method, it possibly contains issues and extra complexity
-func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, error) {
+func getSecurityTokenWithAdfs(ctx context.Context, adfsURL string, c *AuthCnfg) (string, string, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -237,7 +243,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 		return "", "", err
 	}
 
-	req, err := http.NewRequest("POST", usernameMixedURL, bytes.NewBuffer([]byte(samlBody)))
+	req, err := http.NewRequestWithContext(ctx, "POST", usernameMixedURL, bytes.NewBuffer([]byte(samlBody)))
 	if err != nil {
 		return "", "", err
 	}
@@ -303,7 +309,7 @@ func getSecurityTokenWithAdfs(adfsURL string, c *AuthCnfg) (string, string, erro
 
 	stsEndpoint := "https://login.microsoftonline.com/extSTS.srf" // TODO: mapping
 
-	req, err = http.NewRequest("POST", stsEndpoint, bytes.NewBuffer([]byte(tokenRequest)))
+	req, err = http.NewRequestWithContext(ctx, "POST", stsEndpoint, bytes.NewBuffer([]byte(tokenRequest)))
 	if err != nil {
 		return "", "", err
 	}

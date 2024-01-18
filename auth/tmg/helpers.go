@@ -1,6 +1,7 @@
 package tmg
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,7 +17,7 @@ var (
 )
 
 // GetAuth gets authentication
-func GetAuth(c *AuthCnfg) (string, int64, error) {
+func GetAuth(ctx context.Context, c *AuthCnfg) (string, int64, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -31,7 +32,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 		return accessToken.(string), exp.Unix(), nil
 	}
 
-	redirect, err := detectCookieAuthURL(c, c.SiteURL)
+	redirect, err := detectCookieAuthURL(ctx, c, c.SiteURL)
 	if err != nil {
 		return "", 0, err
 	}
@@ -59,8 +60,12 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 	// 	},
 	// }
 	c.client.CheckRedirect = doNotCheckRedirect
-
-	resp, err := c.client.Post(endpoint, "application/x-www-form-urlencoded", strings.NewReader(params.Encode()))
+	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, strings.NewReader(params.Encode()))
+	if err != nil {
+		return "", 0, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", 0, err
 	}
@@ -85,7 +90,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 	return authCookie, exp, nil
 }
 
-func detectCookieAuthURL(c *AuthCnfg, siteURL string) (*url.URL, error) {
+func detectCookieAuthURL(ctx context.Context, c *AuthCnfg, siteURL string) (*url.URL, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -97,7 +102,7 @@ func detectCookieAuthURL(c *AuthCnfg, siteURL string) (*url.URL, error) {
 	// }
 	c.client.CheckRedirect = doNotCheckRedirect
 
-	req, err := http.NewRequest("GET", siteURL, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", siteURL, nil)
 	if err != nil {
 		return nil, err
 	}
