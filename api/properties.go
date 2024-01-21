@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -43,13 +44,13 @@ func (properties *Properties) ToURL() string {
 }
 
 // Get gets properties collection
-func (properties *Properties) Get() (PropsResp, error) {
+func (properties *Properties) Get(ctx context.Context) (PropsResp, error) {
 	client := NewHTTPClient(properties.client)
-	return client.Get(properties.ToURL(), properties.config)
+	return client.Get(ctx, properties.ToURL(), properties.config)
 }
 
 // GetProps gets specific props values
-func (properties *Properties) GetProps(props []string) (map[string]string, error) {
+func (properties *Properties) GetProps(ctx context.Context, props []string) (map[string]string, error) {
 	for indx, prop := range props {
 		key := strings.Replace(strings.Replace(prop, "_x005f_", "_", -1), "_", "_x005f_", -1)
 		props[indx] = key
@@ -62,10 +63,10 @@ func (properties *Properties) GetProps(props []string) (map[string]string, error
 		}
 		selectProps += prop
 	}
-	res, err := scoped.Select(selectProps).Get()
+	res, err := scoped.Select(selectProps).Get(ctx)
 	if err != nil {
 		scoped.modifiers = &ODataMods{}
-		res, err := scoped.Get()
+		res, err := scoped.Get(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -87,36 +88,36 @@ func (properties *Properties) GetProps(props []string) (map[string]string, error
 }
 
 // Set sets a single property (CSOM helper)
-func (properties *Properties) Set(prop string, value string) error {
-	return properties.SetProps(map[string]string{prop: value})
+func (properties *Properties) Set(ctx context.Context, prop string, value string) error {
+	return properties.SetProps(ctx, map[string]string{prop: value})
 }
 
 // SetProps sets multiple properties defined in string map object (CSOM helper)
-func (properties *Properties) SetProps(props map[string]string) error {
+func (properties *Properties) SetProps(ctx context.Context, props map[string]string) error {
 	if properties.entity == "web" {
-		return properties.setWebProps(props)
+		return properties.setWebProps(ctx, props)
 	}
 	if properties.entity == "folder" {
-		return properties.setFolderProps(props)
+		return properties.setFolderProps(ctx, props)
 	}
 	if properties.entity == "file" {
-		return properties.setFileProps(props)
+		return properties.setFileProps(ctx, props)
 	}
 	return fmt.Errorf("unknown parent entity %s", properties.entity)
 }
 
 // setWebProps sets multiple properties defined in string map object (CSOM helper)
-func (properties *Properties) setWebProps(props map[string]string) error {
+func (properties *Properties) setWebProps(ctx context.Context, props map[string]string) error {
 	// ToDo: exclude extra call to site and web metadata
 	web := NewWeb(properties.client, getPriorEndpoint(properties.endpoint, "/AllProperties"), properties.config)
 
 	site := NewSP(properties.client).Site()
-	siteR, err := site.Select("Id").Get()
+	siteR, err := site.Select("Id").Get(ctx)
 	if err != nil {
 		return err
 	}
 
-	webR, err := web.Select("Id").Get()
+	webR, err := web.Select("Id").Get(ctx)
 	if err != nil {
 		return err
 	}
@@ -139,14 +140,14 @@ func (properties *Properties) setWebProps(props map[string]string) error {
 	}
 
 	client := NewHTTPClient(properties.client)
-	_, err = client.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), properties.config)
+	_, err = client.ProcessQuery(ctx, properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), properties.config)
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err
 }
 
 // setFolderProps sets multiple properties defined in string map object (CSOM helper)
-func (properties *Properties) setFolderProps(props map[string]string) error {
+func (properties *Properties) setFolderProps(ctx context.Context, props map[string]string) error {
 	// ToDo: exclude extra call to site, web and folder metadata
 	identity := ""
 
@@ -154,19 +155,19 @@ func (properties *Properties) setFolderProps(props map[string]string) error {
 	folder := NewFolder(properties.client, getPriorEndpoint(properties.endpoint, "/Properties"), properties.config)
 
 	site := NewSP(properties.client).Site()
-	siteR, err := site.Select("Id").Get()
+	siteR, err := site.Select("Id").Get(ctx)
 	if err != nil {
 		return err
 	}
 	identity = fmt.Sprintf("740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:%s", siteR.Data().ID)
 
-	webR, err := web.Select("Id").Get()
+	webR, err := web.Select("Id").Get(ctx)
 	if err != nil {
 		return err
 	}
 	identity = fmt.Sprintf("%s:web:%s", identity, webR.Data().ID)
 
-	folderR, err := folder.Select("UniqueId").Get()
+	folderR, err := folder.Select("UniqueId").Get(ctx)
 	if err != nil {
 		return err
 	}
@@ -188,17 +189,17 @@ func (properties *Properties) setFolderProps(props map[string]string) error {
 	}
 
 	client := NewHTTPClient(properties.client)
-	_, err = client.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), properties.config)
+	_, err = client.ProcessQuery(ctx, properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), properties.config)
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err
 }
 
 // setFileProps sets multiple properties defined in string map object (CSOM helper)
-func (properties *Properties) setFileProps(props map[string]string) error {
+func (properties *Properties) setFileProps(ctx context.Context, props map[string]string) error {
 	file := NewFile(properties.client, getPriorEndpoint(properties.endpoint, "/Properties"), properties.config)
 
-	fileR, err := file.Select("UniqueId").Get()
+	fileR, err := file.Select("UniqueId").Get(ctx)
 	if err != nil {
 		return err
 	}
@@ -220,7 +221,7 @@ func (properties *Properties) setFileProps(props map[string]string) error {
 	}
 
 	client := NewHTTPClient(properties.client)
-	_, err = client.ProcessQuery(properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), properties.config)
+	_, err = client.ProcessQuery(ctx, properties.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), properties.config)
 
 	printNoScriptWarning(properties.endpoint, err)
 	return err

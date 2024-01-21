@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"testing"
@@ -16,13 +17,13 @@ func TestFile(t *testing.T) {
 	newFolderName := uuid.New().String()
 	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 	newFolderURI := rootFolderURI + "/" + newFolderName
-	if _, err := web.GetFolder(rootFolderURI).Folders().Add(newFolderName); err != nil {
+	if _, err := web.GetFolder(rootFolderURI).Folders().Add(context.Background(), newFolderName); err != nil {
 		t.Error(err)
 	}
 
 	// Create a temporary document library with minor versioning enabled
 	tempDocLibName := uuid.New().String()
-	if _, err := web.Lists().Add(tempDocLibName, map[string]interface{}{
+	if _, err := web.Lists().Add(context.Background(), tempDocLibName, map[string]interface{}{
 		"BaseTemplate":        101,
 		"EnableMinorVersions": true,
 	}); err != nil {
@@ -33,29 +34,29 @@ func TestFile(t *testing.T) {
 		for i := 1; i <= 5; i++ {
 			fileName := fmt.Sprintf("File_%d.txt", i)
 			fileData := []byte(fmt.Sprintf("File %d data", i))
-			if _, err := web.GetFolder(newFolderURI).Files().Add(fileName, fileData, true); err != nil {
+			if _, err := web.GetFolder(newFolderURI).Files().Add(context.Background(), fileName, fileData, true); err != nil {
 				t.Error(err)
 			}
 		}
 	})
 
 	t.Run("CheckOut", func(t *testing.T) {
-		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").CheckOut(); err != nil {
+		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").CheckOut(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("UndoCheckOut", func(t *testing.T) {
-		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").UndoCheckOut(); err != nil {
+		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").UndoCheckOut(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("CheckIn", func(t *testing.T) {
-		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").CheckOut(); err != nil {
+		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").CheckOut(context.Background()); err != nil {
 			t.Error(err)
 		}
-		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").CheckIn("test", CheckInTypes.Major); err != nil {
+		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").CheckIn(context.Background(), "test", CheckInTypes.Major); err != nil {
 			t.Error(err)
 		}
 	})
@@ -63,13 +64,13 @@ func TestFile(t *testing.T) {
 	t.Run("PubUnPub", func(t *testing.T) {
 		// Using temporary document library with minor versioning enabled
 		lib := web.Lists().GetByTitle(tempDocLibName)
-		if _, err := lib.RootFolder().Files().Add("File_1.txt", []byte("File 1 data"), true); err != nil {
+		if _, err := lib.RootFolder().Files().Add(context.Background(), "File_1.txt", []byte("File 1 data"), true); err != nil {
 			t.Error(err)
 		}
-		if _, err := lib.RootFolder().Files().GetByName("File_1.txt").Publish("test"); err != nil {
+		if _, err := lib.RootFolder().Files().GetByName("File_1.txt").Publish(context.Background(), "test"); err != nil {
 			t.Error(err)
 		}
-		if _, err := lib.RootFolder().Files().GetByName("File_1.txt").UnPublish("test"); err != nil {
+		if _, err := lib.RootFolder().Files().GetByName("File_1.txt").UnPublish(context.Background(), "test"); err != nil {
 			t.Error(err)
 		}
 	})
@@ -80,32 +81,32 @@ func TestFile(t *testing.T) {
 		}
 
 		file := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt")
-		props, err := file.Props().Get()
+		props, err := file.Props().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
 		if len(props.Data()) == 0 {
 			t.Error("can't get file properties")
 		}
-		if err := file.Props().Set("MyProp", "MyValue"); err != nil {
+		if err := file.Props().Set(context.Background(), "MyProp", "MyValue"); err != nil {
 			t.Error("can't set file property")
 		}
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		if err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Delete(); err != nil {
+		if err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Recycle", func(t *testing.T) {
-		if err := web.GetFile(newFolderURI + "/File_2.txt").Recycle(); err != nil {
+		if err := web.GetFile(newFolderURI + "/File_2.txt").Recycle(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		data, err := web.GetFile(newFolderURI + "/File_3.txt").Get()
+		data, err := web.GetFile(newFolderURI + "/File_3.txt").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -115,11 +116,11 @@ func TestFile(t *testing.T) {
 	})
 
 	t.Run("GetFileByID", func(t *testing.T) {
-		data, err := web.GetFile(newFolderURI + "/File_3.txt").Get()
+		data, err := web.GetFile(newFolderURI + "/File_3.txt").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
-		d, err := web.GetFileByID(data.Data().UniqueID).Get()
+		d, err := web.GetFileByID(data.Data().UniqueID).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -130,11 +131,11 @@ func TestFile(t *testing.T) {
 	})
 
 	t.Run("GetFileByPath", func(t *testing.T) {
-		data, err := web.GetFile(newFolderURI + "/File_3.txt").Get()
+		data, err := web.GetFile(newFolderURI + "/File_3.txt").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
-		d, err := web.GetFileByPath(data.Data().ServerRelativeURL).Get()
+		d, err := web.GetFileByPath(data.Data().ServerRelativeURL).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -145,11 +146,11 @@ func TestFile(t *testing.T) {
 	})
 
 	t.Run("GetItem", func(t *testing.T) {
-		item, err := web.GetFile(newFolderURI + "/File_3.txt").GetItem()
+		item, err := web.GetFile(newFolderURI + "/File_3.txt").GetItem(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
-		data, err := item.Select("Id").Get()
+		data, err := item.Select("Id").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -160,10 +161,10 @@ func TestFile(t *testing.T) {
 
 	t.Run("GetReader", func(t *testing.T) {
 		fileContent := []byte("file content")
-		if _, err := web.GetFolder(newFolderURI).Files().Add("reader.txt", fileContent, true); err != nil {
+		if _, err := web.GetFolder(newFolderURI).Files().Add(context.Background(), "reader.txt", fileContent, true); err != nil {
 			t.Error(err)
 		}
-		reader, err := web.GetFile(newFolderURI + "/reader.txt").GetReader()
+		reader, err := web.GetFile(newFolderURI + "/reader.txt").GetReader(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -178,17 +179,17 @@ func TestFile(t *testing.T) {
 	})
 
 	t.Run("ContextInfo", func(t *testing.T) {
-		if _, err := web.GetFile(newFolderURI + "/File_3.txt").ContextInfo(); err != nil {
+		if _, err := web.GetFile(newFolderURI + "/File_3.txt").ContextInfo(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Download", func(t *testing.T) {
 		fileContent := []byte("file content")
-		if _, err := web.GetFolder(newFolderURI).Files().Add("download.txt", fileContent, true); err != nil {
+		if _, err := web.GetFolder(newFolderURI).Files().Add(context.Background(), "download.txt", fileContent, true); err != nil {
 			t.Error(err)
 		}
-		content, err := web.GetFile(newFolderURI + "/download.txt").Download()
+		content, err := web.GetFile(newFolderURI + "/download.txt").Download(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -198,22 +199,22 @@ func TestFile(t *testing.T) {
 	})
 
 	t.Run("MoveTo", func(t *testing.T) {
-		if _, err := web.GetFile(newFolderURI+"/File_4.txt").MoveTo(newFolderURI+"/File_4_moved.txt", true); err != nil {
+		if _, err := web.GetFile(newFolderURI+"/File_4.txt").MoveTo(context.Background(), newFolderURI+"/File_4_moved.txt", true); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("CopyTo", func(t *testing.T) {
-		if _, err := web.GetFile(newFolderURI+"/File_5.txt").CopyTo(newFolderURI+"/File_5_copyed.txt", true); err != nil {
+		if _, err := web.GetFile(newFolderURI+"/File_5.txt").CopyTo(context.Background(), newFolderURI+"/File_5_copyed.txt", true); err != nil {
 			t.Error(err)
 		}
 	})
 
 	// Clean up
-	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
+	if err := web.GetFolder(newFolderURI).Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
-	if err := web.Lists().GetByTitle(tempDocLibName).Delete(); err != nil {
+	if err := web.Lists().GetByTitle(tempDocLibName).Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
 }

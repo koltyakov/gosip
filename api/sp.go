@@ -2,6 +2,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -77,14 +78,15 @@ func (sp *SP) Taxonomy() *Taxonomy {
 }
 
 // ContextInfo gets current Context Info object data
-func (sp *SP) ContextInfo() (*ContextInfo, error) {
-	return NewContext(sp.client, sp.ToURL(), sp.config).Get()
+func (sp *SP) ContextInfo(ctx context.Context) (*ContextInfo, error) {
+	return NewContext(sp.client, sp.ToURL(), sp.config).Get(ctx)
 }
 
 // Metadata returns $metadata info
-func (sp *SP) Metadata() ([]byte, error) {
+func (sp *SP) Metadata(ctx context.Context) ([]byte, error) {
 	client := NewHTTPClient(sp.client)
 	return client.Get(
+		ctx,
 		fmt.Sprintf("%s/_api/$metadata", sp.ToURL()),
 		sp.config,
 	)

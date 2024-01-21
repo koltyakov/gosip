@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -18,7 +19,7 @@ func TestGroups(t *testing.T) {
 
 	t.Run("Constructor", func(t *testing.T) {
 		g := NewGroups(spClient, endpoint, nil)
-		if _, err := g.Select("Id").Get(); err != nil {
+		if _, err := g.Select("Id").Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -34,7 +35,7 @@ func TestGroups(t *testing.T) {
 	})
 
 	t.Run("GetGroups", func(t *testing.T) {
-		data, err := groups.Select("Id").Top(5).Get()
+		data, err := groups.Select("Id").Top(5).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -44,7 +45,7 @@ func TestGroups(t *testing.T) {
 	})
 
 	t.Run("GetGroup", func(t *testing.T) {
-		data, err := groups.Select("Id,Title").Top(1).Get()
+		data, err := groups.Select("Id,Title").Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -60,13 +61,13 @@ func TestGroups(t *testing.T) {
 	})
 
 	t.Run("GetByID", func(t *testing.T) {
-		data0, err := groups.Select("Id,Title").Top(1).Get()
+		data0, err := groups.Select("Id,Title").Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
 
 		groupID := data0.Data()[0].Data().ID
-		data, err := groups.GetByID(groupID).Select("Id").Get()
+		data, err := groups.GetByID(groupID).Select("Id").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -81,13 +82,13 @@ func TestGroups(t *testing.T) {
 	})
 
 	t.Run("GetByName", func(t *testing.T) {
-		data0, err := groups.Select("Id,Title").Top(1).Get()
+		data0, err := groups.Select("Id,Title").Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
 
 		groupTitle := data0.Data()[0].Data().Title
-		data, err := groups.GetByName(groupTitle).Select("Title").Get()
+		data, err := groups.GetByName(groupTitle).Select("Title").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -102,11 +103,11 @@ func TestGroups(t *testing.T) {
 	})
 
 	t.Run("Add", func(t *testing.T) {
-		if _, err := groups.Conf(headers.verbose).Add(newGroupName, nil); err != nil {
+		if _, err := groups.Conf(headers.verbose).Add(context.Background(), newGroupName, nil); err != nil {
 			t.Error(err)
 		}
 
-		u, err := sp.Web().CurrentUser().Select("Id").Get()
+		u, err := sp.Web().CurrentUser().Select("Id").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -114,21 +115,21 @@ func TestGroups(t *testing.T) {
 		if envCode != "spo" {
 			t.Skip("is not supported with legacy SP")
 		}
-		if err := groups.GetByName(newGroupName).SetOwner(u.Data().ID); err != nil {
+		if err := groups.GetByName(newGroupName).SetOwner(context.Background(), u.Data().ID); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("RemoveByLoginName", func(t *testing.T) {
-		if _, err := groups.Conf(headers.verbose).Add(newGroupNameRemove, nil); err != nil {
+		if _, err := groups.Conf(headers.verbose).Add(context.Background(), newGroupNameRemove, nil); err != nil {
 			t.Error(err)
 		}
-		if err := groups.RemoveByLoginName(newGroupNameRemove); err != nil {
+		if err := groups.RemoveByLoginName(context.Background(), newGroupNameRemove); err != nil {
 			t.Error(err)
 		}
 	})
 
-	if err := groups.RemoveByLoginName(newGroupName); err != nil {
+	if err := groups.RemoveByLoginName(context.Background(), newGroupName); err != nil {
 		t.Error(err)
 	}
 

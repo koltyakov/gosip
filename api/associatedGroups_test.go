@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"testing"
 )
 
@@ -10,7 +11,7 @@ func TestAssociatedGroups(t *testing.T) {
 	sp := NewSP(spClient)
 
 	t.Run("Visitors", func(t *testing.T) {
-		group, err := sp.Web().AssociatedGroups().Visitors().Get()
+		group, err := sp.Web().AssociatedGroups().Visitors().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -20,7 +21,7 @@ func TestAssociatedGroups(t *testing.T) {
 	})
 
 	t.Run("Members", func(t *testing.T) {
-		group, err := sp.Web().AssociatedGroups().Members().Get()
+		group, err := sp.Web().AssociatedGroups().Members().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -30,7 +31,7 @@ func TestAssociatedGroups(t *testing.T) {
 	})
 
 	t.Run("Owners", func(t *testing.T) {
-		group, err := sp.Web().AssociatedGroups().Owners().Get()
+		group, err := sp.Web().AssociatedGroups().Owners().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}

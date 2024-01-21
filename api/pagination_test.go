@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"testing"
 )
 
@@ -10,7 +11,7 @@ func TestPagination(t *testing.T) {
 	sp := NewSP(spClient)
 
 	t.Run("Items", func(t *testing.T) {
-		paged, err := sp.Web().GetList("_catalogs/masterpage").Items().Top(1).GetPaged()
+		paged, err := sp.Web().GetList("_catalogs/masterpage").Items().Top(1).GetPaged(context.Background())
 		if err != nil {
 			t.Fatal(err)
 		}

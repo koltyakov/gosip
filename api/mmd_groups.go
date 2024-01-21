@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -17,13 +18,13 @@ type TermGroups struct {
 }
 
 // Get gets term groups metadata
-func (termGroups *TermGroups) Get() ([]map[string]interface{}, error) {
+func (termGroups *TermGroups) Get(ctx context.Context) ([]map[string]interface{}, error) {
 	b := termGroups.csomEntry.Clone()
 	b.AddAction(csom.NewQueryWithProps([]string{
 		`<Property Name="Groups" SelectAll="true" />`,
 	}), nil)
 
-	return csomRespChildItemsInProp(termGroups.client, termGroups.endpoint, termGroups.config, b, "Groups")
+	return csomRespChildItemsInProp(ctx, termGroups.client, termGroups.endpoint, termGroups.config, b, "Groups")
 }
 
 // GetByID gets term group object by its GUID
@@ -40,14 +41,14 @@ func (termGroups *TermGroups) GetByID(groupGUID string) *TermGroup {
 }
 
 // Add creates new group
-func (termGroups *TermGroups) Add(name string, guid string) (map[string]interface{}, error) {
+func (termGroups *TermGroups) Add(ctx context.Context, name string, guid string) (map[string]interface{}, error) {
 	b := termGroups.csomEntry.Clone()
 	b.AddObject(csom.NewObjectMethod("CreateGroup", []string{
 		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, name),
 		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, guid),
 	}), nil)
 	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
-	return csomResponse(termGroups.client, termGroups.endpoint, termGroups.config, b)
+	return csomResponse(ctx, termGroups.client, termGroups.endpoint, termGroups.config, b)
 }
 
 /* Term Group */
@@ -81,7 +82,7 @@ func (termGroup *TermGroup) Select(props string) *TermGroup {
 }
 
 // Get gets term group metadata
-func (termGroup *TermGroup) Get() (map[string]interface{}, error) {
+func (termGroup *TermGroup) Get(ctx context.Context) (map[string]interface{}, error) {
 	var props []string
 	for _, prop := range termGroup.selectProps {
 		propertyXML := prop
@@ -94,14 +95,14 @@ func (termGroup *TermGroup) Get() (map[string]interface{}, error) {
 	b := termGroup.csomBuilderEntry()
 	b.AddAction(csom.NewQueryWithProps(props), nil)
 
-	return csomResponse(termGroup.client, termGroup.endpoint, termGroup.config, b)
+	return csomResponse(ctx, termGroup.client, termGroup.endpoint, termGroup.config, b)
 }
 
 // Delete deletes group object
-func (termGroup *TermGroup) Delete() error {
+func (termGroup *TermGroup) Delete(ctx context.Context) error {
 	b := termGroup.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewActionMethod("DeleteObject", []string{}), nil)
-	_, err := csomResponse(termGroup.client, termGroup.endpoint, termGroup.config, b)
+	_, err := csomResponse(ctx, termGroup.client, termGroup.endpoint, termGroup.config, b)
 	return err
 }
 

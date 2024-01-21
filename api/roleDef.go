@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -36,27 +37,27 @@ type RoleDefInfo struct {
 }
 
 // GetByID gets a role definition by its ID
-func (def *RoleDefinitions) GetByID(roleDefID int) (*RoleDefInfo, error) {
+func (def *RoleDefinitions) GetByID(ctx context.Context, roleDefID int) (*RoleDefInfo, error) {
 	endpoint := fmt.Sprintf("%s/GetById(%d)", def.endpoint, roleDefID)
-	return getRoleDef(def, endpoint)
+	return getRoleDef(ctx, def, endpoint)
 }
 
 // GetByName gets a role definition by its Name
-func (def *RoleDefinitions) GetByName(roleDefName string) (*RoleDefInfo, error) {
+func (def *RoleDefinitions) GetByName(ctx context.Context, roleDefName string) (*RoleDefInfo, error) {
 	endpoint := fmt.Sprintf("%s/GetByName('%s')", def.endpoint, roleDefName)
-	return getRoleDef(def, endpoint)
+	return getRoleDef(ctx, def, endpoint)
 }
 
 // GetByType gets a role definition by its RoleTypeKinds
-func (def *RoleDefinitions) GetByType(roleTypeKind int) (*RoleDefInfo, error) {
+func (def *RoleDefinitions) GetByType(ctx context.Context, roleTypeKind int) (*RoleDefInfo, error) {
 	endpoint := fmt.Sprintf("%s/GetByType(%d)", def.endpoint, roleTypeKind)
-	return getRoleDef(def, endpoint)
+	return getRoleDef(ctx, def, endpoint)
 }
 
 // Get gets a collection of available role definitions
-func (def *RoleDefinitions) Get() ([]*RoleDefInfo, error) {
+func (def *RoleDefinitions) Get(ctx context.Context) ([]*RoleDefInfo, error) {
 	client := NewHTTPClient(def.client)
-	data, err := client.Get(def.endpoint, def.config)
+	data, err := client.Get(ctx, def.endpoint, def.config)
 	if err != nil {
 		return nil, err
 	}
@@ -75,10 +76,10 @@ func (def *RoleDefinitions) Get() ([]*RoleDefInfo, error) {
 	return res.D.Results, nil
 }
 
-func getRoleDef(def *RoleDefinitions, endpoint string) (*RoleDefInfo, error) {
+func getRoleDef(ctx context.Context, def *RoleDefinitions, endpoint string) (*RoleDefInfo, error) {
 	client := NewHTTPClient(def.client)
 
-	data, err := client.Post(endpoint, nil, patchConfigHeaders(def.config, HeadersPresets.Verbose.Headers))
+	data, err := client.Post(ctx, endpoint, nil, patchConfigHeaders(def.config, HeadersPresets.Verbose.Headers))
 	if err != nil {
 		return nil, err
 	}

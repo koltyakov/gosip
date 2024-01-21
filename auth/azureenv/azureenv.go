@@ -15,6 +15,7 @@
 package azureenv
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -89,7 +90,7 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 func (c *AuthCnfg) SetMasterkey(masterKey string) { c.masterKey = masterKey }
 
 // GetAuth authenticates, receives access token
-func (c *AuthCnfg) GetAuth() (string, int64, error) {
+func (c *AuthCnfg) GetAuth(ctx context.Context) (string, int64, error) {
 	if c.authorizer == nil {
 		u, _ := url.Parse(c.SiteURL)
 		resource := fmt.Sprintf("https://%s", u.Host)
@@ -102,7 +103,7 @@ func (c *AuthCnfg) GetAuth() (string, int64, error) {
 		c.authorizer = authorizer
 	}
 
-	return c.getToken()
+	return c.getToken(ctx)
 }
 
 // GetSiteURL gets SharePoint siteURL
@@ -114,7 +115,7 @@ func (c *AuthCnfg) GetStrategy() string { return "azureenv" }
 // SetAuth authenticates request
 // noinspection GoUnusedParameter
 func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
-	if _, _, err := c.GetAuth(); err != nil {
+	if _, _, err := c.GetAuth(req.Context()); err != nil {
 		return err
 	}
 	_, err := c.authorizer.WithAuthorization()(preparer{}).Prepare(req)
@@ -154,8 +155,8 @@ func (c *AuthCnfg) newAuthorizerWithEnvVars(
 }
 
 // Getting token with prepare for external usage scenarious
-func (c *AuthCnfg) getToken() (string, int64, error) {
-	req, _ := http.NewRequest("GET", c.SiteURL, nil)
+func (c *AuthCnfg) getToken(ctx context.Context) (string, int64, error) {
+	req, _ := http.NewRequestWithContext(ctx, "GET", c.SiteURL, nil)
 	req, err := c.authorizer.WithAuthorization()(preparer{}).Prepare(req)
 	if err != nil {
 		return "", 0, err

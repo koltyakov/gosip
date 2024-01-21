@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strings"
 	"testing"
@@ -21,13 +22,13 @@ func TestContentType(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := ct.Select("*,Fields/*").Expand("Fields").Get(); err != nil {
+		if _, err := ct.Select("*,Fields/*").Expand("Fields").Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		resp, err := web.ContentTypes().Top(5).Get()
+		resp, err := web.ContentTypes().Top(5).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -38,7 +39,7 @@ func TestContentType(t *testing.T) {
 		if cts[0].Data().ID == "" {
 			t.Error("can't get content type info")
 		}
-		data, err := web.ContentTypes().GetByID(cts[0].Data().ID).Get()
+		data, err := web.ContentTypes().GetByID(cts[0].Data().ID).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -55,15 +56,15 @@ func TestContentType(t *testing.T) {
 			"Id":{"StringValue":"` + ctID + `"},
 			"Name":"test-temp-ct ` + guid + `"
 		}`))
-		ctResp, err := web.ContentTypes().Add(ct)
+		ctResp, err := web.ContentTypes().Add(context.Background(), ct)
 		if err != nil {
 			t.Error(err)
 		}
 		ctID = ctResp.Data().ID // content type ID can't be set in REST API https://github.com/pnp/pnpjs/issues/457
-		if _, err := web.ContentTypes().GetByID(ctID).Update([]byte(`{"Description":"Test"}`)); err != nil {
+		if _, err := web.ContentTypes().GetByID(ctID).Update(context.Background(), []byte(`{"Description":"Test"}`)); err != nil {
 			t.Error(err)
 		}
-		if err := web.ContentTypes().GetByID(ctID).Delete(); err != nil {
+		if err := web.ContentTypes().GetByID(ctID).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -73,7 +74,7 @@ func TestContentType(t *testing.T) {
 func getRandomCT() (*ContentType, error) {
 	sp := NewSP(spClient)
 	if ctID == "" {
-		resp, err := sp.Web().ContentTypes().Top(1).Get()
+		resp, err := sp.Web().ContentTypes().Top(1).Get(context.Background())
 		if err != nil {
 			return nil, err
 		}

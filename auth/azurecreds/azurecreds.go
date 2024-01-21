@@ -7,6 +7,7 @@
 package azurecreds
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -96,7 +97,7 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 func (c *AuthCnfg) SetMasterkey(masterKey string) { c.masterKey = masterKey }
 
 // GetAuth authenticates, receives access token
-func (c *AuthCnfg) GetAuth() (string, int64, error) {
+func (c *AuthCnfg) GetAuth(ctx context.Context) (string, int64, error) {
 	if c.authorizer == nil {
 		u, _ := url.Parse(c.SiteURL)
 		resource := fmt.Sprintf("https://%s", u.Host)
@@ -117,7 +118,7 @@ func (c *AuthCnfg) GetAuth() (string, int64, error) {
 	// }
 	// return token.Token().AccessToken, token.Token().Expires().Unix(), nil
 
-	return c.getToken()
+	return c.getToken(ctx)
 }
 
 // GetSiteURL gets SharePoint siteURL
@@ -129,7 +130,7 @@ func (c *AuthCnfg) GetStrategy() string { return "azurecreds" }
 // SetAuth authenticates request
 // noinspection GoUnusedParameter
 func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
-	authToken, _, err := c.GetAuth()
+	authToken, _, err := c.GetAuth(req.Context())
 	if err != nil {
 		return err
 	}
@@ -139,7 +140,7 @@ func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error 
 }
 
 // Getting token with prepare for external usage scenarious
-func (c *AuthCnfg) getToken() (string, int64, error) {
+func (c *AuthCnfg) getToken(ctx context.Context) (string, int64, error) {
 	// Get from cache
 	parsedURL, err := url.Parse(c.SiteURL)
 	if err != nil {
@@ -151,7 +152,7 @@ func (c *AuthCnfg) getToken() (string, int64, error) {
 	}
 
 	// Get token
-	req, _ := http.NewRequest("GET", c.SiteURL, nil)
+	req, _ := http.NewRequestWithContext(ctx, "GET", c.SiteURL, nil)
 	req, err = c.authorizer.WithAuthorization()(preparer{}).Prepare(req)
 	if err != nil {
 		return "", 0, err

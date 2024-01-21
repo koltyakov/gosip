@@ -1,6 +1,7 @@
 package gosip
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net"
@@ -25,7 +26,7 @@ func (c *AnonymousCnfg) ParseConfig(bytesValue []byte) error { return nil }
 func (c *AnonymousCnfg) WriteConfig(privateFile string) error { return nil }
 
 // GetAuth : authenticates, receives access token
-func (c *AnonymousCnfg) GetAuth() (string, int64, error) { return "", 0, nil }
+func (c *AnonymousCnfg) GetAuth(_ context.Context) (string, int64, error) { return "", 0, nil }
 
 // GetSiteURL : gets siteURL
 func (c *AnonymousCnfg) GetSiteURL() string { return c.SiteURL }

@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -38,16 +39,16 @@ func (webs *Webs) ToURL() string {
 }
 
 // Get gets Webs response - a collection of WebInfo for the parent Web
-func (webs *Webs) Get() (WebsResp, error) {
+func (webs *Webs) Get(ctx context.Context) (WebsResp, error) {
 	client := NewHTTPClient(webs.client)
-	return client.Get(webs.ToURL(), webs.config)
+	return client.Get(ctx, webs.ToURL(), webs.config)
 }
 
 // Add creates a sub web for a parent web with provided `title` and `url`.
 // `url` stands for a system friendly URI (e.g. `finances`) while `title` is a human friendly name (e.g. `Financial Department`).
 // Along with title and url additional metadata can be provided in optional `metadata` string map object.
 // `metadata` props should correspond to `SP.WebCreationInformation` API type. Some props have defaults as Language (1033), WebTemplate (STS), etc.
-func (webs *Webs) Add(title string, url string, metadata map[string]interface{}) (WebResp, error) {
+func (webs *Webs) Add(ctx context.Context, title string, url string, metadata map[string]interface{}) (WebResp, error) {
 	endpoint := fmt.Sprintf("%s/Add", webs.endpoint)
 
 	if metadata == nil {
@@ -86,5 +87,5 @@ func (webs *Webs) Add(title string, url string, metadata map[string]interface{})
 	headers["Accept"] = "application/json;odata=verbose"
 	headers["Content-Type"] = "application/json;odata=verbose;charset=utf-8"
 
-	return client.Post(endpoint, bytes.NewBuffer([]byte(body)), patchConfigHeaders(webs.config, headers))
+	return client.Post(ctx, endpoint, bytes.NewBuffer([]byte(body)), patchConfigHeaders(webs.config, headers))
 }

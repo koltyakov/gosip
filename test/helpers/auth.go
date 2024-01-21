@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"time"
@@ -24,7 +25,7 @@ func CheckAuth(auth gosip.AuthCnfg, cnfgPath string, required []string) error {
 		return nil
 	}
 
-	token, _, err := auth.GetAuth()
+	token, _, err := auth.GetAuth(context.Background())
 	if err != nil {
 		return err
 	}
@@ -34,7 +35,7 @@ func CheckAuth(auth gosip.AuthCnfg, cnfgPath string, required []string) error {
 
 	// Second auth should involve caching and be instant
 	startAt := time.Now()
-	token, _, err = auth.GetAuth()
+	token, _, err = auth.GetAuth(context.Background())
 	if err != nil {
 		return err
 	}

@@ -2,6 +2,7 @@ package fba
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -20,7 +21,7 @@ var (
 )
 
 // GetAuth gets authentication
-func GetAuth(c *AuthCnfg) (string, int64, error) {
+func GetAuth(ctx context.Context, c *AuthCnfg) (string, int64, error) {
 	if c.client == nil {
 		c.client = &http.Client{}
 	}
@@ -41,7 +42,7 @@ func GetAuth(c *AuthCnfg) (string, int64, error) {
 		return "", 0, err
 	}
 
-	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer([]byte(soapBody)))
+	req, err := http.NewRequestWithContext(ctx, "POST", endpoint, bytes.NewBuffer([]byte(soapBody)))
 	if err != nil {
 		return "", 0, err
 	}

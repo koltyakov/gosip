@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -59,9 +60,9 @@ func (customActions *CustomActions) ToURL() string {
 }
 
 // Get gets event customActions collection
-func (customActions *CustomActions) Get() ([]*CustomActionInfo, error) {
+func (customActions *CustomActions) Get(ctx context.Context) ([]*CustomActionInfo, error) {
 	client := NewHTTPClient(customActions.client)
-	data, err := client.Get(customActions.ToURL(), customActions.config)
+	data, err := client.Get(ctx, customActions.ToURL(), customActions.config)
 	if err != nil {
 		return nil, err
 	}
@@ -74,10 +75,10 @@ func (customActions *CustomActions) Get() ([]*CustomActionInfo, error) {
 }
 
 // Add register new user custom action
-func (customActions *CustomActions) Add(payload []byte) (*CustomActionInfo, error) {
+func (customActions *CustomActions) Add(ctx context.Context, payload []byte) (*CustomActionInfo, error) {
 	body := patchMetadataType(payload, "SP.UserCustomAction")
 	client := NewHTTPClient(customActions.client)
-	data, err := client.Post(customActions.endpoint, bytes.NewBuffer(body), customActions.config)
+	data, err := client.Post(ctx, customActions.endpoint, bytes.NewBuffer(body), customActions.config)
 	if err != nil {
 		return nil, err
 	}
@@ -118,9 +119,9 @@ func (customActions *CustomActions) GetByID(actionID string) *CustomAction {
 }
 
 // Get gets this action metadata
-func (customAction *CustomAction) Get() (*CustomActionInfo, error) {
+func (customAction *CustomAction) Get(ctx context.Context) (*CustomActionInfo, error) {
 	client := NewHTTPClient(customAction.client)
-	data, err := client.Get(customAction.endpoint, customAction.config)
+	data, err := client.Get(ctx, customAction.endpoint, customAction.config)
 	if err != nil {
 		return nil, err
 	}
@@ -149,8 +150,8 @@ func (customAction *CustomAction) Get() (*CustomActionInfo, error) {
 // }
 
 // Delete deletes this custom action
-func (customAction *CustomAction) Delete() error {
+func (customAction *CustomAction) Delete(ctx context.Context) error {
 	client := NewHTTPClient(customAction.client)
-	_, err := client.Delete(customAction.endpoint, customAction.config)
+	_, err := client.Delete(ctx, customAction.endpoint, customAction.config)
 	return err
 }

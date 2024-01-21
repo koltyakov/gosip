@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -30,13 +31,13 @@ func (terms *Terms) Select(props string) *Terms {
 }
 
 // Get gets child terms
-func (terms *Terms) Get() ([]map[string]interface{}, error) {
+func (terms *Terms) Get(ctx context.Context) ([]map[string]interface{}, error) {
 	b := terms.csomEntry.Clone()
 	b.AddAction(csom.NewQueryWithProps([]string{
 		`<Property Name="Terms" SelectAll="true" />`,
 	}), nil)
 
-	return csomRespChildItemsInProp(terms.client, terms.endpoint, terms.config, b, "Terms")
+	return csomRespChildItemsInProp(ctx, terms.client, terms.endpoint, terms.config, b, "Terms")
 }
 
 // GetByID gets a term by its GUID
@@ -52,7 +53,7 @@ func (terms *Terms) GetByID(termGUID string) *Term {
 }
 
 // Add creates new term
-func (terms *Terms) Add(name string, guid string, lcid int) (map[string]interface{}, error) {
+func (terms *Terms) Add(ctx context.Context, name string, guid string, lcid int) (map[string]interface{}, error) {
 	b := terms.csomBuilderEntry().Clone()
 	b.AddObject(csom.NewObjectMethod("CreateTerm", []string{
 		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, name),
@@ -60,7 +61,7 @@ func (terms *Terms) Add(name string, guid string, lcid int) (map[string]interfac
 		fmt.Sprintf(`<Parameter Type="String">%s</Parameter>`, guid),
 	}), nil)
 	b.AddAction(csom.NewQueryWithProps([]string{}), nil)
-	return csomResponse(terms.client, terms.endpoint, terms.config, b)
+	return csomResponse(ctx, terms.client, terms.endpoint, terms.config, b)
 }
 
 /* Term */
@@ -94,7 +95,7 @@ func (term *Term) Select(props string) *Term {
 }
 
 // Get gets term metadata
-func (term *Term) Get() (map[string]interface{}, error) {
+func (term *Term) Get(ctx context.Context) (map[string]interface{}, error) {
 	var props []string
 	for _, prop := range term.selectProps {
 		propertyXML := prop
@@ -107,11 +108,11 @@ func (term *Term) Get() (map[string]interface{}, error) {
 	b := term.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewQueryWithProps(props), nil)
 
-	return csomResponse(term.client, term.endpoint, term.config, b)
+	return csomResponse(ctx, term.client, term.endpoint, term.config, b)
 }
 
 // Update sets term's properties
-func (term *Term) Update(properties map[string]interface{}) (map[string]interface{}, error) {
+func (term *Term) Update(ctx context.Context, properties map[string]interface{}) (map[string]interface{}, error) {
 	b := term.csomBuilderEntry().Clone()
 	objects := b.GetObjects() // get parent from all objects
 	termObject := objects[len(objects)-1]
@@ -125,30 +126,30 @@ func (term *Term) Update(properties map[string]interface{}) (map[string]interfac
 		// scalarProperties = append(scalarProperties, fmt.Sprintf(`<Property Name="%s" ScalarProperty="true" />`, prop))
 	}
 	b.AddAction(csom.NewQueryWithProps([]string{}), termObject) // scalarProperties
-	return csomResponse(term.client, term.endpoint, term.config, b)
+	return csomResponse(ctx, term.client, term.endpoint, term.config, b)
 }
 
 // Delete deletes term object
-func (term *Term) Delete() error {
+func (term *Term) Delete(ctx context.Context) error {
 	b := term.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewActionMethod("DeleteObject", []string{}), nil)
-	_, err := csomResponse(term.client, term.endpoint, term.config, b)
+	_, err := csomResponse(ctx, term.client, term.endpoint, term.config, b)
 	return err
 }
 
 // Deprecate deprecates/activates a term
-func (term *Term) Deprecate(deprecate bool) error {
+func (term *Term) Deprecate(ctx context.Context, deprecate bool) error {
 	b := term.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewActionMethod("Deprecate", []string{
 		fmt.Sprintf(`<Parameter Type="Boolean">%t</Parameter>`, deprecate),
 	}), nil)
-	_, err := csomResponse(term.client, term.endpoint, term.config, b)
+	_, err := csomResponse(ctx, term.client, term.endpoint, term.config, b)
 	return err
 }
 
 // Move moves a term to a new location
 // use empty `termGUID` to move to a root term store level
-func (term *Term) Move(termSetGUID string, termGUID string) error {
+func (term *Term) Move(ctx context.Context, termSetGUID string, termGUID string) error {
 	termSetGUID = trimTaxonomyGUID(termSetGUID)
 	termGUID = trimTaxonomyGUID(termGUID)
 
@@ -174,7 +175,7 @@ func (term *Term) Move(termSetGUID string, termGUID string) error {
 		fmt.Sprintf(`<Parameter ObjectPathId="%d" />`, parentObj.GetID()),
 	}), childTermObj)
 
-	_, err := csomResponse(term.client, term.endpoint, term.config, b)
+	_, err := csomResponse(ctx, term.client, term.endpoint, term.config, b)
 	return err
 }
 

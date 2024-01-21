@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"strings"
 	"testing"
 
@@ -19,14 +20,14 @@ func TestFilesChunked(t *testing.T) {
 	newFolderName := uuid.New().String()
 	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 	newFolderURI := rootFolderURI + "/" + newFolderName
-	if _, err := web.GetFolder(rootFolderURI).Folders().Add(newFolderName); err != nil {
+	if _, err := web.GetFolder(rootFolderURI).Folders().Add(context.Background(), newFolderName); err != nil {
 		t.Error(err)
 	}
 
 	t.Run("AddChunkedMicro", func(t *testing.T) {
 		fileName := "TinyFile.txt"
 		stream := strings.NewReader("Less than a chunk content")
-		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, nil); err != nil {
+		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(context.Background(), fileName, stream, nil); err != nil {
 			t.Error(err)
 		}
 	})
@@ -39,11 +40,11 @@ func TestFilesChunked(t *testing.T) {
 			Overwrite: true,
 			ChunkSize: 5,
 		}
-		fileResp, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options)
+		fileResp, err := web.GetFolder(newFolderURI).Files().AddChunked(context.Background(), fileName, stream, options)
 		if err != nil {
 			t.Error(err)
 		}
-		data, err := web.GetFile(fileResp.Data().ServerRelativeURL).Download()
+		data, err := web.GetFile(fileResp.Data().ServerRelativeURL).Download(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -71,7 +72,7 @@ func TestFilesChunked(t *testing.T) {
 			}
 			_, _ = web.GetFolder(newFolderURI).Files().
 				Conf(reqConfig).
-				AddChunked(fileName, stream, options)
+				AddChunked(context.Background(), fileName, stream, options)
 
 			if offset == 0 {
 				t.Error("wrong offset value")
@@ -87,7 +88,7 @@ func TestFilesChunked(t *testing.T) {
 			Overwrite: true,
 			ChunkSize: 5,
 		}
-		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options); err != nil {
+		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(context.Background(), fileName, stream, options); err != nil {
 			t.Error(err)
 		}
 	})
@@ -100,7 +101,7 @@ func TestFilesChunked(t *testing.T) {
 			Overwrite: true,
 			ChunkSize: 0,
 		}
-		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options); err != nil {
+		if _, err := web.GetFolder(newFolderURI).Files().AddChunked(context.Background(), fileName, stream, options); err != nil {
 			t.Error(err)
 		}
 	})
@@ -116,7 +117,7 @@ func TestFilesChunked(t *testing.T) {
 				return data.BlockNumber <= 0 // cancel upload after first chunk
 			},
 		}
-		_, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options)
+		_, err := web.GetFolder(newFolderURI).Files().AddChunked(context.Background(), fileName, stream, options)
 		if err == nil {
 			t.Error("cancel upload was not handled")
 		}
@@ -136,7 +137,7 @@ func TestFilesChunked(t *testing.T) {
 				return false // cancel upload immediately
 			},
 		}
-		_, err := web.GetFolder(newFolderURI).Files().AddChunked(fileName, stream, options)
+		_, err := web.GetFolder(newFolderURI).Files().AddChunked(context.Background(), fileName, stream, options)
 		if err == nil {
 			t.Error("cancel upload was not handled")
 		}
@@ -145,7 +146,7 @@ func TestFilesChunked(t *testing.T) {
 		}
 	})
 
-	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
+	if err := web.GetFolder(newFolderURI).Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
 }

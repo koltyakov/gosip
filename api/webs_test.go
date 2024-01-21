@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"strings"
 	"testing"
 
@@ -18,7 +19,7 @@ func TestWebs(t *testing.T) {
 
 	t.Run("Constructor", func(t *testing.T) {
 		w := NewWebs(spClient, endpoint, nil)
-		if _, err := w.Select("Id").Get(); err != nil {
+		if _, err := w.Select("Id").Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -37,10 +38,10 @@ func TestWebs(t *testing.T) {
 		if !heavyTests {
 			t.Skip("setup SPAPI_HEAVY_TESTS env var to \"true\" to run this test")
 		}
-		if _, err := webs.Add("CI: "+newWebGUID, "ci_"+newWebGUID, nil); err != nil {
+		if _, err := webs.Add(context.Background(), "CI: "+newWebGUID, "ci_"+newWebGUID, nil); err != nil {
 			t.Error(err)
 		}
-		data, err := webs.Select("Id,Title").Get()
+		data, err := webs.Select("Id,Title").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -50,7 +51,7 @@ func TestWebs(t *testing.T) {
 	})
 
 	t.Run("GetWebs", func(t *testing.T) {
-		data, err := webs.Select("Id,Title").Get()
+		data, err := webs.Select("Id,Title").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -66,7 +67,7 @@ func TestWebs(t *testing.T) {
 		}
 		createdWebURL := spClient.AuthCnfg.GetSiteURL() + "/ci_" + newWebGUID
 		subWeb := NewWeb(spClient, createdWebURL, nil)
-		if err := subWeb.Delete(); err != nil {
+		if err := subWeb.Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -74,10 +75,10 @@ func TestWebs(t *testing.T) {
 	t.Run("CreateFieldAsXML", func(t *testing.T) {
 		title := strings.Replace(uuid.New().String(), "-", "", -1)
 		schemaXML := `<Field Type="Text" DisplayName="` + title + `" MaxLength="255" Name="` + title + `" Title="` + title + `"></Field>`
-		if _, err := sp.Web().Fields().CreateFieldAsXML(schemaXML, 0); err != nil {
+		if _, err := sp.Web().Fields().CreateFieldAsXML(context.Background(), schemaXML, 0); err != nil {
 			t.Error(err)
 		}
-		if err := sp.Web().Fields().GetByInternalNameOrTitle(title).Delete(); err != nil {
+		if err := sp.Web().Fields().GetByInternalNameOrTitle(title).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})

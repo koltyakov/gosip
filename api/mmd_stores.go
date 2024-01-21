@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -100,7 +101,7 @@ func (termStore *TermStore) Select(props string) *TermStore {
 }
 
 // Get gets term store metadata
-func (termStore *TermStore) Get() (map[string]interface{}, error) {
+func (termStore *TermStore) Get(ctx context.Context) (map[string]interface{}, error) {
 	var props []string
 	for _, prop := range termStore.selectProps {
 		propertyXML := prop
@@ -113,7 +114,7 @@ func (termStore *TermStore) Get() (map[string]interface{}, error) {
 	b := termStore.csomBuilderEntry()
 	b.AddAction(csom.NewQueryWithProps(props), nil)
 
-	return csomResponse(termStore.client, termStore.endpoint, termStore.config, b)
+	return csomResponse(ctx, termStore.client, termStore.endpoint, termStore.config, b)
 }
 
 // // CommitAll commits all changes
@@ -125,10 +126,10 @@ func (termStore *TermStore) Get() (map[string]interface{}, error) {
 // }
 
 // UpdateCache updates store cache
-func (termStore *TermStore) UpdateCache() error {
+func (termStore *TermStore) UpdateCache(ctx context.Context) error {
 	b := termStore.csomBuilderEntry().Clone()
 	b.AddAction(csom.NewActionMethod("UpdateCache", []string{}), nil)
-	_, err := csomResponse(termStore.client, termStore.endpoint, termStore.config, b)
+	_, err := csomResponse(ctx, termStore.client, termStore.endpoint, termStore.config, b)
 	return err
 }
 

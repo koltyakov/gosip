@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"strings"
 	"testing"
@@ -20,7 +21,7 @@ func TestContentTypes(t *testing.T) {
 	}
 
 	t.Run("GetFromWeb", func(t *testing.T) {
-		data, err := web.ContentTypes().Select("StringId").Top(1).Get()
+		data, err := web.ContentTypes().Select("StringId").Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -30,20 +31,20 @@ func TestContentTypes(t *testing.T) {
 	})
 
 	t.Run("GetFromList", func(t *testing.T) {
-		if _, err := web.GetList(listURI).ContentTypes().Top(1).Get(); err != nil {
+		if _, err := web.GetList(listURI).ContentTypes().Top(1).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("GetByID", func(t *testing.T) {
-		if _, err := web.ContentTypes().GetByID(contentType.ID).Get(); err != nil {
+		if _, err := web.ContentTypes().GetByID(contentType.ID).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("CreateUsingParentID", func(t *testing.T) {
 		guid := uuid.New().String()
-		newCTID, err := web.ContentTypes().Create(&ContentTypeCreationInfo{
+		newCTID, err := web.ContentTypes().Create(context.Background(), &ContentTypeCreationInfo{
 			Name:                guid,
 			Group:               "Test",
 			ParentContentTypeID: "0x01",
@@ -54,14 +55,14 @@ func TestContentTypes(t *testing.T) {
 		if newCTID == "" {
 			t.Error("can't parse CT creation response")
 		}
-		if err := web.ContentTypes().GetByID(newCTID).Delete(); err != nil {
+		if err := web.ContentTypes().GetByID(newCTID).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("CreateUsingID", func(t *testing.T) {
 		guid := uuid.New().String()
-		newCTID, err := web.ContentTypes().Create(&ContentTypeCreationInfo{
+		newCTID, err := web.ContentTypes().Create(context.Background(), &ContentTypeCreationInfo{
 			ID:    "0x0100" + strings.ToUpper(strings.Replace(guid, "-", "", -1)),
 			Name:  guid,
 			Group: "Test",
@@ -72,7 +73,7 @@ func TestContentTypes(t *testing.T) {
 		if newCTID == "" {
 			t.Error("can't parse CT creation response")
 		}
-		if err := web.ContentTypes().GetByID(newCTID).Delete(); err != nil {
+		if err := web.ContentTypes().GetByID(newCTID).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -81,7 +82,7 @@ func TestContentTypes(t *testing.T) {
 
 func getAnyContentType() (*ContentTypeInfo, error) {
 	web := NewSP(spClient).Web()
-	data, err := web.ContentTypes().Conf(headers.verbose).Top(1).Get()
+	data, err := web.ContentTypes().Conf(headers.verbose).Top(1).Get(context.Background())
 	if err != nil {
 		return nil, err
 	}

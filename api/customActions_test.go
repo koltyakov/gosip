@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"testing"
 )
@@ -11,7 +12,7 @@ func TestCustomActions(t *testing.T) {
 	sp := NewSP(spClient)
 
 	t.Run("Get/Site", func(t *testing.T) {
-		actions, err := sp.Site().CustomActions().Top(1).Get()
+		actions, err := sp.Site().CustomActions().Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -23,7 +24,7 @@ func TestCustomActions(t *testing.T) {
 	})
 
 	t.Run("Get/Web", func(t *testing.T) {
-		actions, err := sp.Web().CustomActions().Top(1).Get()
+		actions, err := sp.Web().CustomActions().Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -42,12 +43,12 @@ func TestCustomActions(t *testing.T) {
 		}
 		// Add
 		payload, _ := json.Marshal(info)
-		action, err := sp.Web().CustomActions().Add(payload)
+		action, err := sp.Web().CustomActions().Add(context.Background(), payload)
 		if err != nil {
 			t.Error(err)
 		}
 		// Get
-		action1, err := sp.Web().CustomActions().GetByID(action.ID).Get()
+		action1, err := sp.Web().CustomActions().GetByID(action.ID).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -55,7 +56,7 @@ func TestCustomActions(t *testing.T) {
 			t.Error("can't get action by ID")
 		}
 		// Delete
-		if err := sp.Web().CustomActions().GetByID(action.ID).Delete(); err != nil {
+		if err := sp.Web().CustomActions().GetByID(action.ID).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})

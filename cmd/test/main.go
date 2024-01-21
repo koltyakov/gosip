@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -59,7 +60,7 @@ func main() {
 	// Manual test code is below
 
 	sp := api.NewSP(client)
-	res, err := sp.Web().Select("Title").Get()
+	res, err := sp.Web().Select("Title").Get(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,7 +68,7 @@ func main() {
 	fmt.Printf("%s\n", res.Data().Title)
 
 	l := sp.Web().Lists().GetByTitle("Calendar01")
-	ii, err := l.Items().Select("Id,Title,Created,Editor/Title").Expand("Editor").Get()
+	ii, err := l.Items().Select("Id,Title,Created,Editor/Title").Expand("Editor").Get(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}

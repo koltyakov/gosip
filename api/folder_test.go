@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -15,13 +16,13 @@ func TestFolder(t *testing.T) {
 	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 
 	t.Run("Add", func(t *testing.T) {
-		if _, err := web.GetFolder(rootFolderURI).Folders().Add(newFolderName); err != nil {
+		if _, err := web.GetFolder(rootFolderURI).Folders().Add(context.Background(), newFolderName); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		data, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get()
+		data, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -31,11 +32,11 @@ func TestFolder(t *testing.T) {
 	})
 
 	t.Run("GetFolderByID", func(t *testing.T) {
-		data, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get()
+		data, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
-		d, err := web.GetFolderByID(data.Data().UniqueID).Get()
+		d, err := web.GetFolderByID(data.Data().UniqueID).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -45,11 +46,11 @@ func TestFolder(t *testing.T) {
 	})
 
 	t.Run("GetFolderByPath", func(t *testing.T) {
-		data, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get()
+		data, err := web.GetFolder(rootFolderURI + "/" + newFolderName).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
-		d, err := web.GetFolderByPath(data.Data().ServerRelativeURL).Get()
+		d, err := web.GetFolderByPath(data.Data().ServerRelativeURL).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -59,13 +60,13 @@ func TestFolder(t *testing.T) {
 	})
 
 	t.Run("ContextInfo", func(t *testing.T) {
-		if _, err := web.GetFolder(rootFolderURI + "/" + newFolderName).ContextInfo(); err != nil {
+		if _, err := web.GetFolder(rootFolderURI + "/" + newFolderName).ContextInfo(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("ParentFolder", func(t *testing.T) {
-		pf, err := web.GetFolder(rootFolderURI + "/" + newFolderName).ParentFolder().Get()
+		pf, err := web.GetFolder(rootFolderURI + "/" + newFolderName).ParentFolder().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -77,24 +78,24 @@ func TestFolder(t *testing.T) {
 
 	t.Run("Props", func(t *testing.T) {
 		folder := web.GetFolder(rootFolderURI + "/" + newFolderName)
-		props, err := folder.Props().Get()
+		props, err := folder.Props().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
 		if len(props.Data()) == 0 {
 			t.Error("can't get property bags")
 		}
-		if err := folder.Props().Set("MyProp", "MyValue"); err != nil {
+		if err := folder.Props().Set(context.Background(), "MyProp", "MyValue"); err != nil {
 			t.Error("can't set property bags")
 		}
 	})
 
 	t.Run("GetItem", func(t *testing.T) {
-		item, err := web.GetFolder(rootFolderURI + "/" + newFolderName).GetItem()
+		item, err := web.GetFolder(rootFolderURI + "/" + newFolderName).GetItem(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
-		data, err := item.Get()
+		data, err := item.Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -104,18 +105,18 @@ func TestFolder(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		if err := web.GetFolder(rootFolderURI + "/" + newFolderName).Delete(); err != nil {
+		if err := web.GetFolder(rootFolderURI + "/" + newFolderName).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Recycle", func(t *testing.T) {
 		guid := uuid.New().String()
-		fr, err := web.GetFolder(rootFolderURI).Folders().Add(guid)
+		fr, err := web.GetFolder(rootFolderURI).Folders().Add(context.Background(), guid)
 		if err != nil {
 			t.Error(err)
 		}
-		if err := web.GetFolder(fr.Data().ServerRelativeURL).Recycle(); err != nil {
+		if err := web.GetFolder(fr.Data().ServerRelativeURL).Recycle(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})

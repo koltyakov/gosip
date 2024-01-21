@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"testing"
 )
 
@@ -11,7 +12,7 @@ func TestRoleDefinitions(t *testing.T) {
 	roleDef := &RoleDefInfo{}
 
 	t.Run("GetByType", func(t *testing.T) {
-		res, err := web.RoleDefinitions().GetByType(RoleTypeKinds.Contributor)
+		res, err := web.RoleDefinitions().GetByType(context.Background(), RoleTypeKinds.Contributor)
 		if err != nil {
 			t.Error(err)
 		}
@@ -26,7 +27,7 @@ func TestRoleDefinitions(t *testing.T) {
 			t.Skip("no role definition ID provided")
 		}
 
-		res, err := web.RoleDefinitions().GetByID(roleDef.ID)
+		res, err := web.RoleDefinitions().GetByID(context.Background(), roleDef.ID)
 		if err != nil {
 			t.Error(err)
 		}
@@ -41,7 +42,7 @@ func TestRoleDefinitions(t *testing.T) {
 			t.Skip("no role definition Name provided")
 		}
 
-		res, err := web.RoleDefinitions().GetByName(roleDef.Name)
+		res, err := web.RoleDefinitions().GetByName(context.Background(), roleDef.Name)
 		if err != nil {
 			t.Error(err)
 		}
@@ -52,7 +53,7 @@ func TestRoleDefinitions(t *testing.T) {
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		res, err := web.RoleDefinitions().Get()
+		res, err := web.RoleDefinitions().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}

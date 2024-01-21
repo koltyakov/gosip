@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -35,9 +36,9 @@ func NewContext(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 }
 
 // Get gets context info data object
-func (context *Context) Get() (*ContextInfo, error) {
+func (context *Context) Get(ctx context.Context) (*ContextInfo, error) {
 	endpoint := fmt.Sprintf("%s/_api/ContextInfo", getPriorEndpoint(context.endpoint, "/_api"))
-	resp, err := NewHTTPClient(context.client).Post(endpoint, nil, context.config)
+	resp, err := NewHTTPClient(context.client).Post(ctx, endpoint, nil, context.config)
 	if err != nil {
 		return nil, err
 	}

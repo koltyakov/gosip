@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -48,17 +49,17 @@ func (user *User) ToURL() string {
 }
 
 // Get gets this user data object
-func (user *User) Get() (UserResp, error) {
+func (user *User) Get(ctx context.Context) (UserResp, error) {
 	client := NewHTTPClient(user.client)
-	return client.Get(user.ToURL(), user.config)
+	return client.Get(ctx, user.ToURL(), user.config)
 }
 
 // Update updates User's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.User object
-func (user *User) Update(body []byte) (UserResp, error) {
+func (user *User) Update(ctx context.Context, body []byte) (UserResp, error) {
 	body = patchMetadataType(body, "SP.User")
 	client := NewHTTPClient(user.client)
-	return client.Update(user.endpoint, bytes.NewBuffer(body), user.config)
+	return client.Update(ctx, user.endpoint, bytes.NewBuffer(body), user.config)
 }
 
 // Groups gets Groups API instance queryable collection for this User

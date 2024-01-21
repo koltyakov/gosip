@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -31,9 +32,9 @@ func NewFeatures(client *gosip.SPClient, endpoint string, config *RequestConfig)
 }
 
 // Get gets features collection (IDs)
-func (features *Features) Get() ([]*FeatureInfo, error) {
+func (features *Features) Get(ctx context.Context) ([]*FeatureInfo, error) {
 	client := NewHTTPClient(features.client)
-	data, err := client.Get(features.endpoint, features.config)
+	data, err := client.Get(ctx, features.endpoint, features.config)
 	if err != nil {
 		return nil, err
 	}
@@ -46,19 +47,19 @@ func (features *Features) Get() ([]*FeatureInfo, error) {
 }
 
 // Add activates a feature by its ID (GUID) in the parent container (Site or Web)
-func (features *Features) Add(featureID string, force bool) error {
+func (features *Features) Add(ctx context.Context, featureID string, force bool) error {
 	endpoint := fmt.Sprintf("%s/Add", features.endpoint)
 	client := NewHTTPClient(features.client)
 	body := []byte(fmt.Sprintf(`{"featdefScope":0,"featureId":"%s","force":%t}`, featureID, force))
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), features.config)
+	_, err := client.Post(ctx, endpoint, bytes.NewBuffer(body), features.config)
 	return err
 }
 
 // Remove deactivates a feature by its ID (GUID) in the parent container (Site or Web)
-func (features *Features) Remove(featureID string, force bool) error {
+func (features *Features) Remove(ctx context.Context, featureID string, force bool) error {
 	endpoint := fmt.Sprintf("%s/Remove", features.endpoint)
 	client := NewHTTPClient(features.client)
 	body := []byte(fmt.Sprintf(`{"featureId":"%s","force":%t}`, featureID, force))
-	_, err := client.Post(endpoint, bytes.NewBuffer(body), features.config)
+	_, err := client.Post(ctx, endpoint, bytes.NewBuffer(body), features.config)
 	return err
 }

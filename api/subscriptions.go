@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -64,9 +65,9 @@ func NewSubscription(client *gosip.SPClient, endpoint string, config *RequestCon
 }
 
 // Get gets list subscriptions response collection
-func (subscriptions *Subscriptions) Get() ([]*SubscriptionInfo, error) {
+func (subscriptions *Subscriptions) Get(ctx context.Context) ([]*SubscriptionInfo, error) {
 	client := NewHTTPClient(subscriptions.client)
-	resp, err := client.Get(subscriptions.endpoint, subscriptions.config)
+	resp, err := client.Get(ctx, subscriptions.endpoint, subscriptions.config)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +89,7 @@ func (subscriptions *Subscriptions) GetByID(subscriptionID string) *Subscription
 }
 
 // Add adds/updates new subscription to a list
-func (subscriptions *Subscriptions) Add(notificationURL string, expiration time.Time, clientState string) (*SubscriptionInfo, error) {
+func (subscriptions *Subscriptions) Add(ctx context.Context, notificationURL string, expiration time.Time, clientState string) (*SubscriptionInfo, error) {
 	client := NewHTTPClient(subscriptions.client)
 	payload := map[string]interface{}{
 		"notificationUrl":    notificationURL,
@@ -103,7 +104,7 @@ func (subscriptions *Subscriptions) Add(notificationURL string, expiration time.
 	conf := patchConfigHeaders(subscriptions.config, map[string]string{
 		"Content-Type": "application/json",
 	})
-	resp, err := client.Post(subscriptions.endpoint, bytes.NewBuffer(body), conf)
+	resp, err := client.Post(ctx, subscriptions.endpoint, bytes.NewBuffer(body), conf)
 	if err != nil {
 		return nil, err
 	}
@@ -116,9 +117,9 @@ func (subscriptions *Subscriptions) Add(notificationURL string, expiration time.
 }
 
 // Get gets subscription info
-func (subscription *Subscription) Get() (*SubscriptionInfo, error) {
+func (subscription *Subscription) Get(ctx context.Context) (*SubscriptionInfo, error) {
 	client := NewHTTPClient(subscription.client)
-	resp, err := client.Get(subscription.endpoint, subscription.config)
+	resp, err := client.Get(ctx, subscription.endpoint, subscription.config)
 	if err != nil {
 		return nil, err
 	}
@@ -126,14 +127,14 @@ func (subscription *Subscription) Get() (*SubscriptionInfo, error) {
 }
 
 // Delete deletes a subscription by its ID (GUID)
-func (subscription *Subscription) Delete() error {
+func (subscription *Subscription) Delete(ctx context.Context) error {
 	client := NewHTTPClient(subscription.client)
-	_, err := client.Delete(subscription.endpoint, subscription.config)
+	_, err := client.Delete(ctx, subscription.endpoint, subscription.config)
 	return err
 }
 
 // Update updates a subscription
-func (subscription *Subscription) Update(metadata map[string]interface{}) (*SubscriptionInfo, error) {
+func (subscription *Subscription) Update(ctx context.Context, metadata map[string]interface{}) (*SubscriptionInfo, error) {
 	client := NewHTTPClient(subscription.client)
 	body, err := json.Marshal(metadata)
 	if err != nil {
@@ -142,29 +143,29 @@ func (subscription *Subscription) Update(metadata map[string]interface{}) (*Subs
 	conf := patchConfigHeaders(subscription.config, map[string]string{
 		"Content-Type": "application/json",
 	})
-	if _, err := client.Update(subscription.endpoint, bytes.NewBuffer(body), conf); err != nil {
+	if _, err := client.Update(ctx, subscription.endpoint, bytes.NewBuffer(body), conf); err != nil {
 		return nil, err
 	}
-	return subscription.Get()
+	return subscription.Get(ctx)
 }
 
 // SetExpiration sets new expiration datetime
-func (subscription *Subscription) SetExpiration(expiration time.Time) (*SubscriptionInfo, error) {
-	return subscription.Update(map[string]interface{}{
+func (subscription *Subscription) SetExpiration(ctx context.Context, expiration time.Time) (*SubscriptionInfo, error) {
+	return subscription.Update(ctx, map[string]interface{}{
 		"expirationDateTime": expiration,
 	})
 }
 
 // SetNotificationURL sets new notification URL state
-func (subscription *Subscription) SetNotificationURL(notificationURL string) (*SubscriptionInfo, error) {
-	return subscription.Update(map[string]interface{}{
+func (subscription *Subscription) SetNotificationURL(ctx context.Context, notificationURL string) (*SubscriptionInfo, error) {
+	return subscription.Update(ctx, map[string]interface{}{
 		"notificationUrl": notificationURL,
 	})
 }
 
 // SetClientState sets new client state
-func (subscription *Subscription) SetClientState(clientState string) (*SubscriptionInfo, error) {
-	return subscription.Update(map[string]interface{}{
+func (subscription *Subscription) SetClientState(ctx context.Context, clientState string) (*SubscriptionInfo, error) {
+	return subscription.Update(ctx, map[string]interface{}{
 		"clientState": clientState,
 	})
 }

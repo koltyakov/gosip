@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"context"
+
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/csom"
 )
@@ -61,13 +63,13 @@ func trimTaxonomyGUID(guid string) string {
 	return guid
 }
 
-func csomResponse(httpClient *HTTPClient, siteURL string, config *RequestConfig, csomBuilder csom.Builder) (map[string]interface{}, error) {
+func csomResponse(ctx context.Context, httpClient *HTTPClient, siteURL string, config *RequestConfig, csomBuilder csom.Builder) (map[string]interface{}, error) {
 	csomPkg, err := csomBuilder.Compile()
 	if err != nil {
 		return nil, err
 	}
 
-	jsomResp, err := httpClient.ProcessQuery(siteURL, bytes.NewBuffer([]byte(csomPkg)), config)
+	jsomResp, err := httpClient.ProcessQuery(ctx, siteURL, bytes.NewBuffer([]byte(csomPkg)), config)
 	if err != nil {
 		// Retry Terms update conflicts
 		if strings.Contains(err.Error(), "Term update failed because of save conflict") {
@@ -84,7 +86,7 @@ func csomResponse(httpClient *HTTPClient, siteURL string, config *RequestConfig,
 			retry, _ := strconv.Atoi(retryStr)
 			config.Headers["X-Gosip-Retry"] = strconv.Itoa(retry + 1)
 			if retry+1 <= 5 {
-				return csomResponse(httpClient, siteURL, config, csomBuilder)
+				return csomResponse(ctx, httpClient, siteURL, config, csomBuilder)
 			}
 		}
 		return nil, err
@@ -107,8 +109,8 @@ func csomResponse(httpClient *HTTPClient, siteURL string, config *RequestConfig,
 	return res, nil
 }
 
-func csomRespChildItems(httpClient *HTTPClient, siteURL string, config *RequestConfig, csomBuilder csom.Builder) ([]map[string]interface{}, error) {
-	data, err := csomResponse(httpClient, siteURL, config, csomBuilder)
+func csomRespChildItems(ctx context.Context, httpClient *HTTPClient, siteURL string, config *RequestConfig, csomBuilder csom.Builder) ([]map[string]interface{}, error) {
+	data, err := csomResponse(ctx, httpClient, siteURL, config, csomBuilder)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +132,8 @@ func csomRespChildItems(httpClient *HTTPClient, siteURL string, config *RequestC
 	return resItems, nil
 }
 
-func csomRespChildItemsInProp(httpClient *HTTPClient, siteURL string, config *RequestConfig, csomBuilder csom.Builder, prop string) ([]map[string]interface{}, error) {
-	data, err := csomResponse(httpClient, siteURL, config, csomBuilder)
+func csomRespChildItemsInProp(ctx context.Context, httpClient *HTTPClient, siteURL string, config *RequestConfig, csomBuilder csom.Builder, prop string) ([]map[string]interface{}, error) {
+	data, err := csomResponse(ctx, httpClient, siteURL, config, csomBuilder)
 	if err != nil {
 		return nil, err
 	}

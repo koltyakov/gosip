@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"testing"
 
@@ -15,7 +16,7 @@ func TestFiles(t *testing.T) {
 	newFolderName := uuid.New().String()
 	rootFolderURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 	newFolderURI := rootFolderURI + "/" + newFolderName
-	if _, err := web.GetFolder(rootFolderURI).Folders().Add(newFolderName); err != nil {
+	if _, err := web.GetFolder(rootFolderURI).Folders().Add(context.Background(), newFolderName); err != nil {
 		t.Error(err)
 	}
 
@@ -23,14 +24,14 @@ func TestFiles(t *testing.T) {
 		for i := 1; i <= 5; i++ {
 			fileName := fmt.Sprintf("File_%d.txt", i)
 			fileData := []byte(fmt.Sprintf("File %d data", i))
-			if _, err := web.GetFolder(newFolderURI).Files().Add(fileName, fileData, true); err != nil {
+			if _, err := web.GetFolder(newFolderURI).Files().Add(context.Background(), fileName, fileData, true); err != nil {
 				t.Error(err)
 			}
 		}
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		data, err := web.GetFolder(newFolderURI).Files().Get()
+		data, err := web.GetFolder(newFolderURI).Files().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -43,7 +44,7 @@ func TestFiles(t *testing.T) {
 	})
 
 	t.Run("GetByName", func(t *testing.T) {
-		data, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Get()
+		data, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -53,7 +54,7 @@ func TestFiles(t *testing.T) {
 	})
 
 	t.Run("GetFile", func(t *testing.T) {
-		data, err := web.GetFile(newFolderURI + "/File_2.txt").Get()
+		data, err := web.GetFile(newFolderURI + "/File_2.txt").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -67,7 +68,7 @@ func TestFiles(t *testing.T) {
 			t.Skip("is not supported with legacy SP")
 		}
 
-		data, err := web.GetFileByPath(newFolderURI + "/File_2.txt").Get()
+		data, err := web.GetFileByPath(newFolderURI + "/File_2.txt").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -81,16 +82,16 @@ func TestFiles(t *testing.T) {
 			t.Skip("is not supported with legacy SP")
 		}
 
-		data, err := web.GetFile(newFolderURI + "/File_2.txt").Select("UniqueId").Get()
+		data, err := web.GetFile(newFolderURI + "/File_2.txt").Select("UniqueId").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := web.GetFileByID(data.Data().UniqueID).Get(); err != nil {
+		if _, err := web.GetFileByID(data.Data().UniqueID).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
-	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
+	if err := web.GetFolder(newFolderURI).Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
 }

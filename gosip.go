@@ -19,6 +19,7 @@ package gosip
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -35,7 +36,7 @@ type AuthCnfg interface {
 	// GetAuth Authentication initializer (token/cookie/header, expiration, error)
 	// to support capability for exposing tokens for external tools
 	// e.g. as of this sample project https://github.com/koltyakov/spvault
-	GetAuth() (string, int64, error)
+	GetAuth(ctx context.Context) (string, int64, error)
 
 	// SetAuth Authentication middleware fabric
 	// applies round tripper or enriches requests with authentication and metadata

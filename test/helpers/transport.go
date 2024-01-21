@@ -28,7 +28,7 @@ func CheckTransport(auth gosip.AuthCnfg, cnfgPath string) error {
 		return fmt.Errorf("unable to get digest: %w", err)
 	}
 
-	if _, _, err := client.AuthCnfg.GetAuth(); err != nil {
+	if _, _, err := client.AuthCnfg.GetAuth(context.Background()); err != nil {
 		return err
 	}
 

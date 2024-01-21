@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -14,7 +15,7 @@ func TestRoles(t *testing.T) {
 	newListTitle := uuid.New().String()
 
 	// Pre-configuration
-	if _, err := web.Lists().Add(newListTitle, nil); err != nil {
+	if _, err := web.Lists().Add(context.Background(), newListTitle, nil); err != nil {
 		t.Errorf("can't create a list to test permissions: %s", err)
 	}
 	list := web.Lists().GetByTitle(newListTitle)
@@ -22,20 +23,20 @@ func TestRoles(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	roleDef, err := web.RoleDefinitions().GetByType(RoleTypeKinds.Contributor)
+	roleDef, err := web.RoleDefinitions().GetByType(context.Background(), RoleTypeKinds.Contributor)
 	if err != nil {
 		t.Error(err)
 	}
 
 	t.Run("BreakInheritance", func(t *testing.T) {
-		if err := list.Roles().BreakInheritance(false, true); err != nil {
+		if err := list.Roles().BreakInheritance(context.Background(), false, true); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("HasUniqueAssignments", func(t *testing.T) {
-		_ = list.Roles().BreakInheritance(false, true)
-		hasUniqueAssignments, err := list.Roles().HasUniqueAssignments()
+		_ = list.Roles().BreakInheritance(context.Background(), false, true)
+		hasUniqueAssignments, err := list.Roles().HasUniqueAssignments(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -45,25 +46,25 @@ func TestRoles(t *testing.T) {
 	})
 
 	t.Run("AddAssigment", func(t *testing.T) {
-		if err := list.Roles().AddAssigment(userID, roleDef.ID); err != nil {
+		if err := list.Roles().AddAssigment(context.Background(), userID, roleDef.ID); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("RemoveAssigment", func(t *testing.T) {
-		if err := list.Roles().RemoveAssigment(userID, roleDef.ID); err != nil {
+		if err := list.Roles().RemoveAssigment(context.Background(), userID, roleDef.ID); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("ResetInheritance", func(t *testing.T) {
-		if err := list.Roles().ResetInheritance(); err != nil {
+		if err := list.Roles().ResetInheritance(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	// Post-configurations
-	if err := list.Delete(); err != nil {
+	if err := list.Delete(context.Background()); err != nil {
 		t.Errorf("can't delete a list: %s", err)
 	}
 
@@ -71,7 +72,7 @@ func TestRoles(t *testing.T) {
 
 func getCurrentUserID() (int, error) {
 	web := NewSP(spClient).Web()
-	data, err := web.CurrentUser().Select("Id").Conf(headers.verbose).Get()
+	data, err := web.CurrentUser().Select("Id").Conf(headers.verbose).Get(context.Background())
 	if err != nil {
 		return 0, err
 	}

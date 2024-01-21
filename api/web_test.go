@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"net/url"
 	"testing"
 
@@ -17,7 +18,7 @@ func TestWeb(t *testing.T) {
 
 	t.Run("Constructor", func(t *testing.T) {
 		w := NewWeb(spClient, endpoint, nil)
-		if _, err := w.Select("Id").Get(); err != nil {
+		if _, err := w.Select("Id").Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -59,7 +60,7 @@ func TestWeb(t *testing.T) {
 	})
 
 	t.Run("GetTitle", func(t *testing.T) {
-		data, err := web.Select("Title").Conf(headers.verbose).Get()
+		data, err := web.Select("Title").Conf(headers.verbose).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -74,7 +75,7 @@ func TestWeb(t *testing.T) {
 	})
 
 	t.Run("NoTitle", func(t *testing.T) {
-		data, err := web.Select("Id").Conf(headers.verbose).Get()
+		data, err := web.Select("Id").Conf(headers.verbose).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -89,7 +90,7 @@ func TestWeb(t *testing.T) {
 			t.Skip("is not applicable for Addin Only auth strategy")
 		}
 
-		data, err := web.CurrentUser().Select("LoginName").Conf(headers.verbose).Get()
+		data, err := web.CurrentUser().Select("LoginName").Conf(headers.verbose).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -101,10 +102,10 @@ func TestWeb(t *testing.T) {
 
 	t.Run("EnsureFolder", func(t *testing.T) {
 		guid := uuid.New().String()
-		if _, err := web.EnsureFolder("Shared Documents/" + guid + "/doc1/doc2/doc3/doc4"); err != nil {
+		if _, err := web.EnsureFolder(context.Background(), "Shared Documents/"+guid+"/doc1/doc2/doc3/doc4"); err != nil {
 			t.Error(err)
 		}
-		if err := web.GetFolder("Shared Documents/" + guid).Delete(); err != nil {
+		if err := web.GetFolder("Shared Documents/" + guid).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -115,38 +116,38 @@ func TestWeb(t *testing.T) {
 		}
 
 		guid := uuid.New().String()
-		if _, err := web.EnsureFolderByPath("Shared Documents/" + guid + "/doc1/with #/special %"); err != nil {
+		if _, err := web.EnsureFolderByPath(context.Background(), "Shared Documents/"+guid+"/doc1/with #/special %"); err != nil {
 			t.Error(err)
 		}
-		if err := web.GetFolder("Shared Documents/" + guid).Delete(); err != nil {
+		if err := web.GetFolder("Shared Documents/" + guid).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("EnsureUser", func(t *testing.T) {
-		user, err := sp.Web().CurrentUser().Get()
+		user, err := sp.Web().CurrentUser().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := sp.Web().EnsureUser(user.Data().Email); err != nil {
+		if _, err := sp.Web().EnsureUser(context.Background(), user.Data().Email); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("UserInfoList", func(t *testing.T) {
-		if _, err := sp.Web().UserInfoList().Select("Id").Get(); err != nil {
+		if _, err := sp.Web().UserInfoList().Select("Id").Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Roles", func(t *testing.T) {
-		if _, err := sp.Web().Roles().HasUniqueAssignments(); err != nil {
+		if _, err := sp.Web().Roles().HasUniqueAssignments(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("AvailableContentTypes", func(t *testing.T) {
-		resp, err := sp.Web().AvailableContentTypes().Get()
+		resp, err := sp.Web().AvailableContentTypes().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}

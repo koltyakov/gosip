@@ -1,6 +1,7 @@
 package anon
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"testing"
@@ -76,7 +77,7 @@ func TestAuthEdgeCases(t *testing.T) {
 
 	t.Run("GetAuth", func(t *testing.T) {
 		cnfg := &AuthCnfg{SiteURL: "http://test"}
-		if _, _, err := cnfg.GetAuth(); err != nil {
+		if _, _, err := cnfg.GetAuth(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})

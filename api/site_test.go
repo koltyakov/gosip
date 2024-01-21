@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 )
 
@@ -14,7 +15,7 @@ func TestSite(t *testing.T) {
 
 	t.Run("Constructor", func(t *testing.T) {
 		s := NewSite(spClient, endpoint, nil)
-		if _, err := s.Select("Id").Get(); err != nil {
+		if _, err := s.Select("Id").Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -30,7 +31,7 @@ func TestSite(t *testing.T) {
 	})
 
 	t.Run("GetURL", func(t *testing.T) {
-		data, err := site.Select("Url").Conf(headers.verbose).Get()
+		data, err := site.Select("Url").Conf(headers.verbose).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -50,7 +51,7 @@ func TestSite(t *testing.T) {
 	})
 
 	t.Run("RootWeb", func(t *testing.T) {
-		data, err := site.RootWeb().Select("Title").Conf(headers.verbose).Get()
+		data, err := site.RootWeb().Select("Title").Conf(headers.verbose).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -60,7 +61,7 @@ func TestSite(t *testing.T) {
 	})
 
 	t.Run("OpenWebByID", func(t *testing.T) {
-		data0, err := site.RootWeb().Select("Id").Conf(headers.verbose).Get()
+		data0, err := site.RootWeb().Select("Id").Conf(headers.verbose).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -68,7 +69,7 @@ func TestSite(t *testing.T) {
 			t.Error("can't get root web id property")
 		}
 
-		data, err := site.OpenWebByID(data0.Data().ID)
+		data, err := site.OpenWebByID(context.Background(), data0.Data().ID)
 		if err != nil {
 			t.Error(err)
 		}
@@ -78,7 +79,7 @@ func TestSite(t *testing.T) {
 	})
 
 	t.Run("WebByID", func(t *testing.T) {
-		data0, err := site.RootWeb().Select("Id").Conf(headers.verbose).Get()
+		data0, err := site.RootWeb().Select("Id").Conf(headers.verbose).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -86,11 +87,11 @@ func TestSite(t *testing.T) {
 			t.Error("can't get root web id property")
 		}
 
-		web, err := site.WebByID(data0.Data().ID)
+		web, err := site.WebByID(context.Background(), data0.Data().ID)
 		if err != nil {
 			t.Error(err)
 		}
-		data, err := web.Get()
+		data, err := web.Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -100,7 +101,7 @@ func TestSite(t *testing.T) {
 	})
 
 	t.Run("Owner", func(t *testing.T) {
-		if _, err := site.Owner().Get(); err != nil {
+		if _, err := site.Owner().Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})

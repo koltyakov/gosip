@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"testing"
 
@@ -20,7 +21,7 @@ func TestField(t *testing.T) {
 	}
 
 	t.Run("Get", func(t *testing.T) {
-		data, err := field.Select("Id").Get()
+		data, err := field.Select("Id").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -35,14 +36,14 @@ func TestField(t *testing.T) {
 	t.Run("UpdateDelete", func(t *testing.T) {
 		guid := uuid.New().String()
 		fm := []byte(`{"__metadata":{"type":"SP.FieldText"},"Title":"test-temp-` + guid + `","FieldTypeKind":2,"MaxLength":255}`)
-		d, err := web.Fields().Add(fm)
+		d, err := web.Fields().Add(context.Background(), fm)
 		if err != nil {
 			t.Error(err)
 		}
-		if _, err := web.Fields().GetByID(d.Data().ID).Update([]byte(`{"Description":"Test"}`)); err != nil {
+		if _, err := web.Fields().GetByID(d.Data().ID).Update(context.Background(), []byte(`{"Description":"Test"}`)); err != nil {
 			t.Error(err)
 		}
-		if err := web.Fields().GetByID(d.Data().ID).Delete(); err != nil {
+		if err := web.Fields().GetByID(d.Data().ID).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -52,7 +53,7 @@ func TestField(t *testing.T) {
 func getRandomField() (*Field, error) {
 	sp := NewSP(spClient)
 	if fieldID == "" {
-		resp, err := sp.Web().Fields().Top(1).Get()
+		resp, err := sp.Web().Fields().Top(1).Get(context.Background())
 		if err != nil {
 			return nil, err
 		}

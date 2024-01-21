@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 )
 
@@ -14,7 +15,7 @@ func TestUser(t *testing.T) {
 
 	t.Run("Constructor", func(t *testing.T) {
 		u := NewUser(spClient, endpoint, nil)
-		if _, err := u.Select("Id").Get(); err != nil {
+		if _, err := u.Select("Id").Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -30,7 +31,7 @@ func TestUser(t *testing.T) {
 	})
 
 	t.Run("GetUserInfo", func(t *testing.T) {
-		data, err := user.Get()
+		data, err := user.Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -45,7 +46,7 @@ func TestUser(t *testing.T) {
 	})
 
 	t.Run("GetGroups", func(t *testing.T) {
-		if _, err := user.Groups().Select("Id").Get(); err != nil {
+		if _, err := user.Groups().Select("Id").Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})

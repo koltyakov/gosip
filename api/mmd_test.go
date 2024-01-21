@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"testing"
@@ -14,7 +15,7 @@ func TestTaxonomyStores(t *testing.T) {
 	taxonomy := NewSP(spClient).Taxonomy()
 
 	t.Run("Default", func(t *testing.T) {
-		tsInfo, err := taxonomy.Stores().Default().Get()
+		tsInfo, err := taxonomy.Stores().Default().Get(context.Background())
 		if err != nil {
 			t.Errorf("can't get term store info, %s\n", err)
 		}
@@ -24,11 +25,11 @@ func TestTaxonomyStores(t *testing.T) {
 	})
 
 	t.Run("GetByID", func(t *testing.T) {
-		tsInfo, err := taxonomy.Stores().Default().Get()
+		tsInfo, err := taxonomy.Stores().Default().Get(context.Background())
 		if err != nil {
 			t.Errorf("can't get term store info, %s\n", err)
 		}
-		data, err := taxonomy.Stores().GetByID(tsInfo["Id"].(string)).Get()
+		data, err := taxonomy.Stores().GetByID(tsInfo["Id"].(string)).Get(context.Background())
 		if err != nil {
 			t.Errorf("can't get term store info, %s\n", err)
 		}
@@ -38,11 +39,11 @@ func TestTaxonomyStores(t *testing.T) {
 	})
 
 	t.Run("GetByName", func(t *testing.T) {
-		tsInfo, err := taxonomy.Stores().Default().Get()
+		tsInfo, err := taxonomy.Stores().Default().Get(context.Background())
 		if err != nil {
 			t.Errorf("can't get term store info, %s\n", err)
 		}
-		data, err := taxonomy.Stores().GetByName(tsInfo["Name"].(string)).Get()
+		data, err := taxonomy.Stores().GetByName(tsInfo["Name"].(string)).Get(context.Background())
 		if err != nil {
 			t.Errorf("can't get term store info, %s\n", err)
 		}
@@ -64,7 +65,7 @@ func TestTaxonomyStores(t *testing.T) {
 		if len(ts.selectProps) != 4 {
 			t.Error("error setting props")
 		}
-		data, err := ts.Get()
+		data, err := ts.Get(context.Background())
 		if err != nil {
 			t.Errorf("can't get term store info, %s\n", err)
 		}
@@ -77,13 +78,13 @@ func TestTaxonomyStores(t *testing.T) {
 	})
 
 	t.Run("UpdateCache", func(t *testing.T) {
-		if err := taxonomy.Stores().Default().UpdateCache(); err != nil {
+		if err := taxonomy.Stores().Default().UpdateCache(context.Background()); err != nil {
 			t.Errorf("can't get term store info, %s\n", err)
 		}
 	})
 
 	t.Run("Sets/GetByName", func(t *testing.T) {
-		sets, err := taxonomy.Stores().Default().Sets().GetByName("Department", 1033)
+		sets, err := taxonomy.Stores().Default().Sets().GetByName(context.Background(), "Department", 1033)
 		if err != nil {
 			t.Errorf("can't get term set by name, %s\n", err)
 		}
@@ -102,7 +103,7 @@ func TestTaxonomyGroups(t *testing.T) {
 	newGroupName := "Delete me " + newGroupGUID
 
 	t.Run("Get", func(t *testing.T) {
-		gs, err := taxonomy.Stores().Default().Groups().Get()
+		gs, err := taxonomy.Stores().Default().Groups().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -120,7 +121,7 @@ func TestTaxonomyGroups(t *testing.T) {
 			t.Error(err)
 		}
 
-		group, err := taxonomy.Stores().Default().Groups().GetByID(groupGUID).Select("Id,Name").Get()
+		group, err := taxonomy.Stores().Default().Groups().GetByID(groupGUID).Select("Id,Name").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -131,7 +132,7 @@ func TestTaxonomyGroups(t *testing.T) {
 	})
 
 	t.Run("Add", func(t *testing.T) {
-		group, err := taxonomy.Stores().Default().Groups().Add(newGroupName, newGroupGUID)
+		group, err := taxonomy.Stores().Default().Groups().Add(context.Background(), newGroupName, newGroupGUID)
 		if err != nil {
 			t.Error(err)
 		}
@@ -141,13 +142,13 @@ func TestTaxonomyGroups(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		if err := taxonomy.Stores().Default().Groups().GetByID(newGroupGUID).Delete(); err != nil {
+		if err := taxonomy.Stores().Default().Groups().GetByID(newGroupGUID).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Sets/GetByName", func(t *testing.T) {
-		sets, err := taxonomy.Stores().Default().Groups().GetByID("any-id-should-work-here").Sets().GetByName("Department", 1033)
+		sets, err := taxonomy.Stores().Default().Groups().GetByID("any-id-should-work-here").Sets().GetByName(context.Background(), "Department", 1033)
 		if err != nil {
 			t.Errorf("can't get term set by name, %s\n", err)
 		}
@@ -176,7 +177,7 @@ func TestTaxonomyTermSets(t *testing.T) {
 	newTermSetName := "Delete me " + newTermSetGUID
 
 	t.Run("GetByID", func(t *testing.T) {
-		data, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Select("Id").Get()
+		data, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Select("Id").Get(context.Background())
 		if err != nil {
 			t.Errorf("can't get term set by ID, %s\n", err)
 		}
@@ -186,14 +187,14 @@ func TestTaxonomyTermSets(t *testing.T) {
 	})
 
 	t.Run("GetAllTerms", func(t *testing.T) {
-		_, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Select("Id,Name").GetAllTerms()
+		_, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Select("Id,Name").GetAllTerms(context.Background())
 		if err != nil {
 			t.Errorf("%s", err)
 		}
 	})
 
 	t.Run("Terms/Get", func(t *testing.T) {
-		_, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Terms().Select("Id,Name").Get()
+		_, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Terms().Select("Id,Name").Get(context.Background())
 		if err != nil {
 			t.Errorf("%s", err)
 		}
@@ -202,13 +203,13 @@ func TestTaxonomyTermSets(t *testing.T) {
 	t.Run("Add", func(t *testing.T) {
 		store := taxonomy.Stores().Default()
 
-		tsInfo, err := store.Select("DefaultLanguage").Get()
+		tsInfo, err := store.Select("DefaultLanguage").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
 		lang := int(tsInfo["DefaultLanguage"].(float64))
 
-		termSet, err := store.Groups().GetByID(termGroupID).Sets().Add(newTermSetName, newTermSetGUID, lang)
+		termSet, err := store.Groups().GetByID(termGroupID).Sets().Add(context.Background(), newTermSetName, newTermSetGUID, lang)
 		if err != nil {
 			t.Error(err)
 		}
@@ -219,7 +220,7 @@ func TestTaxonomyTermSets(t *testing.T) {
 
 	t.Run("Delete", func(t *testing.T) {
 		store := taxonomy.Stores().Default()
-		if err := store.Sets().GetByID(newTermSetGUID).Delete(); err != nil {
+		if err := store.Sets().GetByID(newTermSetGUID).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -241,7 +242,7 @@ func TestTaxonomyTerms(t *testing.T) {
 	}
 
 	t.Run("Store/GetTerm", func(t *testing.T) {
-		termInfo, err := taxonomy.Stores().Default().Terms().GetByID(termGUID).Select("Id").Get()
+		termInfo, err := taxonomy.Stores().Default().Terms().GetByID(termGUID).Select("Id").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -252,7 +253,7 @@ func TestTaxonomyTerms(t *testing.T) {
 
 	t.Run("TermSet/GetByID", func(t *testing.T) {
 		termSet := taxonomy.Stores().Default().Sets().GetByID(termSetGUID)
-		termInfo, err := termSet.Terms().GetByID(termGUID).Select("Id").Get()
+		termInfo, err := termSet.Terms().GetByID(termGUID).Select("Id").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -262,7 +263,7 @@ func TestTaxonomyTerms(t *testing.T) {
 	})
 
 	t.Run("Terms/CRUD", func(t *testing.T) {
-		tsInfo, err := taxonomy.Stores().Default().Select("DefaultLanguage").Get()
+		tsInfo, err := taxonomy.Stores().Default().Select("DefaultLanguage").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -273,7 +274,7 @@ func TestTaxonomyTerms(t *testing.T) {
 
 		t.Run("Add", func(t *testing.T) {
 			termSet := taxonomy.Stores().Default().Sets().GetByID(termSetGUID)
-			termInfo, err := termSet.Terms().Add(newTermName, newTermGUID, lang)
+			termInfo, err := termSet.Terms().Add(context.Background(), newTermName, newTermGUID, lang)
 			if err != nil {
 				t.Error(err)
 			}
@@ -289,7 +290,7 @@ func TestTaxonomyTerms(t *testing.T) {
 			store := taxonomy.Stores().Default()
 			parentTerm := store.Terms().GetByID(newTermGUID)
 
-			termInfo, err := parentTerm.Terms().Add(subTermName, subTermGUID, lang)
+			termInfo, err := parentTerm.Terms().Add(context.Background(), subTermName, subTermGUID, lang)
 			if err != nil {
 				t.Error(err)
 			}
@@ -297,7 +298,7 @@ func TestTaxonomyTerms(t *testing.T) {
 				t.Error("unexpected term ID")
 			}
 
-			subTerms, err := parentTerm.Terms().Get()
+			subTerms, err := parentTerm.Terms().Get(context.Background())
 			if err != nil {
 				t.Error(err)
 			}
@@ -312,12 +313,12 @@ func TestTaxonomyTerms(t *testing.T) {
 
 			termSet := taxonomy.Stores().Default().Sets().GetByID(termSetGUID)
 
-			if _, err := termSet.Terms().Add(childTermName, childTermGUID, lang); err != nil {
+			if _, err := termSet.Terms().Add(context.Background(), childTermName, childTermGUID, lang); err != nil {
 				t.Error(err)
 			}
 
 			childTerm := termSet.Terms().GetByID(childTermGUID)
-			if err := childTerm.Move(termSetGUID, newTermGUID); err != nil {
+			if err := childTerm.Move(context.Background(), termSetGUID, newTermGUID); err != nil {
 				t.Error(err)
 			}
 		})
@@ -328,30 +329,30 @@ func TestTaxonomyTerms(t *testing.T) {
 
 			termSet := taxonomy.Stores().Default().Sets().GetByID(termSetGUID)
 
-			if _, err := termSet.Terms().GetByID(newTermGUID).Terms().Add(childTermName, childTermGUID, lang); err != nil {
+			if _, err := termSet.Terms().GetByID(newTermGUID).Terms().Add(context.Background(), childTermName, childTermGUID, lang); err != nil {
 				t.Error(err)
 			}
 
 			childTerm := termSet.Terms().GetByID(childTermGUID)
-			if err := childTerm.Move(termSetGUID, ""); err != nil {
+			if err := childTerm.Move(context.Background(), termSetGUID, ""); err != nil {
 				t.Error(err)
 			}
 
-			if err := childTerm.Delete(); err != nil {
+			if err := childTerm.Delete(context.Background()); err != nil {
 				t.Error(err)
 			}
 		})
 
 		t.Run("Add#FailAddingADuplicate", func(t *testing.T) {
 			termSet := taxonomy.Stores().Default().Sets().GetByID(termSetGUID)
-			if _, err := termSet.Terms().Add(newTermName, newTermGUID, lang); err == nil {
+			if _, err := termSet.Terms().Add(context.Background(), newTermName, newTermGUID, lang); err == nil {
 				t.Error("should fail with duplicate error message")
 			}
 		})
 
 		t.Run("Get", func(t *testing.T) {
 			term := taxonomy.Stores().Default().Terms().GetByID(newTermGUID)
-			if _, err := term.Get(); err != nil {
+			if _, err := term.Get(context.Background()); err != nil {
 				t.Error(err)
 			}
 		})
@@ -360,7 +361,7 @@ func TestTaxonomyTerms(t *testing.T) {
 			updateTermName := newTermName + " (updated)"
 			props := map[string]interface{}{"Name": updateTermName}
 			term := taxonomy.Stores().Default().Terms().GetByID(newTermGUID)
-			termAfterUpdate, err := term.Update(props)
+			termAfterUpdate, err := term.Update(context.Background(), props)
 			if err != nil {
 				t.Error(err)
 			}
@@ -372,7 +373,7 @@ func TestTaxonomyTerms(t *testing.T) {
 		t.Run("Deprecate", func(t *testing.T) {
 			store := taxonomy.Stores().Default()
 			term := store.Terms().GetByID(newTermGUID)
-			if err := term.Deprecate(true); err != nil {
+			if err := term.Deprecate(context.Background(), true); err != nil {
 				t.Error(err)
 			}
 			// if err := store.UpdateCache(); err != nil {
@@ -391,7 +392,7 @@ func TestTaxonomyTerms(t *testing.T) {
 		t.Run("Activate", func(t *testing.T) {
 			store := taxonomy.Stores().Default()
 			term := store.Terms().GetByID(newTermGUID)
-			if err := term.Deprecate(false); err != nil {
+			if err := term.Deprecate(context.Background(), false); err != nil {
 				t.Error(err)
 			}
 			// if err := store.UpdateCache(); err != nil {
@@ -409,7 +410,7 @@ func TestTaxonomyTerms(t *testing.T) {
 
 		t.Run("Delete", func(t *testing.T) {
 			term := taxonomy.Stores().Default().Terms().GetByID(newTermGUID)
-			if err := term.Delete(); err != nil {
+			if err := term.Delete(context.Background()); err != nil {
 				t.Error(err)
 			}
 		})
@@ -423,7 +424,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 	store := taxonomy.Stores().Default()
 
 	t.Run("Groups/GetByID", func(t *testing.T) {
-		_, err := store.Groups().GetByID("wrong-id").Get()
+		_, err := store.Groups().GetByID("wrong-id").Get(context.Background())
 		if err == nil {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
@@ -431,7 +432,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
 
-		_, err = store.Groups().GetByID("c5589d9f-8044-b000-5f6d-bcc9f93b8b8d").Get()
+		_, err = store.Groups().GetByID("c5589d9f-8044-b000-5f6d-bcc9f93b8b8d").Get(context.Background())
 		if err == nil {
 			t.Error("should fail with object not found message")
 		}
@@ -441,7 +442,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 	})
 
 	t.Run("Sets/GetByID", func(t *testing.T) {
-		_, err := store.Sets().GetByID("wrong-id").Get()
+		_, err := store.Sets().GetByID("wrong-id").Get(context.Background())
 		if err == nil {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
@@ -449,7 +450,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
 
-		_, err = store.Sets().GetByID("c5589d9f-8044-b000-5f6d-bcc9f93b8b8d").Get()
+		_, err = store.Sets().GetByID("c5589d9f-8044-b000-5f6d-bcc9f93b8b8d").Get(context.Background())
 		if err == nil {
 			t.Error("should fail with object not found message")
 		}
@@ -459,7 +460,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 	})
 
 	t.Run("Terms/GetByID", func(t *testing.T) {
-		_, err := store.Terms().GetByID("wrong-id").Get()
+		_, err := store.Terms().GetByID("wrong-id").Get(context.Background())
 		if err == nil {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
@@ -467,7 +468,7 @@ func TestTaxonomyNotFoundIDs(t *testing.T) {
 			t.Error("should fail with Guid should contain 32 digits with 4 dashes message")
 		}
 
-		_, err = store.Terms().GetByID("c5589d9f-8044-b000-5f6d-bcc9f93b8b8d").Get()
+		_, err = store.Terms().GetByID("c5589d9f-8044-b000-5f6d-bcc9f93b8b8d").Get(context.Background())
 		if err == nil {
 			t.Error("should fail with object not found message")
 		}
@@ -507,7 +508,7 @@ func TestTaxonomyUtils(t *testing.T) {
 }
 
 func getTermGroupID(taxonomy *Taxonomy) (string, error) {
-	gs, err := taxonomy.Stores().Default().Groups().Get()
+	gs, err := taxonomy.Stores().Default().Groups().Get(context.Background())
 	if err != nil {
 		return "", err
 	}
@@ -537,7 +538,7 @@ func getTermSetID(taxonomy *Taxonomy) (string, error) {
 		return "", err
 	}
 
-	tsData, err := termSets.Get()
+	tsData, err := termSets.Get(context.Background())
 	if err != nil {
 		return "", err
 	}
@@ -564,7 +565,7 @@ func getTermID(taxonomy *Taxonomy) (string, error) {
 		return "", err
 	}
 
-	terms, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Select("Id").GetAllTerms()
+	terms, err := taxonomy.Stores().Default().Sets().GetByID(termSetGUID).Select("Id").GetAllTerms(context.Background())
 	if terms == nil {
 		return "", err
 	}

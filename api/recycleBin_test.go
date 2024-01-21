@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -12,13 +13,13 @@ func TestRecycleBin(t *testing.T) {
 
 	sp := NewSP(spClient)
 	newListTitle := uuid.New().String()
-	if _, err := sp.Web().Lists().Add(newListTitle, nil); err != nil {
+	if _, err := sp.Web().Lists().Add(context.Background(), newListTitle, nil); err != nil {
 		t.Error(err)
 	}
 	list := sp.Web().Lists().GetByTitle(newListTitle)
 
 	t.Run("Get/Site", func(t *testing.T) {
-		data, err := sp.Site().RecycleBin().Top(1).Get()
+		data, err := sp.Site().RecycleBin().Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -28,32 +29,32 @@ func TestRecycleBin(t *testing.T) {
 	})
 
 	t.Run("Get/Web", func(t *testing.T) {
-		_, err := sp.Web().RecycleBin().Top(1).Get()
+		_, err := sp.Web().RecycleBin().Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Restore", func(t *testing.T) {
-		data, err := list.Items().Add([]byte(`{"Title":"Item"}`))
+		data, err := list.Items().Add(context.Background(), []byte(`{"Title":"Item"}`))
 		if err != nil {
 			t.Error(err)
 		}
-		if err := list.Items().GetByID(data.Data().ID).Recycle(); err != nil {
+		if err := list.Items().GetByID(data.Data().ID).Recycle(context.Background()); err != nil {
 			t.Error(err)
 		}
-		items, err := sp.Web().RecycleBin().OrderBy("DeletedDate", false).Filter("LeafName eq '1_.000'").Top(1).Get()
+		items, err := sp.Web().RecycleBin().OrderBy("DeletedDate", false).Filter("LeafName eq '1_.000'").Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
 		itemID := items.Data()[0].Data().ID
-		if _, err := sp.Web().RecycleBin().GetByID(itemID).Get(); err != nil {
+		if _, err := sp.Web().RecycleBin().GetByID(itemID).Get(context.Background()); err != nil {
 			t.Error(err)
 		}
-		if err := sp.Web().RecycleBin().GetByID(itemID).Restore(); err != nil {
+		if err := sp.Web().RecycleBin().GetByID(itemID).Restore(context.Background()); err != nil {
 			t.Error(err)
 		}
-		data2, err := list.Items().Select("Id").Get()
+		data2, err := list.Items().Select("Id").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -62,7 +63,7 @@ func TestRecycleBin(t *testing.T) {
 		}
 	})
 
-	if err := list.Delete(); err != nil {
+	if err := list.Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
 

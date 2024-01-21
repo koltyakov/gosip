@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strings"
 	"testing"
@@ -18,7 +19,7 @@ func TestProperties(t *testing.T) {
 
 	t.Run("Constructor", func(t *testing.T) {
 		p := NewProperties(spClient, endpoint, nil, "web")
-		if _, err := p.Select("vti_x005f_defaultlanguage").Get(); err != nil {
+		if _, err := p.Select("vti_x005f_defaultlanguage").Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
@@ -38,7 +39,7 @@ func TestProperties(t *testing.T) {
 			t.Skip("is not supported with SP 2013")
 		}
 
-		data, err := webProps.Select("vti_x005f_defaultlanguage").Get()
+		data, err := webProps.Select("vti_x005f_defaultlanguage").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -53,7 +54,7 @@ func TestProperties(t *testing.T) {
 	})
 
 	t.Run("GetProps", func(t *testing.T) {
-		data, err := webProps.GetProps([]string{"vti_defaultlanguage"})
+		data, err := webProps.GetProps(context.Background(), []string{"vti_defaultlanguage"})
 		if err != nil {
 			t.Error(err)
 		}
@@ -64,7 +65,7 @@ func TestProperties(t *testing.T) {
 	})
 
 	t.Run("GetMultipleProps", func(t *testing.T) {
-		data, err := webProps.GetProps([]string{"vti_defaultlanguage", "vti_associategroups"})
+		data, err := webProps.GetProps(context.Background(), []string{"vti_defaultlanguage", "vti_associategroups"})
 		if err != nil {
 			t.Error(err)
 		}
@@ -75,20 +76,20 @@ func TestProperties(t *testing.T) {
 	})
 
 	t.Run("GetNonExistongProps", func(t *testing.T) {
-		_, err := webProps.GetProps([]string{"vti_defaultlanguage", "vti_associategroups_do_not_exist"})
+		_, err := webProps.GetProps(context.Background(), []string{"vti_defaultlanguage", "vti_associategroups_do_not_exist"})
 		if err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Set", func(t *testing.T) {
-		if err := webProps.Set("test_gosip", time.Now().String()); err != nil {
+		if err := webProps.Set(context.Background(), "test_gosip", time.Now().String()); err != nil {
 			// By default is denied on Modern SPO sites, so ignore in tests
 			if !strings.Contains(err.Error(), "System.UnauthorizedAccessException") {
 				t.Error(err)
 			}
 		}
-		if err := web.RootFolder().Props().Set("test_gosip", time.Now().String()); err != nil {
+		if err := web.RootFolder().Props().Set(context.Background(), "test_gosip", time.Now().String()); err != nil {
 			// By default is denied on Modern SPO sites, so ignore in tests
 			if !strings.Contains(err.Error(), "System.UnauthorizedAccessException") {
 				t.Error(err)
@@ -97,7 +98,7 @@ func TestProperties(t *testing.T) {
 	})
 
 	t.Run("SetProps", func(t *testing.T) {
-		if err := webProps.SetProps(map[string]string{
+		if err := webProps.SetProps(context.Background(), map[string]string{
 			"test_gosip_prop1": time.Now().String(),
 			"test_gosip_prop2": time.Now().String(),
 		}); err != nil {

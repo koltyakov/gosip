@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -16,7 +17,7 @@ func TestGroup(t *testing.T) {
 	newGroupName := uuid.New().String()
 	group := &GroupInfo{}
 
-	user, err := web.CurrentUser().Select("Id,LoginName").Get()
+	user, err := web.CurrentUser().Select("Id,LoginName").Get(context.Background())
 	if err != nil {
 		t.Error(err)
 	}
@@ -28,7 +29,7 @@ func TestGroup(t *testing.T) {
 	}
 
 	t.Run("Add", func(t *testing.T) {
-		data, err := web.SiteGroups().Add(newGroupName, nil)
+		data, err := web.SiteGroups().Add(context.Background(), newGroupName, nil)
 		if err != nil {
 			t.Error(err)
 		}
@@ -36,7 +37,7 @@ func TestGroup(t *testing.T) {
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		data, err := web.SiteGroups().GetByName(newGroupName).Get()
+		data, err := web.SiteGroups().GetByName(newGroupName).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -52,37 +53,37 @@ func TestGroup(t *testing.T) {
 		}
 		metadata["Description"] = "It's a test group" // ToDo: check if update works
 		body, _ := json.Marshal(metadata)
-		if _, err := web.SiteGroups().GetByID(group.ID).Update(body); err != nil {
+		if _, err := web.SiteGroups().GetByID(group.ID).Update(context.Background(), body); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("AddUser", func(t *testing.T) {
-		if err := web.SiteGroups().GetByID(group.ID).AddUser(user.Data().LoginName); err != nil {
+		if err := web.SiteGroups().GetByID(group.ID).AddUser(context.Background(), user.Data().LoginName); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("RemoveUser", func(t *testing.T) {
-		if err := web.SiteGroups().GetByID(group.ID).RemoveUser(user.Data().LoginName); err != nil {
+		if err := web.SiteGroups().GetByID(group.ID).RemoveUser(context.Background(), user.Data().LoginName); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("AddUserByID", func(t *testing.T) {
-		if err := web.SiteGroups().GetByID(group.ID).AddUserByID(user.Data().ID); err != nil {
+		if err := web.SiteGroups().GetByID(group.ID).AddUserByID(context.Background(), user.Data().ID); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("RemoveUserByID", func(t *testing.T) {
-		if err := web.SiteGroups().GetByID(group.ID).RemoveUserByID(user.Data().ID); err != nil {
+		if err := web.SiteGroups().GetByID(group.ID).RemoveUserByID(context.Background(), user.Data().ID); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("SetAsOwner/User", func(t *testing.T) {
-		au, err := web.SiteUsers().Select("Id").Filter(fmt.Sprintf("Id ne %d and PrincipalType eq 1", user.Data().ID)).Top(1).Get()
+		au, err := web.SiteUsers().Select("Id").Filter(fmt.Sprintf("Id ne %d and PrincipalType eq 1", user.Data().ID)).Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -90,10 +91,10 @@ func TestGroup(t *testing.T) {
 			return
 		}
 		g := web.SiteGroups().GetByID(group.ID)
-		if err := g.SetOwner(au.Data()[0].Data().ID); err != nil {
+		if err := g.SetOwner(context.Background(), au.Data()[0].Data().ID); err != nil {
 			t.Error(err)
 		}
-		o, err := g.Select("Owner/Id").Expand("Owner").Get()
+		o, err := g.Select("Owner/Id").Expand("Owner").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -107,15 +108,15 @@ func TestGroup(t *testing.T) {
 	})
 
 	t.Run("SetAsOwner/Group", func(t *testing.T) {
-		mg, err := web.AssociatedGroups().Members().Select("Id").Get()
+		mg, err := web.AssociatedGroups().Members().Select("Id").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
 		g := web.SiteGroups().GetByID(group.ID)
-		if err := g.SetOwner(mg.Data().ID); err != nil {
+		if err := g.SetOwner(context.Background(), mg.Data().ID); err != nil {
 			t.Error(err)
 		}
-		o, err := g.Select("Owner/Id").Expand("Owner").Get()
+		o, err := g.Select("Owner/Id").Expand("Owner").Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -133,7 +134,7 @@ func TestGroup(t *testing.T) {
 			t.Skip("is not supported with SP 2013")
 		}
 
-		au, err := web.SiteUsers().Select("Id").Filter(fmt.Sprintf("Id ne %d", user.Data().ID)).OrderBy("Id", false).Top(1).Get()
+		au, err := web.SiteUsers().Select("Id").Filter(fmt.Sprintf("Id ne %d", user.Data().ID)).OrderBy("Id", false).Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -141,19 +142,19 @@ func TestGroup(t *testing.T) {
 			return
 		}
 		g := web.SiteGroups().GetByID(group.ID)
-		if err := g.SetUserAsOwner(au.Data()[0].Data().ID); err != nil {
+		if err := g.SetUserAsOwner(context.Background(), au.Data()[0].Data().ID); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("RemoveByID", func(t *testing.T) {
-		if err := web.SiteGroups().RemoveByID(group.ID); err != nil {
+		if err := web.SiteGroups().RemoveByID(context.Background(), group.ID); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Modifiers", func(t *testing.T) {
-		if _, err := web.AssociatedGroups().Visitors().Users().Get(); err != nil {
+		if _, err := web.AssociatedGroups().Visitors().Users().Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})

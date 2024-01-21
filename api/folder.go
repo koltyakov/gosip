@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -55,31 +56,31 @@ func (folder *Folder) ToURL() string {
 }
 
 // Get gets this folder data object
-func (folder *Folder) Get() (FolderResp, error) {
+func (folder *Folder) Get(ctx context.Context) (FolderResp, error) {
 	client := NewHTTPClient(folder.client)
-	return client.Get(folder.ToURL(), folder.config)
+	return client.Get(ctx, folder.ToURL(), folder.config)
 }
 
 // Update updates Folder's metadata with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.Folder object
-func (folder *Folder) Update(body []byte) (FolderResp, error) {
+func (folder *Folder) Update(ctx context.Context, body []byte) (FolderResp, error) {
 	body = patchMetadataType(body, "SP.Folder")
 	client := NewHTTPClient(folder.client)
-	return client.Update(folder.endpoint, bytes.NewBuffer(body), folder.config)
+	return client.Update(ctx, folder.endpoint, bytes.NewBuffer(body), folder.config)
 }
 
 // Delete deletes this folder (can't be restored from a recycle bin)
-func (folder *Folder) Delete() error {
+func (folder *Folder) Delete(ctx context.Context) error {
 	client := NewHTTPClient(folder.client)
-	_, err := client.Delete(folder.endpoint, folder.config)
+	_, err := client.Delete(ctx, folder.endpoint, folder.config)
 	return err
 }
 
 // Recycle moves this folder to the recycle bin
-func (folder *Folder) Recycle() error {
+func (folder *Folder) Recycle(ctx context.Context) error {
 	client := NewHTTPClient(folder.client)
 	endpoint := fmt.Sprintf("%s/Recycle", folder.endpoint)
-	_, err := client.Post(endpoint, nil, folder.config)
+	_, err := client.Post(ctx, endpoint, nil, folder.config)
 	return err
 }
 
@@ -121,7 +122,7 @@ func (folder *Folder) Files() *Files {
 }
 
 // ListItemAllFields gets this folder Item data object metadata
-func (folder *Folder) ListItemAllFields() (ListItemAllFieldsResp, error) {
+func (folder *Folder) ListItemAllFields(ctx context.Context) (ListItemAllFieldsResp, error) {
 	endpoint := fmt.Sprintf("%s/ListItemAllFields", folder.endpoint)
 	apiURL, _ := url.Parse(endpoint)
 
@@ -133,7 +134,7 @@ func (folder *Folder) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	apiURL.RawQuery = query.Encode()
 	client := NewHTTPClient(folder.client)
 
-	data, err := client.Get(apiURL.String(), folder.config)
+	data, err := client.Get(ctx, apiURL.String(), folder.config)
 	if err != nil {
 		return nil, err
 	}
@@ -142,9 +143,9 @@ func (folder *Folder) ListItemAllFields() (ListItemAllFieldsResp, error) {
 }
 
 // GetItem gets this folder Item API object metadata
-func (folder *Folder) GetItem() (*Item, error) {
+func (folder *Folder) GetItem(ctx context.Context) (*Item, error) {
 	scoped := NewFolder(folder.client, folder.endpoint, folder.config)
-	data, err := scoped.Conf(HeadersPresets.Verbose).Select("Id").ListItemAllFields()
+	data, err := scoped.Conf(HeadersPresets.Verbose).Select("Id").ListItemAllFields(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -169,8 +170,8 @@ func (folder *Folder) GetItem() (*Item, error) {
 }
 
 // ContextInfo gets current Context Info object data
-func (folder *Folder) ContextInfo() (*ContextInfo, error) {
-	return NewContext(folder.client, folder.ToURL(), folder.config).Get()
+func (folder *Folder) ContextInfo(ctx context.Context) (*ContextInfo, error) {
+	return NewContext(folder.client, folder.ToURL(), folder.config).Get(ctx)
 }
 
 // ToDo:
@@ -178,7 +179,7 @@ func (folder *Folder) ContextInfo() (*ContextInfo, error) {
 
 // ensureFolder ensures folder existence by its server relative URL
 // mode: modern (SP 2016 and newer), legacy (SP 2013)
-func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string, mode string) ([]byte, error) {
+func ensureFolder(ctx context.Context, web *Web, serverRelativeURL string, currentRelativeURL string, mode string) ([]byte, error) {
 	headers := map[string]string{}
 	for key, val := range getConfHeaders(web.config) {
 		headers[key] = val
@@ -198,7 +199,7 @@ func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string,
 		getFolder = web.GetFolder
 	}
 
-	data, err := getFolder(currentRelativeURL).Conf(conf).Get()
+	data, err := getFolder(currentRelativeURL).Conf(conf).Get(ctx)
 	if err != nil {
 		splitted := strings.Split(currentRelativeURL, "/")
 		if len(splitted) == 1 {
@@ -206,7 +207,7 @@ func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string,
 		}
 		splitted = splitted[0 : len(splitted)-1]
 		currentRelativeURL = strings.Join(splitted, "/")
-		return ensureFolder(web, serverRelativeURL, currentRelativeURL, mode)
+		return ensureFolder(ctx, web, serverRelativeURL, currentRelativeURL, mode)
 	}
 
 	curFolders := strings.Split(currentRelativeURL, "/")
@@ -218,7 +219,7 @@ func ensureFolder(web *Web, serverRelativeURL string, currentRelativeURL string,
 
 	createFolders := expFolders[len(curFolders):]
 	for _, folder := range createFolders {
-		data, err = getFolder(currentRelativeURL).Folders().Add(url.PathEscape(folder))
+		data, err = getFolder(currentRelativeURL).Folders().Add(ctx, url.PathEscape(folder))
 		if err != nil {
 			return nil, err
 		}

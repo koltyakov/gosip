@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -14,11 +15,11 @@ func TestItem(t *testing.T) {
 
 	web := NewSP(spClient).Web()
 	newListTitle := uuid.New().String()
-	if _, err := web.Lists().Add(newListTitle, nil); err != nil {
+	if _, err := web.Lists().Add(context.Background(), newListTitle, nil); err != nil {
 		t.Error(err)
 	}
 	list := web.Lists().GetByTitle(newListTitle)
-	entType, err := list.GetEntityType()
+	entType, err := list.GetEntityType(context.Background())
 	if err != nil {
 		t.Error(err)
 	}
@@ -29,14 +30,14 @@ func TestItem(t *testing.T) {
 			metadata["__metadata"] = map[string]string{"type": entType}
 			metadata["Title"] = fmt.Sprintf("Item %d", i)
 			body, _ := json.Marshal(metadata)
-			if _, err := list.Items().Add(body); err != nil {
+			if _, err := list.Items().Add(context.Background(), body); err != nil {
 				t.Error(err)
 			}
 		}
 	})
 
 	t.Run("Get", func(t *testing.T) {
-		item, err := list.Items().GetByID(1).Conf(HeadersPresets.Verbose).Get()
+		item, err := list.Items().GetByID(1).Conf(HeadersPresets.Verbose).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -56,7 +57,7 @@ func TestItem(t *testing.T) {
 		metadata["__metadata"] = map[string]string{"type": entType}
 		metadata["Title"] = "Updated Item 1"
 		body, _ := json.Marshal(metadata)
-		if _, err := list.Items().GetByID(1).Update(body); err != nil {
+		if _, err := list.Items().GetByID(1).Update(context.Background(), body); err != nil {
 			t.Error(err)
 		}
 	})
@@ -65,42 +66,42 @@ func TestItem(t *testing.T) {
 		metadata := make(map[string]interface{})
 		metadata["Title"] = "Updated Item 2"
 		body, _ := json.Marshal(metadata)
-		if _, err := list.Items().GetByID(2).Update(body); err != nil {
+		if _, err := list.Items().GetByID(2).Update(context.Background(), body); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		if err := list.Items().GetByID(1).Delete(); err != nil {
+		if err := list.Items().GetByID(1).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Recycle", func(t *testing.T) {
-		if err := list.Items().GetByID(2).Recycle(); err != nil {
+		if err := list.Items().GetByID(2).Recycle(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("ParentList", func(t *testing.T) {
-		if _, err := list.Items().GetByID(3).ParentList().Get(); err != nil {
+		if _, err := list.Items().GetByID(3).ParentList().Get(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("Roles", func(t *testing.T) {
-		if _, err := list.Items().GetByID(3).Roles().HasUniqueAssignments(); err != nil {
+		if _, err := list.Items().GetByID(3).Roles().HasUniqueAssignments(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("ContextInfo", func(t *testing.T) {
-		if _, err := list.Items().GetByID(3).ContextInfo(); err != nil {
+		if _, err := list.Items().GetByID(3).ContextInfo(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
-	if err := list.Delete(); err != nil {
+	if err := list.Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
 }

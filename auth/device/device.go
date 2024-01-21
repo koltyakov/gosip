@@ -5,6 +5,7 @@
 package device
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -66,7 +67,7 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 }
 
 // GetAuth authenticates, receives access token
-func (c *AuthCnfg) GetAuth() (string, int64, error) {
+func (c *AuthCnfg) GetAuth(ctx context.Context) (string, int64, error) {
 	u, _ := url.Parse(c.SiteURL)
 	resource := fmt.Sprintf("https://%s", u.Host)
 
@@ -96,7 +97,7 @@ func (c *AuthCnfg) GetAuth() (string, int64, error) {
 	config := auth.NewDeviceFlowConfig(c.ClientID, c.TenantID)
 	config.Resource = resource
 
-	token, err := config.ServicePrincipalToken()
+	token, err := config.ServicePrincipalToken(ctx)
 	if err != nil {
 		return "", 0, err
 	}
@@ -116,7 +117,7 @@ func (c *AuthCnfg) GetStrategy() string { return "device" }
 // SetAuth authenticates request
 // noinspection GoUnusedParameter
 func (c *AuthCnfg) SetAuth(req *http.Request, httpClient *gosip.SPClient) error {
-	accessToken, _, err := c.GetAuth()
+	accessToken, _, err := c.GetAuth(req.Context())
 	if err != nil {
 		return err
 	}

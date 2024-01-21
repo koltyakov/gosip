@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -81,28 +82,28 @@ func (file *File) ToURL() string {
 }
 
 // Get gets file data object
-func (file *File) Get() (FileResp, error) {
+func (file *File) Get(ctx context.Context) (FileResp, error) {
 	client := NewHTTPClient(file.client)
-	return client.Get(file.ToURL(), file.config)
+	return client.Get(ctx, file.ToURL(), file.config)
 }
 
 // Delete deletes this file skipping recycle bin
-func (file *File) Delete() error {
+func (file *File) Delete(ctx context.Context) error {
 	client := NewHTTPClient(file.client)
-	_, err := client.Delete(file.endpoint, file.config)
+	_, err := client.Delete(ctx, file.endpoint, file.config)
 	return err
 }
 
 // Recycle moves this file to the recycle bin
-func (file *File) Recycle() error {
+func (file *File) Recycle(ctx context.Context) error {
 	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/Recycle", file.endpoint)
-	_, err := client.Post(endpoint, nil, file.config)
+	_, err := client.Post(ctx, endpoint, nil, file.config)
 	return err
 }
 
 // ListItemAllFields gets this file Item data object metadata
-func (file *File) ListItemAllFields() (ListItemAllFieldsResp, error) {
+func (file *File) ListItemAllFields(ctx context.Context) (ListItemAllFieldsResp, error) {
 	endpoint := fmt.Sprintf("%s/ListItemAllFields", file.endpoint)
 	apiURL, _ := url.Parse(endpoint)
 
@@ -114,7 +115,7 @@ func (file *File) ListItemAllFields() (ListItemAllFieldsResp, error) {
 	apiURL.RawQuery = query.Encode()
 	client := NewHTTPClient(file.client)
 
-	data, err := client.Get(apiURL.String(), file.config)
+	data, err := client.Get(ctx, apiURL.String(), file.config)
 	if err != nil {
 		return nil, err
 	}
@@ -123,9 +124,9 @@ func (file *File) ListItemAllFields() (ListItemAllFieldsResp, error) {
 }
 
 // GetItem gets this folder Item API object metadata
-func (file *File) GetItem() (*Item, error) {
+func (file *File) GetItem(ctx context.Context) (*Item, error) {
 	scoped := NewFile(file.client, file.endpoint, file.config)
-	data, err := scoped.Conf(HeadersPresets.Verbose).Select("Id").ListItemAllFields()
+	data, err := scoped.Conf(HeadersPresets.Verbose).Select("Id").ListItemAllFields(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +151,7 @@ func (file *File) GetItem() (*Item, error) {
 }
 
 // CheckIn checks file in, checkInType: 0 - Minor, 1 - Major, 2 - Overwrite
-func (file *File) CheckIn(comment string, checkInType int) ([]byte, error) {
+func (file *File) CheckIn(ctx context.Context, comment string, checkInType int) ([]byte, error) {
 	endpoint := fmt.Sprintf(
 		"%s/CheckIn(comment='%s',checkintype=%d)",
 		file.endpoint,
@@ -158,50 +159,50 @@ func (file *File) CheckIn(comment string, checkInType int) ([]byte, error) {
 		checkInType,
 	)
 	client := NewHTTPClient(file.client)
-	return client.Post(endpoint, nil, file.config)
+	return client.Post(ctx, endpoint, nil, file.config)
 }
 
 // CheckOut checks file out
-func (file *File) CheckOut() ([]byte, error) {
+func (file *File) CheckOut(ctx context.Context) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/CheckOut", file.endpoint)
 	client := NewHTTPClient(file.client)
-	return client.Post(endpoint, nil, file.config)
+	return client.Post(ctx, endpoint, nil, file.config)
 }
 
 // UndoCheckOut undoes file check out
-func (file *File) UndoCheckOut() ([]byte, error) {
+func (file *File) UndoCheckOut(ctx context.Context) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/UndoCheckOut", file.endpoint)
 	client := NewHTTPClient(file.client)
-	return client.Post(endpoint, nil, file.config)
+	return client.Post(ctx, endpoint, nil, file.config)
 }
 
 // Publish publishes a file
-func (file *File) Publish(comment string) ([]byte, error) {
+func (file *File) Publish(ctx context.Context, comment string) ([]byte, error) {
 	endpoint := fmt.Sprintf(
 		"%s/Publish(comment='%s')",
 		file.endpoint,
 		comment,
 	)
 	client := NewHTTPClient(file.client)
-	return client.Post(endpoint, nil, file.config)
+	return client.Post(ctx, endpoint, nil, file.config)
 }
 
 // UnPublish un-publishes a file
-func (file *File) UnPublish(comment string) ([]byte, error) {
+func (file *File) UnPublish(ctx context.Context, comment string) ([]byte, error) {
 	endpoint := fmt.Sprintf(
 		"%s/Publish(comment='%s')",
 		file.endpoint,
 		comment,
 	)
 	client := NewHTTPClient(file.client)
-	return client.Post(endpoint, nil, file.config)
+	return client.Post(ctx, endpoint, nil, file.config)
 }
 
 // GetReader gets file io.ReadCloser
-func (file *File) GetReader() (io.ReadCloser, error) {
+func (file *File) GetReader(ctx context.Context) (io.ReadCloser, error) {
 	endpoint := fmt.Sprintf("%s/$value", file.endpoint)
 
-	req, err := http.NewRequest("GET", endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -224,8 +225,8 @@ func (file *File) GetReader() (io.ReadCloser, error) {
 }
 
 // Download file bytes
-func (file *File) Download() ([]byte, error) {
-	body, err := file.GetReader()
+func (file *File) Download(ctx context.Context) ([]byte, error) {
+	body, err := file.GetReader(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -239,26 +240,26 @@ func (file *File) Download() ([]byte, error) {
 }
 
 // MoveTo file to new location within the same site
-func (file *File) MoveTo(newURL string, overwrite bool) ([]byte, error) {
+func (file *File) MoveTo(ctx context.Context, newURL string, overwrite bool) ([]byte, error) {
 	flag := 0
 	if overwrite {
 		flag = 1
 	}
 	endpoint := fmt.Sprintf("%s/MoveTo(newurl='%s',flags=%d)", file.endpoint, newURL, flag)
 	client := NewHTTPClient(file.client)
-	return client.Post(endpoint, nil, file.config)
+	return client.Post(ctx, endpoint, nil, file.config)
 }
 
 // CopyTo file to new location within the same site
-func (file *File) CopyTo(newURL string, overwrite bool) ([]byte, error) {
+func (file *File) CopyTo(ctx context.Context, newURL string, overwrite bool) ([]byte, error) {
 	endpoint := fmt.Sprintf("%s/CopyTo(strnewurl='%s',boverwrite=%t)", file.endpoint, newURL, overwrite)
 	client := NewHTTPClient(file.client)
-	return client.Post(endpoint, nil, file.config)
+	return client.Post(ctx, endpoint, nil, file.config)
 }
 
 // ContextInfo ...
-func (file *File) ContextInfo() (*ContextInfo, error) {
-	return NewContext(file.client, file.ToURL(), file.config).Get()
+func (file *File) ContextInfo(ctx context.Context) (*ContextInfo, error) {
+	return NewContext(file.client, file.ToURL(), file.config).Get(ctx)
 }
 
 // Props gets Properties API instance queryable collection for this File

@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 
 	"github.com/koltyakov/gosip"
@@ -37,17 +38,17 @@ func (views *Views) ToURL() string {
 }
 
 // Get gets this List or Document Library views collection
-func (views *Views) Get() (ViewsResp, error) {
+func (views *Views) Get(ctx context.Context) (ViewsResp, error) {
 	client := NewHTTPClient(views.client)
-	return client.Get(views.ToURL(), views.config)
+	return client.Get(ctx, views.ToURL(), views.config)
 }
 
 // Add adds view with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.View object
-func (views *Views) Add(body []byte) (ViewResp, error) {
+func (views *Views) Add(ctx context.Context, body []byte) (ViewResp, error) {
 	body = patchMetadataType(body, "SP.View")
 	client := NewHTTPClient(views.client)
-	return client.Post(views.endpoint, bytes.NewBuffer(body), views.config)
+	return client.Post(ctx, views.endpoint, bytes.NewBuffer(body), views.config)
 }
 
 // GetByID gets a view by its ID (GUID)

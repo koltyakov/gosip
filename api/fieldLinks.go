@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -73,9 +74,9 @@ func (fieldLinks *FieldLinks) ToURL() string {
 }
 
 // Get gets fields response collection
-func (fieldLinks *FieldLinks) Get() (FieldLinksResp, error) {
+func (fieldLinks *FieldLinks) Get(ctx context.Context) (FieldLinksResp, error) {
 	client := NewHTTPClient(fieldLinks.client)
-	return client.Get(fieldLinks.ToURL(), fieldLinks.config)
+	return client.Get(ctx, fieldLinks.ToURL(), fieldLinks.config)
 }
 
 // GetByID gets a field link by its ID (GUID)
@@ -88,9 +89,9 @@ func (fieldLinks *FieldLinks) GetByID(fieldLinkID string) *FieldLink {
 }
 
 // Delete deletes a field link by its ID (GUID)
-func (fieldLink *FieldLink) Delete() error {
+func (fieldLink *FieldLink) Delete(ctx context.Context) error {
 	client := NewHTTPClient(fieldLink.client)
-	_, err := client.Delete(fieldLink.endpoint, fieldLink.config)
+	_, err := client.Delete(ctx, fieldLink.endpoint, fieldLink.config)
 	return err
 }
 
@@ -102,7 +103,7 @@ func (fieldLink *FieldLink) Delete() error {
 // }
 
 // GetFields gets fields response collection
-func (fieldLinks *FieldLinks) GetFields() (FieldsResp, error) {
+func (fieldLinks *FieldLinks) GetFields(ctx context.Context) (FieldsResp, error) {
 	endpoint := getPriorEndpoint(fieldLinks.endpoint, "/FieldLinks")
 	fields := NewFields(
 		fieldLinks.client,
@@ -111,11 +112,11 @@ func (fieldLinks *FieldLinks) GetFields() (FieldsResp, error) {
 		"contentType",
 	)
 	fields.modifiers = fieldLinks.modifiers
-	return fields.Get()
+	return fields.Get(ctx)
 }
 
 // Add adds field link
-func (fieldLinks *FieldLinks) Add(name string) (string, error) {
+func (fieldLinks *FieldLinks) Add(ctx context.Context, name string) (string, error) {
 	// // REST API doesn't work in that context as supposed to (https://social.msdn.microsoft.com/Forums/office/en-US/52dc9d24-2eb3-4540-a26a-02b12fe1155b/rest-add-fieldlink-to-content-type?forum=sharepointdevelopment)
 	// body := []byte(TrimMultiline(fmt.Sprintf(`{
 	// 	"__metadata": { "type": "SP.FieldLink" },
@@ -140,7 +141,7 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 			getPriorEndpoint(fieldLinks.endpoint, "/FieldLinks"),
 			fieldLinks.config,
 		)
-		resp, err := ct.Select("StringId").Get()
+		resp, err := ct.Select("StringId").Get(ctx)
 		if err != nil {
 			return "", err
 		}
@@ -172,7 +173,11 @@ func (fieldLinks *FieldLinks) Add(name string) (string, error) {
 	}
 
 	client := NewHTTPClient(fieldLinks.client)
-	resp, err := client.ProcessQuery(fieldLinks.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), fieldLinks.config)
+	resp, err := client.ProcessQuery(
+		ctx,
+		fieldLinks.client.AuthCnfg.GetSiteURL(),
+		bytes.NewBuffer([]byte(csomPkg)),
+		fieldLinks.config)
 	if err != nil {
 		return "", err
 	}

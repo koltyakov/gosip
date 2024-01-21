@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -40,7 +41,7 @@ func main() {
 }
 
 func runner(sp *api.SP) {
-	r, err := sp.Web().Select("Title").Get()
+	r, err := sp.Web().Select("Title").Get(context.Background())
 	if err != nil {
 		fmt.Println(err)
 	}

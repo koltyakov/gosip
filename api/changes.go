@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -89,10 +90,10 @@ func NewChanges(client *gosip.SPClient, endpoint string, config *RequestConfig) 
 }
 
 // GetCurrentToken gets current change token for this parent entity
-func (changes *Changes) GetCurrentToken() (string, error) {
+func (changes *Changes) GetCurrentToken(ctx context.Context) (string, error) {
 	endpoint := fmt.Sprintf("%s?$select=CurrentChangeToken", changes.endpoint)
 	client := NewHTTPClient(changes.client)
-	data, err := client.Get(endpoint, changes.config)
+	data, err := client.Get(ctx, endpoint, changes.config)
 	if err != nil {
 		return "", err
 	}
@@ -107,7 +108,7 @@ func (changes *Changes) GetCurrentToken() (string, error) {
 }
 
 // GetChanges gets changes in scope of the parent container using provided change query
-func (changes *Changes) GetChanges(changeQuery *ChangeQuery) (*ChangesResp, error) {
+func (changes *Changes) GetChanges(ctx context.Context, changeQuery *ChangeQuery) (*ChangesResp, error) {
 	endpoint := toURL(fmt.Sprintf("%s/GetChanges", changes.endpoint), changes.modifiers)
 	client := NewHTTPClient(changes.client)
 	metadata := map[string]interface{}{}
@@ -132,7 +133,7 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) (*ChangesResp, erro
 	if err != nil {
 		return nil, err
 	}
-	data, err := client.Post(endpoint, bytes.NewBuffer(body), changes.config)
+	data, err := client.Post(ctx, endpoint, bytes.NewBuffer(body), changes.config)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +160,7 @@ func (changes *Changes) GetChanges(changeQuery *ChangeQuery) (*ChangesResp, erro
 			return nil, fmt.Errorf("can't get next page of an empty collection")
 		}
 		changeQuery.ChangeTokenStart = result.data[len(result.data)-1].ChangeToken.StringValue
-		return changes.GetChanges(changeQuery)
+		return changes.GetChanges(ctx, changeQuery)
 	}
 
 	return result, nil

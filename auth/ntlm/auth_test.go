@@ -1,6 +1,7 @@
 package ntlm
 
 import (
+	"context"
 	"os"
 	"testing"
 
@@ -103,7 +104,7 @@ func TestAuthEdgeCases(t *testing.T) {
 
 	t.Run("GetAuth", func(t *testing.T) {
 		cnfg := &AuthCnfg{}
-		r, _, err := cnfg.GetAuth()
+		r, _, err := cnfg.GetAuth(context.Background())
 		if err != nil {
 			t.Error(err)
 		}

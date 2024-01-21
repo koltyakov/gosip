@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"strings"
 	"testing"
 
@@ -19,14 +20,14 @@ func TestFieldLinks(t *testing.T) {
 		"Id": {"StringValue":"` + ctID + `"},
 		"Name":"test-temp-ct ` + guid + `"
 	}`))
-	ctResp, err := web.ContentTypes().Add(ct)
+	ctResp, err := web.ContentTypes().Add(context.Background(), ct)
 	if err != nil {
 		t.Error(err)
 	}
 	ctID = ctResp.Data().ID // content type ID can't be set in REST API https://github.com/pnp/pnpjs/issues/457
 
 	t.Run("Get", func(t *testing.T) {
-		resp, err := web.ContentTypes().GetByID(ctID).FieldLinks().Get()
+		resp, err := web.ContentTypes().GetByID(ctID).FieldLinks().Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -42,7 +43,7 @@ func TestFieldLinks(t *testing.T) {
 	})
 
 	t.Run("GetFields", func(t *testing.T) {
-		resp, err := web.ContentTypes().GetByID(ctID).FieldLinks().GetFields()
+		resp, err := web.ContentTypes().GetByID(ctID).FieldLinks().GetFields(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -58,23 +59,23 @@ func TestFieldLinks(t *testing.T) {
 	})
 
 	t.Run("Add", func(t *testing.T) {
-		fl, err := web.ContentTypes().GetByID(ctID).FieldLinks().Add("Language")
+		fl, err := web.ContentTypes().GetByID(ctID).FieldLinks().Add(context.Background(), "Language")
 		if err != nil {
 			t.Error(err)
 		}
 		if fl == "" {
 			t.Error("can't parse field link add response")
 		}
-		fls, _ := web.ContentTypes().GetByID(ctID).FieldLinks().Get()
+		fls, _ := web.ContentTypes().GetByID(ctID).FieldLinks().Get(context.Background())
 		if len(fls.Data()) < 3 {
 			t.Error("failed adding field link")
 		}
-		if err := web.ContentTypes().GetByID(ctID).FieldLinks().GetByID(fl).Delete(); err != nil {
+		if err := web.ContentTypes().GetByID(ctID).FieldLinks().GetByID(fl).Delete(context.Background()); err != nil {
 			t.Error(err)
 		}
 	})
 
-	if err := web.ContentTypes().GetByID(ctID).Delete(); err != nil {
+	if err := web.ContentTypes().GetByID(ctID).Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
 

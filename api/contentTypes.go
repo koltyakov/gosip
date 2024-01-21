@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -49,9 +50,9 @@ func (contentTypes *ContentTypes) ToURL() string {
 }
 
 // Get gets content typed queryable collection response
-func (contentTypes *ContentTypes) Get() (ContentTypesResp, error) {
+func (contentTypes *ContentTypes) Get(ctx context.Context) (ContentTypesResp, error) {
 	client := NewHTTPClient(contentTypes.client)
-	return client.Get(contentTypes.ToURL(), contentTypes.config)
+	return client.Get(ctx, contentTypes.ToURL(), contentTypes.config)
 }
 
 // GetByID gets a content type by its ID (GUID)
@@ -65,15 +66,15 @@ func (contentTypes *ContentTypes) GetByID(contentTypeID string) *ContentType {
 
 // Add adds Content Types with properties provided in `body` parameter
 // where `body` is byte array representation of JSON string payload relevant to SP.ContentType object
-func (contentTypes *ContentTypes) Add(body []byte) (ContentTypeResp, error) {
+func (contentTypes *ContentTypes) Add(ctx context.Context, body []byte) (ContentTypeResp, error) {
 	// REST API doesn't work in that context as supposed to https://github.com/pnp/pnpjs/issues/457
 	body = patchMetadataType(body, "SP.ContentType")
 	client := NewHTTPClient(contentTypes.client)
-	return client.Post(contentTypes.endpoint, bytes.NewBuffer(body), contentTypes.config)
+	return client.Post(ctx, contentTypes.endpoint, bytes.NewBuffer(body), contentTypes.config)
 }
 
 // Create adds Content Type using CSOM polyfill as REST's Add method is limited (https://github.com/pnp/pnpjs/issues/457)
-func (contentTypes *ContentTypes) Create(contentTypeInfo *ContentTypeCreationInfo) (string, error) {
+func (contentTypes *ContentTypes) Create(ctx context.Context, contentTypeInfo *ContentTypeCreationInfo) (string, error) {
 	client := NewHTTPClient(contentTypes.client)
 
 	b := csom.NewBuilder()
@@ -126,7 +127,11 @@ func (contentTypes *ContentTypes) Create(contentTypeInfo *ContentTypeCreationInf
 		return "", nil
 	}
 
-	resp, err := client.ProcessQuery(contentTypes.client.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomPkg)), contentTypes.config)
+	resp, err := client.ProcessQuery(
+		ctx,
+		contentTypes.client.AuthCnfg.GetSiteURL(),
+		bytes.NewBuffer([]byte(csomPkg)),
+		contentTypes.config)
 	if err != nil {
 		return "", nil
 	}

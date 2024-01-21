@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"sync"
@@ -14,11 +15,11 @@ func TestItemsPaged(t *testing.T) {
 
 	web := NewSP(spClient).Web()
 	newListTitle := uuid.New().String()
-	if _, err := web.Lists().Add(newListTitle, nil); err != nil {
+	if _, err := web.Lists().Add(context.Background(), newListTitle, nil); err != nil {
 		t.Error(err)
 	}
 	list := web.Lists().GetByTitle(newListTitle)
-	entType, err := list.GetEntityType()
+	entType, err := list.GetEntityType(context.Background())
 	if err != nil {
 		t.Error(err)
 	}
@@ -32,7 +33,7 @@ func TestItemsPaged(t *testing.T) {
 				metadata["__metadata"] = map[string]string{"type": entType}
 				metadata["Title"] = fmt.Sprintf("Item %d", i)
 				body, _ := json.Marshal(metadata)
-				if _, err := list.Items().Add(body); err != nil {
+				if _, err := list.Items().Add(context.Background(), body); err != nil {
 					t.Error(err)
 				}
 				wg.Done()
@@ -42,7 +43,7 @@ func TestItemsPaged(t *testing.T) {
 	})
 
 	t.Run("HasNextPage", func(t *testing.T) {
-		items, err := list.Items().Select("Id").Top(1).Get()
+		items, err := list.Items().Select("Id").Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -54,7 +55,7 @@ func TestItemsPaged(t *testing.T) {
 			t.Skip("is not supported with SP 2013")
 		}
 
-		items, err = list.Items().Conf(HeadersPresets.Minimalmetadata).Select("Id").Top(1).Get()
+		items, err = list.Items().Conf(HeadersPresets.Minimalmetadata).Select("Id").Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -62,7 +63,7 @@ func TestItemsPaged(t *testing.T) {
 			t.Error("can't get next page URL")
 		}
 
-		items, err = list.Items().Conf(HeadersPresets.Nometadata).Select("Id").Top(1).Get()
+		items, err = list.Items().Conf(HeadersPresets.Nometadata).Select("Id").Top(1).Get(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -72,7 +73,7 @@ func TestItemsPaged(t *testing.T) {
 	})
 
 	t.Run("GetAll", func(t *testing.T) {
-		items, err := list.Items().Select("Id").Top(10).GetAll()
+		items, err := list.Items().Select("Id").Top(10).GetAll(context.Background())
 		if err != nil {
 			t.Error(err)
 		}
@@ -81,7 +82,7 @@ func TestItemsPaged(t *testing.T) {
 		}
 	})
 
-	if err := list.Delete(); err != nil {
+	if err := list.Delete(context.Background()); err != nil {
 		t.Error(err)
 	}
 

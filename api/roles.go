@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -46,10 +47,10 @@ func NewRoles(client *gosip.SPClient, endpoint string, config *RequestConfig) *R
 }
 
 // HasUniqueAssignments checks is a securable object has unique permissions
-func (permissions *Roles) HasUniqueAssignments() (bool, error) {
+func (permissions *Roles) HasUniqueAssignments(ctx context.Context) (bool, error) {
 	client := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf("%s/HasUniqueRoleAssignments", permissions.endpoint)
-	data, err := client.Post(endpoint, nil, permissions.config)
+	data, err := client.Post(ctx, endpoint, nil, permissions.config)
 	if err != nil {
 		return false, err
 	}
@@ -65,17 +66,17 @@ func (permissions *Roles) HasUniqueAssignments() (bool, error) {
 }
 
 // ResetInheritance resets permissions inheritance for this securable object
-func (permissions *Roles) ResetInheritance() error {
+func (permissions *Roles) ResetInheritance(ctx context.Context) error {
 	client := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf("%s/ResetRoleInheritance", permissions.endpoint)
-	_, err := client.Post(endpoint, nil, permissions.config)
+	_, err := client.Post(ctx, endpoint, nil, permissions.config)
 	return err
 }
 
 // BreakInheritance breaks permissions inheritance for this securable object
 // `copyRoleAssignments` - if true the permissions are copied from the current parent scope
 // `clearSubScopes` - true to make all child securable objects inherit role assignments from the current object
-func (permissions *Roles) BreakInheritance(copyRoleAssignments bool, clearSubScopes bool) error {
+func (permissions *Roles) BreakInheritance(ctx context.Context, copyRoleAssignments bool, clearSubScopes bool) error {
 	client := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf(
 		"%s/BreakRoleInheritance(copyroleassignments=%t,clearsubscopes=%t)",
@@ -83,14 +84,14 @@ func (permissions *Roles) BreakInheritance(copyRoleAssignments bool, clearSubSco
 		copyRoleAssignments,
 		clearSubScopes,
 	)
-	_, err := client.Post(endpoint, nil, permissions.config)
+	_, err := client.Post(ctx, endpoint, nil, permissions.config)
 	return err
 }
 
 // AddAssigment adds role assigment for this securable object. Relevant only for the objects after breaking inheritance.
 // `principalID` - Principal ID - numeric ID from User information list - user or group ID
 // `roleDefID` - Role definition ID, use RoleDefinitions API for getting roleDefID
-func (permissions *Roles) AddAssigment(principalID int, roleDefID int) error {
+func (permissions *Roles) AddAssigment(ctx context.Context, principalID int, roleDefID int) error {
 	client := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf(
 		"%s/RoleAssignments/AddRoleAssignment(principalid=%d,roledefid=%d)",
@@ -98,14 +99,14 @@ func (permissions *Roles) AddAssigment(principalID int, roleDefID int) error {
 		principalID,
 		roleDefID,
 	)
-	_, err := client.Post(endpoint, nil, permissions.config)
+	_, err := client.Post(ctx, endpoint, nil, permissions.config)
 	return err
 }
 
 // RemoveAssigment removes specified role assigment for a principal for this securable object.
 // `principalID` - Principal ID - numeric ID from User information list - user or group ID
 // `roleDefID` - Role definition ID, use RoleDefinitions API for getting roleDefID
-func (permissions *Roles) RemoveAssigment(principalID int, roleDefID int) error {
+func (permissions *Roles) RemoveAssigment(ctx context.Context, principalID int, roleDefID int) error {
 	client := NewHTTPClient(permissions.client)
 	endpoint := fmt.Sprintf(
 		"%s/RoleAssignments/RemoveRoleAssignment(principalid=%d,roledefid=%d)",
@@ -113,7 +114,7 @@ func (permissions *Roles) RemoveAssigment(principalID int, roleDefID int) error 
 		principalID,
 		roleDefID,
 	)
-	_, err := client.Post(endpoint, nil, permissions.config)
+	_, err := client.Post(ctx, endpoint, nil, permissions.config)
 	return err
 }
 
