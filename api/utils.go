@@ -104,11 +104,15 @@ func getRelativeURL(absURL string) string {
 // checkGetRelativeURL checks if URL is relative, prepends relative part if missed
 func checkGetRelativeURL(relativeURI string, ctxURL string) string {
 	// Prepend web relative URL to "Lists/ListPath" URIs
-	if string([]rune(relativeURI)[0]) != "/" {
-		absoluteURL := getPriorEndpoint(ctxURL, "/_api")
-		relativeURL := getRelativeURL(absoluteURL)
-		relativeURI = fmt.Sprintf("%s/%s", relativeURL, relativeURI)
+
+	if relativeURI != "" {
+		if string([]rune(relativeURI)[0]) != "/" {
+			absoluteURL := getPriorEndpoint(ctxURL, "/_api")
+			relativeURL := getRelativeURL(absoluteURL)
+			relativeURI = fmt.Sprintf("%s/%s", relativeURL, relativeURI)
+		}
 	}
+
 	return relativeURI
 }
 
