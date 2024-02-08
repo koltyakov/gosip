@@ -123,6 +123,21 @@ func TestWeb(t *testing.T) {
 		}
 	})
 
+	t.Run("EnsureFolderByPathRoot", func(t *testing.T) {
+		if envCode == "2013" {
+			t.Skip("is not supported with SP 2013")
+		}
+
+		res, err := web.EnsureFolderByPath("Shared Documents")
+		if err != nil {
+			t.Error(err)
+		}
+
+		if res.Data().Name != "Shared Documents" {
+			t.Error("can't get folder by path")
+		}
+	})
+
 	t.Run("EnsureUser", func(t *testing.T) {
 		user, err := sp.Web().CurrentUser().Get()
 		if err != nil {

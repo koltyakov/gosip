@@ -310,12 +310,12 @@ func (web *Web) GetFolderByID(uniqueID string) *Folder {
 }
 
 // EnsureFolder is a helper to ensure a folder by its relevant URI, when there was no folder it's created
-func (web *Web) EnsureFolder(serverRelativeURL string) ([]byte, error) {
+func (web *Web) EnsureFolder(serverRelativeURL string) (FolderResp, error) {
 	return ensureFolder(web, serverRelativeURL, serverRelativeURL, "legacy")
 }
 
 // EnsureFolderByPath is a helper to ensure a folder by its relevant URI, when there was no folder it's created
-func (web *Web) EnsureFolderByPath(serverRelativeURL string) ([]byte, error) {
+func (web *Web) EnsureFolderByPath(serverRelativeURL string) (FolderResp, error) {
 	return ensureFolder(web, serverRelativeURL, serverRelativeURL, "modern")
 }
 
