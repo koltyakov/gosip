@@ -293,6 +293,16 @@ func TestUtils(t *testing.T) {
 		}
 	})
 
+	t.Run("checkGetRelativeURLEmpty", func(t *testing.T) {
+		ctxURL := "https://contoso.sharepoint.com/sites/site/my-site"
+		relativeURI := ""
+		resultURL := "/sites/site/my-site"
+		res := checkGetRelativeURL(relativeURI, ctxURL)
+		if resultURL != res {
+			t.Errorf(`wrong URL transformation, expected "%s", received "%s"`, resultURL, res)
+		}
+	})
+
 	t.Run("extractEntityURI", func(t *testing.T) {
 		ep1 := []byte(`{
 			"__metadata": {
