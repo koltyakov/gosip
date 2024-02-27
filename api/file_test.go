@@ -104,7 +104,7 @@ func TestFile(t *testing.T) {
 	})
 
 	t.Run("SetContent", func(t *testing.T) {
-		fileName := "File_2.txt"
+		fileName := "File_3.txt"
 		file := web.GetFolder(newFolderURI).Files().GetByName(fileName)
 		newContent := []byte("new content")
 
