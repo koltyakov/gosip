@@ -29,15 +29,14 @@ func TestFile(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Run("AddSeries", func(t *testing.T) {
-		for i := 1; i <= 5; i++ {
-			fileName := fmt.Sprintf("File_%d.txt", i)
-			fileData := []byte(fmt.Sprintf("File %d data", i))
-			if _, err := web.GetFolder(newFolderURI).Files().Add(fileName, fileData, true); err != nil {
-				t.Error(err)
-			}
+	// Add preset files
+	for i := 1; i <= 5; i++ {
+		fileName := fmt.Sprintf("File_%d.txt", i)
+		fileData := []byte(fmt.Sprintf("File %d data", i))
+		if _, err := web.GetFolder(newFolderURI).Files().Add(fileName, fileData, true); err != nil {
+			t.Error(err)
 		}
-	})
+	}
 
 	t.Run("CheckOut", func(t *testing.T) {
 		if _, err := web.GetFolder(newFolderURI).Files().GetByName("File_1.txt").CheckOut(); err != nil {
@@ -101,6 +100,25 @@ func TestFile(t *testing.T) {
 	t.Run("Recycle", func(t *testing.T) {
 		if err := web.GetFile(newFolderURI + "/File_2.txt").Recycle(); err != nil {
 			t.Error(err)
+		}
+	})
+
+	t.Run("SetContent", func(t *testing.T) {
+		fileName := "File_2.txt"
+		file := web.GetFolder(newFolderURI).Files().GetByName(fileName)
+		newContent := []byte("new content")
+
+		if err := file.SetContent(newContent); err != nil {
+			t.Error(err)
+		}
+
+		fileContent, err := file.Download()
+		if err != nil {
+			t.Error(err)
+		}
+
+		if !bytes.Equal(newContent, fileContent) {
+			t.Error("incorrect file body")
 		}
 	})
 

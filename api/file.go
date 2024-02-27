@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -98,6 +99,22 @@ func (file *File) Recycle() error {
 	client := NewHTTPClient(file.client)
 	endpoint := fmt.Sprintf("%s/Recycle", file.endpoint)
 	_, err := client.Post(endpoint, nil, file.config)
+	return err
+}
+
+// SetContent updates file content
+func (file *File) SetContent(content []byte) error {
+	config := &RequestConfig{}
+	if file.config != nil {
+		config.Context = file.config.Context
+		config.Headers = file.config.Headers
+	}
+	if config.Headers == nil {
+		config.Headers = make(map[string]string)
+	}
+	config.Headers["X-HTTP-Method"] = "PUT"
+	client := NewHTTPClient(file.client)
+	_, err := client.Post(fmt.Sprintf("%s/$value", file.endpoint), bytes.NewBuffer(content), config)
 	return err
 }
 
