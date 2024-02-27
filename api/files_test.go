@@ -19,15 +19,14 @@ func TestFiles(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Run("AddSeries", func(t *testing.T) {
-		for i := 1; i <= 5; i++ {
-			fileName := fmt.Sprintf("File_%d.txt", i)
-			fileData := []byte(fmt.Sprintf("File %d data", i))
-			if _, err := web.GetFolder(newFolderURI).Files().Add(fileName, fileData, true); err != nil {
-				t.Error(err)
-			}
+	// Add preset files
+	for i := 1; i <= 5; i++ {
+		fileName := fmt.Sprintf("File_%d.txt", i)
+		fileData := []byte(fmt.Sprintf("File %d data", i))
+		if _, err := web.GetFolder(newFolderURI).Files().Add(fileName, fileData, true); err != nil {
+			t.Error(err)
 		}
-	})
+	}
 
 	t.Run("Get", func(t *testing.T) {
 		data, err := web.GetFolder(newFolderURI).Files().Get()
@@ -90,6 +89,7 @@ func TestFiles(t *testing.T) {
 		}
 	})
 
+	// Clean up
 	if err := web.GetFolder(newFolderURI).Delete(); err != nil {
 		t.Error(err)
 	}
