@@ -170,4 +170,17 @@ func TestWeb(t *testing.T) {
 		}
 	})
 
+	t.Run("CreateDocumentLibrary", func(t *testing.T) {
+		guid := uuid.New().String()
+		newLib, err := sp.Web().Lists().Add("My Lib "+guid, map[string]interface{}{
+			"BaseTemplate": 101,
+		})
+		if err != nil {
+			t.Error(err)
+		}
+		if err := sp.Web().Lists().GetByID(newLib.Data().ID).Delete(); err != nil {
+			t.Error(err)
+		}
+	})
+
 }
