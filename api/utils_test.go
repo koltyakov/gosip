@@ -347,4 +347,23 @@ func TestUtils(t *testing.T) {
 		}
 	})
 
+	t.Run("escapePathURI", func(t *testing.T) {
+		// Array of test cases input and output
+		testCases := []struct {
+			input  string
+			output string
+		}{
+			{"path/to/file", "path/to/file"},
+			{"path/to/file with spaces", "path/to/file with spaces"},
+			{"path/to/file with %", "path/to/file with %25"},
+			{"path/to/file with '", "path/to/file with ''"},
+		}
+
+		for _, tc := range testCases {
+			if res := EscapePathURI(tc.input); res != tc.output {
+				t.Errorf("incorrect URI escaping, expected \"%s\", got \"%s\"", tc.output, res)
+			}
+		}
+	})
+
 }

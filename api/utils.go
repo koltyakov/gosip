@@ -70,6 +70,13 @@ func ExtractEntityURI(payload []byte) string {
 	return entityURI
 }
 
+// EscapePathURI escapes URI path for GetFile and GetFolder methods
+func EscapePathURI(s string) string {
+	s = strings.Replace(s, "'", "''", -1)
+	s = strings.Replace(s, "%", "%25", -1)
+	return s
+}
+
 // getConfHeaders resolves headers from config overrides
 func getConfHeaders(config *RequestConfig) map[string]string {
 	headers := map[string]string{}

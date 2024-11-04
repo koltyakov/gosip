@@ -277,7 +277,7 @@ func (web *Web) GetFolder(serverRelativeURL string) *Folder {
 		fmt.Sprintf(
 			"%s/GetFolderByServerRelativeUrl('%s')",
 			web.endpoint,
-			checkGetRelativeURL(serverRelativeURL, web.endpoint),
+			EscapePathURI(checkGetRelativeURL(serverRelativeURL, web.endpoint)),
 		),
 		web.config,
 	)
@@ -293,7 +293,7 @@ func (web *Web) GetFolderByPath(serverRelativeURL string) *Folder {
 		fmt.Sprintf(
 			"%s/GetFolderByServerRelativePath(decodedUrl='%s')",
 			web.endpoint,
-			checkGetRelativeURL(serverRelativeURL, web.endpoint),
+			EscapePathURI(checkGetRelativeURL(serverRelativeURL, web.endpoint)),
 		),
 		web.config,
 	)
@@ -329,7 +329,7 @@ func (web *Web) GetFile(serverRelativeURL string) *File {
 		fmt.Sprintf(
 			"%s/GetFileByServerRelativeUrl('%s')",
 			web.endpoint,
-			checkGetRelativeURL(serverRelativeURL, web.endpoint),
+			EscapePathURI(checkGetRelativeURL(serverRelativeURL, web.endpoint)),
 		),
 		web.config,
 	)
@@ -346,7 +346,7 @@ func (web *Web) GetFileByPath(serverRelativeURL string) *File {
 		fmt.Sprintf(
 			"%s/GetFileByServerRelativePath(decodedUrl='%s')",
 			web.endpoint,
-			checkGetRelativeURL(serverRelativeURL, web.endpoint),
+			EscapePathURI(checkGetRelativeURL(serverRelativeURL, web.endpoint)),
 		),
 		web.config,
 	)
