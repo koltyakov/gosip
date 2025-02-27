@@ -74,6 +74,7 @@ func ExtractEntityURI(payload []byte) string {
 func EscapePathURI(s string) string {
 	s = strings.Replace(s, "'", "''", -1)
 	s = strings.Replace(s, "%", "%25", -1)
+	s = strings.Replace(s, "#", "%23", -1)
 	return s
 }
 
