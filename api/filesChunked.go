@@ -65,7 +65,7 @@ func (files *Files) AddChunked(name string, stream io.Reader, options *AddChunke
 
 	slot := make([]byte, options.ChunkSize)
 	for {
-		size, err := stream.Read(slot)
+		size, err := io.ReadFull(stream, slot)
 		if err == io.EOF {
 			break
 		}
