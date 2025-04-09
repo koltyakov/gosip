@@ -19,7 +19,7 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.2 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.1 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.1 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	golang.org/x/crypto v0.33.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
