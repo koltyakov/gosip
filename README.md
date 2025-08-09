@@ -215,8 +215,8 @@ func main() {
 	}
 
 	// sp.Post(endpoint, body, nil) // generic POST
-	// sp.Delete(endpoint, nil) // generic DELETE helper crafts "X-Http-Method"="DELETE" header
-	// sp.Update(endpoint, nil) // generic UPDATE helper crafts "X-Http-Method"="MERGE" header
+	// sp.Delete(endpoint, nil) // generic DELETE helper crafts "X-HTTP-Method"="DELETE" header
+	// sp.Update(endpoint, nil) // generic UPDATE helper crafts "X-HTTP-Method"="MERGE" header
 	// sp.ProcessQuery(endpoint, body) // CSOM helper (client.svc/ProcessQuery)
 
 	fmt.Printf("response: %s\n", data)

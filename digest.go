@@ -17,9 +17,9 @@ var storage = cache.New(5*time.Minute, 10*time.Minute)
 type contextInfoResponse struct {
 	D struct {
 		GetContextWebInformation struct {
-			FormDigestTimeoutSeconds time.Duration `json:"FormDigestTimeoutSeconds"`
-			FormDigestValue          string        `json:"FormDigestValue"`
-			LibraryVersion           string        `json:"LibraryVersion"`
+			FormDigestTimeoutSeconds int    `json:"FormDigestTimeoutSeconds"`
+			FormDigestValue          string `json:"FormDigestValue"`
+			LibraryVersion           string `json:"LibraryVersion"`
 		} `json:"GetContextWebInformation"`
 	} `json:"d"`
 }
@@ -67,7 +67,7 @@ func GetDigest(context context.Context, client *SPClient) (string, error) {
 		return "", errors.New("received empty FormDigestValue")
 	}
 
-	expiry := (results.D.GetContextWebInformation.FormDigestTimeoutSeconds - 60) * time.Second
+	expiry := time.Duration(results.D.GetContextWebInformation.FormDigestTimeoutSeconds-60) * time.Second
 
 	storage.Set(
 		cacheKey,
