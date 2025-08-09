@@ -17,6 +17,7 @@ type HookHandlers struct {
 type HookEvent struct {
 	Request    *http.Request
 	StartedAt  time.Time
+	Duration   time.Duration
 	StatusCode int
 	Error      error
 }
@@ -31,6 +32,7 @@ func (c *SPClient) onError(req *http.Request, startAt time.Time, statusCode int,
 		c.Hooks.OnError(&HookEvent{
 			Request:    req,
 			StartedAt:  startAt,
+			Duration:   time.Since(startAt),
 			StatusCode: statusCode,
 			Error:      err,
 		})
@@ -47,6 +49,7 @@ func (c *SPClient) onRetry(req *http.Request, startAt time.Time, statusCode int,
 		c.Hooks.OnRetry(&HookEvent{
 			Request:    req,
 			StartedAt:  startAt,
+			Duration:   time.Since(startAt),
 			StatusCode: statusCode,
 			Error:      err,
 		})
@@ -63,6 +66,7 @@ func (c *SPClient) onResponse(req *http.Request, startAt time.Time, statusCode i
 		c.Hooks.OnResponse(&HookEvent{
 			Request:    req,
 			StartedAt:  startAt,
+			Duration:   time.Since(startAt),
 			StatusCode: statusCode,
 			Error:      err,
 		})
@@ -79,6 +83,7 @@ func (c *SPClient) onRequest(req *http.Request, startAt time.Time, statusCode in
 		c.Hooks.OnRequest(&HookEvent{
 			Request:    req,
 			StartedAt:  startAt,
+			Duration:   time.Since(startAt),
 			StatusCode: statusCode,
 			Error:      err,
 		})
