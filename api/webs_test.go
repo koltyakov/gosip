@@ -19,7 +19,7 @@ func TestWebs(t *testing.T) {
 	t.Run("Constructor", func(t *testing.T) {
 		w := NewWebs(spClient, endpoint, nil)
 		if _, err := w.Select("Id").Get(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 
@@ -38,11 +38,11 @@ func TestWebs(t *testing.T) {
 			t.Skip("setup SPAPI_HEAVY_TESTS env var to \"true\" to run this test")
 		}
 		if _, err := webs.Add("CI: "+newWebGUID, "ci_"+newWebGUID, nil); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		data, err := webs.Select("Id,Title").Get()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if len(data.Data()) == 0 {
 			t.Error("wrong webs number")
@@ -52,7 +52,7 @@ func TestWebs(t *testing.T) {
 	t.Run("GetWebs", func(t *testing.T) {
 		data, err := webs.Select("Id,Title").Get()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 
 		if bytes.Compare(data, data.Normalized()) == -1 {
@@ -67,7 +67,7 @@ func TestWebs(t *testing.T) {
 		createdWebURL := spClient.AuthCnfg.GetSiteURL() + "/ci_" + newWebGUID
 		subWeb := NewWeb(spClient, createdWebURL, nil)
 		if err := subWeb.Delete(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 
@@ -75,10 +75,10 @@ func TestWebs(t *testing.T) {
 		title := strings.Replace(uuid.New().String(), "-", "", -1)
 		schemaXML := `<Field Type="Text" DisplayName="` + title + `" MaxLength="255" Name="` + title + `" Title="` + title + `"></Field>`
 		if _, err := sp.Web().Fields().CreateFieldAsXML(schemaXML, 0); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if err := sp.Web().Fields().GetByInternalNameOrTitle(title).Delete(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 

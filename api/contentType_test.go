@@ -19,17 +19,17 @@ func TestContentType(t *testing.T) {
 	t.Run("Modifiers", func(t *testing.T) {
 		ct, err := getRandomCT()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if _, err := ct.Select("*,Fields/*").Expand("Fields").Get(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 
 	t.Run("Get", func(t *testing.T) {
 		resp, err := web.ContentTypes().Top(5).Get()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		cts := resp.Data()
 		if len(cts) != 5 {
@@ -40,7 +40,7 @@ func TestContentType(t *testing.T) {
 		}
 		data, err := web.ContentTypes().GetByID(cts[0].Data().ID).Get()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if bytes.Compare(data, data.Normalized()) == -1 {
 			t.Error("response normalization error")
@@ -57,14 +57,14 @@ func TestContentType(t *testing.T) {
 		}`))
 		ctResp, err := web.ContentTypes().Add(ct)
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		ctID = ctResp.Data().ID // content type ID can't be set in REST API https://github.com/pnp/pnpjs/issues/457
 		if _, err := web.ContentTypes().GetByID(ctID).Update([]byte(`{"Description":"Test"}`)); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if err := web.ContentTypes().GetByID(ctID).Delete(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 

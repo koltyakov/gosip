@@ -16,13 +16,13 @@ func TestContentTypes(t *testing.T) {
 	listURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 	contentType, err := getAnyContentType()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	t.Run("GetFromWeb", func(t *testing.T) {
 		data, err := web.ContentTypes().Select("StringId").Top(1).Get()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if bytes.Compare(data, data.Normalized()) == -1 {
 			t.Error("response normalization error")
@@ -31,13 +31,13 @@ func TestContentTypes(t *testing.T) {
 
 	t.Run("GetFromList", func(t *testing.T) {
 		if _, err := web.GetList(listURI).ContentTypes().Top(1).Get(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 
 	t.Run("GetByID", func(t *testing.T) {
 		if _, err := web.ContentTypes().GetByID(contentType.ID).Get(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 
@@ -49,13 +49,13 @@ func TestContentTypes(t *testing.T) {
 			ParentContentTypeID: "0x01",
 		})
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if newCTID == "" {
 			t.Error("can't parse CT creation response")
 		}
 		if err := web.ContentTypes().GetByID(newCTID).Delete(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 
@@ -67,13 +67,13 @@ func TestContentTypes(t *testing.T) {
 			Group: "Test",
 		})
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if newCTID == "" {
 			t.Error("can't parse CT creation response")
 		}
 		if err := web.ContentTypes().GetByID(newCTID).Delete(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 

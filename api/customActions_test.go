@@ -45,18 +45,22 @@ func TestCustomActions(t *testing.T) {
 		action, err := sp.Web().CustomActions().Add(payload)
 		if err != nil {
 			t.Error(err)
+			return
 		}
 		// Get
 		action1, err := sp.Web().CustomActions().GetByID(action.ID).Get()
 		if err != nil {
 			t.Error(err)
+			return
 		}
 		if action.ID != action1.ID {
 			t.Error("can't get action by ID")
+			return
 		}
 		// Delete
 		if err := sp.Web().CustomActions().GetByID(action.ID).Delete(); err != nil {
 			t.Error(err)
+			return
 		}
 	})
 

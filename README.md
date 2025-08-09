@@ -2,7 +2,8 @@
 
 > Authentication, HTTP client & fluent API wrapper
 
-![Build Status](https://koltyakov.visualstudio.com/SPNode/_apis/build/status/gosip?branchName=master)
+<!-- ![Build Status](https://koltyakov.visualstudio.com/SPNode/_apis/build/status/gosip?branchName=master) -->
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/koltyakov/gosip)](https://goreportcard.com/report/github.com/koltyakov/gosip)
 [![GoDoc](https://godoc.org/github.com/koltyakov/gosip?status.svg)](https://godoc.org/github.com/koltyakov/gosip)
 [![License](https://img.shields.io/github/license/koltyakov/gosip.svg)](https://github.com/koltyakov/gosip/blob/master/LICENSE)
@@ -37,14 +38,14 @@
   - SAML based with user credentials
   - Add-In only permissions
   - ADFS user credentials (automatically detects in SAML strategy)
-  - On-Demand auth [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/ondemand)
+  - On-Demand auth
 
 - SharePoint On-Premises 2019/2016/2013:
   - User credentials (NTLM)
   - ADFS user credentials (ADFS, WAP -> Basic/NTLM, WAP -> ADFS)
   - Behind a reverse proxy (Forefront TMG, WAP -> Basic/NTLM, WAP -> ADFS)
   - Form-based authentication (FBA)
-  - On-Demand auth [🔗](https://github.com/koltyakov/gosip-sandbox/tree/master/strategies/ondemand)
+  - On-Demand auth
 
 ## Installation
 
@@ -251,22 +252,22 @@ Import path `strategy "github.com/koltyakov/gosip/auth/{strategy}"`. Where `/{st
 Azure AD based strategies (recommended production use with SharePoint Online):
 
 | `/{strategy}` | Description                                       | Credentials sample(s)                                                   |
-| ------------- | ------------------------------------------------- | ------------------------ |
+| ------------- | ------------------------------------------------- | ----------------------------------------------------------------------- |
 | `/azurecert`  | Azure AD Certificate authentication               | [details](https://go.spflow.com/auth/strategies/azure-certificate-auth) |
-| `/azurecreds` | Azure AD authorization with username and password | [details](https://go.spflow.com/auth/strategies/azure-creds-auth) |
+| `/azurecreds` | Azure AD authorization with username and password | [details](https://go.spflow.com/auth/strategies/azure-creds-auth)       |
 | `/azureenv`   | Azure AD environment-based authentication         | [details](https://go.spflow.com/auth/strategies/azure-environment-auth) |
-| `/device`     | Azure AD Device Token authentication              | [details](https://go.spflow.com/auth/strategies/azure-device-flow) |
+| `/device`     | Azure AD Device Token authentication              | [details](https://go.spflow.com/auth/strategies/azure-device-flow)      |
 
 Other strategies:
 
-| `/{strategy}` | SPO | On-Prem | Credentials sample(s)                                                                                                                                          |
-| ------------- | --- | ------- | ------------------ |
-| `/saml`       | ✅  | ❌      | [details](https://go.spflow.com/auth/strategies/saml) |
-| `/addin`      | ✅  | ❌      | [details](https://go.spflow.com/auth/strategies/addin) |
-| `/ntlm`       | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/ntlm) |
-| `/adfs`       | ✅  | ✅      | [details](https://go.spflow.com/auth/strategies/adfs) |
-| `/fba`        | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/fba) |
-| `/tmg`        | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/tmg) |
+| `/{strategy}` | SPO | On-Prem | Credentials sample(s)                                       |
+| ------------- | --- | ------- | ----------------------------------------------------------- |
+| `/saml`       | ✅  | ❌      | [details](https://go.spflow.com/auth/strategies/saml)       |
+| `/addin`      | ✅  | ❌      | [details](https://go.spflow.com/auth/strategies/addin)      |
+| `/ntlm`       | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/ntlm)       |
+| `/adfs`       | ✅  | ✅      | [details](https://go.spflow.com/auth/strategies/adfs)       |
+| `/fba`        | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/fba)        |
+| `/tmg`        | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/tmg)        |
 | `/ondemand`   | ✅  | ✅      | [details](https://go.spflow.com/auth/custom-auth/on-demand) |
 
 Environment should configured for a specific auth strategy. E.g. you won't succeed with `adfs` in SPO if it has not setup properly.

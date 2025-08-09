@@ -17,7 +17,7 @@ func TestView(t *testing.T) {
 	t.Run("Get", func(t *testing.T) {
 		data, err := web.GetList(listURI).Views().DefaultView().Get()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if data.Data().ID == "" {
 			t.Error("can't unmarshal data")
@@ -36,14 +36,14 @@ func TestView(t *testing.T) {
 		data, _ := json.Marshal(meta)
 		vr, err := web.GetList(listURI).Views().Add(data)
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if _, err := web.GetList(listURI).Views().GetByID(vr.Data().ID).
 			SetViewXML(vr.Data().ListViewXML); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if err := web.GetList(listURI).Views().GetByID(vr.Data().ID).Delete(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 
@@ -56,14 +56,14 @@ func TestView(t *testing.T) {
 		data, _ := json.Marshal(meta)
 		vr, err := web.GetList(listURI).Views().Add(data)
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if _, err := web.GetList(listURI).Views().GetByID(vr.Data().ID).
 			Update([]byte(`{"PersonalView":false}`)); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if err := web.GetList(listURI).Views().GetByID(vr.Data().ID).Delete(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 

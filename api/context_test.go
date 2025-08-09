@@ -12,7 +12,7 @@ func TestContextInfo(t *testing.T) {
 	t.Run("ContextInfo/SP", func(t *testing.T) {
 		contextInfo, err := sp.ContextInfo()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if contextInfo.WebFullURL != sp.ToURL() {
 			t.Error("incorrect web url")
@@ -22,7 +22,7 @@ func TestContextInfo(t *testing.T) {
 	t.Run("ContextInfo/Web", func(t *testing.T) {
 		contextInfo, err := sp.Web().ContextInfo()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if contextInfo.WebFullURL != sp.ToURL() {
 			t.Error("incorrect web url")
@@ -32,7 +32,7 @@ func TestContextInfo(t *testing.T) {
 	t.Run("ContextInfo/List", func(t *testing.T) {
 		contextInfo, err := sp.Web().GetList("Shared Documents").ContextInfo()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if contextInfo.WebFullURL != sp.ToURL() {
 			t.Error("incorrect web url")

@@ -20,6 +20,7 @@ func TestCsomRequest(t *testing.T) {
 	csomXML, err := b.Compile()
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	if _, err := client.ProcessQuery(spClient.AuthCnfg.GetSiteURL(), bytes.NewBuffer([]byte(csomXML)), nil); err != nil {

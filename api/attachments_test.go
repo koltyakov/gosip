@@ -14,12 +14,12 @@ func TestAttachments(t *testing.T) {
 	listTitle := uuid.New().String()
 
 	if _, err := web.Lists().Add(listTitle, nil); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	list := web.Lists().GetByTitle(listTitle)
 	item, err := list.Items().Add([]byte(`{"Title":"Attachment test"}`))
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	t.Run("Add", func(t *testing.T) {
@@ -39,7 +39,7 @@ func TestAttachments(t *testing.T) {
 	t.Run("Get", func(t *testing.T) {
 		data, err := list.Items().GetByID(item.Data().ID).Attachments().Get()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if len(data.Data()) != 4 {
 			t.Error("wrong number of attachments")
@@ -52,7 +52,7 @@ func TestAttachments(t *testing.T) {
 	t.Run("GetByName", func(t *testing.T) {
 		data, err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_01.txt").Get()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if data.Data().FileName != "att_01.txt" {
 			t.Error("wrong attachment name")
@@ -64,7 +64,7 @@ func TestAttachments(t *testing.T) {
 
 	t.Run("Delete", func(t *testing.T) {
 		if err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_02.txt").Delete(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 
@@ -74,7 +74,7 @@ func TestAttachments(t *testing.T) {
 		}
 
 		if err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_03.txt").Recycle(); err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 	})
 
@@ -82,7 +82,7 @@ func TestAttachments(t *testing.T) {
 		expectedContent := []byte("attachment 04")
 		content, err := list.Items().GetByID(item.Data().ID).Attachments().GetByName("att_04.txt").Download()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if !bytes.Equal(content, expectedContent) {
 			t.Error("wrong attachment content")
@@ -90,7 +90,7 @@ func TestAttachments(t *testing.T) {
 	})
 
 	if err := list.Delete(); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 }

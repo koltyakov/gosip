@@ -14,6 +14,7 @@ func TestEncryptAndDecrypt(t *testing.T) {
 	encrypted, err := encrypt(rawSecret, masterKey)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	if rawSecret == encrypted {
@@ -27,6 +28,7 @@ func TestEncryptAndDecrypt(t *testing.T) {
 	decrypted, err := decrypt(encrypted, masterKey)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	if decrypted == encrypted {
@@ -44,11 +46,13 @@ func TestMultiEncryption(t *testing.T) {
 	encrypted1, err := encrypt(rawSecret, masterKey)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	encrypted2, err := encrypt(rawSecret, masterKey)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	if encrypted1 == encrypted2 {

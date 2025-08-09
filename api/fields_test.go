@@ -16,13 +16,13 @@ func TestFields(t *testing.T) {
 	listURI := getRelativeURL(spClient.AuthCnfg.GetSiteURL()) + "/Shared%20Documents"
 	field, err := getAnyField()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	t.Run("GetFromWeb", func(t *testing.T) {
 		data, err := web.Fields().Top(1).Get()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		if bytes.Compare(data, data.Normalized()) == -1 {
 			t.Error("response normalization error")
