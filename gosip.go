@@ -73,97 +73,99 @@ type SPClient struct {
 // Execute : SharePoint HTTP client
 // is a wrapper for standard http.Client' `Do` method, injects authorization tokens, etc.
 func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
-	reqTime := time.Now()
+	for {
+		reqTime := time.Now()
 
-	// Apply authentication flow
-	if res, err := c.applyAuth(req); err != nil {
-		c.onError(req, reqTime, 0, err)
-		return res, err
-	}
-
-	// Setup request default headers
-	if err := c.applyHeaders(req); err != nil {
-		// An error might occur only when calling for the digest
-		res := &http.Response{
-			Status:     "400 Bad Request",
-			StatusCode: 400,
-			Request:    req,
+		// Apply authentication flow
+		if res, err := c.applyAuth(req); err != nil {
+			c.onError(req, reqTime, 0, err)
+			return res, err
 		}
-		c.onError(req, reqTime, 0, err)
-		return res, err
-	}
 
-	c.onRequest(req, reqTime, 0, nil)
-	reqTime = time.Now() // update request time to exclude auth-related timings
-
-	// Creating backup reader to be able to retry none nil body requests
-	var bodyBackup io.Reader
-	if req.Body != nil {
-		var buf bytes.Buffer
-		tee := io.TeeReader(req.Body, &buf)
-		bodyBackup = &buf
-		req.Body = io.NopCloser(tee)
-	}
-
-	// Sending actual request to SharePoint API/resource
-	resp, err := c.Do(req)
-	if err != nil {
-		// Retry only for NTLM
-		if c.AuthCnfg.GetStrategy() == "ntlm" && c.shouldRetry(req, resp, 5) {
-			statusCode := 400
-			if resp != nil {
-				statusCode = resp.StatusCode
+		// Setup request default headers
+		if err := c.applyHeaders(req); err != nil {
+			// An error might occur only when calling for the digest
+			res := &http.Response{
+				Status:     "400 Bad Request",
+				StatusCode: 400,
+				Request:    req,
 			}
-			c.onRetry(req, reqTime, statusCode, nil)
-			// Reset body reader closer
-			if bodyBackup != nil {
-				req.Body = io.NopCloser(bodyBackup)
+			c.onError(req, reqTime, 0, err)
+			return res, err
+		}
+
+		c.onRequest(req, reqTime, 0, nil)
+		reqTime = time.Now() // update request time to exclude auth-related timings
+
+		// Prepare body replay for potential retries (best-effort, matches previous behavior)
+		var bodyBuf bytes.Buffer
+		usedTee := false
+		if req.Body != nil {
+			tee := io.TeeReader(req.Body, &bodyBuf)
+			req.Body = io.NopCloser(tee)
+			usedTee = true
+		}
+
+		// Sending actual request to SharePoint API/resource
+		resp, err := c.Do(req)
+		if err != nil {
+			// Retry only for NTLM
+			if c.AuthCnfg.GetStrategy() == "ntlm" && c.shouldRetry(req, resp, 5) {
+				statusCode := 400
+				if resp != nil {
+					statusCode = resp.StatusCode
+				}
+				c.onRetry(req, reqTime, statusCode, nil)
+				// Reset body reader closer for next attempt
+				if usedTee {
+					req.Body = io.NopCloser(bytes.NewReader(bodyBuf.Bytes()))
+				}
+				continue
 			}
-			return c.Execute(req)
+			c.onError(req, reqTime, 0, err)
+			return resp, err
 		}
-		c.onError(req, reqTime, 0, err)
-		return resp, err
-	}
 
-	// Wait and retry after a delay for error state responses, due to retry policies
-	if retries := c.getRetryPolicy(resp.StatusCode); retries > 0 {
-		// Register retry in OnError hook
-		// otherwise it only called in OnRetry after timeout right before the next call
-		if resp.StatusCode == 429 {
-			noRetry := req.Header.Get("X-Gosip-NoRetry")
-			retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
-			if retry < retries && noRetry != "true" {
-				c.onError(req, reqTime, resp.StatusCode, nil)
+		// Wait and retry after a delay for error state responses, due to retry policies
+		if retries := c.getRetryPolicy(resp.StatusCode); retries > 0 {
+			// Register retry in OnError hook for throttling
+			if resp.StatusCode == 429 {
+				noRetry := req.Header.Get("X-Gosip-NoRetry")
+				retry, _ := strconv.Atoi(req.Header.Get("X-Gosip-Retry"))
+				if retry < retries && noRetry != "true" {
+					c.onError(req, reqTime, resp.StatusCode, nil)
+				}
+			}
+
+			// When it should, shouldRetry not only checks but waits before a retry
+			if c.shouldRetry(req, resp, retries) {
+				c.onRetry(req, reqTime, resp.StatusCode, nil)
+				// Reset body for next attempt
+				if usedTee {
+					req.Body = io.NopCloser(bytes.NewReader(bodyBuf.Bytes()))
+				}
+				continue
 			}
 		}
 
-		// When it should, shouldRetry not only checks but waits before a retry
-		if c.shouldRetry(req, resp, retries) {
-			c.onRetry(req, reqTime, resp.StatusCode, nil)
-			// Reset body reader closer
-			if bodyBackup != nil {
-				req.Body = io.NopCloser(bodyBackup)
+		// Return meaningful error message
+		var outErr error
+		if !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
+			var buf bytes.Buffer
+			tee := io.TeeReader(resp.Body, &buf)
+			details, _ := io.ReadAll(tee)
+			outErr = fmt.Errorf("%s :: %s", resp.Status, details)
+			// Unescape unicode-escaped error messages for non Latin languages
+			if unescaped, e := strconv.Unquote("\"" + strings.Replace(string(details), "\"", "\\\"", -1) + "\""); e == nil {
+				outErr = fmt.Errorf("%s :: %s", resp.Status, unescaped)
 			}
-			return c.Execute(req)
+			resp.Body = io.NopCloser(&buf)
+			c.onError(req, reqTime, resp.StatusCode, outErr)
 		}
-	}
 
-	// Return meaningful error message
-	if !(resp.StatusCode >= 200 && resp.StatusCode < 300) {
-		var buf bytes.Buffer
-		tee := io.TeeReader(resp.Body, &buf)
-		details, _ := io.ReadAll(tee)
-		err = fmt.Errorf("%s :: %s", resp.Status, details)
-		// Unescape unicode-escaped error messages for non Latin languages
-		if unescaped, e := strconv.Unquote(`"` + strings.Replace(string(details), `"`, `\"`, -1) + `"`); e == nil {
-			err = fmt.Errorf("%s :: %s", resp.Status, unescaped)
-		}
-		resp.Body = io.NopCloser(&buf)
-		c.onError(req, reqTime, resp.StatusCode, err)
+		c.onResponse(req, reqTime, resp.StatusCode, outErr)
+		return resp, outErr
 	}
-
-	c.onResponse(req, reqTime, resp.StatusCode, err)
-	return resp, err
 }
 
 // applyAuth applies authentication flow
