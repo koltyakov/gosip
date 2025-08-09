@@ -73,6 +73,30 @@ type SPClient struct {
 // Execute : SharePoint HTTP client
 // is a wrapper for standard http.Client' `Do` method, injects authorization tokens, etc.
 func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
+	// Prepare a safe body replay strategy before attempts begin
+	const maxReplayBytes int64 = 10 << 20 // 10MB cap for in-memory buffering
+	var bodyRebuilder func() (io.ReadCloser, error)
+	// Prefer existing GetBody if provided by caller/new request constructors
+	if req.GetBody != nil {
+		bodyRebuilder = req.GetBody
+	} else if req.Body != nil {
+		// Pre-buffer small bodies when content length is known and under cap
+		if req.ContentLength >= 0 && req.ContentLength <= maxReplayBytes {
+			buf, err := io.ReadAll(req.Body)
+			if err != nil {
+				return nil, err
+			}
+			// Seed the request body for the first attempt
+			req.Body = io.NopCloser(bytes.NewReader(buf))
+			// Provide a GetBody for future attempts
+			req.GetBody = func() (io.ReadCloser, error) {
+				return io.NopCloser(bytes.NewReader(buf)), nil
+			}
+			bodyRebuilder = req.GetBody
+		}
+		// else: unknown/large bodies fallback to per-attempt TeeReader buffering
+	}
+
 	for {
 		reqTime := time.Now()
 
@@ -97,10 +121,18 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 		c.onRequest(req, reqTime, 0, nil)
 		reqTime = time.Now() // update request time to exclude auth-related timings
 
-		// Prepare body replay for potential retries (best-effort, matches previous behavior)
+		// Prepare body for this attempt
 		var bodyBuf bytes.Buffer
 		usedTee := false
-		if req.Body != nil {
+		if bodyRebuilder != nil {
+			rc, err := bodyRebuilder()
+			if err != nil {
+				c.onError(req, reqTime, 0, err)
+				return nil, err
+			}
+			req.Body = rc
+		} else if req.Body != nil {
+			// Fallback: tee to buffer what we read this attempt
 			tee := io.TeeReader(req.Body, &bodyBuf)
 			req.Body = io.NopCloser(tee)
 			usedTee = true
@@ -116,8 +148,14 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 					statusCode = resp.StatusCode
 				}
 				c.onRetry(req, reqTime, statusCode, nil)
-				// Reset body reader closer for next attempt
-				if usedTee {
+				// Reset body for next attempt
+				if bodyRebuilder != nil {
+					if rc, e := bodyRebuilder(); e == nil {
+						req.Body = rc
+					} else {
+						return resp, e
+					}
+				} else if usedTee {
 					req.Body = io.NopCloser(bytes.NewReader(bodyBuf.Bytes()))
 				}
 				continue
@@ -141,7 +179,13 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 			if c.shouldRetry(req, resp, retries) {
 				c.onRetry(req, reqTime, resp.StatusCode, nil)
 				// Reset body for next attempt
-				if usedTee {
+				if bodyRebuilder != nil {
+					if rc, e := bodyRebuilder(); e == nil {
+						req.Body = rc
+					} else {
+						return resp, e
+					}
+				} else if usedTee {
 					req.Body = io.NopCloser(bytes.NewReader(bodyBuf.Bytes()))
 				}
 				continue
