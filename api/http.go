@@ -53,7 +53,7 @@ var HeadersPresets = struct {
 }
 
 // applyDefaults applies context and header defaults for SP REST helpers
-func applyDefaults(req *http.Request, conf *RequestConfig, needsBodyCT bool) {
+func applyDefaults(req *http.Request, conf *RequestConfig, needsBodyCT bool) *http.Request {
 	// Apply context
 	if conf != nil && conf.Context != nil {
 		req = req.WithContext(conf.Context)
@@ -71,6 +71,7 @@ func applyDefaults(req *http.Request, conf *RequestConfig, needsBodyCT bool) {
 			req.Header.Set(key, value)
 		}
 	}
+	return req
 }
 
 // NewHTTPClient creates an instance of httpClient
@@ -84,7 +85,7 @@ func (client *HTTPClient) Get(endpoint string, conf *RequestConfig) ([]byte, err
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
-	applyDefaults(req, conf, false)
+	req = applyDefaults(req, conf, false)
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
@@ -103,7 +104,7 @@ func (client *HTTPClient) Post(endpoint string, body io.Reader, conf *RequestCon
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
-	applyDefaults(req, conf, true)
+	req = applyDefaults(req, conf, true)
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
@@ -121,7 +122,7 @@ func (client *HTTPClient) Delete(endpoint string, conf *RequestConfig) ([]byte, 
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
-	applyDefaults(req, conf, true)
+	req = applyDefaults(req, conf, true)
 	req.Header.Add("X-HTTP-Method", "DELETE")
 	req.Header.Add("If-Match", "*")
 
@@ -142,7 +143,7 @@ func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestC
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
-	applyDefaults(req, conf, true)
+	req = applyDefaults(req, conf, true)
 	req.Header.Add("X-HTTP-Method", "MERGE")
 	req.Header.Add("If-Match", "*")
 
