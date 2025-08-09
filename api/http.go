@@ -136,7 +136,7 @@ func (client *HTTPClient) Delete(endpoint string, conf *RequestConfig) ([]byte, 
 	// Default headers
 	req.Header.Set("Accept", "application/json;odata=verbose") // default to SP2013 for backwards compatibility
 	req.Header.Set("Content-Type", "application/json;odata=verbose;charset=utf-8")
-	req.Header.Add("X-Http-Method", "DELETE")
+	req.Header.Add("X-HTTP-Method", "DELETE")
 	req.Header.Add("If-Match", "*")
 
 	// Apply custom headers
@@ -171,7 +171,7 @@ func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestC
 	// Default headers
 	req.Header.Set("Accept", "application/json;odata=verbose") // default to SP2013 for backwards compatibility
 	req.Header.Set("Content-Type", "application/json;odata=verbose;charset=utf-8")
-	req.Header.Add("X-Http-Method", "MERGE")
+	req.Header.Add("X-HTTP-Method", "MERGE")
 	req.Header.Add("If-Match", "*")
 
 	// Apply custom headers
