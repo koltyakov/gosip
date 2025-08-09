@@ -70,6 +70,18 @@ type SPClient struct {
 	Hooks         *HookHandlers // hook handlers definition
 }
 
+// SPError represents a SharePoint HTTP error with status code and body
+type SPError struct {
+	StatusCode int
+	Status     string
+	Body       string
+}
+
+func (e *SPError) Error() string {
+	// Preserve existing error message format
+	return fmt.Sprintf("%s :: %s", e.Status, e.Body)
+}
+
 // Execute : SharePoint HTTP client
 // is a wrapper for standard http.Client' `Do` method, injects authorization tokens, etc.
 func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
@@ -198,11 +210,12 @@ func (c *SPClient) Execute(req *http.Request) (*http.Response, error) {
 			var buf bytes.Buffer
 			tee := io.TeeReader(resp.Body, &buf)
 			details, _ := io.ReadAll(tee)
-			outErr = fmt.Errorf("%s :: %s", resp.Status, details)
+			bodyText := string(details)
 			// Unescape unicode-escaped error messages for non Latin languages
-			if unescaped, e := strconv.Unquote("\"" + strings.Replace(string(details), "\"", "\\\"", -1) + "\""); e == nil {
-				outErr = fmt.Errorf("%s :: %s", resp.Status, unescaped)
+			if unescaped, e := strconv.Unquote("\"" + strings.Replace(bodyText, "\"", "\\\"", -1) + "\""); e == nil {
+				bodyText = unescaped
 			}
+			outErr = &SPError{StatusCode: resp.StatusCode, Status: resp.Status, Body: bodyText}
 			resp.Body = io.NopCloser(&buf)
 			c.onError(req, reqTime, resp.StatusCode, outErr)
 		}
