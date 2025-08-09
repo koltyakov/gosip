@@ -29,6 +29,16 @@ import (
 
 const version = "1.0.0"
 
+// Default header values (exported for internal reuse across packages)
+const (
+	// DefaultAccept is the generic JSON Accept used when callers didn't specify one
+	DefaultAccept = "application/json"
+	// DefaultAcceptVerbose is the SP2013-compatible verbose JSON Accept used by API helpers
+	DefaultAcceptVerbose = "application/json;odata=verbose"
+	// DefaultContentTypeVerbose is the verbose JSON Content-Type used by API helpers
+	DefaultContentTypeVerbose = "application/json;odata=verbose;charset=utf-8"
+)
+
 // AuthCnfg is an abstract auth config interface,
 // allows different authentications strategies' dependency injection
 type AuthCnfg interface {
@@ -204,10 +214,10 @@ func (c *SPClient) applyHeaders(req *http.Request) error {
 
 	// Default SP REST API headers
 	if req.Header.Get("Accept") == "" {
-		req.Header.Set("Accept", "application/json")
+		req.Header.Set("Accept", DefaultAccept)
 	}
 	if req.Header.Get("Content-Type") == "" {
-		req.Header.Set("Content-Type", "application/json;odata=verbose;charset=utf-8")
+		req.Header.Set("Content-Type", DefaultContentTypeVerbose)
 	}
 
 	// Vendor/client header

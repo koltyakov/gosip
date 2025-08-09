@@ -52,6 +52,27 @@ var HeadersPresets = struct {
 	},
 }
 
+// applyDefaults applies context and header defaults for SP REST helpers
+func applyDefaults(req *http.Request, conf *RequestConfig, needsBodyCT bool) {
+	// Apply context
+	if conf != nil && conf.Context != nil {
+		req = req.WithContext(conf.Context)
+	}
+	// Default headers (Accept always; Content-Type only when body is expected)
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", gosip.DefaultAcceptVerbose) // default to SP2013 for backwards compatibility
+	}
+	if needsBodyCT && req.Header.Get("Content-Type") == "" {
+		req.Header.Set("Content-Type", gosip.DefaultContentTypeVerbose)
+	}
+	// Apply custom headers last to allow overrides
+	if conf != nil && conf.Headers != nil {
+		for key, value := range conf.Headers {
+			req.Header.Set(key, value)
+		}
+	}
+}
+
 // NewHTTPClient creates an instance of httpClient
 func NewHTTPClient(spClient *gosip.SPClient) *HTTPClient {
 	return &HTTPClient{sp: spClient}
@@ -63,21 +84,7 @@ func (client *HTTPClient) Get(endpoint string, conf *RequestConfig) ([]byte, err
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
-
-	// Apply context
-	if conf != nil && conf.Context != nil {
-		req = req.WithContext(conf.Context)
-	}
-
-	// Default headers
-	req.Header.Set("Accept", "application/json;odata=verbose") // default to SP2013 for backwards compatibility
-
-	// Apply custom headers
-	if conf != nil && conf.Headers != nil {
-		for key, value := range conf.Headers {
-			req.Header.Set(key, value)
-		}
-	}
+	applyDefaults(req, conf, false)
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
@@ -96,21 +103,7 @@ func (client *HTTPClient) Post(endpoint string, body io.Reader, conf *RequestCon
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
-	// Apply context
-	if conf != nil && conf.Context != nil {
-		req = req.WithContext(conf.Context)
-	}
-
-	// Default headers
-	req.Header.Set("Accept", "application/json;odata=verbose") // default to SP2013 for backwards compatibility
-	req.Header.Set("Content-Type", "application/json;odata=verbose;charset=utf-8")
-
-	// Apply custom headers
-	if conf != nil && conf.Headers != nil {
-		for key, value := range conf.Headers {
-			req.Header.Set(key, value)
-		}
-	}
+	applyDefaults(req, conf, true)
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
@@ -128,23 +121,9 @@ func (client *HTTPClient) Delete(endpoint string, conf *RequestConfig) ([]byte, 
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
-	// Apply context
-	if conf != nil && conf.Context != nil {
-		req = req.WithContext(conf.Context)
-	}
-
-	// Default headers
-	req.Header.Set("Accept", "application/json;odata=verbose") // default to SP2013 for backwards compatibility
-	req.Header.Set("Content-Type", "application/json;odata=verbose;charset=utf-8")
+	applyDefaults(req, conf, true)
 	req.Header.Add("X-HTTP-Method", "DELETE")
 	req.Header.Add("If-Match", "*")
-
-	// Apply custom headers
-	if conf != nil && conf.Headers != nil {
-		for key, value := range conf.Headers {
-			req.Header.Set(key, value)
-		}
-	}
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
@@ -163,23 +142,9 @@ func (client *HTTPClient) Update(endpoint string, body io.Reader, conf *RequestC
 		return nil, fmt.Errorf("unable to create a request: %w", err)
 	}
 
-	// Apply context
-	if conf != nil && conf.Context != nil {
-		req = req.WithContext(conf.Context)
-	}
-
-	// Default headers
-	req.Header.Set("Accept", "application/json;odata=verbose") // default to SP2013 for backwards compatibility
-	req.Header.Set("Content-Type", "application/json;odata=verbose;charset=utf-8")
+	applyDefaults(req, conf, true)
 	req.Header.Add("X-HTTP-Method", "MERGE")
 	req.Header.Add("If-Match", "*")
-
-	// Apply custom headers
-	if conf != nil {
-		for key, value := range conf.Headers {
-			req.Header.Set(key, value)
-		}
-	}
 
 	resp, err := client.sp.Execute(req)
 	if err != nil {
