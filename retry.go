@@ -2,6 +2,7 @@ package gosip
 
 import (
 	"math"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -53,6 +54,13 @@ func (c *SPClient) shouldRetry(req *http.Request, resp *http.Response, retries i
 		sleepTimeout := time.Duration(100*math.Pow(2, float64(retry))) * time.Millisecond // default, no Retry-After header
 		if retryAfter != 0 {
 			sleepTimeout = time.Duration(retryAfter) * time.Second // wait for Retry-After header info value
+		} else {
+			// Add jitter of ±15% to reduce thundering herd
+			// Keep the same mean by sampling a factor in [0.85, 1.15]
+			// Seed once per process; if not seeded yet rand will auto-seed with time.Now in Go1.20+, but we seed here for older versions.
+			rand.Seed(time.Now().UnixNano())
+			jitterFactor := 0.85 + rand.Float64()*(1.15-0.85)
+			sleepTimeout = time.Duration(float64(sleepTimeout) * jitterFactor)
 		}
 		// time.Sleep(sleepTimeout)
 		select {
