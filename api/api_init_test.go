@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/koltyakov/gosip"
+	a "github.com/koltyakov/gosip/auth"
 	"github.com/koltyakov/gosip/auth/ntlm"
 	"github.com/koltyakov/gosip/auth/saml"
 	h "github.com/koltyakov/gosip/test/helpers"
@@ -58,20 +59,29 @@ func init() {
 	envResolver := map[string]func() *gosip.SPClient{
 		"spo": func() *gosip.SPClient {
 			cnfgPath := "./config/integration/private.spo.json"
-			auth := &saml.AuthCnfg{}
 			if ci {
+				auth := &saml.AuthCnfg{}
 				auth.SiteURL = os.Getenv("ENV_SPO_SITEURL")
 				auth.Username = os.Getenv("ENV_SPO_USERNAME")
 				auth.Password = os.Getenv("ENV_SPO_PASSWORD")
-			} else {
-				if err := auth.ReadConfig(resolveCnfgPath(cnfgPath)); err != nil {
+				if err := h.CheckAuthProps(auth, []string{"SiteURL", "Username", "Password"}); err != nil {
 					return nil
 				}
+				client := &gosip.SPClient{AuthCnfg: auth}
+				// Pre-auth for tests not include auth timing involved
+				if _, _, err := client.AuthCnfg.GetAuth(); err != nil {
+					fmt.Printf("can't auth, %s\n", err)
+					// Force all test being skipped in case of auth issues
+					return nil
+				}
+				return client
 			}
-			if err := h.CheckAuthProps(auth, []string{"SiteURL", "Username", "Password"}); err != nil {
+
+			authCnfg, err := a.NewAuthFromFile(resolveCnfgPath(cnfgPath))
+			if err != nil {
 				return nil
 			}
-			client := &gosip.SPClient{AuthCnfg: auth}
+			client := &gosip.SPClient{AuthCnfg: authCnfg}
 			// Pre-auth for tests not include auth timing involved
 			if _, _, err := client.AuthCnfg.GetAuth(); err != nil {
 				fmt.Printf("can't auth, %s\n", err)
