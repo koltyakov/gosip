@@ -35,9 +35,9 @@
   - Azure Certificate (App Only) [🔗](https://go.spflow.com/auth/strategies/azure-certificate-auth)
   - Azure Username/Password [🔗](https://go.spflow.com/auth/strategies/azure-creds-auth)
   - Azure Device Flow [🔗](https://go.spflow.com/auth/strategies/azure-device-flow)
-  - SAML based with user credentials
+  - ~~SAML based with user credentials~~ (deprecated by platform)
   - Add-In only permissions
-  - ADFS user credentials (automatically detects in SAML strategy)
+  - ADFS user credentials
   - On-Demand auth
 
 - SharePoint On-Premises 2019/2016/2013:
@@ -260,15 +260,15 @@ Azure AD based strategies (recommended production use with SharePoint Online):
 
 Other strategies:
 
-| `/{strategy}` | SPO | On-Prem | Credentials sample(s)                                       |
-| ------------- | --- | ------- | ----------------------------------------------------------- |
-| `/saml`       | ✅  | ❌      | [details](https://go.spflow.com/auth/strategies/saml)       |
-| `/addin`      | ✅  | ❌      | [details](https://go.spflow.com/auth/strategies/addin)      |
-| `/ntlm`       | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/ntlm)       |
-| `/adfs`       | ✅  | ✅      | [details](https://go.spflow.com/auth/strategies/adfs)       |
-| `/fba`        | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/fba)        |
-| `/tmg`        | ❌  | ✅      | [details](https://go.spflow.com/auth/strategies/tmg)        |
-| `/ondemand`   | ✅  | ✅      | [details](https://go.spflow.com/auth/custom-auth/on-demand) |
+| `/{strategy}` | SPO                   | On-Prem | Credentials sample(s)                                       |
+| ------------- | --------------------- | ------- | ----------------------------------------------------------- |
+| `/adfs`       | ✅                    | ✅      | [details](https://go.spflow.com/auth/strategies/adfs)       |
+| `/ondemand`   | ✅                    | ✅      | [details](https://go.spflow.com/auth/custom-auth/on-demand) |
+| `/addin`      | ✅                    | ❌      | [details](https://go.spflow.com/auth/strategies/addin)      |
+| `/ntlm`       | ❌                    | ✅      | [details](https://go.spflow.com/auth/strategies/ntlm)       |
+| `/fba`        | ❌                    | ✅      | [details](https://go.spflow.com/auth/strategies/fba)        |
+| `/tmg`        | ❌                    | ✅      | [details](https://go.spflow.com/auth/strategies/tmg)        |
+| `/saml`       | ✅ -> ❌ (deprecated) | ❌      | [details](https://go.spflow.com/auth/strategies/saml)       |
 
 Environment should configured for a specific auth strategy. E.g. you won't succeed with `adfs` in SPO if it has not setup properly.
 
@@ -283,22 +283,6 @@ Depending on an application type, there are different authentication strategies:
 - Azure AD Certificate authentication: for headless applications, which are not able to provide user interaction, like a background service or a daemon. It uses a certificate to authenticate an application.
 - Azure AD authorization with username and password: for applications which are able to provide user interaction, like a desktop application or CLI with credentials prompt. It uses a username and password to authenticate a user.
 - Azure AD device token authentication: for applications which are able to provide user interaction, like a desktop application or CLI. It uses a device code to authenticate a user. It also supports multi-factor authentication.
-
-### SAML Auth (SharePoint Online user credentials authentication)
-
-This authentication option uses Microsoft Online Security Token Service `https://login.microsoftonline.com/extSTS.srf` and SAML tokens in order to obtain an authentication cookie.
-
-```golang
-// AuthCnfg - SAML auth config structure
-type AuthCnfg struct {
-	// SPSite or SPWeb URL, which is the context target for the API calls
-	SiteURL string `json:"siteUrl"`
-	// Username for SharePoint Online, for example `[user]@[company].onmicrosoft.com`
-	Username string `json:"username"`
-	// User or App password
-	Password string `json:"password"`
-}
-```
 
 ### AddIn Only Auth
 
