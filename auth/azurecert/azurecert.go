@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/cpass"
@@ -39,6 +40,11 @@ var (
 	"certPass": "password"
 }
 */
+// Azure AD endpoint is auto-detected from SiteURL:
+//  - *.sharepoint.com  -> login.microsoftonline.com (Commercial)
+//  - *.sharepoint.us   -> login.microsoftonline.us (GCC High)
+//  - *.sharepoint.cn   -> login.chinacloudapi.cn (China)
+//  - *.sharepoint.de   -> login.microsoftonline.de (Germany)
 type AuthCnfg struct {
 	SiteURL  string `json:"siteUrl"`  // SPSite or SPWeb URL, which is the context target for the API calls
 	TenantID string `json:"tenantId"` // Azure Tenant ID
@@ -88,7 +94,7 @@ func (c *AuthCnfg) WriteConfig(privateFile string) error {
 		SiteURL:  c.SiteURL,
 		TenantID: c.TenantID,
 		ClientID: c.ClientID,
-		CertPath: c.CertPass,
+		CertPath: c.CertPath,
 		CertPass: secret,
 	}
 	file, _ := json.MarshalIndent(config, "", "  ")
@@ -107,6 +113,9 @@ func (c *AuthCnfg) GetAuth() (string, int64, error) {
 		config := auth.NewClientCertificateConfig(c.CertPath, c.CertPass, c.ClientID, c.TenantID)
 		config.Resource = resource
 
+		// Auto-detect Azure AD endpoint from SharePoint URL
+		config.AADEndpoint = getAADEndpoint(u.Host)
+
 		authorizer, err := config.Authorizer()
 		if err != nil {
 			return "", 0, err
@@ -114,13 +123,21 @@ func (c *AuthCnfg) GetAuth() (string, int64, error) {
 		c.authorizer = authorizer
 	}
 
-	// token, err := config.ServicePrincipalToken()
-	// if err != nil {
-	// 	return "", 0, err
-	// }
-	// return token.Token().AccessToken, token.Token().Expires().Unix(), nil
-
 	return c.getToken()
+}
+
+// getAADEndpoint returns the Azure AD endpoint based on SharePoint domain
+func getAADEndpoint(host string) string {
+	switch {
+	case strings.HasSuffix(host, ".sharepoint.us"):
+		return azure.USGovernmentCloud.ActiveDirectoryEndpoint
+	case strings.HasSuffix(host, ".sharepoint.cn"):
+		return azure.ChinaCloud.ActiveDirectoryEndpoint
+	case strings.HasSuffix(host, ".sharepoint.de"):
+		return azure.GermanCloud.ActiveDirectoryEndpoint
+	default:
+		return azure.PublicCloud.ActiveDirectoryEndpoint
+	}
 }
 
 // GetSiteURL gets SharePoint siteURL
