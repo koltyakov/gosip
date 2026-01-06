@@ -33,7 +33,6 @@
 - SharePoint Online:
 
   - Azure Certificate (App Only) [🔗](https://go.spflow.com/auth/strategies/azure-certificate-auth)
-  - Azure Username/Password [🔗](https://go.spflow.com/auth/strategies/azure-creds-auth)
   - Azure Device Flow [🔗](https://go.spflow.com/auth/strategies/azure-device-flow)
   - ~~SAML based with user credentials~~ (deprecated by platform)
   - Add-In only permissions
