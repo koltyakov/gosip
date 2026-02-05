@@ -25,7 +25,9 @@ var (
 		spoChina:  "login.chinacloudapi.cn",
 		spoUSGov:  "login-us.microsoftonline.com",
 		spoUSDef:  "login-us.microsoftonline.com",
-	}
+		spoBleu:   "login.sovcloud-identity.fr",
+		spoDelos:  "login.sovcloud-identity.de",
+		spoGovSG:  "login.sovcloud-identity.sg",	}
 )
 
 // GetAuth gets authentication
