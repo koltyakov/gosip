@@ -30,6 +30,19 @@ var (
 	storage = cache.New(5*time.Minute, 10*time.Minute)
 )
 
+// AzureCloud represents an Azure cloud environment
+type AzureCloud string
+
+const (
+	AzurePublic       AzureCloud = "public"       // login.microsoftonline.com
+	AzureUSGovernment AzureCloud = "usgovernment" // login.microsoftonline.us
+	AzureChina        AzureCloud = "china"        // login.chinacloudapi.cn
+	AzureGermany      AzureCloud = "germany"      // login.microsoftonline.de
+	AzureBleu         AzureCloud = "bleu"         // login.sovcloud-identity.fr (France)
+	AzureDelos        AzureCloud = "delos"        // login.sovcloud-identity.de (Germany)
+	AzureGovSG        AzureCloud = "govsg"        // login.sovcloud-identity.sg (Singapore)
+)
+
 // AuthCnfg - AAD Certificate Auth Flow
 /* Config sample:
 {
@@ -37,7 +50,8 @@ var (
 	"tenantId": "e4d43069-8ecb-49c4-8178-5bec83c53e9d",
 	"clientId": "628cc712-c9a4-48f0-a059-af64bdbb4be5",
 	"certPath": "cert.pfx",
-	"certPass": "password"
+	"certPass": "password",
+	"cloud": "public"
 }
 */
 // Azure AD endpoint is auto-detected from SiteURL:
@@ -45,12 +59,15 @@ var (
 //  - *.sharepoint.us   -> login.microsoftonline.us (GCC High)
 //  - *.sharepoint.cn   -> login.chinacloudapi.cn (China)
 //  - *.sharepoint.de   -> login.microsoftonline.de (Germany)
+// Or can be explicitly set using the "cloud" field:
+//  - "public", "usgovernment", "china", "germany", "bleu", "delos", "govsg"
 type AuthCnfg struct {
-	SiteURL  string `json:"siteUrl"`  // SPSite or SPWeb URL, which is the context target for the API calls
-	TenantID string `json:"tenantId"` // Azure Tenant ID
-	ClientID string `json:"clientId"` // Azure Client ID
-	CertPath string `json:"certPath"` // Azure certificate (.pfx) file location, relative to config location or absolute
-	CertPass string `json:"certPass"` // Azure certificate export password
+	SiteURL  string     `json:"siteUrl"`          // SPSite or SPWeb URL, which is the context target for the API calls
+	TenantID string     `json:"tenantId"`         // Azure Tenant ID
+	ClientID string     `json:"clientId"`         // Azure Client ID
+	CertPath string     `json:"certPath"`         // Azure certificate (.pfx) file location, relative to config location or absolute
+	CertPass string     `json:"certPass"`         // Azure certificate export password
+	Cloud    AzureCloud `json:"cloud,omitempty"` // Azure cloud environment (optional, auto-detected if not specified)
 
 	authorizer  autorest.Authorizer
 	privateFile string
@@ -113,8 +130,8 @@ func (c *AuthCnfg) GetAuth() (string, int64, error) {
 		config := auth.NewClientCertificateConfig(c.CertPath, c.CertPass, c.ClientID, c.TenantID)
 		config.Resource = resource
 
-		// Auto-detect Azure AD endpoint from SharePoint URL
-		config.AADEndpoint = getAADEndpoint(u.Host)
+		// Set Azure AD endpoint (explicit cloud config or auto-detect from SharePoint URL)
+		config.AADEndpoint = c.getAADEndpoint(u.Host)
 
 		authorizer, err := config.Authorizer()
 		if err != nil {
@@ -126,8 +143,14 @@ func (c *AuthCnfg) GetAuth() (string, int64, error) {
 	return c.getToken()
 }
 
-// getAADEndpoint returns the Azure AD endpoint based on SharePoint domain
-func getAADEndpoint(host string) string {
+// getAADEndpoint returns the Azure AD endpoint based on cloud config or SharePoint domain
+func (c *AuthCnfg) getAADEndpoint(host string) string {
+	// If cloud is explicitly configured, use it
+	if c.Cloud != "" {
+		return getCloudEndpoint(c.Cloud)
+	}
+
+	// Otherwise, auto-detect from SharePoint domain
 	switch {
 	case strings.HasSuffix(host, ".sharepoint.us"):
 		return azure.USGovernmentCloud.ActiveDirectoryEndpoint
@@ -135,9 +158,34 @@ func getAADEndpoint(host string) string {
 		return azure.ChinaCloud.ActiveDirectoryEndpoint
 	case strings.HasSuffix(host, ".sharepoint.de"):
 		return azure.GermanCloud.ActiveDirectoryEndpoint
+	// TODO: Add new sovereign cloud domain patterns when SharePoint domains are announced
+	// case strings.HasSuffix(host, ".TBD"):  // Bleu (France)
+	//     return "https://login.sovcloud-identity.fr"
+	// case strings.HasSuffix(host, ".TBD"):  // Delos (Germany)
+	//     return "https://login.sovcloud-identity.de"
+	// case strings.HasSuffix(host, ".TBD"):  // GovSG (Singapore)
+	//     return "https://login.sovcloud-identity.sg"
 	default:
 		return azure.PublicCloud.ActiveDirectoryEndpoint
 	}
+}
+
+// getCloudEndpoint returns the Azure AD endpoint URL for a specific cloud environment
+func getCloudEndpoint(cloud AzureCloud) string {
+	endpoints := map[AzureCloud]string{
+		AzurePublic:       "https://login.microsoftonline.com",
+		AzureUSGovernment: "https://login.microsoftonline.us",
+		AzureChina:        "https://login.chinacloudapi.cn",
+		AzureGermany:      "https://login.microsoftonline.de",
+		AzureBleu:         "https://login.sovcloud-identity.fr",
+		AzureDelos:        "https://login.sovcloud-identity.de",
+		AzureGovSG:        "https://login.sovcloud-identity.sg",
+	}
+
+	if endpoint, ok := endpoints[cloud]; ok {
+		return endpoint
+	}
+	return "https://login.microsoftonline.com" // default to public cloud
 }
 
 // GetSiteURL gets SharePoint siteURL

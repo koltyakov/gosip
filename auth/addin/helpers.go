@@ -21,6 +21,9 @@ var (
 		spoChina:  "accounts.accesscontrol.chinacloudapi.cn",
 		spoUSGov:  "accounts.accesscontrol.windows.net",
 		spoUSDef:  "accounts.accesscontrol.windows.net",
+		spoBleu:   "login.sovcloud-identity.fr",
+		spoDelos:  "login.sovcloud-identity.de",
+		spoGovSG:  "login.sovcloud-identity.sg",
 	}
 )
 

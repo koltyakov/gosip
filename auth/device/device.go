@@ -24,18 +24,33 @@ var (
 	crypter    = cpass.Cpass("")
 )
 
+// AzureCloud represents an Azure cloud environment
+type AzureCloud string
+
+const (
+	AzurePublic       AzureCloud = "public"       // login.microsoftonline.com
+	AzureUSGovernment AzureCloud = "usgovernment" // login.microsoftonline.us
+	AzureChina        AzureCloud = "china"        // login.chinacloudapi.cn
+	AzureGermany      AzureCloud = "germany"      // login.microsoftonline.de
+	AzureBleu         AzureCloud = "bleu"         // login.sovcloud-identity.fr (France)
+	AzureDelos        AzureCloud = "delos"        // login.sovcloud-identity.de (Germany)
+	AzureGovSG        AzureCloud = "govsg"        // login.sovcloud-identity.sg (Singapore)
+)
+
 // AuthCnfg - AAD Device Flow auth config structure
 /* Config sample:
 {
   "siteUrl": "https://contoso.sharepoint.com/sites/test",
 	"clientId": "61367a97-562c-4372-a9ee-b35307abdd26",
-	"tenantId": "3f83fe32-29b2-488e-8c3f-c8b7a2e19a2f"
+	"tenantId": "3f83fe32-29b2-488e-8c3f-c8b7a2e19a2f",
+	"cloud": "public"
 }
 */
 type AuthCnfg struct {
-	SiteURL  string `json:"siteUrl"`  // SPSite or SPWeb URL, which is the context target for the API calls
-	ClientID string `json:"clientId"` // Azure AD App Registration Client ID
-	TenantID string `json:"tenantId"` // Azure AD App Registration Tenant ID
+	SiteURL  string     `json:"siteUrl"`          // SPSite or SPWeb URL, which is the context target for the API calls
+	ClientID string     `json:"clientId"`         // Azure AD App Registration Client ID
+	TenantID string     `json:"tenantId"`         // Azure AD App Registration Tenant ID
+	Cloud    AzureCloud `json:"cloud,omitempty"` // Azure cloud environment (optional, defaults to public)
 }
 
 // ReadConfig reads private config with auth options
@@ -95,6 +110,11 @@ func (c *AuthCnfg) GetAuth() (string, int64, error) {
 
 	config := auth.NewDeviceFlowConfig(c.ClientID, c.TenantID)
 	config.Resource = resource
+
+	// Set Azure AD endpoint if cloud is explicitly configured
+	if c.Cloud != "" {
+		config.AADEndpoint = getCloudEndpoint(c.Cloud)
+	}
 
 	token, err := config.ServicePrincipalToken()
 	if err != nil {
@@ -178,4 +198,22 @@ func (c *AuthCnfg) getTokenDiskCache() (*adal.ServicePrincipalToken, error) {
 func (c *AuthCnfg) getTokenCachePath() string {
 	tmpDir := filepath.Join(os.TempDir(), "gosip")
 	return filepath.Join(tmpDir, c.GetStrategy()+"_"+c.ClientID)
+}
+
+// getCloudEndpoint returns the Azure AD endpoint URL for a specific cloud environment
+func getCloudEndpoint(cloud AzureCloud) string {
+	endpoints := map[AzureCloud]string{
+		AzurePublic:       "https://login.microsoftonline.com",
+		AzureUSGovernment: "https://login.microsoftonline.us",
+		AzureChina:        "https://login.chinacloudapi.cn",
+		AzureGermany:      "https://login.microsoftonline.de",
+		AzureBleu:         "https://login.sovcloud-identity.fr",
+		AzureDelos:        "https://login.sovcloud-identity.de",
+		AzureGovSG:        "https://login.sovcloud-identity.sg",
+	}
+
+	if endpoint, ok := endpoints[cloud]; ok {
+		return endpoint
+	}
+	return "https://login.microsoftonline.com" // default to public cloud
 }
