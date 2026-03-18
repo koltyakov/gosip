@@ -1,6 +1,10 @@
 install:
 	go get -u ./... && go mod tidy
 
+test-authinteractive:
+	mkdir -p tmp
+	SPAUTH_INTERACTIVE=1 DEVICE_CODE_FILE=./tmp/device_code.txt go test ./auth/... -v -race -count=1 -coverprofile=./tmp/authinteractive_coverage.out
+
 test-auth:
 	mkdir -p tmp
 	go test ./auth/... -v -race -count=1 -coverprofile=./tmp/auth_coverage.out

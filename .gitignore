@@ -1,6 +1,8 @@
 # Package specific
 config/private.*
 config/*/private.*
+!config/samples/private.*
+auth/**/config/
 config/certs/*.*
 bin/
 pkg/
