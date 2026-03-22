@@ -76,6 +76,12 @@ func (sp *SP) Taxonomy() *Taxonomy {
 	return NewTaxonomy(sp.client, sp.ToURL(), sp.config)
 }
 
+// SPOTenant getter for querying site properties via Tenant Administration CSOM API.
+// SP instance should target the tenant admin site URL (e.g., https://contoso-admin.sharepoint.com).
+func (sp *SP) SPOTenant() *SPOTenant {
+	return NewSPOTenant(sp.client, sp.ToURL(), sp.config)
+}
+
 // ContextInfo gets current Context Info object data
 func (sp *SP) ContextInfo() (*ContextInfo, error) {
 	return NewContext(sp.client, sp.ToURL(), sp.config).Get()
